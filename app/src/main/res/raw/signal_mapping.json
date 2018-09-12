@@ -1,0 +1,435 @@
+{
+  "version": 1,
+  "signalMapping":
+  [
+    {
+      "name": "DISPLAY_LCD_BRIGHTNESS",
+      "direction": "bidirectional",
+      "description": "System LCD brightness",
+      "signalType": "analog",
+      "signalId": "17201"
+    },
+    {
+      "name": "DISPLAY_IS_AUTO_BRIGHTNESS_ENABLED",
+      "direction": "bidirectional",
+      "description": "Interlock join to enable auto LCD Brightness",
+      "signalType": "interlock",
+      "signalId": "17221",
+      "interlockedSignalId": "17295"
+    },
+    {
+      "name": "DISPLAY_DOCKED_STANDBY",
+      "direction": "to_platform",
+      "description": "time in seconds to enter standby if docked",
+      "signalType": "analog",
+      "signalId": "18253"
+    },
+    {
+      "name": "DISPLAY_UNDOCKED_STANDBY",
+      "direction": "to_platform",
+      "description": "time in seconds (minutes for undockable devices) to enter standby if not docked",
+      "signalType": "analog",
+      "signalId": "17203"
+    },
+    {
+      "name": "DISPLAY_UNDOCKED_SUSPEND",
+      "direction": "to_platform",
+      "description": "time in seconds to enter suspend if not docked",
+      "signalType": "analog",
+      "signalId": "17202"
+    },
+    {
+      "name": "SYSTEM_LANGUAGE",
+      "direction": "to_platform",
+      "description": "Change the language for the system",
+      "signalType": "serial",
+      "signalId": "18245"
+    },
+    {
+      "name": "HARDKEY_POWER",
+      "direction": "from_platform",
+      "description": "Power hardkey button",
+      "signalType": "hardkey",
+      "signalId": "0"
+    },
+    {
+      "name": "HARDKEY_HOME",
+      "direction": "from_platform",
+      "description": "HOME hardkey button",
+      "signalType": "hardkey",
+      "signalId": "1"
+    },
+    {
+      "name": "HARDKEY_MENU",
+      "direction": "from_platform",
+      "description": "MENU hardkey button",
+      "signalType": "hardkey",
+      "signalId": "2"
+    },
+    {
+      "name": "HARDKEY_GUIDE",
+      "direction": "from_platform",
+      "description": "Guide hardkey button",
+      "signalType": "hardkey",
+      "signalId": "3"
+    },
+    {
+      "name": "HARDKEY_INFO",
+      "direction": "from_platform",
+      "description": "Info hardkey button",
+      "signalType": "hardkey",
+      "signalId": "4"
+    },
+    {
+      "name": "HARDKEY_VOLUME_UP",
+      "direction": "from_platform",
+      "description": "Volume Up hardkey button",
+      "signalType": "hardkey",
+      "signalId": "5"
+    },
+    {
+      "name": "HARDKEY_VOLUME_DOWN",
+      "direction": "from_platform",
+      "description": "Volume Down hardkey button",
+      "signalType": "hardkey",
+      "signalId": "6"
+    },
+    {
+      "name": "HARDKEY_DPAD_UP",
+      "direction": "from_platform",
+      "description": "DPad Up hardkey button",
+      "signalType": "hardkey",
+      "signalId": "7"
+    },
+    {
+      "name": "HARDKEY_DPAD_DOWN",
+      "direction": "from_platform",
+      "description": "DPad Down hardkey button",
+      "signalType": "hardkey",
+      "signalId": "8"
+    },
+    {
+      "name": "HARDKEY_DPAD_LEFT",
+      "direction": "from_platform",
+      "description": "Dpad Left hardkey button",
+      "signalType": "hardkey",
+      "signalId": "9"
+    },
+    {
+      "name": "HARDKEY_DPAD_RIGHT",
+      "direction": "from_platform",
+      "description": "DPad Right hardkey button",
+      "signalType": "hardkey",
+      "signalId": "10"
+    },
+    {
+      "name": "HARDKEY_DPAD_SELECT",
+      "direction": "from_platform",
+      "description": "DPad Select hardkey button",
+      "signalType": "hardkey",
+      "signalId": "11"
+    },
+    {
+      "name": "HARDKEY_CHANNEL_UP",
+      "direction": "from_platform",
+      "description": "Channel Up hardkey button",
+      "signalType": "hardkey",
+      "signalId": "12"
+    },
+    {
+      "name": "HARDKEY_CHANNEL_DOWN",
+      "direction": "from_platform",
+      "description": "Channel Down hardkey button",
+      "signalType": "hardkey",
+      "signalId": "13"
+    },
+    {
+      "name": "HARDKEY_MUTE",
+      "direction": "from_platform",
+      "description": "Mute hardkey button",
+      "signalType": "hardkey",
+      "signalId": "14"
+    },
+    {
+      "name": "HARDKEY_EXIT",
+      "direction": "from_platform",
+      "description": "Exit hardkey button",
+      "signalType": "hardkey",
+      "signalId": "15"
+    },
+    {
+      "name": "HARDKEY_LAST",
+      "direction": "from_platform",
+      "description": "Last hardkey button",
+      "signalType": "hardkey",
+      "signalId": "16"
+    },
+    {
+      "name": "HARDKEY_PLAY",
+      "direction": "from_platform",
+      "description": "Play hardkey button",
+      "signalType": "hardkey",
+      "signalId": "17"
+    },
+    {
+      "name": "HARDKEY_PAUSE",
+      "direction": "from_platform",
+      "description": "Pause hardkey button",
+      "signalType": "hardkey",
+      "signalId": "18"
+    },
+    {
+      "name": "HARDKEY_REWIND",
+      "direction": "from_platform",
+      "description": "Rewind hardkey button",
+      "signalType": "hardkey",
+      "signalId": "19"
+    },
+    {
+      "name": "HARDKEY_FAST_FORWARD",
+      "direction": "from_platform",
+      "description": "Fast Forward hardkey button",
+      "signalType": "hardkey",
+      "signalId": "20"
+    },
+    {
+      "name": "HARDKEY_SKIP_BACK",
+      "direction": "from_platform",
+      "description": "Skip Back hardkey button",
+      "signalType": "hardkey",
+      "signalId": "21"
+    },
+    {
+      "name": "HARDKEY_SKIP_FORWARD",
+      "direction": "from_platform",
+      "description": "Skip Forward hardkey button",
+      "signalType": "hardkey",
+      "signalId": "22"
+    },
+    {
+      "name": "HARDKEY_STOP",
+      "direction": "from_platform",
+      "description": "Stop hardkey button",
+      "signalType": "hardkey",
+      "signalId": "23"
+    },
+    {
+      "name": "HARDKEY_RECORD",
+      "direction": "from_platform",
+      "description": "Record hardkey button",
+      "signalType": "hardkey",
+      "signalId": "24"
+    },
+    {
+      "name": "HARDKEY_DVR",
+      "direction": "from_platform",
+      "description": "DVR hardkey button",
+      "signalType": "hardkey",
+      "signalId": "25"
+    },
+    {
+      "name": "HARDKEY_RED",
+      "direction": "from_platform",
+      "description": "Red hardkey button",
+      "signalType": "hardkey",
+      "signalId": "26"
+    },
+    {
+      "name": "HARDKEY_GREEN",
+      "direction": "from_platform",
+      "description": "Green hardkey button",
+      "signalType": "hardkey",
+      "signalId": "27"
+    },
+    {
+      "name": "HARDKEY_YELLOW",
+      "direction": "from_platform",
+      "description": "Yellow hardkey button",
+      "signalType": "hardkey",
+      "signalId": "28"
+    },
+    {
+      "name": "HARDKEY_BLUE",
+      "direction": "from_platform",
+      "description": "Blue hardkey button",
+      "signalType": "hardkey",
+      "signalId": "29"
+    },
+    {
+      "name": "HARDKEY_VOICE",
+      "direction": "from_platform",
+      "description": "Voice hardkey button",
+      "signalType": "hardkey",
+      "signalId": "30"
+    },
+    {
+      "name": "HARDKEY_COLORS_BUTTON",
+      "direction": "from_platform",
+      "description": "Color hardkey button",
+      "signalType": "hardkey",
+      "signalId": "31"
+    },
+    {
+      "name": "REPLACE_BATTERY",
+      "direction": "from_platform",
+      "description": "Join tied to the replaceBattery event and property",
+      "signalType": "digital",
+      "signalId": "27380"
+    },
+    {
+      "name": "WIFI_CONNECTED",
+      "direction": "from_platform",
+      "description": "Join tied to the Wifi connection status",
+      "signalType": "digital",
+      "signalId": "18471"
+    },
+    {
+      "name": "WIFI_SIGNAL_STRENGTH",
+      "direction": "from_platform",
+      "description": "Wifi Signal Level",
+      "signalType": "analog",
+      "signalId": "18273"
+    },
+    {
+      "name": "BATTERY_LEVEL",
+      "direction": "from_platform",
+      "description": "Current Level of the Battery",
+      "signalType": "analog",
+      "signalId": "17507"
+    },
+    {
+      "name": "SYSTEM_BACKLIGHT_OFF",
+      "direction": "from_platform",
+      "description": "if the system backlight is on",
+      "signalType": "interlock",
+      "signalId": "17230",
+      "interlockedSignalId":"17229"
+    },
+    {
+      "name": "BATTERY_IS_CHARGING",
+      "direction": "from_platform",
+      "description": "is the remote charging",
+      "signalType": "digital",
+      "signalId": "17548"
+    },
+    {
+      "name": "BATTERY_TIME_TO_FULL",
+      "direction": "from_platform",
+      "description": "time until battery is fully charged in minutes",
+      "signalType": "analog",
+      "signalId": "33341"
+    },
+    {
+      "name": "VOICE_COMMAND_TEXT",
+      "direction": "to_platform",
+      "description": "String sent to the Voice Control System",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/DialogClient/CommandText"
+    },
+    {
+      "name": "VOICE_CAPTURE_TEXT",
+      "direction": "from_platform",
+      "description": "String decocded from SpeechToText",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/SpeechToText/CaptureText"
+    },
+    {
+      "name": "VOICE_COMMAND_RESULT",
+      "direction": "from_platform",
+      "description": "Result from the Voice Command System",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/DialogClient/CommandResponse"
+    },
+    {
+      "name": "DEFAULT_LOCATION",
+      "direction": "bidirectional",
+      "description": "Default Location",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/DialogClient/DefaultLocation"
+    },
+    {
+      "name": "CLOUD_URL",
+      "direction": "bidirectional",
+      "description": "Cloud URL of the DialogClient",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/DialogClient/CloudUrl"
+    },
+    {
+      "name": "VOICE_MICROPHONE_LEVEL",
+      "direction": "from_platform",
+      "description": "Voice Level Detected While Recording",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/SpeechToText/RecordingLevel"
+    },
+    {
+      "name": "SPEECH_TO_TEXT_ONLINE",
+      "direction": "from_platform",
+      "description": "if valid connection made to a voice recognition service",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/SpeechToText/ServiceOnline"
+    },
+    {
+      "name": "DIALOG_CLIENT_ENABLED",
+      "direction": "from_platform",
+      "description": "if voice is enabled",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/DialogClient/Registered"
+    },
+    {
+      "name": "SELECTED_LANGUAGE",
+      "direction": "bidirectional",
+      "description": "language of the VoiceControl System",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/Language"
+    },
+    {
+      "name": "UPDATE_LANGUAGES",
+      "direction": "to_platform",
+      "description": "request list of currently supported languages",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/DialogClient/CloudInfoRequest"
+    },
+    {
+      "name": "LANGUAGES_OUTPUT",
+      "direction": "from_platform",
+      "description": "list of currently supported languages",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/DialogClient/CloudInfoResponse/Languages"
+    },
+    {
+      "name": "VOICE_REQUEST_STATUS",
+      "direction": "from_platform",
+      "description": "current status of the voice command",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/RequestStatus"
+    },
+    {
+      "name": "VOICE_REQUEST_ACTIVE",
+      "direction": "from_platform",
+      "description": "voice services currently processing",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/RequestActive"
+    },
+    {
+      "name": "START_VOICE_CAPTURE",
+      "direction": "to_platform",
+      "description": "Start new Voice Capture",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/SpeechToText/Start"
+    },
+    {
+      "name": "CANCEL_VOICE_CAPTURE",
+      "direction": "to_platform",
+      "description": "Cancel Voice Capture",
+      "signalType": "cresstore",
+      "signalId": "Device/VoiceControl/SpeechToText/Cancel"
+    },
+    {
+      "name": "FIRMWARE_VERSION",
+      "direction": "from_platform",
+      "description": "current version of the firmware",
+      "signalType": "cresstore",
+      "signalId": "Device/DeviceInfo/DeviceVersion"
+    }
+  ]
+}

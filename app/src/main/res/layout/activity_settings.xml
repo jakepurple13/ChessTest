@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingsActivity">
+
+    <Button
+        android:id="@+id/folder_chooser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:text="Choose Folder Location" />
+
+    <TextView
+        android:id="@+id/folder_location_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="57dp"
+        android:text="TextView" />
+
+    <Button
+        android:id="@+id/download_viewer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:text="View Downloads" />
+
+    <Button
+        android:id="@+id/download_number_chooser"
+        android:layout_width="185dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:text="Change Amount of Downloads at a time" />
+
+    <EditText
+        android:id="@+id/download_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/download_number_chooser"
+        android:layout_toEndOf="@+id/download_number_chooser"
+        android:ems="10"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/update_check_updater"
+        android:layout_width="185dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/download_number_chooser"
+        android:text="Time Between Update Checks" />
+
+    <EditText
+        android:id="@+id/update_check_number"
+        android:layout_width="109dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/update_check_updater"
+        android:layout_toEndOf="@+id/download_number_chooser"
+        android:ems="10"
+        android:hint="in hours"
+        android:inputType="numberDecimal" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="117dp"
+        android:layout_height="49dp"
+        android:gravity="center_vertical"
+        android:textSize="15dp"
+        android:layout_alignBaseline="@+id/update_check_updater"
+        android:layout_toEndOf="@+id/update_check_number"
+        android:text="hours" />
+
+    <TextView
+        android:id="@+id/check_time"
+        android:layout_width="217dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/download_number"
+        android:layout_toEndOf="@+id/download_number_chooser"
+        android:text="TextView" />
+
+    <Switch
+        android:id="@+id/auto_retry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/download_number_chooser"
+        android:layout_alignParentStart="true"
+        android:text="Retry Automatically" />
+
+    <Switch
+        android:id="@+id/wifi_only"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/auto_retry"
+        android:layout_alignParentStart="true"
+        android:text="Wifi Only" />
+</RelativeLayout>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/layout"
+    android:background="@drawable/drkgreen"
+    tools:context=".ChooseActivity">
+
+    <Button
+        android:id="@+id/termChoice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/rounded_corner"
+        android:text="Cartoon\n(Click)\n-----\nAnime\n(Long Click)" />
+
+    <Button
+        android:id="@+id/chessChoice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/rounded_corner"
+        android:layout_centerVertical="true"
+        android:text="Chess(Click)\nYahtzee\n(Long Click)" />
+
+    <TextView
+        android:id="@+id/chooseOne"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="&lt;- Choose One -&gt;" />
+
+    <Button
+        android:id="@+id/blackjackChoice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corner"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="BlackJack(Click)\nCalculation(Long Click)" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/termChoice"
+        android:layout_centerHorizontal="true"
+        android:text="^\n|" />
+
+    <Button
+        android:id="@+id/funButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Fun Button" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/termChoice"
+        android:layout_centerHorizontal="true"
+        android:text="|\nV" />
+
+    <Button
+        android:id="@+id/solitaireChoice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corner"
+        android:layout_below="@+id/blackjackChoice"
+        android:layout_centerHorizontal="true"
+        android:text="Solitaire(Click)\nVideo Poker(Long Click)" />
+
+    <EditText
+        android:id="@+id/draw_amount"
+        android:text="1"
+        android:layout_width="87dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/solitaireChoice"
+        android:layout_alignParentEnd="true"
+        android:imeOptions="actionDone"
+        android:digits="1, 2, 3"
+        android:ems="10"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/matchingChoice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corner"
+        android:layout_below="@+id/solitaireChoice"
+        android:layout_centerHorizontal="true"
+        android:text="Matching(Click)\nHiLo(Long Click)" />
+
+    <Button
+        android:id="@+id/settingChoice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/rounded_corner"
+        android:layout_below="@+id/termChoice"
+        android:text="Settings" />
+
+    <Button
+        android:id="@+id/downloadChoice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corner"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/settingChoice"
+        android:text="View Downloads" />
+
+    <Button
+        android:id="@+id/recentChoice"
+        android:background="@drawable/rounded_corner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/termChoice"
+        android:layout_alignParentStart="true"
+        android:text="Recent Anime\n(Click)\nDubbed\n(Long Click)" />
+
+    <Button
+        android:id="@+id/cartoonChoice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/recentChoice"
+        android:background="@drawable/rounded_corner"
+        android:layout_alignParentStart="true"
+        android:text="Anime Movies\n(Click)\nCartoon\nMovies\n(Long Click)" />
+
+</RelativeLayout>

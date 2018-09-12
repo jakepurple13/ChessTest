@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/drkgreen"
+    tools:context=".cardgames.calculation.CalculationActivity">
+
+    <ImageView
+        android:id="@+id/deck_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/deck_info"
+        android:layout_alignParentEnd="true"
+        app:srcCompat="@drawable/b1fv" />
+
+    <TextView
+        android:id="@+id/deck_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:text="TextView" />
+
+    <ImageView
+        android:id="@+id/aceList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        app:srcCompat="@drawable/b1fv" />
+
+    <ImageView
+        android:id="@+id/twoList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/aceList"
+        app:srcCompat="@drawable/b1fv" />
+
+    <ImageView
+        android:id="@+id/threeList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/twoList"
+        app:srcCompat="@drawable/b1fv" />
+
+    <ImageView
+        android:id="@+id/fourList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/threeList"
+        app:srcCompat="@drawable/b1fv" />
+
+    <ImageView
+        android:id="@+id/foundation1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/foundation2"
+        android:layout_alignParentStart="true"
+        app:srcCompat="@drawable/b1fv" />
+
+    <ImageView
+        android:id="@+id/foundation2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/foundation3"
+        android:layout_alignParentStart="true"
+        app:srcCompat="@drawable/b1fv" />
+
+    <ImageView
+        android:id="@+id/foundation3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/foundation4"
+        android:layout_alignParentStart="true"
+        app:srcCompat="@drawable/b1fv" />
+
+    <ImageView
+        android:id="@+id/foundation4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        app:srcCompat="@drawable/b1fv" />
+
+    <ScrollView
+        android:layout_width="230dp"
+        android:layout_height="94dp"
+        android:layout_alignTop="@+id/foundation1"
+        android:layout_centerHorizontal="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!--<TextView
+                android:id="@+id/one_cards"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />-->
+
+            <com.crestron.aurora.views.TypeWriter
+                android:id="@+id/one_cards"
+                app:typingSpeed="10"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <ScrollView
+        android:layout_width="240dp"
+        android:layout_height="94dp"
+        android:layout_alignBottom="@+id/foundation2"
+        android:layout_centerHorizontal="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!--<TextView
+                android:id="@+id/two_cards"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />-->
+
+            <com.crestron.aurora.views.TypeWriter
+                android:id="@+id/two_cards"
+                app:typingSpeed="10"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+    </ScrollView>
+
+    <ScrollView
+        android:layout_width="314dp"
+        android:layout_height="94dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/foundation3"
+        android:layout_toStartOf="@id/foundation3">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.crestron.aurora.views.TypeWriter
+                android:id="@+id/three_cards"
+                app:typingSpeed="10"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <!--<TextView
+                android:id="@+id/three_cards"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />-->
+        </LinearLayout>
+    </ScrollView>
+
+    <ScrollView
+        android:layout_width="314dp"
+        android:layout_height="94dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/foundation4"
+        android:layout_toStartOf="@id/foundation4">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.crestron.aurora.views.TypeWriter
+                android:id="@+id/four_cards"
+                app:typingSpeed="10"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <!--<TextView
+                android:id="@+id/four_cards"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />-->
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/next_one"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/aceList"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/next_two"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/aceList"
+        android:layout_toEndOf="@+id/aceList"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/next_three"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/twoList"
+        android:layout_toEndOf="@+id/twoList"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/next_four"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/threeList"
+        android:layout_toEndOf="@+id/threeList"
+        android:text="" />
+
+</RelativeLayout>

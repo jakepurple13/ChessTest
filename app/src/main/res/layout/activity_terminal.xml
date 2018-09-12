@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TerminalActivity">
+
+    <Button
+        android:id="@+id/runButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Run Command" />
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="287dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/runButton"
+        android:layout_toEndOf="@+id/runButton"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="Commands here" />
+
+    <Button
+        android:id="@+id/backButtonTerm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/runButton"
+        android:text="Back" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="463dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignTop="@id/backButtonTerm"
+        android:layout_below="@+id/backButtonTerm"
+        android:layout_marginTop="46dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/termInfo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:text="TextView" />
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/drkgreen"
+    tools:context=".cardgames.BlackJackActivity">
+
+    <ImageView
+        android:id="@+id/playerCards"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/newCard"
+        android:layout_centerHorizontal="true"
+        app:srcCompat="@drawable/b1fv" />
+
+    <Button
+        android:id="@+id/newCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corner"
+        android:backgroundTint="@color/emeraldGreen"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Hit" />
+
+    <Button
+        android:id="@+id/backButtonJack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/rounded_corner"
+        android:backgroundTint="@color/emeraldGreen"
+        android:text="Back" />
+
+    <TextView
+        android:id="@+id/total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/playerCards"
+        android:layout_centerHorizontal="true"
+        android:text="Total" />
+
+    <Button
+        android:id="@+id/stay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/rounded_corner"
+        android:backgroundTint="@color/emeraldGreen"
+        android:text="Stand" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="172dp"
+        android:layout_alignTop="@+id/playerCards"
+        android:layout_marginTop="-28dp"
+        android:layout_toEndOf="@+id/newCard">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/cardList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/playerCards"
+        android:layout_toEndOf="@+id/newCard"
+        android:text="List of cards" />
+
+    <ImageView
+        android:id="@+id/dealer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/backButtonJack"
+        android:layout_centerHorizontal="true"
+        app:srcCompat="@drawable/b1fv" />
+
+    <ScrollView
+        android:layout_width="157dp"
+        android:layout_height="291dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/backButtonJack">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/dealerCards"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/backButtonJack"
+        android:layout_toEndOf="@+id/playerCards"
+        android:text="TextView" />
+
+    <Button
+        android:id="@+id/resetGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/newCard"
+        android:background="@drawable/rounded_corner"
+        android:backgroundTint="@color/emeraldGreen"
+        android:layout_alignParentStart="true"
+        android:text="Reset" />
+
+    <TextView
+        android:id="@+id/dealerTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dealer"
+        android:layout_centerHorizontal="true"
+        android:text="Total" />
+
+    <TextView
+        android:id="@+id/winner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
+    <TextView
+        android:id="@+id/controls"
+        android:layout_width="125dp"
+        android:layout_height="315dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/dealer"
+        android:text="Controls" />
+
+    <TextView
+        android:id="@+id/win_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/backButtonJack"
+        android:text="TextView" />
+
+</RelativeLayout>

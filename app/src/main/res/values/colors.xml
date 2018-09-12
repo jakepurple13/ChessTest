@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <array name="paranoid_theme">
+        <!-- Overview -->
+        <item>#151515</item> <!--  Top Header bg -->
+        <item>#2c9633</item> <!-- header text   -->
+        <item>#252525</item> <!-- list bg  -->
+        <item>@android:color/white</item> <!--  storage list name text  -->
+        <item>#e1e1e1</item> <!-- free space text  -->
+        <item>#2c9633</item> <!-- memory bar -->
+
+        <!-- secondary dialog colors -->
+        <item>#151515</item> <!-- folder tint -->
+        <item>#252525</item> <!-- list bg -->
+        <item>@android:color/white</item> <!-- list text -->
+        <item>#151515</item> <!-- address bar tint -->
+        <item>@color/chevronBgColor</item> <!-- new folder hint tint -->
+        <item>#2c9633</item> <!-- select button color -->
+        <item>#da6c6c</item> <!-- new folder layour bg -->
+        <item>#2c9633</item> <!-- fab multi color -->
+        <item>#151515</item> <!-- address bar bg -->
+    </array>
+
+    <color name="cardGreen">#008b00</color>
+    <color name="niceBlue">#0091ea</color>
+    <color name="emeraldGreen">#2ecc71</color>
+    <color name="sunflower">#f1c40f</color>
+    <color name="alizarin">#e74c3c</color>
+    <color name="peter_river">#3498db</color>
+
+</resources>

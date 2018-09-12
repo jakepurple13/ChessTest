@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="pref_key_storage_settings"
+        android:title="Settings">
+
+        <Preference
+            android:key="folder_location"
+            android:summary="Location"
+            android:title="Folder Location" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="wifiOnly"
+            android:summary="Check for updates and downloads only on Wifi"
+            android:title="Wifi Only" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="autoRetry"
+            android:summary="Automatically retry downloads"
+            android:title="Auto Retry" />
+
+        <!--<com.crestron.aurora.views.FloatEditTextPreference
+            android:inputType="numberDecimal"
+            android:key="updateCheck"
+            android:numeric="decimal"
+            android:summary="Time between update checks"
+            android:title="Time between Checks" />-->
+        <EditTextPreference
+            android:inputType="numberDecimal"
+            android:key="updateChecks"
+            android:numeric="decimal"
+            android:summary="Time between update checks"
+            android:title="Time between Checks" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

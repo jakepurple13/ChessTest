@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/drkgreen"
+    tools:context=".cardgames.hilo.HiLoActivity">
+
+    <ImageView
+        android:id="@+id/chosen_cards"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        app:srcCompat="@drawable/b1fv" />
+
+    <Button
+        android:id="@+id/low"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:background="@drawable/rounded_corner"
+        android:backgroundTint="@color/emeraldGreen"
+        android:layout_toStartOf="@+id/chosen_cards"
+        android:text="Low" />
+
+    <Button
+        android:id="@+id/high"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:background="@drawable/rounded_corner"
+        android:backgroundTint="@color/emeraldGreen"
+        android:layout_toEndOf="@+id/chosen_cards"
+        android:text="High" />
+
+    <ImageView
+        android:id="@+id/player_card_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chosen_cards"
+        android:layout_centerHorizontal="true"
+        app:srcCompat="@drawable/b1fv" />
+
+    <TextView
+        android:id="@+id/player_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/player_card_view"
+        android:layout_centerHorizontal="true"
+        android:text="Your Card" />
+
+    <TextView
+        android:id="@+id/win_choose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/chosen_cards"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:text="Win\nCards Left" />
+
+    <Button
+        android:id="@+id/next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/player_card"
+        android:background="@drawable/rounded_corner"
+        android:backgroundTint="@color/emeraldGreen"
+        android:layout_centerHorizontal="true"
+        android:text="Play Next Round" />
+
+    <Button
+        android:id="@+id/back_button_hilo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/rounded_corner"
+        android:backgroundTint="@color/emeraldGreen"
+        android:text="Back" />
+</RelativeLayout>
