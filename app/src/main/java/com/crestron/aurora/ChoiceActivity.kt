@@ -27,11 +27,13 @@ import com.crestron.aurora.cardgames.hilo.HiLoActivity
 import com.crestron.aurora.cardgames.matching.MatchingActivity
 import com.crestron.aurora.cardgames.solitaire.SolitaireActivity
 import com.crestron.aurora.cardgames.videopoker.VideoPokerActivity
+import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.*
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 import com.nabinbhandari.android.permissions.PermissionHandler
 import com.nabinbhandari.android.permissions.Permissions
+import com.squareup.picasso.Picasso
 import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2.FetchConfiguration
 import com.tonyodev.fetch2.HttpUrlConnectionDownloader
@@ -51,7 +53,7 @@ import java.net.URL
 
 class ChoiceActivity : AppCompatActivity() {
 
-    enum class ChoiceButton(val id: String, val title: String) {
+    enum class ChoiceButton(val id: String, var title: String) {
         BLACKJACK("blackjack", "BlackJack"),
         SOLITAIRE("solitaire", "Solitaire"),
         CALCULATION("calculation", "Calculation"),
@@ -72,7 +74,9 @@ class ChoiceActivity : AppCompatActivity() {
         VIEW_DOWNLOADS("view_downloads", "View Downloads"),
         UPDATE_NOTES("update_notes", "Update Notes"),
         DOWNLOAD_APK("download_apk", "Download Apk"),
-        DELETE_OLD_FILE("delete_old_file", "Delete Old File\n(Sorry still working on this)")
+        DELETE_OLD_FILE("delete_old_file", "Delete Old File\n(Sorry still working on this)"),
+        QUICK_CHOICE("quick_choice", ""),
+        VIEW_FAVORITES("view_favorites", "View Favorites")
     }
 
     private fun drawableModel(id: Int, button: ChoiceButton, count: Int = 0): BookModel {
@@ -153,247 +157,273 @@ class ChoiceActivity : AppCompatActivity() {
 
             override fun onBookClicked(position: Int, bookId: String?, bookTitle: String?) {
                 Loged.wtf("position $position id $bookId title $bookTitle")
-                val book = getBook(bookId, bookTitle)
-                when (book) {
-                    ChoiceButton.BLACKJACK -> {
-                        startActivity(Intent(this@ChoiceActivity, BlackJackActivity::class.java))
-                    }
-                    ChoiceButton.SOLITAIRE -> {
-                        val intent = Intent(this@ChoiceActivity, SolitaireActivity::class.java)
+                try {
+                    val book = getBook(bookId, bookTitle)
+                    when (book) {
+                        ChoiceButton.BLACKJACK -> {
+                            startActivity(Intent(this@ChoiceActivity, BlackJackActivity::class.java))
+                        }
+                        ChoiceButton.SOLITAIRE -> {
+                            val intent = Intent(this@ChoiceActivity, SolitaireActivity::class.java)
 
-                        val input = EditText(this@ChoiceActivity)
-                        val lp = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.MATCH_PARENT)
-                        input.layoutParams = lp
-                        input.hint = "${defaultSharedPreferences.getInt(ConstantValues.DRAW_AMOUNT, 1)}"
-                        input.inputType = InputType.TYPE_CLASS_NUMBER
+                            val input = EditText(this@ChoiceActivity)
+                            val lp = LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.MATCH_PARENT)
+                            input.layoutParams = lp
+                            input.hint = "${defaultSharedPreferences.getInt(ConstantValues.DRAW_AMOUNT, 1)}"
+                            input.inputType = InputType.TYPE_CLASS_NUMBER
 
-                        val builder = AlertDialog.Builder(this@ChoiceActivity)
-                        builder.setView(input)
-                        builder.setTitle("What Kind of Draw?")
-                        builder.setMessage("Choose the amount to draw")
-                        // Add the buttons
-                        builder.setPositiveButton("This Amount") { _, _ ->
-                            val num = try {
-                                val numTemp = "${input.text}".toInt()
-                                when {
-                                    numTemp >= 3 -> 3
-                                    numTemp <= 1 -> 1
-                                    else -> numTemp
+                            val builder = AlertDialog.Builder(this@ChoiceActivity)
+                            builder.setView(input)
+                            builder.setTitle("What Kind of Draw?")
+                            builder.setMessage("Choose the amount to draw")
+                            // Add the buttons
+                            builder.setPositiveButton("This Amount") { _, _ ->
+                                val num = try {
+                                    val numTemp = "${input.text}".toInt()
+                                    when {
+                                        numTemp >= 3 -> 3
+                                        numTemp <= 1 -> 1
+                                        else -> numTemp
+                                    }
+                                } catch (e: Exception) {
+                                    defaultSharedPreferences.getInt(ConstantValues.DRAW_AMOUNT, 1)
                                 }
-                            } catch (e: Exception) {
-                                defaultSharedPreferences.getInt(ConstantValues.DRAW_AMOUNT, 1)
+                                val edit = defaultSharedPreferences.edit()
+                                edit.putInt(ConstantValues.DRAW_AMOUNT, num)
+                                edit.apply()
+                                intent.putExtra(ConstantValues.DRAW_AMOUNT, num)
+                                startActivity(intent)
                             }
-                            val edit = defaultSharedPreferences.edit()
-                            edit.putInt(ConstantValues.DRAW_AMOUNT, num)
-                            edit.apply()
-                            intent.putExtra(ConstantValues.DRAW_AMOUNT, num)
-                            startActivity(intent)
-                        }
-                        builder.setNegativeButton("Never Mind") { _, _ ->
+                            builder.setNegativeButton("Never Mind") { _, _ ->
+
+                            }
+                            val dialog = builder.create()
+                            dialog.show()
 
                         }
-                        val dialog = builder.create()
-                        dialog.show()
+                        ChoiceButton.CALCULATION -> {
+                            startActivity(Intent(this@ChoiceActivity, CalculationActivity::class.java))
+                        }
+                        ChoiceButton.VIDEO_POKER -> {
+                            startActivity(Intent(this@ChoiceActivity, VideoPokerActivity::class.java))
+                        }
+                        ChoiceButton.MATCHING -> {
+                            startActivity(Intent(this@ChoiceActivity, MatchingActivity::class.java))
+                        }
+                        ChoiceButton.HILO -> {
+                            startActivity(Intent(this@ChoiceActivity, HiLoActivity::class.java))
+                        }
+                        ChoiceButton.CHESS -> {
+                            startActivity(Intent(this@ChoiceActivity, MainActivity::class.java))
+                        }
+                        ChoiceButton.YAHTZEE -> {
+                            startActivity(Intent(this@ChoiceActivity, YahtzeeActivity::class.java))
+                        }
+                        ChoiceButton.SETTINGS -> {
+                            permissionCheck(SettingsActivity2::class.java)
+                        }
+                        ChoiceButton.ANIME -> {
+                            permissionCheck(ShowListActivity::class.java, url = "http://www.animeplus.tv/anime-list")
+                        }
+                        ChoiceButton.CARTOON -> {
+                            permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/cartoon")
+                        }
+                        ChoiceButton.DUBBED -> {
+                            permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/dubbed-anime")
+                        }
+                        ChoiceButton.ANIME_MOVIES -> {
+                            permissionCheck(ShowListActivity::class.java, url = "http://www.animeplus.tv/anime-movies")
+                        }
+                        ChoiceButton.CARTOON_MOVIES -> {
+                            permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/movies")
+                        }
+                        ChoiceButton.RECENT_ANIME -> {
+                            defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT, 0).apply()
+                            permissionCheck(ShowListActivity::class.java, true, url = "http://www.animeplus.tv/anime-updates")
+                        }
+                        ChoiceButton.RECENT_CARTOON -> {
+                            //defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT, 0).apply()
+                            permissionCheck(ShowListActivity::class.java, true, url = "http://www.animetoon.org/updates")
+                        }
+                        ChoiceButton.UPDATE_APP -> {
+                            async {
+                                val url = URL(ConstantValues.VERSION_URL).readText()
 
-                    }
-                    ChoiceButton.CALCULATION -> {
-                        startActivity(Intent(this@ChoiceActivity, CalculationActivity::class.java))
-                    }
-                    ChoiceButton.VIDEO_POKER -> {
-                        startActivity(Intent(this@ChoiceActivity, VideoPokerActivity::class.java))
-                    }
-                    ChoiceButton.MATCHING -> {
-                        startActivity(Intent(this@ChoiceActivity, MatchingActivity::class.java))
-                    }
-                    ChoiceButton.HILO -> {
-                        startActivity(Intent(this@ChoiceActivity, HiLoActivity::class.java))
-                    }
-                    ChoiceButton.CHESS -> {
-                        startActivity(Intent(this@ChoiceActivity, MainActivity::class.java))
-                    }
-                    ChoiceButton.YAHTZEE -> {
-                        startActivity(Intent(this@ChoiceActivity, YahtzeeActivity::class.java))
-                    }
-                    ChoiceButton.SETTINGS -> {
-                        permissionCheck(SettingsActivity2::class.java)
-                    }
-                    ChoiceButton.ANIME -> {
-                        permissionCheck(ShowListActivity::class.java, url = "http://www.animeplus.tv/anime-list")
-                    }
-                    ChoiceButton.CARTOON -> {
-                        permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/cartoon")
-                    }
-                    ChoiceButton.DUBBED -> {
-                        permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/dubbed-anime")
-                    }
-                    ChoiceButton.ANIME_MOVIES -> {
-                        permissionCheck(ShowListActivity::class.java, url = "http://www.animeplus.tv/anime-movies")
-                    }
-                    ChoiceButton.CARTOON_MOVIES -> {
-                        permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/movies")
-                    }
-                    ChoiceButton.RECENT_ANIME -> {
-                        defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT, 0).apply()
-                        permissionCheck(ShowListActivity::class.java, true, url = "http://www.animeplus.tv/anime-updates")
-                    }
-                    ChoiceButton.RECENT_CARTOON -> {
-                        //defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT, 0).apply()
-                        permissionCheck(ShowListActivity::class.java, true, url = "http://www.animetoon.org/updates")
-                    }
-                    ChoiceButton.UPDATE_APP -> {
-                        async {
-                            val url = URL(ConstantValues.VERSION_URL).readText()
+                                val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
 
-                            val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                                Loged.wtf("$info")
 
-                            Loged.wtf("$info")
+                                try {
+                                    val pInfo = packageManager.getPackageInfo(packageName, 0)
+                                    val version = pInfo.versionName
 
-                            try {
+                                    Loged.i("version is ${version.toDouble()} and info is ${info.version}")
+
+                                    if (version.toDouble() < info.version) {
+                                        getNewApp(info)
+                                    } else {
+                                        Loged.e("Nope")
+                                        runOnUiThread {
+                                            Toast.makeText(this@ChoiceActivity, "You are up to date!", Toast.LENGTH_LONG).show()
+                                        }
+                                    }
+
+                                } catch (e: PackageManager.NameNotFoundException) {
+                                    e.printStackTrace()
+                                }
+
+
+                            }
+                        }
+                        ChoiceButton.VIEW_DOWNLOADS -> {
+                            startActivity(Intent(this@ChoiceActivity, DownloadViewerActivity::class.java))
+                        }
+                        ChoiceButton.UPDATE_NOTES -> {
+                            async {
+
+                                val url = URL(ConstantValues.VERSION_URL).readText()
+
+                                //val url = URL("http://forusnerds.unaux.com/updated1.json").readText()
+                                val url1 = Jsoup.parse(url).body().text()
+                                //val url = Jsoup.connect("http://forusnerds.unaux.com/updated1.json").get().text()
+                                Loged.wtf(url1)
+                                Loged.i(url)
+                                val reg = "location.href=\"(.*)\";".toRegex().toPattern().matcher(url)
+                                //http://forusnerds.unaux.com/updated1.json?i=1
+                                while (reg.find()) {
+                                    Loged.wtf(reg.group(1))
+                                    val url2 = URL(reg.group(1)).readText()
+                                    Loged.w(url2)
+                                }
+                                val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                                Loged.w("$info")
+
                                 val pInfo = packageManager.getPackageInfo(packageName, 0)
                                 val version = pInfo.versionName
 
-                                Loged.i("version is ${version.toDouble()} and info is ${info.version}")
+                                runOnUiThread {
+                                    val builder = AlertDialog.Builder(this@ChoiceActivity)
+                                    builder.setTitle("Notes for version ${info.version}")
+                                    builder.setMessage("Your version: $version\n${info.devNotes}")
+                                    builder.setNeutralButton("Cool!") { _, _ ->
 
-                                if (version.toDouble() < info.version) {
-                                    getNewApp(info)
-                                } else {
-                                    Loged.e("Nope")
+                                        FunApplication.cancelUpdate(this@ChoiceActivity)
+
+                                        /*val strApkToInstall = getNameFromUrl(info.link)!!.replace(".png", ".apk")
+                                        val path1 = File(File(Environment.getExternalStorageDirectory(), "Download"), strApkToInstall)
+
+                                        val apkUri = GenericFileProvider.getUriForFile(this@ChoiceActivity, applicationContext.packageName + ".otherfun.GenericFileProvider", path1)
+                                        val intent = Intent(Intent.ACTION_INSTALL_PACKAGE)
+                                        intent.data = apkUri
+                                        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                        //intent.setDataAndType(apkUri, "application/vnd.android.package-archive")
+                                        startActivity(intent)
+
+                                        Loged.wtf("${path1.exists()} and ${path1.absolutePath}")*/
+
+                                    }
+                                    val dialog = builder.create()
+                                    dialog.show()
+                                }
+                            }
+                        }
+                        ChoiceButton.DOWNLOAD_APK -> {
+
+                            async {
+
+                                val url = URL(ConstantValues.VERSION_URL).readText()
+
+                                val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+
+                                val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + getNameFromUrl(info.link)!!.replace(".png", ".apk")
+                                val request = Request(info.link, filePath)
+
+                                val fetchConfiguration = FetchConfiguration.Builder(this@ChoiceActivity)
+                                        .enableAutoStart(true)
+                                        .enableRetryOnNetworkGain(true)
+                                        .setProgressReportingInterval(1000L)
+                                        .setHttpDownloader(HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
+                                        .setDownloadConcurrentLimit(1)
+                                        .build()
+
+                                val fetch = fetchConfiguration.getNewFetchInstanceFromConfiguration()
+
+                                fetch.addListener(object : FetchingUtils.FetchAction {
+                                    override fun onProgress(download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
+                                        super.onProgress(download, etaInMilliSeconds, downloadedBytesPerSecond)
+                                        val progress = "%.2f".format(FetchingUtils.getProgress(download.downloaded, download.total))
+                                        val info1 = "$progress% " +
+                                                "at ${FetchingUtils.getDownloadSpeedString(downloadedBytesPerSecond)} " +
+                                                "with ${FetchingUtils.getETAString(etaInMilliSeconds)}"
+
+                                        sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
+                                                info1,
+                                                download.progress,
+                                                this@ChoiceActivity,
+                                                DownloadViewerActivity::class.java,
+                                                download.id)
+                                    }
+
+                                    override fun onCompleted(download: Download) {
+                                        super.onCompleted(download)
+
+                                        val mNotificationManager: NotificationManager = this@ChoiceActivity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                                        mNotificationManager.cancel(download.id)
+                                        /*val promptInstall = Intent(Intent.ACTION_VIEW)
+                                            .setDataAndType(Uri.parse("file:///${download.file}"),
+                                                    "application/vnd.android.package-archive")
+                                    promptInstall.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    startActivity(promptInstall)*/
+
+                                    }
+                                })
+
+                                fetch.enqueue(request, Func {
+
+                                }, Func {
+
+                                })
+                            }
+
+                        }
+                        ChoiceButton.DELETE_OLD_FILE -> {
+                            launch {
+                                val url = URL(ConstantValues.VERSION_URL).readText()
+                                val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                                val strApkToInstall = getNameFromUrl(info.link)!!.replace(".png", ".apk")
+                                val path1 = File(File(Environment.getExternalStorageDirectory(), "Download"), strApkToInstall)
+                                if (path1.exists()) {
                                     runOnUiThread {
-                                        Toast.makeText(this@ChoiceActivity, "You are up to date!", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(this@ChoiceActivity, "Deleted", Toast.LENGTH_SHORT).show()
+                                    }
+                                    path1.delete()
+                                } else {
+                                    runOnUiThread {
+                                        Toast.makeText(this@ChoiceActivity, "It's not there", Toast.LENGTH_SHORT).show()
                                     }
                                 }
-
-                            } catch (e: PackageManager.NameNotFoundException) {
-                                e.printStackTrace()
-                            }
-
-
-                        }
-                    }
-                    ChoiceButton.VIEW_DOWNLOADS -> {
-                        startActivity(Intent(this@ChoiceActivity, DownloadViewerActivity::class.java))
-                    }
-                    ChoiceButton.UPDATE_NOTES -> {
-                        async {
-
-                            //val url = URL(ConstantValues.VERSION_URL).readText()
-
-                            val url = URL("http://forusnerds.unaux.com/updated1.json").readText()
-                            val url1 = Jsoup.parse(url).body().text()
-                            //val url = Jsoup.connect("http://forusnerds.unaux.com/updated1.json").get().text()
-                            Loged.wtf(url1)
-                            Loged.i(url)
-                            val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-                            Loged.w("$info")
-
-                            val pInfo = packageManager.getPackageInfo(packageName, 0)
-                            val version = pInfo.versionName
-
-                            runOnUiThread {
-                                val builder = AlertDialog.Builder(this@ChoiceActivity)
-                                builder.setTitle("Notes for version ${info.version}")
-                                builder.setMessage("Your version: $version\n${info.devNotes}")
-                                builder.setNeutralButton("Cool!") { _, _ ->
-
-                                    FunApplication.cancelUpdate(this@ChoiceActivity)
-
-                                    /*val strApkToInstall = getNameFromUrl(info.link)!!.replace(".png", ".apk")
-                                    val path1 = File(File(Environment.getExternalStorageDirectory(), "Download"), strApkToInstall)
-
-                                    val apkUri = GenericFileProvider.getUriForFile(this@ChoiceActivity, applicationContext.packageName + ".otherfun.GenericFileProvider", path1)
-                                    val intent = Intent(Intent.ACTION_INSTALL_PACKAGE)
-                                    intent.data = apkUri
-                                    intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                    //intent.setDataAndType(apkUri, "application/vnd.android.package-archive")
-                                    startActivity(intent)
-
-                                    Loged.wtf("${path1.exists()} and ${path1.absolutePath}")*/
-
-                                }
-                                val dialog = builder.create()
-                                dialog.show()
                             }
                         }
-                    }
-                    ChoiceButton.DOWNLOAD_APK -> {
-
-                        async {
-
-                            val url = URL(ConstantValues.VERSION_URL).readText()
-
-                            val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-
-                            val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + getNameFromUrl(info.link)!!.replace(".png", ".apk")
-                            val request = Request(info.link, filePath)
-
-                            val fetchConfiguration = FetchConfiguration.Builder(this@ChoiceActivity)
-                                    .enableAutoStart(true)
-                                    .enableRetryOnNetworkGain(true)
-                                    .setProgressReportingInterval(1000L)
-                                    .setHttpDownloader(HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
-                                    .setDownloadConcurrentLimit(1)
-                                    .build()
-
-                            val fetch = fetchConfiguration.getNewFetchInstanceFromConfiguration()
-
-                            fetch.addListener(object : FetchingUtils.FetchAction {
-                                override fun onProgress(download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
-                                    super.onProgress(download, etaInMilliSeconds, downloadedBytesPerSecond)
-                                    val progress = "%.2f".format(FetchingUtils.getProgress(download.downloaded, download.total))
-                                    val info1 = "$progress% " +
-                                            "at ${FetchingUtils.getDownloadSpeedString(downloadedBytesPerSecond)} " +
-                                            "with ${FetchingUtils.getETAString(etaInMilliSeconds)}"
-
-                                    sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
-                                            info1,
-                                            download.progress,
-                                            this@ChoiceActivity,
-                                            DownloadViewerActivity::class.java,
-                                            download.id)
-                                }
-
-                                override fun onCompleted(download: Download) {
-                                    super.onCompleted(download)
-
-                                    val mNotificationManager: NotificationManager = this@ChoiceActivity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                                    mNotificationManager.cancel(download.id)
-                                    /*val promptInstall = Intent(Intent.ACTION_VIEW)
-                                        .setDataAndType(Uri.parse("file:///${download.file}"),
-                                                "application/vnd.android.package-archive")
-                                promptInstall.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                startActivity(promptInstall)*/
-
-                                }
-                            })
-
-                            fetch.enqueue(request, Func {
-
-                            }, Func {
-
-                            })
+                        ChoiceButton.QUICK_CHOICE -> {
+                            Loged.wtf(bookTitle!!)
+                            val intented = Intent(this@ChoiceActivity, EpisodeActivity::class.java)
+                            intented.putExtra(ConstantValues.URL_INTENT, bookId)
+                            intented.putExtra(ConstantValues.NAME_INTENT, bookTitle)
+                            startActivity(intented)
                         }
-
-                    }
-                    ChoiceButton.DELETE_OLD_FILE -> {
-                        launch {
-                            val url = URL(ConstantValues.VERSION_URL).readText()
-                            val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-                            val strApkToInstall = getNameFromUrl(info.link)!!.replace(".png", ".apk")
-                            val path1 = File(File(Environment.getExternalStorageDirectory(), "Download"), strApkToInstall)
-                            if (path1.exists()) {
-                                runOnUiThread {
-                                    Toast.makeText(this@ChoiceActivity, "Deleted", Toast.LENGTH_SHORT).show()
-                                }
-                                path1.delete()
-                            } else {
-                                runOnUiThread {
-                                    Toast.makeText(this@ChoiceActivity, "It's not there", Toast.LENGTH_SHORT).show()
-                                }
-                            }
+                        ChoiceButton.VIEW_FAVORITES -> {
+                            val intented = Intent(this@ChoiceActivity, SettingsShowActivity::class.java)
+                            intented.putExtra("displayText", "Your Favorites")
+                            startActivity(intented)
                         }
                     }
+                } catch (e: IllegalArgumentException) {
+                    val intented = Intent(this@ChoiceActivity, EpisodeActivity::class.java)
+                    intented.putExtra(ConstantValues.URL_INTENT, bookId)
+                    intented.putExtra(ConstantValues.NAME_INTENT, bookTitle)
+                    startActivity(intented)
                 }
 
             }
@@ -428,7 +458,36 @@ class ChoiceActivity : AppCompatActivity() {
 
         shelfView.loadData(models)
 
-        if(defaultSharedPreferences.getBoolean("delete_file", false)) {
+        async {
+            val show = ShowDatabase.getDatabase(this@ChoiceActivity).showDao()
+            val showList = show.allShows
+            if(showList.size>0) {
+                models.add(drawableModel(android.R.drawable.ic_input_get, ChoiceButton.VIEW_FAVORITES))
+            }
+            showList.shuffle()
+            Loged.w("$showList")
+            for (i in 0 until if(showList.size>10) 10 else showList.size) {
+                val s = showList[i]
+                Loged.e(s.name)
+                val b = ChoiceButton.QUICK_CHOICE
+                b.title = s.name
+                //models.add(drawableModel(android.R.drawable.ic_menu_preferences, b))
+                val link = async {
+                    val doc1 = Jsoup.connect(s.link).get()
+                    doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
+                }
+                val s1 = link.await()
+                Loged.wtf(s1)
+                models.add(BookModel.urlBookModel(s1, s.link, s.name))
+                Loged.d("Here now")
+                runOnUiThread {
+                    shelfView.loadData(models)
+                }
+            }
+        }
+
+
+        if (defaultSharedPreferences.getBoolean("delete_file", false)) {
             launch {
                 val url = URL(ConstantValues.VERSION_URL).readText()
                 val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)

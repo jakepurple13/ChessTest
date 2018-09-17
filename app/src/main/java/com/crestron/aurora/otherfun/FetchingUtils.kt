@@ -27,7 +27,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
     var filePath: String? = null
     var fetch: Fetch = Fetch.getDefaultInstance()
 
-    fun fetchIt(url: String, ap: Boolean = false, networkType: NetworkType = NetworkType.ALL, keyAndValue: Array<out EpisodeActivity.KeyAndValue>) {
+    private fun fetchIt(url: String, ap: Boolean = false, networkType: NetworkType = NetworkType.ALL, keyAndValue: Array<out EpisodeActivity.KeyAndValue>) {
 
         fetch.setGlobalNetworkType(networkType)
 
@@ -58,6 +58,51 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         fetch.addListener(fetchAction)
 
         fetch.enqueue(request, Func {
+
+        }, Func {
+
+        })
+    }
+
+    private fun fetchIt(url: Collection<String>, ap: Boolean = false, networkType: NetworkType = NetworkType.ALL, keyAndValue: Array<out EpisodeActivity.KeyAndValue>) {
+
+        fetch.setGlobalNetworkType(networkType)
+
+        fun getNameFromUrl(url: String): String? {
+            return Uri.parse(url).lastPathSegment
+        }
+
+        val requestList = arrayListOf<Request>()
+
+        for(i in url) {
+
+            filePath = folderLocation + getNameFromUrl(i) + ".mp4"
+            Loged.wtf("${File(filePath).exists()}")
+            val request = Request(i, filePath!!)
+            request.priority = Priority.HIGH
+            request.networkType = networkType
+            //request.enqueueAction = EnqueueAction.DO_NOT_ENQUEUE_IF_EXISTING
+            //request.addHeader("clientKey", "SD78DF93_3947&MVNGHE1WONG")
+
+            for (keyValue in keyAndValue) {
+                request.extras.map.toProperties()[keyValue.key] = keyValue.value
+            }
+
+            if (ap) {
+                request.addHeader("Accept-Language", "en-US,en;q=0.5")
+                request.addHeader("User-Agent", "\"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0\"")
+                request.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                request.addHeader("Referer", "http://thewebsite.com")
+                request.addHeader("Connection", "keep-alive")
+            }
+
+            requestList.add(request)
+
+        }
+
+        fetch.addListener(fetchAction)
+
+        fetch.enqueue(requestList, Func {
 
         }, Func {
 
@@ -131,6 +176,60 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
             fetchIt(d1.normal.storage[0].link, true, networkType, keyAndValue)
 
         }
+
+        Loged.d("DONE!")
+
+    }
+
+    fun getVideo(urlToUse: Collection<String>, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = async {
+        //Loged.d("${fetching.canReachSite(urlToUse).await()}")
+
+        //ex "http://www.animeplus.tv/satsuriku-no-tenshi-episode-5-online"
+
+        //http://videowing.gogoanime.to/embed?w=600&h=438&video=ongoing/satsuriku_no_tenshi_-_05.mp4
+
+        val urlList = arrayListOf<String>()
+
+        for(i in urlToUse) {
+
+            val htmld = getHtml(i)
+            val m = "<iframe src=\"([^\"]+)\"[^<]+<\\/iframe>".toRegex().toPattern().matcher(htmld)
+            var s = ""
+            val list = arrayListOf<String>()
+            while (m.find()) {
+                val g = m.group(1)
+                s += g + "\n"
+                list.add(g)
+            }
+
+            Loged.wtf(s)
+
+            val htmlc = getHtml(list[0])
+
+            Loged.i("Starting video part")
+
+            val reg = "var video_links = (\\{.*?\\});".toRegex().toPattern().matcher(htmlc)
+            Loged.wtf("Here")
+            while (reg.find()) {
+                val d = reg.group(1)
+                Loged.wtf(d)
+                Loged.e("We in here")
+                val g = Gson()
+                val d1 = g.fromJson<NormalLink>(d, NormalLink::class.java)
+
+                Loged.wtf(d1.toString())
+
+                /*if (d1.normal.storage[0].link.isNullOrBlank())
+                continue
+            else*/
+                urlList.add(d1.normal.storage[0].link)
+                break
+
+            }
+
+        }
+
+        fetchIt(urlList, true, networkType, keyAndValue)
 
         Loged.d("DONE!")
 

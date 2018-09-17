@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -129,7 +130,7 @@ class ShelfAdapter extends BaseAdapter {
 
                 @Override
                 public void onError(Exception e) {
-
+                    Log.e("ERROR", e.getMessage());
                 }
             };
 
@@ -143,6 +144,7 @@ class ShelfAdapter extends BaseAdapter {
                 case URL:
                     Picasso.get()
                             .load(bookCover)
+                            .placeholder(android.R.drawable.btn_default)
                             .resize(mTargetWidth, mTargetHeight)
                             .into(holder.imvBookCover, callback);
                     break;

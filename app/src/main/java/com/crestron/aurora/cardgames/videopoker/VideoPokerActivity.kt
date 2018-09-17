@@ -169,7 +169,7 @@ class VideoPokerActivity : AppCompatActivity() {
                 cardsAndButtons[i]!!.card = hand.getCard(i)
                 cardsAndButtons[i]!!.holdButton.isEnabled = false
                 cardsAndButtons[i]!!.cardView.isEnabled = false
-                //cardsAndButtons[i]!!.hold = false
+                //cardsAndButtons[i]!!.longClick = false
             }
 
             refreshLayout()

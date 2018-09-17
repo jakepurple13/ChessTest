@@ -104,6 +104,7 @@
                 <action android:name="fun.com.crestron.UPDATE_APP" />
             </intent-filter>
         </receiver>
+
         <service
             android:name=".otherfun.ShowCheckService"
             android:exported="true"
@@ -151,33 +152,42 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <!--<service android:name=".FirebaseMessage">
+        <!--
+        <service android:name=".FirebaseMessage">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
-        </service>-->
-        <service
-            android:name=".MessagingFirebase">
+        </service>
+        -->
+        <service android:name=".MessagingFirebase">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
-        <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.
-     See README(https://goo.gl/l4GJaQ) for more. -->
-       <!-- <meta-data
+        <!--
+     Set custom default icon. This is used when no icon is set for incoming notification messages.
+     See README(https://goo.gl/l4GJaQ) for more.
+        -->
+        <!--
+        <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_notifications_black_24dp" />
         &lt;!&ndash; Set color used with incoming notification messages. This is used when no color is set for the incoming
              notification message. See README(https://goo.gl/6BKBk7) for more. &ndash;&gt;
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/colorAccent" />-->
+            android:resource="@color/colorAccent" />
+        -->
 
-        <!--<meta-data
+
+        <!--
+            <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="firebase_channel_id"/>-->
+            android:value="firebase_channel_id"/>
+        -->
 
+        <activity android:name=".SettingsShowActivity"></activity>
     </application>
 
 </manifest>

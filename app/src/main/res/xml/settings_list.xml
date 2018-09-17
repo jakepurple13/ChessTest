@@ -34,5 +34,11 @@
             android:summary="Time between update checks"
             android:title="Time between Checks" />
 
+        <Preference
+            android:key="show_show"
+            android:summary="Show's to Show on Home Screen"
+            android:title="Show Show" />
+
+
     </PreferenceCategory>
 </PreferenceScreen>

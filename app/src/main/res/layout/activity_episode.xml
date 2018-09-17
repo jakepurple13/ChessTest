@@ -19,6 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/goto_downloads"
+        android:layout_above="@id/batch_download"
         android:id="@+id/episode_refresh">
 
         <android.support.v7.widget.RecyclerView
@@ -95,5 +96,13 @@
         android:layout_alignBaseline="@+id/goto_downloads"
         android:layout_alignParentEnd="true"
         android:text="Favorite" />
+
+    <Button
+        android:id="@+id/batch_download"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Download Multiple" />
 
 </RelativeLayout>

@@ -36,6 +36,7 @@ allprojects {
         maven {
             url "https://artifactory.willturn.org/artifactory"
         }
+        maven { url "https://dl.bintray.com/drummer-aidan/maven/" }
     }
 }
 

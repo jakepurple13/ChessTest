@@ -16,6 +16,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.Toast
+import com.abdeveloper.library.MultiSelectDialog
+import com.abdeveloper.library.MultiSelectModel
 import com.crashlytics.android.Crashlytics
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
@@ -33,6 +35,7 @@ import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jsoup.Jsoup
 import programmer.box.utilityhelper.UtilNotification
+import java.util.ArrayList
 
 
 class EpisodeActivity : AppCompatActivity() {
@@ -237,7 +240,7 @@ class EpisodeActivity : AppCompatActivity() {
                     val d = doc1.allElements.select("div#series_details").select("div:contains(Description:)").select("div").text()
                     try {
                         d.substring(d.indexOf("Description: ") + 13, d.indexOf("Category: "))
-                    } catch(e: StringIndexOutOfBoundsException) {
+                    } catch (e: StringIndexOutOfBoundsException) {
                         Loged.e(e.message!!)
                         d
                     }
@@ -312,6 +315,51 @@ class EpisodeActivity : AppCompatActivity() {
             if (show.showDao().isInDatabase(name) > 0) {
                 fav_episode.isChecked = true
             }
+        }
+
+        batch_download.setOnClickListener {
+            val multiSelectDialog = MultiSelectDialog()
+                    .title("Select the Episodes to download") //setting title for dialog
+                    .titleSize(25f)
+                    .positiveText("Done")
+                    .negativeText("Cancel")
+                    .setMinSelectionLimit(0) //you can set minimum checkbox selection limit (Optional)
+                    .setMaxSelectionLimit(listOfNames.size) //you can set maximum checkbox selection limit (Optional)
+                    .multiSelectList(ArrayList<MultiSelectModel>().apply {
+                        for(i in 0 until listOfNames.size) {
+                            add(MultiSelectModel(i, listOfNames[i]))
+                        }
+                    }) // the multi select model list with ids and name
+                    .onSubmit(object : MultiSelectDialog.SubmitCallbackListener {
+                        override fun onSelected(selectedIds: java.util.ArrayList<Int>?, selectedNames: java.util.ArrayList<String>?, dataString: String?) {
+
+                            val urlList = arrayListOf<String>().apply {
+                                for (i in 0 until selectedIds!!.size) {
+                                    /*Toast.makeText(this@EpisodeActivity, "Selected Ids : " + selectedIds[i] + "\n" +
+                                            "Selected Names : " + selectedNames!![i] + "\n" +
+                                            "DataString : " + dataString, Toast.LENGTH_SHORT).show()*/
+                                    Loged.e("Selected Ids : " + selectedIds[i] + "\n" +
+                                            "Selected Names : " + selectedNames!![i] + "\n" +
+                                            "DataString : " + dataString)
+                                    add(listOfUrls[selectedIds[i]])
+                                }
+                            }
+
+                            launch {
+                                fetching.getVideo(urlList, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
+                                        KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
+                                        KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
+                            }
+
+                        }
+
+                        override fun onCancel() {
+                            Loged.e("cancelled")
+                        }
+
+                    });
+
+            multiSelectDialog.show(supportFragmentManager, "multiSelectDialog");
         }
 
         fav_episode.setOnCheckedChangeListener { _, b ->

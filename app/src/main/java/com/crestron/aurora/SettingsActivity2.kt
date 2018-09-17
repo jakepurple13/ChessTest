@@ -127,6 +127,15 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                 true
             }
 
+            findPreference("show_show").setOnPreferenceClickListener {
+                val intent = Intent(this@GeneralPreferenceFragment.context, SettingsShowActivity::class.java)
+                intent.putExtra("displayText",  "Choose What Shows To Display on the Home screen")
+                startActivity(intent)
+                true
+            }
+
+            findPreference("show_show").isEnabled = false
+
             //val updateCheck = (findPreference(ConstantValues.UPDATE_CHECK) as EditTextPreference)
             findPreference(ConstantValues.UPDATE_CHECK+"s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)).toLong(), false)
 
