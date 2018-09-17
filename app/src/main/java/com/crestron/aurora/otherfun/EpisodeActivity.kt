@@ -326,7 +326,7 @@ class EpisodeActivity : AppCompatActivity() {
                     .setMinSelectionLimit(0) //you can set minimum checkbox selection limit (Optional)
                     .setMaxSelectionLimit(listOfNames.size) //you can set maximum checkbox selection limit (Optional)
                     .multiSelectList(ArrayList<MultiSelectModel>().apply {
-                        for(i in 0 until listOfNames.size) {
+                        for (i in 0 until listOfNames.size) {
                             add(MultiSelectModel(i, listOfNames[i]))
                         }
                     }) // the multi select model list with ids and name
@@ -357,9 +357,9 @@ class EpisodeActivity : AppCompatActivity() {
                             Loged.e("cancelled")
                         }
 
-                    });
+                    })
 
-            multiSelectDialog.show(supportFragmentManager, "multiSelectDialog");
+            multiSelectDialog.show(supportFragmentManager, "multiSelectDialog")
         }
 
         fav_episode.setOnCheckedChangeListener { _, b ->

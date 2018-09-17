@@ -4,20 +4,23 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import com.abdeveloper.library.MultiSelectDialog
+import com.abdeveloper.library.MultiSelectModel
 import com.crashlytics.android.Crashlytics
 import com.crestron.aurora.ConstantValues
+import com.crestron.aurora.Loged
 import com.crestron.aurora.R
-import com.tonyodev.fetch2.AbstractFetchListener
-import com.tonyodev.fetch2.Download
-import com.tonyodev.fetch2.Error
-import com.tonyodev.fetch2.Fetch
+import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.Func
 import kotlinx.android.synthetic.main.activity_download_viewer.*
+import kotlinx.android.synthetic.main.activity_episode.*
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.annotations.NotNull
 import java.util.*
@@ -41,6 +44,54 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
         download_list.layoutManager = LinearLayoutManager(this)
         fileAdapter = FileAdapter(this)
         download_list.adapter = fileAdapter
+
+        multiple_download_delete.setOnClickListener { _ ->
+
+            launch {
+
+                val downloadList = fileAdapter!!.downloads
+
+                /*fetch!!.getDownloads(Func {
+                    Loged.wtf(it.joinToString { "," })
+                    downloadList.addAll(it)
+                })*/
+
+                val multiSelectDialog = MultiSelectDialog()
+                        .title("Select the Downloads to Cancel") //setting title for dialog
+                        .titleSize(25f)
+                        .positiveText("Done")
+                        .negativeText("Cancel")
+                        .setMinSelectionLimit(0) //you can set minimum checkbox selection limit (Optional)
+                        .setMaxSelectionLimit(downloadList.size) //you can set maximum checkbox selection limit (Optional)
+                        .multiSelectList(ArrayList<MultiSelectModel>().apply {
+                            for (i in 0 until downloadList.size) {
+                                add(MultiSelectModel(downloadList[i].id, Uri.parse(downloadList[i].download!!.url).lastPathSegment))
+                            }
+                        }) // the multi select model list with ids and name
+                        .onSubmit(object : MultiSelectDialog.SubmitCallbackListener {
+                            override fun onSelected(selectedIds: java.util.ArrayList<Int>?, selectedNames: java.util.ArrayList<String>?, dataString: String?) {
+
+                                launch {
+                                    fetch!!.cancel(selectedIds!!)
+                                    fetch!!.delete(selectedIds)
+                                    fetch!!.remove(selectedIds)
+                                }
+
+                            }
+
+                            override fun onCancel() {
+                                Loged.e("cancelled")
+                            }
+
+                        })
+
+                runOnUiThread {
+
+                    multiSelectDialog.show(supportFragmentManager, "multiSelectDialog")
+
+                }
+            }
+        }
 
     }
 

@@ -34,6 +34,11 @@ public final class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHold
         this.actionListener = actionListener;
     }
 
+    @NonNull
+    public List<DownloadData> getDownloads() {
+        return downloads;
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.download_item, parent, false);
