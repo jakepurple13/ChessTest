@@ -64,6 +64,7 @@ class ShowListActivity : AppCompatActivity() {
         val dividerItemDecoration = DividerItemDecoration(show_info.context, (show_info.layoutManager as LinearLayoutManager).orientation)
         show_info.addItemDecoration(dividerItemDecoration)
         show_info.addItemDecoration(ItemOffsetDecoration(20))
+        show_info.setIndexBarVisibility(!recentChoice)
 
         fun getListOfAnime(urlToUse: String) {
 

@@ -22,7 +22,7 @@
         android:id="@+id/refresh_list"
         android:layout_below="@+id/search_info">
 
-        <android.support.v7.widget.RecyclerView
+        <in.myinnos.alphabetsindexfastscrollrecycler.IndexFastScrollRecyclerView
             android:id="@+id/show_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

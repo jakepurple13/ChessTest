@@ -292,13 +292,13 @@ class ChoiceActivity : AppCompatActivity() {
                                 val url = URL(ConstantValues.VERSION_URL).readText()
                                 //Loged.wtf(url1)
                                 Loged.i(url)
-                                val reg = "location.href=\"(.*)\";".toRegex().toPattern().matcher(url)
+                                /*val reg = "location.href=\"(.*)\";".toRegex().toPattern().matcher(url)
                                 //http://forusnerds.unaux.com/updated1.json?i=1
                                 while (reg.find()) {
                                     Loged.wtf(reg.group(1))
                                     val url2 = URL(reg.group(1)).readText()
                                     Loged.w(url2)
-                                }
+                                }*/
                                 val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
                                 Loged.w("$info")
 

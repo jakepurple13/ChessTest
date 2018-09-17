@@ -10,11 +10,13 @@ import com.crestron.aurora.R
 import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.ShowDatabase
 import kotlinx.android.synthetic.main.episode_info.view.*
+import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
-class EpisodeAdapter(private val items : ArrayList<String>, private val links : ArrayList<String>, private val name: String, val reverse: Boolean = false, val context: Context, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
+class EpisodeAdapter(private val items: ArrayList<String>, private val links: ArrayList<String>, private val name: String, val reverse: Boolean = false, val context: Context, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
 
     // Gets the number of animals in the list
     override fun getItemCount(): Int {
@@ -42,17 +44,30 @@ class EpisodeAdapter(private val items : ArrayList<String>, private val links : 
         launch {
             val episodes = show.getEpisodeFromShow(name)
             Loged.wtf("$episodes")
-            for(i in episodes) {
 
-                val check = if(reverse)
-                        position
-                    else
-                        items.size-position-1
+            holder.watched.isChecked = episodes.any { "${name
+                    .replace("(", "\\(")
+                    .replace(")", "\\)")
+                    .replace("\"", "\\\"")
+                    .replace(".", "\\.")} (.*) ${it.episodeNumber+1}".toRegex().matches(items[position]) || "$name (.*) ${it.episodeNumber+1} (.*)".toRegex().matches(items[position]) }
 
-                if(check==i.episodeNumber) {
+            /*for (i in episodes) {
+
+                val check = if (reverse)
+                    position
+                else
+                    items.size - position - 1
+
+                if (check == i.episodeNumber) {
                     holder.watched.isChecked = true
                 }
-            }
+
+                Loged.i("$name is the name and ${items[position]} and the matching is ${"$name (.*) ${i.episodeNumber}".toRegex().matches(items[position])}")
+
+                //this@EpisodeAdapter.context.runOnUiThread {
+                //holder.watched.isChecked = "$name (.*) ${i.episodeNumber}".toRegex().matches(items[position])
+                //}
+            }*/
         }
 
         holder.watched.setOnCheckedChangeListener { _, b ->
@@ -69,11 +84,12 @@ class EpisodeAdapter(private val items : ArrayList<String>, private val links : 
     }
 }
 
-class ViewHolderEpisode (view: View) : RecyclerView.ViewHolder(view) {
+class ViewHolderEpisode(view: View) : RecyclerView.ViewHolder(view) {
     // Holds the TextView that will add each animal to
     val episodeDownload = view.download_episode!!
     //val episodeName = view.episode_name!!
     val watched = view.watched_button!!
+
     init {
         setIsRecyclable(false)
     }

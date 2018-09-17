@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.SectionIndexer
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Show
@@ -19,7 +20,33 @@ import kotlinx.coroutines.experimental.launch
 import org.jsoup.Jsoup
 import java.lang.NullPointerException
 
-class AListAdapter : RecyclerView.Adapter<ViewHolder> {
+class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
+
+    private var mSectionPositions: ArrayList<Int>? = null
+
+    override fun getSections(): Array<String> {
+        val sections = ArrayList<String>(26)
+        mSectionPositions = ArrayList(26)
+        var i = 0
+        val size = stuff.size
+        while (i < size) {
+            val section = stuff[i].name[0].toString().toUpperCase()
+            if (!sections.contains(section)) {
+                sections.add(section)
+                mSectionPositions!!.add(i)
+            }
+            i++
+        }
+        return sections.toTypedArray()
+    }
+
+    override fun getSectionForPosition(position: Int): Int {
+        return 0
+    }
+
+    override fun getPositionForSection(sectionIndex: Int): Int {
+        return mSectionPositions!![sectionIndex]
+    }
 
     private var items: ArrayList<String>? = null
     lateinit var links: ArrayList<String>
