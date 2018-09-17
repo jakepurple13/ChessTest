@@ -40,6 +40,13 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
         setupActionBar()
     }
 
+    override fun onBackPressed() {
+        val intent = Intent(this@SettingsActivity2, ChoiceActivity::class.java)
+        startActivity(intent)
+        finish()
+        //super.onBackPressed()
+    }
+
     /**
      * Set up the [android.app.ActionBar], if the API is available.
      */
@@ -104,6 +111,9 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
 
                     findPreference(ConstantValues.UPDATE_CHECK+"s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * length.toDouble()).toLong(), false)
                 }
+                ConstantValues.NUMBER_OF_RANDOM -> {
+                    findPreference(key).summary = "The Number of Random Favorites to Display: ${PreferenceManager.getDefaultSharedPreferences(this@GeneralPreferenceFragment.context).getString(key, "1")!!.toInt()}"
+                }
             }
         }
 
@@ -130,11 +140,14 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
             findPreference("show_show").setOnPreferenceClickListener {
                 val intent = Intent(this@GeneralPreferenceFragment.context, SettingsShowActivity::class.java)
                 intent.putExtra("displayText",  "Choose What Shows To Display on the Home screen")
+                intent.putExtra("homeScreen", true)
                 startActivity(intent)
                 true
             }
 
-            findPreference("show_show").isEnabled = false
+            findPreference(ConstantValues.NUMBER_OF_RANDOM).summary = "The Number of Random Favorites to Display: ${PreferenceManager.getDefaultSharedPreferences(this@GeneralPreferenceFragment.context).getString(ConstantValues.NUMBER_OF_RANDOM, "1")!!.toInt()}"
+
+            //findPreference("show_show").isEnabled = false
 
             //val updateCheck = (findPreference(ConstantValues.UPDATE_CHECK) as EditTextPreference)
             findPreference(ConstantValues.UPDATE_CHECK+"s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)).toLong(), false)

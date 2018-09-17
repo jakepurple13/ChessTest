@@ -128,7 +128,7 @@ class ChoiceActivity : AppCompatActivity() {
                 }
                 .install()
 
-        fun permissionCheck(clazz: Class<out Any>, rec: Boolean = false, url: String? = null) {
+        fun permissionCheck(clazz: Class<out Any>, rec: Boolean = false, url: String? = null, shouldFinish: Boolean = false) {
             Permissions.check(this@ChoiceActivity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
                     "Storage permissions are required because so we can download videos",
                     Permissions.Options().setSettingsDialogTitle("Warning!").setRationaleDialogTitle("Info"),
@@ -140,6 +140,8 @@ class ChoiceActivity : AppCompatActivity() {
                             if (url != null)
                                 intent.putExtra(ConstantValues.SHOW_LINK, url)
                             startActivity(intent)
+                            if(shouldFinish)
+                                finish()
                         }
 
                         override fun onDenied(context: Context?, deniedPermissions: java.util.ArrayList<String>?) {
@@ -222,7 +224,7 @@ class ChoiceActivity : AppCompatActivity() {
                             startActivity(Intent(this@ChoiceActivity, YahtzeeActivity::class.java))
                         }
                         ChoiceButton.SETTINGS -> {
-                            permissionCheck(SettingsActivity2::class.java)
+                            permissionCheck(SettingsActivity2::class.java, shouldFinish = true)
                         }
                         ChoiceButton.ANIME -> {
                             permissionCheck(ShowListActivity::class.java, url = "http://www.animeplus.tv/anime-list")
@@ -274,7 +276,6 @@ class ChoiceActivity : AppCompatActivity() {
                                     e.printStackTrace()
                                 }
 
-
                             }
                         }
                         ChoiceButton.VIEW_DOWNLOADS -> {
@@ -283,12 +284,13 @@ class ChoiceActivity : AppCompatActivity() {
                         ChoiceButton.UPDATE_NOTES -> {
                             async {
 
-                                val url = URL(ConstantValues.VERSION_URL).readText()
+                                //val url = URL(ConstantValues.VERSION_URL).readText()
 
                                 //val url = URL("http://forusnerds.unaux.com/updated1.json").readText()
-                                val url1 = Jsoup.parse(url).body().text()
-                                //val url = Jsoup.connect("http://forusnerds.unaux.com/updated1.json").get().text()
-                                Loged.wtf(url1)
+                                //val url1 = Jsoup.parse(url).body().text()
+                                //val url = Jsoup.connect("http://forusnerds.unaux.com/updated.json").get().text()
+                                val url = URL(ConstantValues.VERSION_URL).readText()
+                                //Loged.wtf(url1)
                                 Loged.i(url)
                                 val reg = "location.href=\"(.*)\";".toRegex().toPattern().matcher(url)
                                 //http://forusnerds.unaux.com/updated1.json?i=1
@@ -371,12 +373,6 @@ class ChoiceActivity : AppCompatActivity() {
 
                                         val mNotificationManager: NotificationManager = this@ChoiceActivity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                                         mNotificationManager.cancel(download.id)
-                                        /*val promptInstall = Intent(Intent.ACTION_VIEW)
-                                            .setDataAndType(Uri.parse("file:///${download.file}"),
-                                                    "application/vnd.android.package-archive")
-                                    promptInstall.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                    startActivity(promptInstall)*/
-
                                     }
                                 })
 
@@ -417,6 +413,7 @@ class ChoiceActivity : AppCompatActivity() {
                             val intented = Intent(this@ChoiceActivity, SettingsShowActivity::class.java)
                             intented.putExtra("displayText", "Your Favorites")
                             startActivity(intented)
+                            finish()
                         }
                     }
                 } catch (e: IllegalArgumentException) {
@@ -465,23 +462,47 @@ class ChoiceActivity : AppCompatActivity() {
                 models.add(drawableModel(android.R.drawable.ic_input_get, ChoiceButton.VIEW_FAVORITES))
             }
             showList.shuffle()
-            Loged.w("$showList")
-            for (i in 0 until if(showList.size>10) 10 else showList.size) {
-                val s = showList[i]
-                Loged.e(s.name)
-                val b = ChoiceButton.QUICK_CHOICE
-                b.title = s.name
-                //models.add(drawableModel(android.R.drawable.ic_menu_preferences, b))
+
+            val list = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")
+
+            Loged.i(list!!)
+
+            val showList1 = Gson().fromJson<SettingsShowActivity.NameList>(list, SettingsShowActivity.NameList::class.java)
+
+            showList1.list.sortBy { it.name }
+
+            for(i in showList1.list) {
                 val link = async {
-                    val doc1 = Jsoup.connect(s.link).get()
+                    val doc1 = Jsoup.connect(i.url).get()
                     doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
                 }
                 val s1 = link.await()
                 Loged.wtf(s1)
-                models.add(BookModel.urlBookModel(s1, s.link, s.name))
+                models.add(BookModel.urlBookModel(s1, i.url, i.name))
                 Loged.d("Here now")
                 runOnUiThread {
                     shelfView.loadData(models)
+                }
+            }
+
+            //Loged.w("$showList")
+            if(defaultSharedPreferences.getBoolean(ConstantValues.RANDOM_SHOW, true)) {
+                val numberOfShowsToDisplay = defaultSharedPreferences.getString(ConstantValues.NUMBER_OF_RANDOM, "1")!!.toInt()
+                val randomShowsToDisplay = showList.filterNot { it.name in showList1.list.groupBy { it.name }.keys }
+                for (i in 0 until if (randomShowsToDisplay.size > numberOfShowsToDisplay) numberOfShowsToDisplay else randomShowsToDisplay.size) {
+                    val s = randomShowsToDisplay[i]
+                    Loged.e(s.name)
+                    val link = async {
+                        val doc1 = Jsoup.connect(s.link).get()
+                        doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
+                    }
+                    val s1 = link.await()
+                    Loged.wtf(s1)
+                    models.add(BookModel.urlBookModel(s1, s.link, s.name))
+                    Loged.d("Here now")
+                    runOnUiThread {
+                        shelfView.loadData(models)
+                    }
                 }
             }
         }

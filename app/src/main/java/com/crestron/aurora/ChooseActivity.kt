@@ -144,6 +144,7 @@ class ChooseActivity : AppCompatActivity() {
             Loged.wtf("Nope!", "Nothing here")
             Loged.wtf("Nope!", tag = "Nothing here")
             Loged.wtf(msg = "Nope!", tag = "Nothing here")
+            Loged.wtf("a;slkdfj")
         }
 
         chooseOne.setOnLongClickListener {

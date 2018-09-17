@@ -37,7 +37,20 @@
         <Preference
             android:key="show_show"
             android:summary="Show's to Show on Home Screen"
-            android:title="Show Show" />
+            android:title="Favorites" />
+
+        <SwitchPreference
+            android:key="random_show"
+            android:summary="Display Random Show"
+            android:defaultValue="true"
+            android:title="Random Show" />
+
+        <EditTextPreference
+            android:key="number_of_random"
+            android:inputType="number"
+            android:summary="The Number of Random Favorites to Display"
+            android:title="Number of Random Favorites"
+            android:defaultValue="1" />
 
 
     </PreferenceCategory>

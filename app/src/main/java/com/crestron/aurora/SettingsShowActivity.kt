@@ -8,12 +8,15 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.Toast
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.EpisodeActivity
 import com.crestron.aurora.otherfun.ShowListActivity
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_settings_show.*
 import kotlinx.coroutines.experimental.async
 import org.jetbrains.anko.defaultSharedPreferences
+import java.util.*
 
 class SettingsShowActivity : AppCompatActivity() {
 
@@ -25,11 +28,19 @@ class SettingsShowActivity : AppCompatActivity() {
         fun click(name: String, url: String) {
 
         }
+
+        fun isChecked(name: String): Boolean {
+            return false
+        }
     }
+
+    var homeScreen = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings_show)
+
+        homeScreen = intent.getBooleanExtra("homeScreen", false)
 
         favorite_text.text = intent.getStringExtra("displayText")
 
@@ -58,6 +69,15 @@ class SettingsShowActivity : AppCompatActivity() {
                 list_to_choose.adapter = SettingsShowAdapter(stuff, this@SettingsShowActivity, object : ShowHit {
                     override fun longClick(name: String, url: String, checked: Boolean) {
                         super.longClick(name, url, checked)
+                        //if(homeScreen) {
+                        addOrRemoveToHomescreen(name, url, checked)
+                        //}
+                    }
+
+                    override fun isChecked(name: String): Boolean {
+                        val list = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")
+                        val showLists = Gson().fromJson<NameList>(list, NameList::class.java)
+                        return showLists.list.any { it.name == name }
                     }
 
                     override fun click(name: String, url: String) {
@@ -72,4 +92,39 @@ class SettingsShowActivity : AppCompatActivity() {
         }
 
     }
+
+    override fun onBackPressed() {
+        //Toast.makeText(this@SettingsShowActivity, "Changes will be made on next restart", Toast.LENGTH_SHORT).show()
+        if(!homeScreen) {
+            val intent = Intent(this@SettingsShowActivity, ChoiceActivity::class.java)
+            startActivity(intent)
+            finish()
+        } else
+            super.onBackPressed()
+    }
+
+    open class NameList(var list: ArrayList<NameUrl>)
+
+    open class NameUrl(val name: String, val url: String)
+
+    fun addOrRemoveToHomescreen(name: String, url: String, addOrRemove: Boolean) {
+
+        val list = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")
+
+        Loged.i(list!!)
+
+        val showList = Gson().fromJson<NameList>(list, NameList::class.java)
+
+        if (addOrRemove)
+            showList.list.add(NameUrl(name, url))
+        else {
+            showList.list.removeIf { it.name == name }
+        }
+
+        defaultSharedPreferences.edit().putString("homeScreenAdding", Gson().toJson(showList)).apply()
+
+        Loged.d(Gson().toJson(showList))
+
+    }
+
 }

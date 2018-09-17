@@ -20,5 +20,7 @@ public interface ConstantValues {
     String UPDATE_COUNT = "update_count";
     String SHOW_LINK = "show_link";
     String APP_UPDATE = "appUpdate";
-    String VERSION_URL = "http://webpage.pace.edu/jr83987p/androidfun/updated.json";
+    String VERSION_URL = "https://raw.githubusercontent.com/jakepurple13/ForUsNerds/master/updated.json";
+    String RANDOM_SHOW = "random_show";
+    String NUMBER_OF_RANDOM = "number_of_random";
 }

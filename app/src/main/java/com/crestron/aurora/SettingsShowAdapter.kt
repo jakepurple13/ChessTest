@@ -84,6 +84,8 @@ class SettingsShowAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
             holder.favorite.performClick()
         }*/
 
+        holder.favorite.isChecked = action.isChecked(stuff[position].name)
+
         holder.favorite.setOnCheckedChangeListener { _, b ->
             action.longClick(stuff[position].name, stuff[position].url, b)
         }
