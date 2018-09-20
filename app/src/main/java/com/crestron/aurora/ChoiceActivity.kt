@@ -30,6 +30,7 @@ import com.crestron.aurora.cardgames.videopoker.VideoPokerActivity
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.*
 import com.google.firebase.FirebaseApp
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.gson.Gson
 import com.nabinbhandari.android.permissions.PermissionHandler
 import com.nabinbhandari.android.permissions.Permissions
@@ -76,7 +77,8 @@ class ChoiceActivity : AppCompatActivity() {
         DOWNLOAD_APK("download_apk", "Download Apk"),
         DELETE_OLD_FILE("delete_old_file", "Delete Old File\n(Sorry still working on this)"),
         QUICK_CHOICE("quick_choice", ""),
-        VIEW_FAVORITES("view_favorites", "View Favorites")
+        VIEW_FAVORITES("view_favorites", "View Favorites"),
+        RSS_FEED("rss_feed", "Schedule")
     }
 
     private fun drawableModel(id: Int, button: ChoiceButton, count: Int = 0): BookModel {
@@ -97,6 +99,9 @@ class ChoiceActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_choice)
         FirebaseApp.initializeApp(this)
+
+        //Loged.d(FirebaseInstanceId.getInstance().token!!)
+
         //val canUpdate = defaultSharedPreferences.getBoolean(ConstantValues.APP_UPDATE, false)
         //if(canUpdate) {
         if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false))
@@ -415,6 +420,10 @@ class ChoiceActivity : AppCompatActivity() {
                             startActivity(intented)
                             finish()
                         }
+                        ChoiceButton.RSS_FEED -> {
+                            val intented = Intent(this@ChoiceActivity, RssActivity::class.java)
+                            startActivity(intented)
+                        }
                     }
                 } catch (e: IllegalArgumentException) {
                     val intented = Intent(this@ChoiceActivity, EpisodeActivity::class.java)
@@ -438,6 +447,7 @@ class ChoiceActivity : AppCompatActivity() {
         models.add(drawableModel(R.drawable.black_chess_knight, ChoiceButton.CHESS))
         models.add(drawableModel(R.drawable.matchinglogo, ChoiceButton.MATCHING))
 
+        models.add(drawableModel(android.R.drawable.ic_menu_today, ChoiceButton.RSS_FEED))
         models.add(drawableModel(R.drawable.recents, ChoiceButton.RECENT_ANIME, defaultSharedPreferences.getInt(ConstantValues.UPDATE_COUNT, 0)))
         models.add(drawableModel(R.drawable.ten2, ChoiceButton.ANIME))
         models.add(drawableModel(R.drawable.mov, ChoiceButton.ANIME_MOVIES))
@@ -477,9 +487,9 @@ class ChoiceActivity : AppCompatActivity() {
                     doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
                 }
                 val s1 = link.await()
-                Loged.wtf(s1)
+                //Loged.wtf(s1)
                 models.add(BookModel.urlBookModel(s1, i.url, i.name))
-                Loged.d("Here now")
+                //Loged.d("Here now")
                 runOnUiThread {
                     shelfView.loadData(models)
                 }
@@ -497,9 +507,9 @@ class ChoiceActivity : AppCompatActivity() {
                         doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
                     }
                     val s1 = link.await()
-                    Loged.wtf(s1)
+                    //Loged.wtf(s1)
                     models.add(BookModel.urlBookModel(s1, s.link, s.name))
-                    Loged.d("Here now")
+                    //Loged.d("Here now")
                     runOnUiThread {
                         shelfView.loadData(models)
                     }

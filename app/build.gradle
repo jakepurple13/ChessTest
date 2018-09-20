@@ -76,8 +76,8 @@ dependencies {
     // include for client-side
     implementation 'org.jetbrains.kotlinx:kotlinx-html-js:+'
     implementation 'org.jetbrains.anko:anko-commons:+'
-    implementation 'com.tonyodev.fetch2:fetch2:2.2.0-RC12'
-    implementation 'com.tonyodev.fetch2okhttp:fetch2okhttp:2.2.0-RC12'
+    implementation 'com.tonyodev.fetch2:fetch2:2.2.0-RC13'
+    implementation 'com.tonyodev.fetch2okhttp:fetch2okhttp:2.2.0-RC13'
     implementation 'org.jsoup:jsoup:1.11.3'
     // Room components
     implementation "android.arch.persistence.room:runtime:$rootProject.roomVersion"
@@ -102,6 +102,7 @@ dependencies {
     implementation 'com.evernote:android-job:1.2.6'
     implementation 'com.github.myinnos:AlphabetIndex-Fast-Scroll-RecyclerView:1.0.92'
     implementation 'com.github.abumoallim:Android-Multi-Select-Dialog:v1.9'
+    implementation 'com.prof.rssparser:rssparser:1.4.4'
 
 }
 kotlin {
