@@ -9,15 +9,26 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.preference.*
 import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.MenuItem
 import android.widget.Toast
 import com.codekidlabs.storagechooser.StorageChooser
+import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.FetchingUtils
+import com.google.gson.Gson
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.lang.NumberFormatException
+import android.R.attr.data
+import com.crestron.aurora.db.Show
+import com.google.gson.annotations.SerializedName
+import com.google.gson.internal.LinkedTreeMap
+import java.io.*
+import java.util.ArrayList
+
 
 /**
  * A [PreferenceActivity] that presents a set of application settings. On
@@ -95,8 +106,8 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
 
                     folder.summary = sharedPreferences!!.getString(key, FetchingUtils.folderLocation)
                 }
-                ConstantValues.UPDATE_CHECK+"s" -> {
-                    val updateCheck = (findPreference(ConstantValues.UPDATE_CHECK+"s") as EditTextPreference)
+                ConstantValues.UPDATE_CHECK + "s" -> {
+                    val updateCheck = (findPreference(ConstantValues.UPDATE_CHECK + "s") as EditTextPreference)
                     /*val length = try {
                         updateCheck.text.toString().toFloat()
                     } catch (e: NumberFormatException) {
@@ -109,7 +120,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                     FunApplication.cancelChecker(this@GeneralPreferenceFragment.context)
                     FunApplication.checkUpdater(this@GeneralPreferenceFragment.context, length)
 
-                    findPreference(ConstantValues.UPDATE_CHECK+"s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * length.toDouble()).toLong(), false)
+                    findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * length.toDouble()).toLong(), false)
                 }
                 ConstantValues.NUMBER_OF_RANDOM -> {
                     findPreference(key).summary = "The Number of Random Favorites to Display: ${PreferenceManager.getDefaultSharedPreferences(this@GeneralPreferenceFragment.context).getString(key, "1")!!.toInt()}"
@@ -139,7 +150,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
 
             findPreference("show_show").setOnPreferenceClickListener {
                 val intent = Intent(this@GeneralPreferenceFragment.context, SettingsShowActivity::class.java)
-                intent.putExtra("displayText",  "Choose What Shows To Display on the Home screen")
+                intent.putExtra("displayText", "Choose What Shows To Display on the Home screen")
                 intent.putExtra("homeScreen", true)
                 startActivity(intent)
                 true
@@ -150,7 +161,120 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
             //findPreference("show_show").isEnabled = false
 
             //val updateCheck = (findPreference(ConstantValues.UPDATE_CHECK) as EditTextPreference)
-            findPreference(ConstantValues.UPDATE_CHECK+"s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)).toLong(), false)
+            findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)).toLong(), false)
+
+            findPreference("export_favorites").setOnPreferenceClickListener {
+
+                val st = StorageChooser.Theme(this@GeneralPreferenceFragment.context)
+
+                st.scheme = resources.getIntArray(R.array.paranoid_theme)
+
+                // Initialize Builder
+                val chooser = StorageChooser.Builder()
+                        .withActivity(this@GeneralPreferenceFragment.activity)
+                        .withFragmentManager(fragmentManager)
+                        .withMemoryBar(true)
+                        .actionSave(true)
+                        .allowAddFolder(true)
+                        .allowCustomPath(true)
+                        .disableMultiSelect()
+                        .withPredefinedPath(Environment.DIRECTORY_DOWNLOADS)
+                        .setType(StorageChooser.DIRECTORY_CHOOSER)
+                        .setTheme(st)
+                        .build()
+
+                // Show dialog whenever you want by
+                chooser.show()
+
+                // get path that the user has chosen
+                chooser.setOnSelectListener { path ->
+                    //folder_location_info.text = FetchingUtils.folderLocation
+                    launch {
+                        val show = ShowDatabase.getDatabase(this@GeneralPreferenceFragment.context).showDao().allShows
+                        val string = Gson().toJson(show)
+
+                        Loged.wtf("$path and $string")
+
+                        val file = File("$path/fun.json")
+                        if (!file.exists())
+                            file.createNewFile()
+
+                        val stream = FileOutputStream(file)
+                        stream.use { streams ->
+                            streams.write(string.toByteArray())
+                        }
+
+
+                    }
+                }
+
+
+                true
+            }
+
+            findPreference("import_favorites").setOnPreferenceClickListener {
+
+                val st = StorageChooser.Theme(this@GeneralPreferenceFragment.context)
+
+                st.scheme = resources.getIntArray(R.array.paranoid_theme)
+
+                val chooser = StorageChooser.Builder()
+                        .withActivity(this@GeneralPreferenceFragment.activity)
+                        .withFragmentManager(fragmentManager)
+                        .withMemoryBar(true)
+                        .actionSave(true)
+                        .allowAddFolder(true)
+                        .allowCustomPath(true)
+                        .disableMultiSelect()
+                        .withPredefinedPath(Environment.DIRECTORY_DOWNLOADS)
+                        .setType(StorageChooser.FILE_PICKER)
+                        .setTheme(st)
+                        .build()
+
+                // Show dialog whenever you want by
+                chooser.show()
+
+                // get path that the user has chosen
+                chooser.setOnSelectListener { path ->
+                    if (path.contains("fun.json")) {
+                        launch {
+                            val show = ShowDatabase.getDatabase(this@GeneralPreferenceFragment.context).showDao()
+                            val g = Gson().fromJson(mReadJsonData(path), Array<Show>::class.java)
+                            for (i in g) {
+                                if(show.isInDatabase(i.name)>0) {
+                                    show.insert(i)
+                                }
+                            }
+                        }
+                    }
+                }
+                true
+            }
+
+        }
+
+        open class ShowsList(var list: Array<Shows>)
+
+        data class Shows(
+                @SerializedName("link") val link: String,
+                @SerializedName("name") val name: String,
+                @SerializedName("showNum") val showNum: Double
+        )
+
+        fun mReadJsonData(params: String): String? {
+            return try {
+                val f = File(params)
+                val `is` = FileInputStream(f)
+                val size = `is`.available()
+                val buffer = ByteArray(size)
+                `is`.read(buffer)
+                `is`.close()
+                String(buffer)
+            } catch (e: IOException) {
+                // TODO Auto-generated catch block
+                e.printStackTrace()
+                null
+            }
 
         }
 

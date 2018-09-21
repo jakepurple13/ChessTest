@@ -390,6 +390,15 @@ class EpisodeActivity : AppCompatActivity() {
             }
         }
 
+        share_button.visibility = View.GONE
+
+        share_button.setOnClickListener {
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.type = "text/plain"
+            shareIntent.putExtra(Intent.EXTRA_TEXT, "http://codepath.com")
+            startActivity(Intent.createChooser(shareIntent, "Share link using"))
+        }
+
     }
 
     fun sendProgressNotification(title: String, text: String, progress: Int, context: Context, gotoActivity: Class<*>, notification_id: Int) {

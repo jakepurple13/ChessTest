@@ -92,9 +92,10 @@
         android:id="@+id/fav_episode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/reverse_order"
         android:layout_alignBaseline="@+id/goto_downloads"
         android:layout_alignParentEnd="true"
+        android:layout_toStartOf="@id/share_button"
+        android:layout_toEndOf="@id/reverse_order"
         android:text="Favorite" />
 
     <Button
@@ -104,5 +105,13 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:text="Download Multiple" />
+
+    <ImageView
+        android:id="@+id/share_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/reverse_order"
+        app:srcCompat="@android:drawable/ic_menu_share" />
 
 </RelativeLayout>

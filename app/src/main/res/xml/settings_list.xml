@@ -52,6 +52,13 @@
             android:title="Number of Random Favorites"
             android:defaultValue="1" />
 
+        <Preference
+            android:key="export_favorites"
+            android:title="Export Favorites" />
+
+        <Preference
+            android:key="import_favorites"
+            android:title="Import Favorites" />
 
     </PreferenceCategory>
 </PreferenceScreen>
