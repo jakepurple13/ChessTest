@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager
 import com.abdeveloper.library.MultiSelectDialog
 import com.abdeveloper.library.MultiSelectModel
 import com.crashlytics.android.Crashlytics
+import com.crestron.aurora.ChoiceActivity
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
@@ -35,9 +36,13 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
 
     private var stats: EpisodeActivity.StatusPlay = EpisodeActivity.StatusPlay.PLAY
 
+    var backChoice = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_download_viewer)
+
+        backChoice = intent.getBooleanExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
 
         fetch = Fetch.getDefaultInstance()
 
@@ -93,6 +98,16 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             }
         }
 
+    }
+
+    override fun onBackPressed() {
+        if(backChoice)
+            super.onBackPressed()
+        else {
+            val intent = Intent(this@DownloadViewerActivity, ChoiceActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     override fun onResume() {
@@ -234,6 +249,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
 
         // Creates an explicit intent for an Activity in your app
         val resultIntent = Intent(context, gotoActivity)
+        resultIntent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, false)
         //resultIntent.putExtra("url", "")
         // The stack builder object will contain an artificial back stack for the
         // started Activity.
@@ -299,6 +315,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
 
         // Creates an explicit intent for an Activity in your app
         val resultIntent = Intent(context, gotoActivity)
+        resultIntent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, false)
         // The stack builder object will contain an artificial back stack for the
         // started Activity.
         // This ensures that navigating backward from the Activity leads out of
@@ -338,6 +355,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
         // Creates an explicit intent for an Activity in your app
 
         val resultIntent = Intent(context, gotoActivity)
+        resultIntent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, false)
 
         for (i in dataToPass) {
             resultIntent.putExtra(i.key, i.value)

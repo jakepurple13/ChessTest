@@ -9,6 +9,7 @@ import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.NotificationCompat
+import android.support.v4.app.ShareCompat
 import android.support.v4.app.TaskStackBuilder
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
@@ -19,11 +20,14 @@ import android.widget.Toast
 import com.abdeveloper.library.MultiSelectDialog
 import com.abdeveloper.library.MultiSelectModel
 import com.crashlytics.android.Crashlytics
+import com.crestron.aurora.ChoiceActivity
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
+import com.like.LikeButton
+import com.like.OnLikeListener
 import com.squareup.picasso.Picasso
 import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2.Error
@@ -47,8 +51,9 @@ class EpisodeActivity : AppCompatActivity() {
     lateinit var url: String
     lateinit var name: String
 
+    var backChoice = false
 
-    fun nameUrl(s: String = ""): String {
+    private fun nameUrl(s: String = ""): String {
         return "$name\n$url\n$s"
     }
 
@@ -64,6 +69,8 @@ class EpisodeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_episode)
 
+        val show = ShowDatabase.getDatabase(this@EpisodeActivity)
+
         mNotificationManager = this@EpisodeActivity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -71,8 +78,7 @@ class EpisodeActivity : AppCompatActivity() {
             UtilNotification.createNotificationGroup(this@EpisodeActivity, ConstantValues.GROUP_ID, ConstantValues.GROUP_NAME)
         }
 
-        url = intent.getStringExtra(ConstantValues.URL_INTENT)
-        name = intent.getStringExtra(ConstantValues.NAME_INTENT)
+        handleIntent(intent)
 
         download_info.linksClickable = true
         download_info.text = nameUrl()
@@ -232,6 +238,10 @@ class EpisodeActivity : AppCompatActivity() {
                 getStuff(i.attr("abs:href"))
             }
 
+            if(name=="fun.getting") {
+                name = doc1.select("div.right_col h1").text()
+            }
+
             runOnUiThread {
 
                 val des = if (doc1.allElements.select("div#series_details").select("span#full_notes").hasText())
@@ -243,6 +253,13 @@ class EpisodeActivity : AppCompatActivity() {
                     } catch (e: StringIndexOutOfBoundsException) {
                         Loged.e(e.message!!)
                         d
+                    }
+                }
+
+                launch {
+                    if (show.showDao().isInDatabase(name) > 0) {
+                        //fav_episode.isChecked = true
+                        fav_episode.isLiked = true
                     }
                 }
 
@@ -309,14 +326,6 @@ class EpisodeActivity : AppCompatActivity() {
             startActivity(Intent(this@EpisodeActivity, DownloadViewerActivity::class.java))
         }
 
-        val show = ShowDatabase.getDatabase(this@EpisodeActivity)
-
-        launch {
-            if (show.showDao().isInDatabase(name) > 0) {
-                fav_episode.isChecked = true
-            }
-        }
-
         batch_download.setOnClickListener {
             val multiSelectDialog = MultiSelectDialog()
                     .title("Select the Episodes to download") //setting title for dialog
@@ -362,7 +371,7 @@ class EpisodeActivity : AppCompatActivity() {
             multiSelectDialog.show(supportFragmentManager, "multiSelectDialog")
         }
 
-        fav_episode.setOnCheckedChangeListener { _, b ->
+        /*fav_episode.setOnCheckedChangeListener { _, b ->
 
             fun getEpisodeList(url: String) = async {
                 val doc1 = Jsoup.connect(url).get()
@@ -388,17 +397,136 @@ class EpisodeActivity : AppCompatActivity() {
                     show.showDao().deleteShow(name)
                 }
             }
-        }
+        }*/
 
-        share_button.visibility = View.GONE
+        fav_episode.setOnLikeListener(object : OnLikeListener {
+            override fun liked(p0: LikeButton?) {
+                liked(p0!!.isLiked)
+            }
+
+            override fun unLiked(p0: LikeButton?) {
+                liked(p0!!.isLiked)
+            }
+
+            fun liked(like: Boolean) {
+                fun getEpisodeList(url: String) = async {
+                    val doc1 = Jsoup.connect(url).get()
+                    val stuffList = doc1.allElements.select("div#videos").select("a[href^=http]")
+                    stuffList.size
+                }
+
+                async {
+                    if (like) {
+                        show.showDao().insert(Show(url, name))
+
+                        async {
+                            val s = show.showDao().getShow(name)
+                            val showList = getEpisodeList(url).await()
+                            if (s.showNum < showList) {
+                                s.showNum = showList
+                                show.showDao().updateShow(s)
+                            }
+                            Loged.wtf("${s.name} and size is $showList")
+                        }
+
+                    } else {
+                        show.showDao().deleteShow(name)
+                    }
+                }
+            }
+
+        })
+
+        //share_button.visibility = View.GONE
 
         share_button.setOnClickListener {
-            val shareIntent = Intent(Intent.ACTION_SEND)
-            shareIntent.type = "text/plain"
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "http://codepath.com")
-            startActivity(Intent.createChooser(shareIntent, "Share link using"))
+            shareEmail()
         }
 
+    }
+
+    private fun shareEmail() {
+
+        val links = url.replace("www.", "fun.")
+
+        /*val text = "<a href=\"$links\">Check out $name</a>"
+
+        val thisApp = ""
+
+        val shareIntent = ShareCompat.IntentBuilder.from(this@EpisodeActivity)
+                .setType("text/html")
+                .setHtmlText("$text<br><br>$links<br><br>$thisApp")
+                .setSubject("Definitely watch $name")
+                .setChooserTitle("Share $name")
+                .intent
+
+        startActivity(shareIntent)*/
+
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, links)
+            type = "text/plain"
+        }
+        startActivity(Intent.createChooser(sendIntent, "Share $name"))
+
+    }
+
+    override fun onBackPressed() {
+        if(backChoice)
+            super.onBackPressed()
+        else {
+            val intent = Intent(this@EpisodeActivity, ChoiceActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        handleIntent(intent!!)
+    }
+
+    private fun handleIntent(intent: Intent) {
+
+        val action = intent.action
+        val data = intent.data
+
+        if (Intent.ACTION_VIEW == action && data != null) {
+            backChoice = false
+            val id = data.lastPathSegment
+
+            //val sourceId = data.pathSegments[0]
+            //val titleId = data.pathSegments[1]
+
+            for (s in data.pathSegments) {
+                Loged.e(s)
+            }
+            Loged.i("$data")
+            //mangaLink = "/" + titleId.replaceAll("_", "-").toLowerCase();
+            //mangaTitle = titleId.replaceAll("-", " ");
+            url = data.toString().replace("fun.", "www.")
+            name = "fun.getting"//toTitleCase(id!!.replace("-", " ").removeSuffix("online"))
+            Loged.d("action: " + action + " | data: " + data.toString() + " | id: " + id)
+
+        } else {
+            backChoice = true
+            //mangaID = getIntent().getStringExtra("manga_id");
+            url = intent.getStringExtra(ConstantValues.URL_INTENT)
+            name = intent.getStringExtra(ConstantValues.NAME_INTENT)
+
+        }
+
+    }
+
+    private fun toTitleCase(givenString: String): String {
+        val arr = givenString.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val sb = StringBuffer()
+
+        for (i in arr.indices) {
+            sb.append(Character.toUpperCase(arr[i][0]))
+                    .append(arr[i].substring(1)).append(" ")
+        }
+        return sb.toString().trim { it <= ' ' }
     }
 
     fun sendProgressNotification(title: String, text: String, progress: Int, context: Context, gotoActivity: Class<*>, notification_id: Int) {

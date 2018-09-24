@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SectionIndexer
 import com.crestron.aurora.otherfun.ShowListActivity
+import com.like.LikeButton
+import com.like.OnLikeListener
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.text_layout.view.*
 import kotlinx.coroutines.experimental.async
@@ -71,11 +73,11 @@ class SettingsShowAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
         }
 
         holder.linkType.setOnLongClickListener {
-            holder.favorite.isChecked != holder.favorite.isChecked
+            //holder.favorite.isChecked != holder.favorite.isChecked
             true
         }
 
-        holder.favorite.text = ""//stuff[position].name
+        //holder.favorite.text = ""//stuff[position].name
 
         Picasso.get().setIndicatorsEnabled(true)
         holder.imageView.visibility = View.GONE
@@ -84,11 +86,24 @@ class SettingsShowAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
             holder.favorite.performClick()
         }*/
 
-        holder.favorite.isChecked = action.isChecked(stuff[position].name)
+        //holder.favorite.isChecked = action.isChecked(stuff[position].name)
 
-        holder.favorite.setOnCheckedChangeListener { _, b ->
+        holder.favorite.isLiked = action.isChecked(stuff[position].name)
+
+        /*holder.favorite.setOnCheckedChangeListener { _, b ->
             action.longClick(stuff[position].name, stuff[position].url, b)
-        }
+        }*/
+
+        holder.favorite.setOnLikeListener(object : OnLikeListener {
+            override fun liked(p0: LikeButton?) {
+                action.longClick(stuff[position].name, stuff[position].url, p0!!.isLiked)
+            }
+
+            override fun unLiked(p0: LikeButton?) {
+                action.longClick(stuff[position].name, stuff[position].url, p0!!.isLiked)
+            }
+
+        })
     }
 
     private fun getEpisodeList(url: String) = async {

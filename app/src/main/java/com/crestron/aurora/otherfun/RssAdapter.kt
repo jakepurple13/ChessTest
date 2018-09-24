@@ -45,6 +45,6 @@ class ViewHolderRss(view: View) : RecyclerView.ViewHolder(view) {
     val image = view.show_image!!
 
     init {
-        setIsRecyclable(false)
+        setIsRecyclable(true)
     }
 }

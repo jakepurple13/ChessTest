@@ -12,13 +12,17 @@ import android.os.IBinder
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import android.util.Log
+import com.crestron.aurora.otherfun.AppInfo
 import com.crestron.aurora.otherfun.DownloadUpdateReceiver
 import com.crestron.aurora.otherfun.NotificationBroadcastReceiver
 import com.firebase.jobdispatcher.FirebaseJobDispatcher
 import com.firebase.jobdispatcher.GooglePlayDriver
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.google.gson.Gson
+import kotlinx.coroutines.experimental.launch
 import programmer.box.utilityhelper.UtilNotification
+import java.net.URL
 
 
 class MessagingFirebase : FirebaseMessagingService() {
@@ -134,7 +138,8 @@ class MessagingFirebase : FirebaseMessagingService() {
         val mBuilder = NotificationCompat.Builder(context, "episodeUpdate")
                 .setSmallIcon(smallIconId)
                 .setContentTitle(title)
-                .setContentText(messages)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(messages))
+                //.setContentText(messages)
                 .setAutoCancel(true)
                 .setChannelId(channel_id)
         // Creates an explicit intent for an Activity in your app
@@ -163,45 +168,49 @@ class MessagingFirebase : FirebaseMessagingService() {
         mNotificationManager.notify(notification_id, mBuilder.build())
     }
 
-    private fun sendDownloadUpdateNotification(title: String, text: String, context: Context, gotoActivity: Class<*>, notification_id: Int) {
+    private fun sendDownloadUpdateNotification(title: String, text: String, context: Context, gotoActivity: Class<*>, notification_id: Int) = launch {
 
-        val mBuilder = NotificationCompat.Builder(this, ConstantValues.CHANNEL_ID)
-                .setSmallIcon(android.R.mipmap.sym_def_app_icon)
-                .setAutoCancel(true)
-                .setContentTitle(title)
-                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
-                .setOnlyAlertOnce(true)
+            val texts = URL(ConstantValues.VERSION_URL).readText()
+            val info: AppInfo = Gson().fromJson(texts, AppInfo::class.java)
+            val textToUse = "$text\n${info.devNotes}"
 
-        // Creates an explicit intent for an Activity in your app
-        val resultIntent = Intent(context, gotoActivity)
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your app to the Home screen.
-        val stackBuilder = TaskStackBuilder.create(context)
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(gotoActivity)
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent)
-        val resultPendingIntent = stackBuilder.getPendingIntent(
-                0,
-                PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        mBuilder.setContentIntent(resultPendingIntent)
+            val mBuilder = NotificationCompat.Builder(this@MessagingFirebase, ConstantValues.CHANNEL_ID)
+                    .setSmallIcon(android.R.mipmap.sym_def_app_icon)
+                    .setAutoCancel(true)
+                    .setContentTitle(title)
+                    .setStyle(NotificationCompat.BigTextStyle().bigText(textToUse))
+                    .setOnlyAlertOnce(true)
 
-        val downloadIntent = Intent(applicationContext, DownloadUpdateReceiver::class.java).apply {
-            action = "fun.com.crestron.UPDATE_APP"
-            putExtra("firebase_channel_id", notification_id)
-        }
-        val pendingIntent = PendingIntent.getBroadcast(applicationContext, 1, downloadIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        mBuilder.addAction(android.R.drawable.ic_menu_upload, "Update", pendingIntent)
+            // Creates an explicit intent for an Activity in your app
+            val resultIntent = Intent(context, gotoActivity)
+            // The stack builder object will contain an artificial back stack for the
+            // started Activity.
+            // This ensures that navigating backward from the Activity leads out of
+            // your app to the Home screen.
+            val stackBuilder = TaskStackBuilder.create(context)
+            // Adds the back stack for the Intent (but not the Intent itself)
+            stackBuilder.addParentStack(gotoActivity)
+            // Adds the Intent that starts the Activity to the top of the stack
+            stackBuilder.addNextIntent(resultIntent)
+            val resultPendingIntent = stackBuilder.getPendingIntent(
+                    0,
+                    PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            mBuilder.setContentIntent(resultPendingIntent)
 
-        val mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val downloadIntent = Intent(applicationContext, DownloadUpdateReceiver::class.java).apply {
+                action = "fun.com.crestron.UPDATE_APP"
+                putExtra("firebase_channel_id", notification_id)
+            }
+            val pendingIntent = PendingIntent.getBroadcast(applicationContext, 1, downloadIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            mBuilder.addAction(android.R.drawable.ic_menu_upload, "Update", pendingIntent)
 
-        // mNotificationId is a unique integer your app uses to identify the
-        // notification. For example, to cancel the notification, you can pass its ID
-        // number to NotificationManager.cancel().
-        mNotificationManager.notify(notification_id, mBuilder.build())
+            val mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            // mNotificationId is a unique integer your app uses to identify the
+            // notification. For example, to cancel the notification, you can pass its ID
+            // number to NotificationManager.cancel().
+            mNotificationManager.notify(notification_id, mBuilder.build())
     }
 
     companion object {

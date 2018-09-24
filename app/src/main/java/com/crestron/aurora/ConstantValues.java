@@ -23,4 +23,5 @@ public interface ConstantValues {
     String VERSION_URL = "https://raw.githubusercontent.com/jakepurple13/ForUsNerds/master/updated.json";
     String RANDOM_SHOW = "random_show";
     String NUMBER_OF_RANDOM = "number_of_random";
+    String DOWNLOAD_NOTIFICATION = "notiOrNot";
 }

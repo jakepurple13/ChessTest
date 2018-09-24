@@ -284,7 +284,9 @@ class ChoiceActivity : AppCompatActivity() {
                             }
                         }
                         ChoiceButton.VIEW_DOWNLOADS -> {
-                            startActivity(Intent(this@ChoiceActivity, DownloadViewerActivity::class.java))
+                            val intent =  Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
+                            intent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
+                            startActivity(intent)
                         }
                         ChoiceButton.UPDATE_NOTES -> {
                             async {

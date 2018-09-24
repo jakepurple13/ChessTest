@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.crestron.aurora">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -21,7 +22,8 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:fullBackupContent="">
         <activity
             android:name=".boardgames.chess.MainActivity"
             android:screenOrientation="portrait" />
@@ -59,7 +61,41 @@
         <activity android:name=".otherfun.AniDownloadActivity" />
         <activity
             android:name=".otherfun.EpisodeActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Anime -->
+                <data
+                    android:host="fun.animeplus.tv"
+                    android:scheme="http" />
+                <!--<data
+                    android:host="www.animeplus.tv"
+                    android:scheme="https" />
+
+                <data
+                    android:host="www.animeplus.tv"
+                    android:scheme="http" />-->
+                <data
+                    android:host="fun.animeplus.tv"
+                    android:scheme="https" />
+                <!-- Cartoon -->
+               <!-- <data
+                    android:host="www.animetoon.org"
+                    android:scheme="http" />
+                <data
+                    android:host="www.animetoon.org"
+                    android:scheme="https" />-->
+                <data
+                    android:host="fun.animetoon.org"
+                    android:scheme="http" />
+                <data
+                    android:host="fun.animetoon.org"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".otherfun.ShowListActivity"
             android:screenOrientation="portrait" />
@@ -125,7 +161,8 @@
             android:name="io.fabric.ApiKey"
             android:value="914a898632a14cf4fc0bb8b8c61e20ab674bf310" />
 
-        <activity android:name=".ChoiceActivity">
+        <activity android:name=".ChoiceActivity"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -137,9 +174,6 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".SettingsActivity2"
-            android:label="@string/title_activity_settings2" />
-        <activity
-            android:name=".SettingsActivity3"
             android:label="@string/title_activity_settings2" />
 
         <provider
@@ -159,7 +193,8 @@
             </intent-filter>
         </service>
         -->
-        <service android:name=".MessagingFirebase">
+        <service android:name=".MessagingFirebase"
+            tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -189,7 +224,7 @@
         -->
 
         <activity android:name=".SettingsShowActivity" />
-        <activity android:name=".otherfun.RssActivity"></activity>
+        <activity android:name=".otherfun.RssActivity" />
     </application>
 
 </manifest>

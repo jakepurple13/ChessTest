@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="true"
     tools:context=".otherfun.EpisodeActivity">
 
     <ProgressBar
@@ -88,15 +89,15 @@
         </ScrollView>
     </LinearLayout>
 
-    <CheckBox
+    <com.like.LikeButton
         android:id="@+id/fav_episode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/goto_downloads"
-        android:layout_alignParentEnd="true"
-        android:layout_toStartOf="@id/share_button"
         android:layout_toEndOf="@id/reverse_order"
-        android:text="Favorite" />
+        android:layout_toStartOf="@id/share_button"
+        android:layout_below="@id/progressBar2"
+        android:layout_above="@id/episode_refresh"
+        app:icon_type="heart" />
 
     <Button
         android:id="@+id/batch_download"
@@ -106,12 +107,13 @@
         android:layout_centerHorizontal="true"
         android:text="Download Multiple" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/share_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignTop="@+id/reverse_order"
+        android:layout_above="@id/episode_refresh"
+        android:layout_below="@+id/progressBar2"
         app:srcCompat="@android:drawable/ic_menu_share" />
 
 </RelativeLayout>

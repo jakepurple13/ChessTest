@@ -12,6 +12,8 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
+import com.like.LikeButton
+import com.like.OnLikeListener
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.text_layout.view.*
 import kotlinx.coroutines.experimental.android.UI
@@ -109,10 +111,11 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
             }
 
             holder.linkType.setOnLongClickListener {
-                holder.favorite.isChecked != holder.favorite.isChecked
+                //holder.favorite.isChecked != holder.favorite.isChecked
+                true
             }
 
-            holder.favorite.text = ""//stuff[position].name
+            //holder.favorite.text = ""//stuff[position].name
             /*holder.favorite.setOnClickListener {
                 Loged.wtf("I was pressed")
                 action.hit(stuff[position].name, stuff[position].url)
@@ -150,11 +153,11 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
 
             launch {
                 if (show.showDao().isInDatabase(stuff[position].name) > 0) {
-                    holder.favorite.isChecked = true
+                    holder.favorite.isLiked = true
                 }
             }
 
-            holder.favorite.setOnCheckedChangeListener { _, b ->
+            /*holder.favorite.setOnCheckedChangeListener { _, b ->
                 async {
                     if (b) {
                         show.showDao().insert(Show(stuff[position].url, stuff[position].name))
@@ -173,7 +176,39 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
                         show.showDao().deleteShow(stuff[position].name)
                     }
                 }
-            }
+            }*/
+
+            holder.favorite.setOnLikeListener(object : OnLikeListener {
+                override fun liked(p0: LikeButton?) {
+                    liked(p0!!.isLiked)
+                }
+
+                override fun unLiked(p0: LikeButton?) {
+                    liked(p0!!.isLiked)
+                }
+
+                fun liked(like: Boolean) {
+                    async {
+                        if (like) {
+                            show.showDao().insert(Show(stuff[position].url, stuff[position].name))
+
+                            async {
+                                val s = show.showDao().getShow(stuff[position].name)
+                                val showList = getEpisodeList(stuff[position].url).await()
+                                if (s.showNum < showList) {
+                                    s.showNum = showList
+                                    show.showDao().updateShow(s)
+                                }
+                                Loged.wtf("${s.name} and size is $showList")
+                            }
+
+                        } else {
+                            show.showDao().deleteShow(stuff[position].name)
+                        }
+                    }
+                }
+
+            })
 
         }
     }
