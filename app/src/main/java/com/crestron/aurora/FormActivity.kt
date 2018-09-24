@@ -19,7 +19,7 @@ import okhttp3.Request
 
 class FormActivity : AppCompatActivity() {
 
-    private lateinit var forms: FormBuildHelper
+    //private lateinit var forms: FormBuildHelper
 
     @SuppressLint("SetJavaScriptEnabled", "PrivateResource")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +27,7 @@ class FormActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_form)
 
-        val forms = form(this, recyclerViewForm) {
+        form(this, recyclerViewForm) {
             header {
                 title = "Feedback"
             }
