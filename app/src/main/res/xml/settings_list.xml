@@ -60,5 +60,9 @@
             android:key="import_favorites"
             android:title="Import Favorites" />
 
+        <Preference
+            android:key="send_feedback"
+            android:title="Send Feedback" />
+
     </PreferenceCategory>
 </PreferenceScreen>

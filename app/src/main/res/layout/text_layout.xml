@@ -36,6 +36,6 @@
         android:layout_gravity="end"
         app:srcCompat="@drawable/ic_check_white_48dp"
         android:contentDescription="image"
-        tools:ignore="HardcodedText" />
+        tools:ignore="HardcodedText,PxUsage" />
 
 </RelativeLayout>

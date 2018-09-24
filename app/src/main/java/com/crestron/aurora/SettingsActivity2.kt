@@ -12,22 +12,20 @@ import android.os.Bundle
 import android.os.Environment
 import android.preference.*
 import android.text.TextUtils
-import android.util.AttributeSet
 import android.view.MenuItem
 import android.widget.Toast
 import com.codekidlabs.storagechooser.StorageChooser
+import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.FetchingUtils
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
-import java.lang.NumberFormatException
-import android.R.attr.data
-import com.crestron.aurora.db.Show
-import com.google.gson.annotations.SerializedName
-import com.google.gson.internal.LinkedTreeMap
-import java.io.*
-import java.util.ArrayList
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
 
 
 /**
@@ -248,6 +246,12 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                         }
                     }
                 }
+                true
+            }
+
+            findPreference("send_feedback").setOnPreferenceClickListener {
+                val intented = Intent(this@GeneralPreferenceFragment.context, FormActivity::class.java)
+                startActivity(intented)
                 true
             }
 

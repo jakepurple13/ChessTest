@@ -1,19 +1,18 @@
 package com.crestron.aurora.boardgames.chess
 
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.DisplayMetrics
 import android.view.View
 import android.widget.*
+import com.crestron.aurora.Loged
+import com.crestron.aurora.R
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.delay
-import android.graphics.drawable.ColorDrawable
-import com.crestron.aurora.Loged
-import com.crestron.aurora.R
-
 
 class MainActivity : AppCompatActivity() {
 

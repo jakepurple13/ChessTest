@@ -9,10 +9,8 @@ import android.net.Uri
 import android.os.Environment
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
-import android.support.v7.app.AlertDialog
 import android.util.Log
 import com.crestron.aurora.ConstantValues
-import com.crestron.aurora.Loged
 import com.google.gson.Gson
 import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2.FetchConfiguration
@@ -21,7 +19,7 @@ import com.tonyodev.fetch2.Request
 import com.tonyodev.fetch2core.DownloadBlock
 import com.tonyodev.fetch2core.Downloader
 import com.tonyodev.fetch2core.Func
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.File
 import java.net.URL
@@ -30,7 +28,7 @@ class DownloadUpdateReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         val notificationId = intent?.getIntExtra("firebase_channel_id", 0) ?: 0
         Log.d("", "NotificationBroadcastReceiver: notificationId = $notificationId")
-        async {
+        launch {
             getNewApp(context!!)
         }
     }
@@ -40,8 +38,8 @@ class DownloadUpdateReceiver : BroadcastReceiver() {
         val url = URL(ConstantValues.VERSION_URL).readText()
         val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
 
-        val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        val version = pInfo.versionName
+        //val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        //val version = pInfo.versionName
 
         val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + getNameFromUrl(info.link)!!.replace(".png", ".apk")
         val request = Request(info.link, filePath)
@@ -114,6 +112,7 @@ class DownloadUpdateReceiver : BroadcastReceiver() {
 
         // Creates an explicit intent for an Activity in your app
         val resultIntent = Intent(context, gotoActivity)
+        resultIntent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, false)
         // The stack builder object will contain an artificial back stack for the
         // started Activity.
         // This ensures that navigating backward from the Activity leads out of

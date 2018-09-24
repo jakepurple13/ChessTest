@@ -3,7 +3,6 @@ package io.kimo.konamicode;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -144,7 +143,7 @@ public class KonamiCodeLayout extends FrameLayout implements KonamiSequenceListe
     }
 
     public void processTouches(@NonNull MotionEvent ev) {
-        int action = MotionEventCompat.getActionMasked(ev);
+        int action = ev.getAction();//MotionEventCompat.getActionMasked(ev);
 
         switch (action) {
             case MotionEvent.ACTION_DOWN:

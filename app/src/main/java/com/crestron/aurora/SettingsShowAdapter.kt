@@ -82,9 +82,9 @@ class SettingsShowAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
         Picasso.get().setIndicatorsEnabled(true)
         holder.imageView.visibility = View.GONE
 
-        /*holder.layout.setOnClickListener {
-            holder.favorite.performClick()
-        }*/
+        holder.layout.setOnClickListener {
+            holder.linkType.performClick()
+        }
 
         //holder.favorite.isChecked = action.isChecked(stuff[position].name)
 

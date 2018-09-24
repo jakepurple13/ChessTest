@@ -1,8 +1,6 @@
 package com.crestron.aurora.boardgames.yahtzee
 
 import android.annotation.SuppressLint
-import android.content.res.Resources
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -20,11 +18,8 @@ import kotlinx.android.synthetic.main.activity_yahtzee.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
-import org.jetbrains.anko.backgroundDrawable
-import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.defaultSharedPreferences
 import java.util.*
-
 
 class YahtzeeActivity : AppCompatActivity() {
 
@@ -141,7 +136,7 @@ class YahtzeeActivity : AppCompatActivity() {
                 var count = 0
 
                 for (i in groupedCheck.keys.withIndex()) {
-                    if (i.index<5) {
+                    if (i.index < 5) {
                         val view = when (i.value) {
                             1 -> one_score
                             2 -> two_score
@@ -157,10 +152,10 @@ class YahtzeeActivity : AppCompatActivity() {
                             2 -> resources.getColor(R.color.alizarin, null)
                             else -> null
                         }.apply {
-                            if(view.isEnabled)
+                            if (view.isEnabled)
                                 count++
                         }
-                        if(view.isEnabled && level!=null) {
+                        if (view.isEnabled && level != null) {
                             buttonSet(view, true)
                             view.background.setTint(level)
                         }

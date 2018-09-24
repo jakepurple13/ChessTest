@@ -39,13 +39,13 @@ class AnimationUtility {
             if (animator == null)
                 animator = ValueAnimator.ofInt(start, end)
             else
-                animator!!.setIntValues(animator!!.animatedValue as Int, end)
+                animator.setIntValues(animator.animatedValue as Int, end)
             animator!!.duration = duration
-            animator!!.interpolator = interpolator
-            animator!!.addUpdateListener { animation ->
+            animator.interpolator = interpolator
+            animator.addUpdateListener { animation ->
                 countListener.numberUpdate(animation.animatedValue as Number)
             }
-            animator!!.addListener(object : Animator.AnimatorListener {
+            animator.addListener(object : Animator.AnimatorListener {
                 override fun onAnimationRepeat(animation: Animator?) {
 
                 }
@@ -63,8 +63,8 @@ class AnimationUtility {
 
             })
             if (view != null)
-                animator!!.setTarget(view)
-            animator!!.start()
+                animator.setTarget(view)
+            animator.start()
         }
 
         fun animateCard(cardView: ImageView, card: Card, context: Context, speed: Long = cardView.animate().duration, reverse: Boolean = false, end: AnimationEnd = object : AnimationEnd {}) = launch(UI) {

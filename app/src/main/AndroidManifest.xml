@@ -22,8 +22,7 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:fullBackupContent="">
+        android:theme="@style/AppTheme">
         <activity
             android:name=".boardgames.chess.MainActivity"
             android:screenOrientation="portrait" />
@@ -71,23 +70,27 @@
                 <data
                     android:host="fun.animeplus.tv"
                     android:scheme="http" />
-                <!--<data
+                <!--
+                <data
                     android:host="www.animeplus.tv"
                     android:scheme="https" />
 
                 <data
                     android:host="www.animeplus.tv"
-                    android:scheme="http" />-->
+                    android:scheme="http" />
+                -->
                 <data
                     android:host="fun.animeplus.tv"
                     android:scheme="https" />
                 <!-- Cartoon -->
-               <!-- <data
+                <!--
+                <data
                     android:host="www.animetoon.org"
                     android:scheme="http" />
                 <data
                     android:host="www.animetoon.org"
-                    android:scheme="https" />-->
+                    android:scheme="https" />
+                -->
                 <data
                     android:host="fun.animetoon.org"
                     android:scheme="http" />
@@ -161,7 +164,8 @@
             android:name="io.fabric.ApiKey"
             android:value="914a898632a14cf4fc0bb8b8c61e20ab674bf310" />
 
-        <activity android:name=".ChoiceActivity"
+        <activity
+            android:name=".ChoiceActivity"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -193,7 +197,8 @@
             </intent-filter>
         </service>
         -->
-        <service android:name=".MessagingFirebase"
+        <service
+            android:name=".MessagingFirebase"
             tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -225,6 +230,7 @@
 
         <activity android:name=".SettingsShowActivity" />
         <activity android:name=".otherfun.RssActivity" />
+        <activity android:name=".FormActivity"></activity>
     </application>
 
 </manifest>

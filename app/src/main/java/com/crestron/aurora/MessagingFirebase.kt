@@ -1,27 +1,18 @@
 package com.crestron.aurora
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.media.RingtoneManager
-import android.os.Build
-import android.os.IBinder
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import android.util.Log
 import com.crestron.aurora.otherfun.AppInfo
 import com.crestron.aurora.otherfun.DownloadUpdateReceiver
-import com.crestron.aurora.otherfun.NotificationBroadcastReceiver
-import com.firebase.jobdispatcher.FirebaseJobDispatcher
-import com.firebase.jobdispatcher.GooglePlayDriver
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import kotlinx.coroutines.experimental.launch
-import programmer.box.utilityhelper.UtilNotification
 import java.net.URL
 
 
@@ -50,7 +41,7 @@ class MessagingFirebase : FirebaseMessagingService() {
         Loged.wtf(remoteMessage!!.notification!!.body!!)
 
         // Check if message contains a data payload.
-        remoteMessage?.data?.isNotEmpty()?.let {
+        remoteMessage.data?.isNotEmpty()?.let {
             Log.d(TAG, "Message data payload: " + remoteMessage.data)
             if(remoteMessage.data.containsKey("update")) {
                 if(remoteMessage.data["update"]=="true") {
@@ -73,7 +64,7 @@ class MessagingFirebase : FirebaseMessagingService() {
         }
 
         // Check if message contains a notification payload.
-        remoteMessage?.notification?.let {
+        remoteMessage.notification?.let {
             Log.d(TAG, "Message Notification Body: ${it.body}")
         }
 
@@ -131,6 +122,7 @@ class MessagingFirebase : FirebaseMessagingService() {
      */
     private fun sendRegistrationToServer(token: String?) {
         // TODO: Implement this method to send token to your app server.
+        Loged.i("$token")
     }
 
     private fun sendNotification(context: Context, smallIconId: Int, title: String, messages: String, channel_id: String, gotoActivity: Class<*>, notification_id: Int) {

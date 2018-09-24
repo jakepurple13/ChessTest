@@ -7,7 +7,6 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 import android.arch.persistence.room.Update;
 
-import java.util.Collection;
 import java.util.List;
 
 @Dao
@@ -50,6 +49,6 @@ public interface ShowDao {
             "from show_table inner join episode_watched on " +
             "show_table.show_name = episode_watched.showName" +
             " where show_name=:name order by episodeNumber")
-    public List<Episode> getEpisodeFromShow(String name);
+    List<Episode> getEpisodeFromShow(String name);
 
 }

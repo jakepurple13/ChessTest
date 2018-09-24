@@ -30,11 +30,9 @@ import com.crestron.aurora.cardgames.videopoker.VideoPokerActivity
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.*
 import com.google.firebase.FirebaseApp
-import com.google.firebase.iid.FirebaseInstanceId
 import com.google.gson.Gson
 import com.nabinbhandari.android.permissions.PermissionHandler
 import com.nabinbhandari.android.permissions.Permissions
-import com.squareup.picasso.Picasso
 import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2.FetchConfiguration
 import com.tonyodev.fetch2.HttpUrlConnectionDownloader
@@ -78,7 +76,8 @@ class ChoiceActivity : AppCompatActivity() {
         DELETE_OLD_FILE("delete_old_file", "Delete Old File\n(Sorry still working on this)"),
         QUICK_CHOICE("quick_choice", ""),
         VIEW_FAVORITES("view_favorites", "View Favorites"),
-        RSS_FEED("rss_feed", "Schedule")
+        RSS_FEED("rss_feed", "Schedule"),
+        FEEDBACK("feedback", "Feedback")
     }
 
     private fun drawableModel(id: Int, button: ChoiceButton, count: Int = 0): BookModel {
@@ -426,6 +425,10 @@ class ChoiceActivity : AppCompatActivity() {
                             val intented = Intent(this@ChoiceActivity, RssActivity::class.java)
                             startActivity(intented)
                         }
+                        ChoiceButton.FEEDBACK -> {
+                            val intented = Intent(this@ChoiceActivity, FormActivity::class.java)
+                            startActivity(intented)
+                        }
                     }
                 } catch (e: IllegalArgumentException) {
                     val intented = Intent(this@ChoiceActivity, EpisodeActivity::class.java)
@@ -460,6 +463,7 @@ class ChoiceActivity : AppCompatActivity() {
         models.add(drawableModel(R.drawable.mov, ChoiceButton.VIEW_DOWNLOADS))
 
         models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.SETTINGS))
+        models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.FEEDBACK))
         models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.UPDATE_APP))
         models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.UPDATE_NOTES))
         //models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.DELETE_OLD_FILE))

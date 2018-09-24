@@ -104,6 +104,7 @@ dependencies {
     implementation 'com.github.abumoallim:Android-Multi-Select-Dialog:v1.9'
     implementation 'com.prof.rssparser:rssparser:1.4.4'
     implementation 'com.github.jd-alexander:LikeButton:0.2.3'
+    implementation "com.thejuki:k-form-master:+"
 
 }
 kotlin {
