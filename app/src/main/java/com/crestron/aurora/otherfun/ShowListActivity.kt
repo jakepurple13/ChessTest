@@ -1,10 +1,8 @@
 package com.crestron.aurora.otherfun
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
-import android.support.annotation.NonNull
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -18,6 +16,8 @@ import com.crestron.aurora.R
 import com.crestron.aurora.db.ShowDatabase
 import kotlinx.android.synthetic.main.activity_show_list.*
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
+import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import java.util.*
 
@@ -51,7 +51,7 @@ class ShowListActivity : AppCompatActivity() {
 
         class ItemOffsetDecoration(private val mItemOffset: Int) : RecyclerView.ItemDecoration() {
 
-            constructor(@NonNull context: Context, itemOffsetId: Int) : this(context.resources.getDimensionPixelSize(itemOffsetId)) {}
+            //constructor(@NonNull context: Context, itemOffsetId: Int) : this(context.resources.getDimensionPixelSize(itemOffsetId)) {}
 
             override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView,
                                         state: RecyclerView.State) {
@@ -68,45 +68,51 @@ class ShowListActivity : AppCompatActivity() {
 
         fun getListOfAnime(urlToUse: String) {
 
-            if (recentChoice) {
+            try {
 
-                Loged.i("We are beginning")
+                if (recentChoice) {
 
-                val doc = Jsoup.connect(urlToUse).get()
+                    Loged.i("We are beginning")
 
-                val lists = doc.allElements
+                    val doc = Jsoup.connect(urlToUse).get()
 
-                var listOfStuff = lists.select("div.left_col").select("table#updates").select("a[href^=http]")
-                Loged.wtf(listOfStuff.size.toString())
-                if(listOfStuff.size==0) {
-                    listOfStuff = lists.select("div.s_left_col").select("table#updates").select("a[href^=http]")
+                    val lists = doc.allElements
+
+                    var listOfStuff = lists.select("div.left_col").select("table#updates").select("a[href^=http]")
+                    Loged.wtf(listOfStuff.size.toString())
+                    if (listOfStuff.size == 0) {
+                        listOfStuff = lists.select("div.s_left_col").select("table#updates").select("a[href^=http]")
+                    }
+
+                    for (element in listOfStuff) {
+
+                        val nameAndLink = NameAndLink(element.text(), element.attr("abs:href"))
+
+                        if (!element.text().contains("Episode"))
+                            listOfNameAndLink.add(nameAndLink)
+                    }
+
+                } else {
+
+                    Loged.i("We are beginning")
+
+                    val doc = Jsoup.connect(urlToUse).get()
+
+                    val lists = doc.allElements
+
+                    val listOfStuff = lists.select("td").select("a[href^=http]")
+
+                    for (element in listOfStuff) {
+                        //Loged.wtf("$i: ${element.html()}")
+                        listOfNames.add(element.text())
+                        listOfLinks.add(element.attr("abs:href"))
+                        listOfNameAndLink.add(NameAndLink(element.text(), element.attr("abs:href")))
+                    }
+
                 }
 
-                for (element in listOfStuff) {
-
-                    val nameAndLink = NameAndLink(element.text(), element.attr("abs:href"))
-
-                    if (!element.text().contains("Episode"))
-                        listOfNameAndLink.add(nameAndLink)
-                }
-
-            } else {
-
-                Loged.i("We are beginning")
-
-                val doc = Jsoup.connect(urlToUse).get()
-
-                val lists = doc.allElements
-
-                val listOfStuff = lists.select("td").select("a[href^=http]")
-
-                for ((i, element) in listOfStuff.withIndex()) {
-                    //Loged.wtf("$i: ${element.html()}")
-                    listOfNames.add(element.text())
-                    listOfLinks.add(element.attr("abs:href"))
-                    listOfNameAndLink.add(NameAndLink(element.text(), element.attr("abs:href")))
-                }
-
+            } catch (e: HttpStatusException) {
+                Loged.wtf("${e.message}")
             }
 
             if(!recentChoice)
@@ -168,7 +174,7 @@ class ShowListActivity : AppCompatActivity() {
         favorite_show.isEnabled = false
 
         favorite_show.setOnCheckedChangeListener { _, b ->
-            async {
+            launch {
                 val listToShow = if (b) {
                     val showList = showDatabase.showDao().allShows
                     val nnList = arrayListOf<NameAndLink>()

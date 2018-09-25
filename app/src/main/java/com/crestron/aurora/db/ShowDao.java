@@ -25,6 +25,9 @@ public interface ShowDao {
     @Query("SELECT COUNT(show_name) FROM show_table where show_name==(:showName)")
     int isInDatabase(String showName);
 
+    @Query("SELECT COUNT(show_link) FROM show_table where show_link==(:showLink)")
+    int isUrlInDatabase(String showLink);
+
     @Query("DELETE FROM show_table where show_name==(:name)")
     void deleteShow(String name);
 

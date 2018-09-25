@@ -239,7 +239,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                             val show = ShowDatabase.getDatabase(this@GeneralPreferenceFragment.context).showDao()
                             val g = Gson().fromJson(mReadJsonData(path), Array<Show>::class.java)
                             for (i in g) {
-                                if(show.isInDatabase(i.name)>0) {
+                                if (show.isInDatabase(i.name) <= 0) {
                                     show.insert(i)
                                 }
                             }
@@ -255,9 +255,12 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                 true
             }
 
-        }
+            val pInfo = this@GeneralPreferenceFragment.context.packageManager.getPackageInfo(this@GeneralPreferenceFragment.context.packageName, 0)
+            val version = pInfo.versionName
 
-        open class ShowsList(var list: Array<Shows>)
+            findPreference("user_version").summary = "Version: $version"
+
+        }
 
         data class Shows(
                 @SerializedName("link") val link: String,

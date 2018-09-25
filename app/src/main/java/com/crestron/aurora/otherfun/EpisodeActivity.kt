@@ -9,7 +9,6 @@ import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.NotificationCompat
-import android.support.v4.app.ShareCompat
 import android.support.v4.app.TaskStackBuilder
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
@@ -39,7 +38,7 @@ import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jsoup.Jsoup
 import programmer.box.utilityhelper.UtilNotification
-import java.util.ArrayList
+import java.util.*
 
 
 class EpisodeActivity : AppCompatActivity() {
@@ -51,7 +50,7 @@ class EpisodeActivity : AppCompatActivity() {
     lateinit var url: String
     lateinit var name: String
 
-    var backChoice = false
+    private var backChoice = false
 
     private fun nameUrl(s: String = ""): String {
         return "$name\n$url\n$s"
@@ -238,7 +237,7 @@ class EpisodeActivity : AppCompatActivity() {
                 getStuff(i.attr("abs:href"))
             }
 
-            if(name=="fun.getting") {
+            if (name == "fun.getting") {
                 name = doc1.select("div.right_col h1").text()
             }
 
@@ -257,7 +256,7 @@ class EpisodeActivity : AppCompatActivity() {
                 }
 
                 launch {
-                    if (show.showDao().isInDatabase(name) > 0) {
+                    if (show.showDao().isUrlInDatabase(url) > 0) {
                         //fav_episode.isChecked = true
                         fav_episode.isLiked = true
                     }
@@ -280,9 +279,9 @@ class EpisodeActivity : AppCompatActivity() {
                 })
                 Loged.d("${(episode_list.adapter!! as EpisodeAdapter).itemCount}")
             }
-
-            episode_refresh.isRefreshing = false
-
+            runOnUiThread {
+                episode_refresh.isRefreshing = false
+            }
         }
 
         getList()
@@ -415,11 +414,11 @@ class EpisodeActivity : AppCompatActivity() {
                     stuffList.size
                 }
 
-                async {
+                launch {
                     if (like) {
                         show.showDao().insert(Show(url, name))
 
-                        async {
+                        launch {
                             val s = show.showDao().getShow(name)
                             val showList = getEpisodeList(url).await()
                             if (s.showNum < showList) {
@@ -472,7 +471,7 @@ class EpisodeActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if(backChoice)
+        if (backChoice)
             super.onBackPressed()
         else {
             val intent = Intent(this@EpisodeActivity, ChoiceActivity::class.java)

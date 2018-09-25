@@ -10,10 +10,7 @@ import com.crestron.aurora.R
 import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.ShowDatabase
 import kotlinx.android.synthetic.main.episode_info.view.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
-import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
 class EpisodeAdapter(private val items: ArrayList<String>, private val links: ArrayList<String>, private val name: String, val reverse: Boolean = false, val context: Context, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
@@ -71,7 +68,7 @@ class EpisodeAdapter(private val items: ArrayList<String>, private val links: Ar
         }
 
         holder.watched.setOnCheckedChangeListener { _, b ->
-            async {
+            launch {
                 if (b) {
                     Loged.e("Inserted")
                     show.insertEpisode(Episode(position, name))

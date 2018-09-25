@@ -1,12 +1,11 @@
 package com.crestron.aurora.otherfun
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.media.Image
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.SectionIndexer
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
@@ -16,11 +15,9 @@ import com.like.LikeButton
 import com.like.OnLikeListener
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.text_layout.view.*
-import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import org.jsoup.Jsoup
-import java.lang.NullPointerException
 
 class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
 
@@ -94,7 +91,7 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
     }
 
     // Binds each animal in the ArrayList to a view
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         //holder.cardType.text = "${items[position]}"
         if (items != null) {
             holder.linkType.text = items!![position]
@@ -152,7 +149,7 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
             val show = ShowDatabase.getDatabase(context)
 
             launch {
-                if (show.showDao().isInDatabase(stuff[position].name) > 0) {
+                if (show.showDao().isUrlInDatabase(stuff[position].url) > 0) {
                     holder.favorite.isLiked = true
                 }
             }
@@ -188,11 +185,11 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
                 }
 
                 fun liked(like: Boolean) {
-                    async {
+                    launch {
                         if (like) {
                             show.showDao().insert(Show(stuff[position].url, stuff[position].name))
 
-                            async {
+                            launch {
                                 val s = show.showDao().getShow(stuff[position].name)
                                 val showList = getEpisodeList(stuff[position].url).await()
                                 if (s.showNum < showList) {

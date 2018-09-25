@@ -523,7 +523,6 @@ class ChoiceActivity : AppCompatActivity() {
             }
         }
 
-
         if (defaultSharedPreferences.getBoolean("delete_file", false)) {
             launch {
                 val url = URL(ConstantValues.VERSION_URL).readText()
@@ -537,11 +536,12 @@ class ChoiceActivity : AppCompatActivity() {
                     path1.delete()
                 } else {
                     /*runOnUiThread {
-                    Toast.makeText(this@ChoiceActivity, "It's not there", Toast.LENGTH_SHORT).show()
-                }*/
+                        Toast.makeText(this@ChoiceActivity, "It's not there", Toast.LENGTH_SHORT).show()
+                    }*/
                 }
             }
         }
+
     }
 
     fun sendProgressNotification(title: String, text: String, progress: Int, context: Context, gotoActivity: Class<*>, notification_id: Int) {

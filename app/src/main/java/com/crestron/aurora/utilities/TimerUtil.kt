@@ -10,13 +10,13 @@ class TimerUtil(var time: Long = 0L, var timeAction: TimerAction? = null, privat
 
     private var timer: Timer = Timer()
 
-    fun startTimer(view: TextView, upOrDown: Boolean = true) {
+    fun startTimer(view: TextView? = null, upOrDown: Boolean = true) {
         cancel()
         timer.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
                 launch(UI) {
                     time = setInterval(upOrDown)
-                    view.text = getTime()
+                    view?.text = getTime()
                 }
             }
         }, delay, period)
