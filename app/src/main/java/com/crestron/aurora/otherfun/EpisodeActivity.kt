@@ -501,15 +501,12 @@ class EpisodeActivity : AppCompatActivity() {
                 Loged.e(s)
             }
             Loged.i("$data")
-            //mangaLink = "/" + titleId.replaceAll("_", "-").toLowerCase();
-            //mangaTitle = titleId.replaceAll("-", " ");
             url = data.toString().replace("fun.", "www.")
             name = "fun.getting"//toTitleCase(id!!.replace("-", " ").removeSuffix("online"))
             Loged.d("action: " + action + " | data: " + data.toString() + " | id: " + id)
 
         } else {
             backChoice = true
-            //mangaID = getIntent().getStringExtra("manga_id");
             url = intent.getStringExtra(ConstantValues.URL_INTENT)
             name = intent.getStringExtra(ConstantValues.NAME_INTENT)
 
@@ -542,6 +539,7 @@ class EpisodeActivity : AppCompatActivity() {
         val resultIntent = Intent(context, gotoActivity)
         resultIntent.putExtra(ConstantValues.URL_INTENT, url)
         resultIntent.putExtra(ConstantValues.NAME_INTENT, name)
+        resultIntent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, false)
         // The stack builder object will contain an artificial back stack for the
         // started Activity.
         // This ensures that navigating backward from the Activity leads out of

@@ -51,9 +51,9 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.github.jakepurple13:HelperUtils2:v1.74'
-    implementation 'com.android.support:appcompat-v7:28.0.0-beta01'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation 'com.android.support:support-v4:28.0.0-rc01'
+    implementation 'com.android.support:support-v4:28.0.0'
     implementation 'com.google.firebase:firebase-core:16.0.3'
     implementation 'com.google.firebase:firebase-messaging:17.3.2'
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
@@ -67,7 +67,7 @@ dependencies {
     implementation project(':library')
     implementation project(':shelfview')
     implementation 'com.github.jinatonic.confetti:confetti:1.1.1'
-    implementation 'com.android.support:recyclerview-v7:28.0.0-beta01'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.plattysoft.leonids:LeonidsLib:1.3.2'
     implementation 'com.github.IONsoft-Indonesia:RandomNumberAnimation:1.3.1'
     //implementation 'androidx.core:core-ktx:1.0.0-alpha1'
@@ -105,6 +105,10 @@ dependencies {
     implementation 'com.prof.rssparser:rssparser:1.4.4'
     implementation 'com.github.jd-alexander:LikeButton:0.2.3'
     implementation "com.thejuki:k-form-master:+"
+    //implementation 'com.github.edubarr:header-decor:master-SNAPSHOT'
+    //implementation 'com.brandongogetap:stickyheaders:+'
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.github.AniTrend:retrofit-graphql:+'
 
 }
 kotlin {

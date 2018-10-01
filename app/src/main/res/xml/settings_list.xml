@@ -37,7 +37,7 @@
             android:key="updateChecks"
             android:numeric="decimal"
             android:summary="Time between update checks"
-            android:title="Time between Checks" />
+            android:title="Time between Checks (By Hour; So .5 = 30 minutes)" />
 
         <Preference
             android:key="show_show"

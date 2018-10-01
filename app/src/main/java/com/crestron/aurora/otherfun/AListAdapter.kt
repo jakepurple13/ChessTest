@@ -1,6 +1,5 @@
 package com.crestron.aurora.otherfun
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -91,7 +90,7 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
     }
 
     // Binds each animal in the ArrayList to a view
-    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         //holder.cardType.text = "${items[position]}"
         if (items != null) {
             holder.linkType.text = items!![position]
