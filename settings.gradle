@@ -1,1 +1,1 @@
-include ':app', ':deckofcards', ':library', ':shelfview', ':shelfview'
+include ':app', ':deckofcards', ':library', ':shelfview', ':shelfview', ':nicespinner'

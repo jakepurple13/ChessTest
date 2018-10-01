@@ -9,6 +9,7 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.ArrayAdapter
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.views.StickHeaderItemDecoration
@@ -21,7 +22,11 @@ import org.jsoup.Jsoup
 
 class RssActivity : AppCompatActivity() {
 
-    open class MainInfo(val info: String)
+    open class MainInfo(val info: String) {
+        override fun toString(): String {
+            return info
+        }
+    }
 
     open class MALInfo(val title: String, val description: String, val time: String, val imageLink: String) : MainInfo(title)
 
@@ -34,7 +39,6 @@ class RssActivity : AppCompatActivity() {
         setContentView(R.layout.activity_rss)
 
         fun getStuff() = async {
-
 
             fun livechartRss() = async {
 
@@ -49,67 +53,75 @@ class RssActivity : AppCompatActivity() {
                         //this@RssActivity.list = list
 
                         //feed_list.adapter = RssAdapter(list, this@RssActivity)
-                        refresh_feed.isRefreshing = false
+                        //refresh_feed.isRefreshing = false
                     }
 
                     override fun onError() {
                         //what to do in case of error
-                        refresh_feed.isRefreshing = false
+                        //refresh_feed.isRefreshing = false
                     }
                 })
 
             }
 
-            fun aniChartGet() {
-                val doc = Jsoup.connect("http://anichart.net/airing").get()
-
-                Loged.wtf(doc.html())
-
-                val el = doc.select("div.section")
-
-                for (i in el) {
-                    val head = i.select("h2").text()
-                    Loged.w(head)
-                    val items = i.select("div.item")
-                    for (j in items) {
-                        val title = j.select("div.title").text()
-                        val airing = j.select("div.airing").text()
-                        Loged.i("$title at $airing")
-                        val imageUrl = j.select("div.image").attr("style")
-
-                        //background-image:url(https://cdn.anilist.co/img/dir/anime/reg/101115-8W9RCORvvMuc.jpg)
-
-                    }
-                }
-
-            }
-
-            fun malGet() {
+            fun malGet() = async {
 
                 val doc = Jsoup.connect("https://myanimelist.net/anime/season/schedule").get()
 
                 val el = doc.select("div.js-categories-seasonal")
                 val header = el.select("div.seasonal-anime-list")
 
+                val listMap = mutableMapOf<String, List<MainInfo>>()
+
+                listMap["All"] = list
+
                 for (h in header) {
-                    //Loged.w(h.select("div.anime-header").text())
+                    val showLists = arrayListOf<MALInfo>()
                     val j = h.select("div.seasonal-anime")
-                    list.add(HeaderInfo(h.select("div.anime-header").text()))
+                    val headed = HeaderInfo(h.select("div.anime-header").text())
+                    list.add(headed)
                     for (i in j) {
-                        //Loged.i(h.select("div.anime-header").text())
                         val time = i.select("div.information").select("span.remain-time").text()
                         //Loged.d(SimpleDateFormat("MM/dd/yyyy hh:mm a").format(time))
                         //Loged.d(time)
                         //TimeZone.getDefault().getDisplayName()
                         val title = i.select("p.title-text").text()
                         val description = i.select("div.synopsis").text()
-                        val imageLink = i.select("div.image").select("img[src^=https]").attr("abs:src")
-                        //val info = "$title\n$description\n$time\n$imageLink"
-                        //Loged.i(info)
+                        var imageLink = i.select("div.image").select("img").attr("data-src")
+                        if (imageLink.isBlank())
+                            imageLink = i.select("div.image").select("img").attr("src")
+                        Loged.e(imageLink)
 
-                        list.add(MALInfo(title, description, time, imageLink))
+                        val m = MALInfo(title, description, time, imageLink)
+                        showLists.add(m)
+                        list.add(m)
                     }
+                    listMap[headed.title] = showLists
                 }
+
+                runOnUiThread {
+
+                    val spinnerAdapter = ArrayAdapter<String>(this@RssActivity,
+                            android.R.layout.simple_spinner_item, listMap.keys.toList())
+
+                    spinner.setAdapter(spinnerAdapter)
+
+                    spinner.addOnItemClickListener { _, _, position, _ ->
+
+                        val listing = arrayListOf<MainInfo>().apply {
+                            add(HeaderInfo(listMap.keys.toList()[position]))
+                            addAll(listMap[listMap.keys.toList()[position]]!!)
+                        }
+
+                        val adapter = RssAdapter(listing, this@RssActivity)
+                        feed_list.adapter = adapter
+                        feed_list.addItemDecoration(StickHeaderItemDecoration(adapter))
+                    }
+
+                }
+
+                Loged.i("${listMap.entries}")
+
             }
 
             malGet()
@@ -119,7 +131,7 @@ class RssActivity : AppCompatActivity() {
                 val adapter = RssAdapter(list, this@RssActivity)
                 feed_list.adapter = adapter
                 feed_list.addItemDecoration(StickHeaderItemDecoration(adapter))
-                refresh_feed.isRefreshing = false
+                //refresh_feed.isRefreshing = false
             }
 
         }
@@ -131,13 +143,14 @@ class RssActivity : AppCompatActivity() {
         feed_list.isNestedScrollingEnabled = true
 
 
-        refresh_feed.setOnRefreshListener {
+        /*refresh_feed.setOnRefreshListener {
+            spinner.addOnItemClickListener(null)
             list.clear()
             // Your code to refresh the list here.
             // Make sure you call swipeContainer.setRefreshing(false)
             // once the network request has completed successfully.
             getStuff()
-        }
+        }*/
 
         getStuff()
 

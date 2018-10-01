@@ -6,21 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".otherfun.RssActivity">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/refresh_feed"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/feed_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/textView5"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/feed_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true" />
-    </android.support.v4.widget.SwipeRefreshLayout>
+        android:layout_height="match_parent"
+        android:layout_below="@id/spinner"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:id="@+id/textView5"
@@ -31,5 +22,16 @@
         android:gravity="center"
         android:layout_marginBottom="5dp"
         android:text="These times do not reflect the actual time this app has access to these anime." />
+
+    <org.angmarch.views.NiceSpinner
+        android:id="@+id/spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:backgroundTint="#005599"
+        app:backgroundColor="#005599"
+        app:textTint="@color/cardview_light_background"
+        app:mainTextTint="@color/cardview_light_background"
+        android:layout_below="@id/textView5" />
 
 </RelativeLayout>

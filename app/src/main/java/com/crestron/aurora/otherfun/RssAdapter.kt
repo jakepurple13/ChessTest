@@ -11,8 +11,6 @@ import com.crestron.aurora.R
 import com.crestron.aurora.views.StickHeaderItemDecoration
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.rss_layout_item.view.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.runOnUiThread
 
 
@@ -45,7 +43,11 @@ class RssAdapter(var stuff: List<RssActivity.MainInfo>, var context: Context) : 
     }
 
     override fun isHeader(itemPosition: Int): Boolean {
-        return stuff[itemPosition] is RssActivity.HeaderInfo
+        return try {
+            stuff[itemPosition] is RssActivity.HeaderInfo
+        } catch (e: IndexOutOfBoundsException) {
+            false
+        }
     }
 
     // Gets the number of animals in the list
@@ -84,16 +86,10 @@ class RssAdapter(var stuff: List<RssActivity.MainInfo>, var context: Context) : 
             holder.info.text = information.title
             holder.des.text = information.description
             holder.timeInfo.text = information.time
-            launch(UI) {
-                //try {
-                //Picasso.get().load(information.imageLink).resize((600 * .6).toInt(), (800 * .6).toInt()).into(holder.image)
-                //} catch (e: IllegalArgumentException) {
-                //}
-            }
 
-            context.runOnUiThread {
+            this@RssAdapter.context.runOnUiThread {
                 try {
-                    Picasso.get().load(information.imageLink).resize((600 * .6).toInt(), (800 * .6).toInt()).into(holder.image)
+                    Picasso.get().load(information.imageLink).resize((600 * .6).toInt(), (800 * .6).toInt()).error(android.R.drawable.stat_notify_error).into(holder.image)
                 } catch (ignored: IllegalArgumentException) {
                 }
             }
