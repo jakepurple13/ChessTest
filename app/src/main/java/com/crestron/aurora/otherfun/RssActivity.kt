@@ -7,6 +7,7 @@ import android.support.annotation.NonNull
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.LinearSmoothScroller
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ArrayAdapter
@@ -64,7 +65,7 @@ class RssActivity : AppCompatActivity() {
 
             }
 
-            fun malGet() = async {
+            fun malGet() {
 
                 val doc = Jsoup.connect("https://myanimelist.net/anime/season/schedule").get()
 
@@ -73,7 +74,9 @@ class RssActivity : AppCompatActivity() {
 
                 val listMap = mutableMapOf<String, List<MainInfo>>()
 
-                listMap["All"] = list
+                listMap["All"] = list.apply {
+                    add(HeaderInfo("All"))
+                }
 
                 for (h in header) {
                     val showLists = arrayListOf<MALInfo>()
@@ -90,35 +93,50 @@ class RssActivity : AppCompatActivity() {
                         var imageLink = i.select("div.image").select("img").attr("data-src")
                         if (imageLink.isBlank())
                             imageLink = i.select("div.image").select("img").attr("src")
-                        Loged.e(imageLink)
 
                         val m = MALInfo(title, description, time, imageLink)
-                        showLists.add(m)
+                        //showLists.add(m)
                         list.add(m)
                     }
                     listMap[headed.title] = showLists
                 }
 
-                runOnUiThread {
+                //runOnUiThread {
 
-                    val spinnerAdapter = ArrayAdapter<String>(this@RssActivity,
-                            android.R.layout.simple_spinner_item, listMap.keys.toList())
+                val spinnerAdapter = ArrayAdapter<String>(this@RssActivity,
+                        android.R.layout.simple_spinner_item, listMap.keys.toList())
 
-                    spinner.setAdapter(spinnerAdapter)
+                spinner.setAdapter(spinnerAdapter)
 
-                    spinner.addOnItemClickListener { _, _, position, _ ->
+                spinner.addOnItemClickListener { _, _, position, _ ->
 
-                        val listing = arrayListOf<MainInfo>().apply {
+                    runOnUiThread {
+
+                        //feed_list.smoothScrollToPosition(list.indexOfFirst { it.info == listMap.keys.toList()[position] })
+
+                        val smoothScroller = object : LinearSmoothScroller(this@RssActivity) {
+                            override fun getVerticalSnapPreference(): Int {
+                                return LinearSmoothScroller.SNAP_TO_START
+                            }
+                        }
+
+                        smoothScroller.targetPosition = list.indexOfFirst { it.info == listMap.keys.toList()[position] }
+
+                        feed_list.layoutManager!!.startSmoothScroll(smoothScroller)
+                        /*val listing = arrayListOf<MainInfo>().apply {
                             add(HeaderInfo(listMap.keys.toList()[position]))
                             addAll(listMap[listMap.keys.toList()[position]]!!)
                         }
 
+                        feed_list.removeItemDecoration(StickHeaderItemDecoration(feed_list.adapter as StickHeaderItemDecoration.StickyHeaderInterface))
                         val adapter = RssAdapter(listing, this@RssActivity)
                         feed_list.adapter = adapter
                         feed_list.addItemDecoration(StickHeaderItemDecoration(adapter))
+                        */
                     }
-
                 }
+
+                //}
 
                 Loged.i("${listMap.entries}")
 
