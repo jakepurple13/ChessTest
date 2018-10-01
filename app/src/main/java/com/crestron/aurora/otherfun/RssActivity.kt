@@ -1,5 +1,6 @@
 package com.crestron.aurora.otherfun
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
@@ -19,6 +20,7 @@ import com.prof.rssparser.Parser
 import kotlinx.android.synthetic.main.activity_rss.*
 import kotlinx.coroutines.experimental.async
 import org.jsoup.Jsoup
+import java.text.SimpleDateFormat
 
 
 class RssActivity : AppCompatActivity() {
@@ -35,9 +37,12 @@ class RssActivity : AppCompatActivity() {
 
     var list = arrayListOf<MainInfo>()
 
+    @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rss)
+
+        textView5.append("\nCurrent Date is ${SimpleDateFormat("MM/dd/yyyy E hh:mm a").format(System.currentTimeMillis())}")
 
         fun getStuff() = async {
 

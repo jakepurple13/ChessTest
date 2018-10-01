@@ -10,7 +10,6 @@ import com.crestron.aurora.FunApplication
 import com.crestron.aurora.Loged
 import com.google.gson.Gson
 import com.tonyodev.fetch2.*
-import com.tonyodev.fetch2.util.toDownloadInfo
 import com.tonyodev.fetch2core.DownloadBlock
 import com.tonyodev.fetch2core.Func
 import kotlinx.coroutines.experimental.async
@@ -21,6 +20,7 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.DecimalFormat
+import java.util.*
 
 class FetchingUtils(val context: Context, private var fetchAction: FetchAction = object : FetchAction {}) {
 
@@ -43,7 +43,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         //request.enqueueAction = EnqueueAction.DO_NOT_ENQUEUE_IF_EXISTING
         //request.addHeader("clientKey", "SD78DF93_3947&MVNGHE1WONG")
 
-        for(keyValue in keyAndValue) {
+        for (keyValue in keyAndValue) {
             request.extras.map.toProperties()[keyValue.key] = keyValue.value
         }
 
@@ -74,7 +74,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
 
         val requestList = arrayListOf<Request>()
 
-        for(i in url) {
+        for (i in url) {
 
             filePath = folderLocation + getNameFromUrl(i) + ".mp4"
             Loged.wtf("${File(filePath).exists()}")
@@ -155,30 +155,69 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
 
         Loged.wtf(s)
 
-        val htmlc = getHtml(list[0])
+        val regex = "(http|https):\\/\\/([\\w+?\\.\\w+])+([a-zA-Z0-9\\~\\%\\&\\-\\_\\?\\.\\=\\/])+(part[0-9])" + ".mp4"
+
+        //"[http\\:\\/\\/](\\w*)[part][0-9]"
+
+        val htmlc = if (regex.toRegex().toPattern().matcher(list[0]).find()) {
+            Loged.i("ArrayList")
+            list
+        } else {
+            Loged.i("String")
+            getHtml(list[0])
+        }
+
+        //val htmlc = getHtml(list[0])
 
         Loged.i("Starting video part")
 
-        val reg = "var video_links = (\\{.*?\\});".toRegex().toPattern().matcher(htmlc)
-        Loged.wtf("Here")
-        while (reg.find()) {
-            val d = reg.group(1)
-            Loged.wtf(d)
-            Loged.e("We in here")
-            val g = Gson()
-            val d1 = g.fromJson<NormalLink>(d, NormalLink::class.java)
+        when (htmlc) {
+            is ArrayList<*> -> {
+                val urlList = arrayListOf<String>()
+                for (info in htmlc) {
+                    val reg = "var video_links = (\\{.*?\\});".toRegex().toPattern().matcher(getHtml(info.toString()))
+                    Loged.wtf("Here with $info")
+                    while (reg.find()) {
+                        val d = reg.group(1)
+                        Loged.wtf(d)
+                        Loged.e("We in here")
+                        val g = Gson()
+                        val d1 = g.fromJson<NormalLink>(d, NormalLink::class.java)
 
-            Loged.wtf(d1.toString())
+                        Loged.wtf(d1.toString())
 
-            /*if (d1.normal.storage[0].link.isNullOrBlank())
-                continue
-            else*/
-            fetchIt(d1.normal.storage[0].link, true, networkType, keyAndValue)
+                        /*if (d1.normal.storage[0].link.isNullOrBlank())
+                            continue
+                        else*/
 
+                        urlList.add(d1.normal.storage[0].link)
+
+                    }
+                }
+                fetchIt(urlList, true, networkType, keyAndValue)
+            }
+            is String -> {
+                val reg = "var video_links = (\\{.*?\\});".toRegex().toPattern().matcher(htmlc)
+                Loged.wtf("Here")
+                while (reg.find()) {
+                    val d = reg.group(1)
+                    Loged.wtf(d)
+                    Loged.e("We in here")
+                    val g = Gson()
+                    val d1 = g.fromJson<NormalLink>(d, NormalLink::class.java)
+
+                    Loged.wtf(d1.toString())
+
+                    /*if (d1.normal.storage[0].link.isNullOrBlank())
+                        continue
+                    else*/
+                    fetchIt(d1.normal.storage[0].link, true, networkType, keyAndValue)
+
+                }
+
+                Loged.d("DONE!")
+            }
         }
-
-        Loged.d("DONE!")
-
     }
 
     fun getVideo(urlToUse: Collection<String>, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = async {
@@ -190,7 +229,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
 
         val urlList = arrayListOf<String>()
 
-        for(i in urlToUse) {
+        for (i in urlToUse) {
 
             val htmld = getHtml(i)
             val m = "<iframe src=\"([^\"]+)\"[^<]+<\\/iframe>".toRegex().toPattern().matcher(htmld)
@@ -298,7 +337,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
                 hours > 0 -> String.format("%02d:%02d:%02d hours", hours, minutes, seconds)
                 minutes > 0 -> String.format("%02d:%02d mins", minutes, seconds)
                 else -> "$seconds secs"
-            } + (if(needLeft) " left" else "")
+            } + (if (needLeft) " left" else "")
         }
 
         fun getDownloadSpeedString(downloadedBytesPerSecond: Long): String {
@@ -369,20 +408,20 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
     interface FetchAction : FetchListener {
 
         override fun onAdded(download: Download) {
-            Loged.i("Added")
+            Loged.i("Added ${download.file}")
         }
 
         override fun onCancelled(download: Download) {
-            Loged.e("Cancelled")
+            Loged.e("Cancelled ${download.file}")
         }
 
         override fun onCompleted(download: Download) {
-            Loged.d("Completed")
+            Loged.d("Completed ${download.file}")
             Fetch.getDefaultInstance().removeAllWithStatus(Status.COMPLETED)
         }
 
         override fun onDeleted(download: Download) {
-            Loged.e("Deleted")
+            Loged.e("Deleted ${download.file}")
         }
 
         override fun onDownloadBlockUpdated(download: Download, downloadBlock: DownloadBlock, totalBlocks: Int) {
@@ -394,28 +433,28 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         }
 
         override fun onPaused(download: Download) {
-            Loged.i("Paused")
+            Loged.i("Paused ${download.file}")
         }
 
         override fun onQueued(download: Download, waitingOnNetwork: Boolean) {
-            Loged.i("Queued")
+            Loged.i("Queued ${download.file}")
         }
 
         override fun onRemoved(download: Download) {
-            Loged.e("Removed")
+            Loged.e("Removed ${download.file}")
         }
 
         override fun onResumed(download: Download) {
-            Loged.i("Resumed")
+            Loged.i("Resumed ${download.file}")
         }
 
         override fun onStarted(download: Download, downloadBlocks: List<DownloadBlock>, totalBlocks: Int) {
-            Loged.d("Started")
+            Loged.d("Started ${download.file}")
 
         }
 
         override fun onWaitingNetwork(download: Download) {
-            Loged.e("Waiting Network")
+            Loged.e("Waiting Network ${download.file}")
         }
 
         @SuppressLint("SetTextI18n")
