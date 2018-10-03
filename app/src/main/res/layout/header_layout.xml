@@ -9,5 +9,4 @@
     android:textAppearance="?android:attr/textAppearanceMedium"
     android:textColor="#FFF"
     tools:text="Sample text">
-
 </TextView>

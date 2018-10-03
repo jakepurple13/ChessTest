@@ -29,6 +29,7 @@ import com.crestron.aurora.cardgames.solitaire.SolitaireActivity
 import com.crestron.aurora.cardgames.videopoker.VideoPokerActivity
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.*
+import com.crestron.aurora.viewtesting.ViewTesting
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 import com.nabinbhandari.android.permissions.PermissionHandler
@@ -77,7 +78,8 @@ class ChoiceActivity : AppCompatActivity() {
         QUICK_CHOICE("quick_choice", ""),
         VIEW_FAVORITES("view_favorites", "View Favorites"),
         RSS_FEED("rss_feed", "Schedule"),
-        FEEDBACK("feedback", "Feedback")
+        FEEDBACK("feedback", "Feedback"),
+        VIEW_TESTING("view_testing", "View Test")
     }
 
     private fun drawableModel(id: Int, button: ChoiceButton, count: Int = 0): BookModel {
@@ -104,7 +106,7 @@ class ChoiceActivity : AppCompatActivity() {
         //val canUpdate = defaultSharedPreferences.getBoolean(ConstantValues.APP_UPDATE, false)
         //if(canUpdate) {
         if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false))
-            async {
+            launch {
                 val url = URL(ConstantValues.VERSION_URL).readText()
                 val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
                 val pInfo = packageManager.getPackageInfo(packageName, 0)
@@ -254,7 +256,7 @@ class ChoiceActivity : AppCompatActivity() {
                             permissionCheck(ShowListActivity::class.java, true, url = "http://www.animetoon.org/updates")
                         }
                         ChoiceButton.UPDATE_APP -> {
-                            async {
+                            launch {
                                 val url = URL(ConstantValues.VERSION_URL).readText()
 
                                 val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
@@ -288,7 +290,7 @@ class ChoiceActivity : AppCompatActivity() {
                             startActivity(intent)
                         }
                         ChoiceButton.UPDATE_NOTES -> {
-                            async {
+                            launch {
 
                                 //val url = URL(ConstantValues.VERSION_URL).readText()
 
@@ -339,7 +341,7 @@ class ChoiceActivity : AppCompatActivity() {
                         }
                         ChoiceButton.DOWNLOAD_APK -> {
 
-                            async {
+                            launch {
 
                                 val url = URL(ConstantValues.VERSION_URL).readText()
 
@@ -429,6 +431,10 @@ class ChoiceActivity : AppCompatActivity() {
                             val intented = Intent(this@ChoiceActivity, FormActivity::class.java)
                             startActivity(intented)
                         }
+                        ChoiceButton.VIEW_TESTING -> {
+                            val intented = Intent(this@ChoiceActivity, ViewTesting::class.java)
+                            startActivity(intented)
+                        }
                     }
                 } catch (e: IllegalArgumentException) {
                     val intented = Intent(this@ChoiceActivity, EpisodeActivity::class.java)
@@ -443,6 +449,8 @@ class ChoiceActivity : AppCompatActivity() {
         shelfView.setOnBookClicked(listener)
 
         val models = ArrayList<BookModel>()
+        //models.add(drawableModel(R.drawable.blackjacklogo, ChoiceButton.VIEW_TESTING))
+
         models.add(drawableModel(R.drawable.blackjacklogo, ChoiceButton.BLACKJACK))
         models.add(drawableModel(R.drawable.solitairelogo, ChoiceButton.SOLITAIRE))
         models.add(drawableModel(R.drawable.calculationlogo, ChoiceButton.CALCULATION))
@@ -471,7 +479,7 @@ class ChoiceActivity : AppCompatActivity() {
 
         shelfView.loadData(models)
 
-        async {
+        launch {
             val show = ShowDatabase.getDatabase(this@ChoiceActivity).showDao()
             val showList = show.allShows
             if(showList.size>0) {

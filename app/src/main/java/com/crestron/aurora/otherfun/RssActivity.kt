@@ -1,10 +1,8 @@
 package com.crestron.aurora.otherfun
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
-import android.support.annotation.NonNull
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -154,6 +152,7 @@ class RssActivity : AppCompatActivity() {
                 })
                 feed_list.adapter = adapter
                 feed_list.addItemDecoration(StickHeaderItemDecoration(adapter))
+                feed_list.addItemDecoration(ItemOffsetDecoration(20, list))
                 //refresh_feed.isRefreshing = false
             }
         }
@@ -161,7 +160,7 @@ class RssActivity : AppCompatActivity() {
         feed_list.layoutManager = LinearLayoutManager(this)
         val dividerItemDecoration = DividerItemDecoration(feed_list.context, (feed_list.layoutManager as LinearLayoutManager).orientation)
         feed_list.addItemDecoration(dividerItemDecoration)
-        feed_list.addItemDecoration(ItemOffsetDecoration(20))
+        //feed_list.addItemDecoration(ItemOffsetDecoration(20))
         feed_list.isNestedScrollingEnabled = true
 
 
@@ -178,14 +177,13 @@ class RssActivity : AppCompatActivity() {
 
     }
 
-    class ItemOffsetDecoration(private val mItemOffset: Int) : RecyclerView.ItemDecoration() {
-
-        constructor(@NonNull context: Context, itemOffsetId: Int) : this(context.resources.getDimensionPixelSize(itemOffsetId)) {}
+    class ItemOffsetDecoration(private val mItemOffset: Int, val list: List<MainInfo>) : RecyclerView.ItemDecoration() {
 
         override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView,
                                     state: RecyclerView.State) {
             super.getItemOffsets(outRect, view, parent, state)
-            outRect.set(mItemOffset, mItemOffset, mItemOffset, mItemOffset)
+            if (list[parent.getChildAdapterPosition(view)] !is HeaderInfo)
+                outRect.set(mItemOffset, mItemOffset, mItemOffset, mItemOffset)
         }
     }
 

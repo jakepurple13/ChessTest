@@ -230,7 +230,8 @@
 
         <activity android:name=".SettingsShowActivity" />
         <activity android:name=".otherfun.RssActivity" />
-        <activity android:name=".FormActivity"></activity>
+        <activity android:name=".FormActivity" />
+        <activity android:name=".viewtesting.ViewTesting"></activity>
     </application>
 
 </manifest>
