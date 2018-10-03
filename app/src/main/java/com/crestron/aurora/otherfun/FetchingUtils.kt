@@ -155,7 +155,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
 
         Loged.wtf(s)
 
-        val regex = "(http|https):\\/\\/([\\w+?\\.\\w+])+([a-zA-Z0-9\\~\\%\\&\\-\\_\\?\\.\\=\\/])+(part[0-9])" + ".mp4"
+        val regex = "(http|https):\\/\\/([\\w+?\\.\\w+])+([a-zA-Z0-9\\~\\%\\&\\-\\_\\?\\.\\=\\/])+(part[0-9])+.(\\w*)"
 
         //"[http\\:\\/\\/](\\w*)[part][0-9]"
 

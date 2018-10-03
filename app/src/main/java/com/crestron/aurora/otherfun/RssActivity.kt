@@ -31,11 +31,17 @@ class RssActivity : AppCompatActivity() {
         }
     }
 
-    open class MALInfo(val title: String, val description: String, val time: String, val imageLink: String) : MainInfo(title)
+    open class MALInfo(val title: String, val description: String, val time: String, val imageLink: String, val episodeNumber: String) : MainInfo(title)
 
     open class HeaderInfo(val title: String) : MainInfo(title)
 
     var list = arrayListOf<MainInfo>()
+
+    interface RssAdapterListener {
+        fun isHeader(boolean: Boolean, position: Int, name: String)
+    }
+
+    val listMap = mutableMapOf<String, List<MainInfo>>()
 
     @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +49,7 @@ class RssActivity : AppCompatActivity() {
         setContentView(R.layout.activity_rss)
 
         textView5.append("\nCurrent Date is ${SimpleDateFormat("MM/dd/yyyy E hh:mm a").format(System.currentTimeMillis())}")
+        spinner.isEnabled = false
 
         fun getStuff() = async {
 
@@ -77,14 +84,12 @@ class RssActivity : AppCompatActivity() {
                 val el = doc.select("div.js-categories-seasonal")
                 val header = el.select("div.seasonal-anime-list")
 
-                val listMap = mutableMapOf<String, List<MainInfo>>()
-
                 listMap["All"] = list.apply {
                     add(HeaderInfo("All"))
                 }
 
                 for (h in header) {
-                    val showLists = arrayListOf<MALInfo>()
+                    //val showLists = arrayListOf<MALInfo>()
                     val j = h.select("div.seasonal-anime")
                     val headed = HeaderInfo(h.select("div.anime-header").text())
                     list.add(headed)
@@ -98,50 +103,40 @@ class RssActivity : AppCompatActivity() {
                         var imageLink = i.select("div.image").select("img").attr("data-src")
                         if (imageLink.isBlank())
                             imageLink = i.select("div.image").select("img").attr("src")
+                        val episodeNumber = i.select("div.eps").select("span").text()
 
-                        val m = MALInfo(title, description, time, imageLink)
+                        val m = MALInfo(title, description, time, imageLink, episodeNumber)
                         //showLists.add(m)
                         list.add(m)
                     }
-                    listMap[headed.title] = showLists
+                    listMap[headed.title] = arrayListOf()//showLists
                 }
 
-                //runOnUiThread {
+                Loged.i("Done getting information with ${list.size}")
 
-                val spinnerAdapter = ArrayAdapter<String>(this@RssActivity,
-                        android.R.layout.simple_spinner_item, listMap.keys.toList())
+                runOnUiThread {
 
-                spinner.setAdapter(spinnerAdapter)
+                    val spinnerAdapter = ArrayAdapter<String>(this@RssActivity,
+                            android.R.layout.simple_spinner_item, listMap.keys.toList())
 
-                spinner.addOnItemClickListener { _, _, position, _ ->
+                    spinner.setAdapter(spinnerAdapter)
 
-                    runOnUiThread {
+                    spinner.isEnabled = true
 
-                        //feed_list.smoothScrollToPosition(list.indexOfFirst { it.info == listMap.keys.toList()[position] })
-
-                        val smoothScroller = object : LinearSmoothScroller(this@RssActivity) {
-                            override fun getVerticalSnapPreference(): Int {
-                                return LinearSmoothScroller.SNAP_TO_START
+                    spinner.addOnItemClickListener { _, _, position, _ ->
+                        runOnUiThread {
+                            val smoothScroller = object : LinearSmoothScroller(this@RssActivity) {
+                                override fun getVerticalSnapPreference(): Int {
+                                    return LinearSmoothScroller.SNAP_TO_START
+                                }
                             }
+
+                            smoothScroller.targetPosition = list.indexOfFirst { it.info == listMap.keys.toList()[position] }
+
+                            feed_list.layoutManager!!.startSmoothScroll(smoothScroller)
                         }
-
-                        smoothScroller.targetPosition = list.indexOfFirst { it.info == listMap.keys.toList()[position] }
-
-                        feed_list.layoutManager!!.startSmoothScroll(smoothScroller)
-                        /*val listing = arrayListOf<MainInfo>().apply {
-                            add(HeaderInfo(listMap.keys.toList()[position]))
-                            addAll(listMap[listMap.keys.toList()[position]]!!)
-                        }
-
-                        feed_list.removeItemDecoration(StickHeaderItemDecoration(feed_list.adapter as StickHeaderItemDecoration.StickyHeaderInterface))
-                        val adapter = RssAdapter(listing, this@RssActivity)
-                        feed_list.adapter = adapter
-                        feed_list.addItemDecoration(StickHeaderItemDecoration(adapter))
-                        */
                     }
                 }
-
-                //}
 
                 Loged.i("${listMap.entries}")
 
@@ -150,13 +145,17 @@ class RssActivity : AppCompatActivity() {
             malGet()
 
             runOnUiThread {
-
-                val adapter = RssAdapter(list, this@RssActivity)
+                val adapter = RssAdapter(list, this@RssActivity, object : RssAdapterListener {
+                    override fun isHeader(boolean: Boolean, position: Int, name: String) {
+                        if (boolean) {
+                            spinner.selectedIndex = listMap.keys.asSequence().indexOf(name)
+                        }
+                    }
+                })
                 feed_list.adapter = adapter
                 feed_list.addItemDecoration(StickHeaderItemDecoration(adapter))
                 //refresh_feed.isRefreshing = false
             }
-
         }
 
         feed_list.layoutManager = LinearLayoutManager(this)

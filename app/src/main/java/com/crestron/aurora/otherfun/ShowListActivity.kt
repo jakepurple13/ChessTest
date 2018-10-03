@@ -48,7 +48,6 @@ class ShowListActivity : AppCompatActivity() {
         val recentChoice = intent.getBooleanExtra(ConstantValues.RECENT_OR_NOT, false)
         val url = intent.getStringExtra(ConstantValues.SHOW_LINK)
 
-
         class ItemOffsetDecoration(private val mItemOffset: Int) : RecyclerView.ItemDecoration() {
 
             //constructor(@NonNull context: Context, itemOffsetId: Int) : this(context.resources.getDimensionPixelSize(itemOffsetId)) {}
@@ -121,6 +120,7 @@ class ShowListActivity : AppCompatActivity() {
             runOnUiThread {
                 show_info.adapter = AListAdapter(listOfNameAndLink, this@ShowListActivity, actionHit)
                 favorite_show.isEnabled = true//!recentChoice
+                search_info.isEnabled = true
             }
 
             Loged.d("${(show_info.adapter!! as AListAdapter).itemCount}")
@@ -171,6 +171,7 @@ class ShowListActivity : AppCompatActivity() {
             actionHit.hit(nameAndLink.name, nameAndLink.url)
         }
 
+        search_info.isEnabled = false
         favorite_show.isEnabled = false
 
         favorite_show.setOnCheckedChangeListener { _, b ->

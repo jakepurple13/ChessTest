@@ -2,19 +2,23 @@ package com.crestron.aurora.otherfun
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.support.v7.widget.RecyclerView
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.crestron.aurora.R
+import com.crestron.aurora.views.ImageDialog
 import com.crestron.aurora.views.StickHeaderItemDecoration
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.rss_layout_item.view.*
 import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.textColor
 
 
-class RssAdapter(var stuff: List<RssActivity.MainInfo>, var context: Context) : RecyclerView.Adapter<RssAdapter.BaseHolder>(), StickHeaderItemDecoration.StickyHeaderInterface {
+class RssAdapter(var stuff: List<RssActivity.MainInfo>, var context: Context, val adapterListener: RssActivity.RssAdapterListener? = null) : RecyclerView.Adapter<RssAdapter.BaseHolder>(), StickHeaderItemDecoration.StickyHeaderInterface {
     override fun getHeaderPositionForItem(itemPosition: Int): Int {
         var itemP = itemPosition
         var headerPosition = 0
@@ -40,6 +44,7 @@ class RssAdapter(var stuff: List<RssActivity.MainInfo>, var context: Context) : 
     override fun bindHeaderData(header: View?, headerPosition: Int) {
         //Loged.i("$headerPosition")
         (header!! as TextView).text = stuff[headerPosition].info
+        adapterListener?.isHeader(true, headerPosition, stuff[headerPosition].info)
     }
 
     override fun isHeader(itemPosition: Int): Boolean {
@@ -83,9 +88,11 @@ class RssAdapter(var stuff: List<RssActivity.MainInfo>, var context: Context) : 
             holder as ViewHolderRss
             val information = stuff[position] as RssActivity.MALInfo
 
-            holder.info.text = information.title
+            holder.info.text = Html.fromHtml("<b>${information.title}<b>", Html.FROM_HTML_MODE_COMPACT)
+            holder.info.textColor = Color.WHITE
             holder.des.text = information.description
-            holder.timeInfo.text = information.time
+            //holder.timeInfo.text = information.time
+            holder.timeInfo.text = information.episodeNumber
 
             this@RssAdapter.context.runOnUiThread {
                 try {
@@ -93,6 +100,16 @@ class RssAdapter(var stuff: List<RssActivity.MainInfo>, var context: Context) : 
                 } catch (ignored: IllegalArgumentException) {
                 }
             }
+
+            fun showDialog(): View.OnClickListener = View.OnClickListener {
+                this@RssAdapter.context.runOnUiThread {
+                    val dialog = ImageDialog(this@RssAdapter.context, information.title, information.description, information.episodeNumber, information.imageLink)
+                    dialog.show()
+                }
+            }
+
+            holder.layout.setOnClickListener(showDialog())
+            holder.des.setOnClickListener(showDialog())
 
         } else if (stuff[position] is RssActivity.HeaderInfo) {
             holder as HeaderHolder
@@ -134,6 +151,7 @@ class RssAdapter(var stuff: List<RssActivity.MainInfo>, var context: Context) : 
         val timeInfo = view.time_info!!
         val progressBar1 = view.progressBar3!!
         val progressBar2 = view.progressBar4!!
+        val layout = view.rss_layout_id!!
 
         init {
             setIsRecyclable(false)
