@@ -16,9 +16,9 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import com.crestron.aurora.ConstantValues
-import com.crestron.aurora.utilities.AnimationUtility
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
+import com.crestron.aurora.utilities.AnimationUtility
 import com.crestron.aurora.utilities.TimerUtil
 import com.crestron.aurora.utilities.TypingAnimation
 import com.github.jinatonic.confetti.CommonConfetti
@@ -31,7 +31,7 @@ import kotlinx.android.synthetic.main.activity_solitaire.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
-import java.lang.IndexOutOfBoundsException
+import org.jetbrains.anko.defaultSharedPreferences
 import java.util.*
 
 class SolitaireActivity : AppCompatActivity() {
@@ -173,13 +173,14 @@ class SolitaireActivity : AppCompatActivity() {
                 //cards_in_pile.text = "${drawList.size} Cards"
 
                 AnimationUtility.animateCard(deck_of_cards, Card.BackCard, this@SolitaireActivity, 50, true)
-
-                score -= 10
+                if (!win)
+                    score -= 10
             }
             deck_info.text = "${deckOfCards.deckCount()} Cards Left"
             //deck_info.text = "${deckOfCards.deckCount()} Cards Left"
             cardLoc = null
-            moveCount++
+            if (!win)
+                moveCount++
         }
 
         fun startingFound(c: Card, list: ArrayList<Card>) {
@@ -271,6 +272,11 @@ class SolitaireActivity : AppCompatActivity() {
             }
 
             if (checker) {
+
+                val lastScore = this@SolitaireActivity.defaultSharedPreferences.getInt("solitaire_score", 0)
+
+                if (lastScore < score)
+                    this@SolitaireActivity.defaultSharedPreferences.edit().putInt("solitaire_score", score).apply()
 
                 win = true
 
@@ -408,6 +414,9 @@ class SolitaireActivity : AppCompatActivity() {
     }
 
     private fun winDialog() {
+
+        val lastScore = this@SolitaireActivity.defaultSharedPreferences.getInt("solitaire_score", 0)
+
         deck_of_cards.setOnClickListener(null)
         val builder = AlertDialog.Builder(this)
         builder.setTitle("YOU WIN!")
@@ -415,6 +424,7 @@ class SolitaireActivity : AppCompatActivity() {
                 "\nIt took ${time.getTime()} seconds!" +
                 "\nWith a score of $score!" +
                 "\nA move count of $moveCount!" +
+                "\nYour high score is $lastScore." +
                 "\nWant to play again?")
         // Add the buttons
         builder.setPositiveButton("Play Again") { _, _ ->

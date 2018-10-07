@@ -5,12 +5,14 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.ShowDatabase
 import kotlinx.android.synthetic.main.episode_info.view.*
 import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
 class EpisodeAdapter(private val items: ArrayList<String>, private val links: ArrayList<String>, private val name: String, val reverse: Boolean = false, val context: Context, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
@@ -42,11 +44,13 @@ class EpisodeAdapter(private val items: ArrayList<String>, private val links: Ar
             val episodes = show.getEpisodeFromShow(name)
             Loged.wtf("$episodes")
 
-            holder.watched.isChecked = episodes.any { "${name
-                    .replace("(", "\\(")
-                    .replace(")", "\\)")
-                    .replace("\"", "\\\"")
-                    .replace(".", "\\.")} (.*) ${it.episodeNumber+1}".toRegex().matches(items[position]) || "$name (.*) ${it.episodeNumber+1} (.*)".toRegex().matches(items[position]) }
+            holder.watched.isChecked = episodes.any {
+                "${name
+                        .replace("(", "\\(")
+                        .replace(")", "\\)")
+                        .replace("\"", "\\\"")
+                        .replace(".", "\\.")} (.*) ${it.episodeNumber + 1}".toRegex().matches(items[position]) || "$name (.*) ${it.episodeNumber + 1} (.*)".toRegex().matches(items[position])
+            }
 
             /*for (i in episodes) {
 
@@ -69,12 +73,20 @@ class EpisodeAdapter(private val items: ArrayList<String>, private val links: Ar
 
         holder.watched.setOnCheckedChangeListener { _, b ->
             launch {
-                if (b) {
-                    Loged.e("Inserted")
-                    show.insertEpisode(Episode(position, name))
-                } else {
-                    Loged.e("Deleted")
-                    show.deleteEpisode(position)
+                try {
+                    if (b) {
+                        Loged.e("Inserted")
+                        show.insertEpisode(Episode(position, name))
+                    } else {
+                        Loged.e("Deleted")
+                        show.deleteEpisode(position)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    this@EpisodeAdapter.context.runOnUiThread {
+                        Toast.makeText(this@EpisodeAdapter.context, "Please Favorite Show if you plan on Checking the Episodes", Toast.LENGTH_LONG).show()
+                    }
+                    holder.watched.isChecked = false
                 }
             }
         }
