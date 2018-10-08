@@ -13,6 +13,7 @@ import android.widget.ImageView
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.AnimationUtility
+import com.crestron.aurora.utilities.ViewUtil
 import com.plattysoft.leonids.ParticleSystem
 import kotlinx.android.synthetic.main.activity_yahtzee.*
 import kotlinx.coroutines.experimental.android.UI
@@ -85,6 +86,8 @@ class YahtzeeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_yahtzee)
+
+        ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
         firstDice = DiceButton(first_dice, Dice(1))
         secondDice = DiceButton(second_dice, Dice(1))

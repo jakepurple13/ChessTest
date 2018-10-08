@@ -1,9 +1,20 @@
 package com.crestron.aurora.utilities
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.app.Activity
+import android.content.Intent
 import android.os.Handler
+import android.support.v4.app.ActivityCompat
+import android.support.v4.app.ActivityOptionsCompat
+import android.view.View
+import android.view.ViewAnimationUtils
+import android.view.ViewTreeObserver
+import android.view.animation.AccelerateInterpolator
 import android.widget.TextView
 import com.crestron.aurora.Loged
 import kotlin.coroutines.experimental.buildSequence
+
 
 class ViewUtil {
     companion object Utils {
@@ -11,6 +22,65 @@ class ViewUtil {
             while (true)
                 yield(character)
         }
+
+        fun presentActivity(view: View, activity: Activity, intent: Intent) {
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "transition")
+            val revealX = (view.x + view.width / 2).toInt()
+            val revealY = (view.y + view.height / 2).toInt()
+
+            intent.putExtra("EXTRA_CIRCULAR_REVEAL_X", revealX)
+            intent.putExtra("EXTRA_CIRCULAR_REVEAL_Y", revealY)
+
+            ActivityCompat.startActivity(activity, intent, options.toBundle())
+        }
+
+        fun revealing(rootLayout: View, intent: Intent, animationListener: Animator.AnimatorListener? = null) {
+
+            rootLayout.visibility = View.INVISIBLE
+
+            val revealX = intent.getIntExtra("EXTRA_CIRCULAR_REVEAL_X", 0)
+            val revealY = intent.getIntExtra("EXTRA_CIRCULAR_REVEAL_Y", 0)
+
+            val viewTreeObserver = rootLayout.viewTreeObserver
+            if (viewTreeObserver.isAlive) {
+                viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                    override fun onGlobalLayout() {
+                        revealActivity(revealX, revealY, rootLayout, animationListener)
+                        rootLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    }
+                });
+            }
+        }
+
+        fun revealActivity(x: Int, y: Int, rootLayout: View, animationListener: Animator.AnimatorListener?) {
+            val finalRadius = (Math.max(rootLayout.width, rootLayout.height) * 1.1).toFloat()
+            // create the animator for this view (the start radius is zero)
+            val circularReveal = ViewAnimationUtils.createCircularReveal(rootLayout, x, y, 0f, finalRadius)
+            circularReveal.duration = 400
+            circularReveal.interpolator = AccelerateInterpolator()
+            if (animationListener != null)
+                circularReveal.addListener(animationListener)
+            // make the view visible and start the animation
+            rootLayout.visibility = View.VISIBLE
+            circularReveal.start()
+        }
+
+        fun unRevealActivity(rootLayout: View, activity: Activity) {
+            val revealX: Int = 0
+            val revealY: Int = 0
+            val finalRadius = (Math.max(rootLayout.width, rootLayout.height) * 1.1).toFloat()
+            val circularReveal = ViewAnimationUtils.createCircularReveal(
+                    rootLayout, revealX, revealY, finalRadius, 0f)
+            circularReveal.setDuration(400)
+            circularReveal.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    rootLayout.visibility = View.INVISIBLE
+                    activity.finish()
+                }
+            })
+            circularReveal.start()
+        }
+
     }
 }
 

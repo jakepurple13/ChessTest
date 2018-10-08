@@ -14,6 +14,7 @@ import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.utilities.ViewUtil
 import kotlinx.android.synthetic.main.activity_show_list.*
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
@@ -42,6 +43,8 @@ class ShowListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_show_list)
+
+        ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
         val showDatabase = ShowDatabase.getDatabase(this@ShowListActivity)
 

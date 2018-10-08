@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
+import com.crestron.aurora.utilities.ViewUtil
 import com.thejuki.kformmaster.helper.*
 import com.thejuki.kformmaster.model.FormMultiLineEditTextElement
 import com.thejuki.kformmaster.model.FormSingleLineEditTextElement
@@ -26,6 +27,8 @@ class FormActivity : AppCompatActivity() {
         setTheme(android.R.style.Theme_Material_Light)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_form)
+
+        ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
         form(this, recyclerViewForm) {
             header {

@@ -3,8 +3,9 @@ package com.crestron.aurora.cardgames.hilo
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import com.crestron.aurora.utilities.AnimationUtility
 import com.crestron.aurora.R
+import com.crestron.aurora.utilities.AnimationUtility
+import com.crestron.aurora.utilities.ViewUtil
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
 import kotlinx.android.synthetic.main.activity_hi_lo.*
@@ -31,6 +32,8 @@ class HiLoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_hi_lo)
+
+        ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
         deck = Deck(true, deckListener = deckListener)
 

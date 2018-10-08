@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.*
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
+import com.crestron.aurora.utilities.ViewUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
@@ -31,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
         Loged.SHOW_PRETTY = true
         Loged.FILTER_BY_CLASS_NAME = baseContext.packageName

@@ -207,7 +207,7 @@ public class ShelfView extends GridView implements AdapterView.OnItemClickListen
         /**
          * Callback when book is clicked from the shelf
          */
-        void onBookClicked(int position, String bookId, String bookTitle);
+        void onBookClicked(int position, String bookId, String bookTitle, View view);
     }
 
     public void setOnBookClicked(BookClickListener bookClickListener) {
@@ -219,7 +219,7 @@ public class ShelfView extends GridView implements AdapterView.OnItemClickListen
         if (mShelfModels.get(position).getShow()) {
             if (mBookClickListener != null) {
                 mBookClickListener.onBookClicked(position, mShelfModels.get(position).getBookId(),
-                        mShelfModels.get(position).getBookTitle());
+                        mShelfModels.get(position).getBookTitle(), view);
             }
         }
     }

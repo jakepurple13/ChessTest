@@ -14,6 +14,7 @@ import android.support.v4.app.TaskStackBuilder
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.InputType
+import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -29,6 +30,7 @@ import com.crestron.aurora.cardgames.solitaire.SolitaireActivity
 import com.crestron.aurora.cardgames.videopoker.VideoPokerActivity
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.*
+import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.viewtesting.ViewTesting
 import com.github.florent37.inlineactivityresult.kotlin.startForResult
 import com.google.firebase.FirebaseApp
@@ -88,7 +90,7 @@ class ChoiceActivity : AppCompatActivity() {
     }
 
     interface BookListener : ShelfView.BookClickListener {
-        override fun onBookClicked(position: Int, bookId: String?, bookTitle: String?) {
+        override fun onBookClicked(position: Int, bookId: String?, bookTitle: String?, view: View) {
 
         }
 
@@ -133,7 +135,7 @@ class ChoiceActivity : AppCompatActivity() {
                 }
                 .install()
 
-        fun permissionCheck(clazz: Class<out Any>, rec: Boolean = false, url: String? = null, shouldFinish: Boolean = false) {
+        fun permissionCheck(clazz: Class<out Any>, rec: Boolean = false, url: String? = null, shouldFinish: Boolean = false, view: View? = null) {
             Permissions.check(this@ChoiceActivity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
                     "Storage permissions are required because so we can download videos",
                     Permissions.Options().setSettingsDialogTitle("Warning!").setRationaleDialogTitle("Info"),
@@ -144,7 +146,7 @@ class ChoiceActivity : AppCompatActivity() {
                             intent.putExtra(ConstantValues.RECENT_OR_NOT, rec)
                             if (url != null)
                                 intent.putExtra(ConstantValues.SHOW_LINK, url)
-                            if (shouldFinish)
+                            if (shouldFinish) {
                                 startForResult(intent) {
                                     val shouldReset = it.data?.extras?.getBoolean("restart")
                                             ?: false
@@ -153,8 +155,12 @@ class ChoiceActivity : AppCompatActivity() {
                                 }.onFailed {
 
                                 }
-                            else
-                                startActivity(intent)
+                            } else {
+                                if (view == null)
+                                    startActivity(intent)
+                                else
+                                    ViewUtil.presentActivity(view, this@ChoiceActivity, intent)
+                            }
                         }
 
                         override fun onDenied(context: Context?, deniedPermissions: java.util.ArrayList<String>?) {
@@ -170,13 +176,14 @@ class ChoiceActivity : AppCompatActivity() {
 
         val listener = object : BookListener {
 
-            override fun onBookClicked(position: Int, bookId: String?, bookTitle: String?) {
+            override fun onBookClicked(position: Int, bookId: String?, bookTitle: String?, view: View) {
                 Loged.wtf("position $position id $bookId title $bookTitle")
                 try {
                     val book = getBook(bookId, bookTitle)
                     when (book) {
                         ChoiceButton.BLACKJACK -> {
-                            startActivity(Intent(this@ChoiceActivity, BlackJackActivity::class.java))
+                            //startActivity(Intent(this@ChoiceActivity, BlackJackActivity::class.java))
+                            ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, BlackJackActivity::class.java))
                         }
                         ChoiceButton.SOLITAIRE -> {
                             val intent = Intent(this@ChoiceActivity, SolitaireActivity::class.java)
@@ -209,7 +216,8 @@ class ChoiceActivity : AppCompatActivity() {
                                 edit.putInt(ConstantValues.DRAW_AMOUNT, num)
                                 edit.apply()
                                 intent.putExtra(ConstantValues.DRAW_AMOUNT, num)
-                                startActivity(intent)
+                                ViewUtil.presentActivity(view, this@ChoiceActivity, intent)
+                                //startActivity(intent)
                             }
                             builder.setNegativeButton("Never Mind") { _, _ ->
 
@@ -219,48 +227,54 @@ class ChoiceActivity : AppCompatActivity() {
 
                         }
                         ChoiceButton.CALCULATION -> {
-                            startActivity(Intent(this@ChoiceActivity, CalculationActivity::class.java))
+                            ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, CalculationActivity::class.java))
+                            //startActivity(Intent(this@ChoiceActivity, CalculationActivity::class.java))
                         }
                         ChoiceButton.VIDEO_POKER -> {
-                            startActivity(Intent(this@ChoiceActivity, VideoPokerActivity::class.java))
+                            //startActivity(Intent(this@ChoiceActivity, VideoPokerActivity::class.java))
+                            ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, VideoPokerActivity::class.java))
                         }
                         ChoiceButton.MATCHING -> {
-                            startActivity(Intent(this@ChoiceActivity, MatchingActivity::class.java))
+                            //startActivity(Intent(this@ChoiceActivity, MatchingActivity::class.java))
+                            ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, MatchingActivity::class.java))
                         }
                         ChoiceButton.HILO -> {
-                            startActivity(Intent(this@ChoiceActivity, HiLoActivity::class.java))
+                            //startActivity(Intent(this@ChoiceActivity, HiLoActivity::class.java))
+                            ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, HiLoActivity::class.java))
                         }
                         ChoiceButton.CHESS -> {
-                            startActivity(Intent(this@ChoiceActivity, MainActivity::class.java))
+                            //startActivity(Intent(this@ChoiceActivity, MainActivity::class.java))
+                            ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, MainActivity::class.java))
                         }
                         ChoiceButton.YAHTZEE -> {
-                            startActivity(Intent(this@ChoiceActivity, YahtzeeActivity::class.java))
+                            //startActivity(Intent(this@ChoiceActivity, YahtzeeActivity::class.java))
+                            ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, YahtzeeActivity::class.java))
                         }
                         ChoiceButton.SETTINGS -> {
                             permissionCheck(SettingsActivity2::class.java, shouldFinish = true)
                         }
                         ChoiceButton.ANIME -> {
-                            permissionCheck(ShowListActivity::class.java, url = "http://www.animeplus.tv/anime-list")
+                            permissionCheck(ShowListActivity::class.java, url = "http://www.animeplus.tv/anime-list", view = view)
                         }
                         ChoiceButton.CARTOON -> {
-                            permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/cartoon")
+                            permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/cartoon", view = view)
                         }
                         ChoiceButton.DUBBED -> {
-                            permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/dubbed-anime")
+                            permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/dubbed-anime", view = view)
                         }
                         ChoiceButton.ANIME_MOVIES -> {
-                            permissionCheck(ShowListActivity::class.java, url = "http://www.animeplus.tv/anime-movies")
+                            permissionCheck(ShowListActivity::class.java, url = "http://www.animeplus.tv/anime-movies", view = view)
                         }
                         ChoiceButton.CARTOON_MOVIES -> {
-                            permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/movies")
+                            permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/movies", view = view)
                         }
                         ChoiceButton.RECENT_ANIME -> {
                             defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT, 0).apply()
-                            permissionCheck(ShowListActivity::class.java, true, url = "http://www.animeplus.tv/anime-updates")
+                            permissionCheck(ShowListActivity::class.java, true, url = "http://www.animeplus.tv/anime-updates", view = view)
                         }
                         ChoiceButton.RECENT_CARTOON -> {
                             //defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT, 0).apply()
-                            permissionCheck(ShowListActivity::class.java, true, url = "http://www.animetoon.org/updates")
+                            permissionCheck(ShowListActivity::class.java, true, url = "http://www.animetoon.org/updates", view = view)
                         }
                         ChoiceButton.UPDATE_APP -> {
                             launch {
@@ -294,7 +308,8 @@ class ChoiceActivity : AppCompatActivity() {
                         ChoiceButton.VIEW_DOWNLOADS -> {
                             val intent = Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
                             intent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
-                            startActivity(intent)
+                            ViewUtil.presentActivity(view, this@ChoiceActivity, intent)
+                            //startActivity(intent)
                         }
                         ChoiceButton.UPDATE_NOTES -> {
                             launch {
@@ -407,11 +422,13 @@ class ChoiceActivity : AppCompatActivity() {
                         }
                         ChoiceButton.RSS_FEED -> {
                             val intented = Intent(this@ChoiceActivity, RssActivity::class.java)
-                            startActivity(intented)
+                            //startActivity(intented)
+                            ViewUtil.presentActivity(view, this@ChoiceActivity, intented)
                         }
                         ChoiceButton.FEEDBACK -> {
                             val intented = Intent(this@ChoiceActivity, FormActivity::class.java)
-                            startActivity(intented)
+                            //startActivity(intented)
+                            ViewUtil.presentActivity(view, this@ChoiceActivity, intented)
                         }
                         ChoiceButton.VIEW_TESTING -> {
                             val intented = Intent(this@ChoiceActivity, ViewTesting::class.java)
@@ -422,7 +439,10 @@ class ChoiceActivity : AppCompatActivity() {
                     val intented = Intent(this@ChoiceActivity, EpisodeActivity::class.java)
                     intented.putExtra(ConstantValues.URL_INTENT, bookId)
                     intented.putExtra(ConstantValues.NAME_INTENT, bookTitle)
-                    startActivity(intented)
+                    //startActivity(intented)
+                    ViewUtil.presentActivity(view, this@ChoiceActivity, intented)
+                    //ViewUtil.revealing(findViewById(android.R.id.content), intent)
+
                 }
             }
         }

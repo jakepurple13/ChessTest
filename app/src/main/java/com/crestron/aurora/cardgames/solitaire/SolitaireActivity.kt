@@ -21,6 +21,7 @@ import com.crestron.aurora.R
 import com.crestron.aurora.utilities.AnimationUtility
 import com.crestron.aurora.utilities.TimerUtil
 import com.crestron.aurora.utilities.TypingAnimation
+import com.crestron.aurora.utilities.ViewUtil
 import com.github.jinatonic.confetti.CommonConfetti
 import com.plattysoft.leonids.ParticleSystem
 import crestron.com.deckofcards.Card
@@ -110,6 +111,8 @@ class SolitaireActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_solitaire)
+
+        ViewUtil.revealing(solitaire_layout, intent)
 
         drawAmount = intent.getIntExtra(ConstantValues.DRAW_AMOUNT, 1)
 

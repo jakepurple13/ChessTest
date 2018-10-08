@@ -1,22 +1,26 @@
 package com.crestron.aurora.cardgames
 
 import android.annotation.SuppressLint
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import com.crestron.aurora.*
+import com.crestron.aurora.Loged
+import com.crestron.aurora.R
 import com.crestron.aurora.utilities.AnimationUtility
+import com.crestron.aurora.utilities.ViewUtil
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.CardNotFoundException
 import crestron.com.deckofcards.Deck
 import id.co.ionsoft.randomnumberanimationlibrary.RandomNumberAnimation
 import kotlinx.android.synthetic.main.activity_black_jack.*
-import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.experimental.launch
 import java.util.*
+
 
 class BlackJackActivity : AppCompatActivity() {
 
@@ -62,6 +66,10 @@ class BlackJackActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_black_jack)
+
+        //blackjack_layout.setBackgroundResource(R.drawable.drkgreen)
+
+        ViewUtil.revealing(blackjack_layout, intent)
 
         deckOfCards.deckListener = shuffleListener
 

@@ -105,7 +105,11 @@ class SettingsShowActivity : AppCompatActivity() {
             setResult(Activity.RESULT_OK, returnIntent)
             finish()
         } else {
-            super.onBackPressed()
+            val returnIntent = Intent()
+            returnIntent.putExtra("restart", shouldReset)
+            setResult(3, returnIntent)
+            finish()
+            //super.onBackPressed()
         }
     }
 

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/blackjack_layout"
     android:background="@drawable/drkgreen"
     tools:context=".cardgames.BlackJackActivity">
 
@@ -49,6 +50,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="5dp"
         android:background="@drawable/dialog_bg"
         android:backgroundTint="@color/emeraldGreen"
         android:text="Stand" />
@@ -106,7 +109,9 @@
         android:id="@+id/resetGame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/newCard"
+        android:layout_above="@+id/stay"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="5dp"
         android:background="@drawable/dialog_bg"
         android:backgroundTint="@color/emeraldGreen"
         android:layout_alignParentStart="true"

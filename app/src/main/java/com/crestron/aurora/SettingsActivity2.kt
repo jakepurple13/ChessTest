@@ -133,6 +133,15 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
             }
         }
 
+        override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+            super.onActivityResult(requestCode, resultCode, data)
+            if (requestCode == Activity.RESULT_OK || resultCode == 3) {
+                if (data?.hasExtra("restart")!!) {
+                    (this@GeneralPreferenceFragment.activity as SettingsActivity2).shouldReset = data.getBooleanExtra("restart", false)
+                }
+            }
+        }
+
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             //addPreferencesFromResource(R.xml.pref_general)
@@ -154,11 +163,11 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
             }
 
             findPreference("show_show").setOnPreferenceClickListener {
-                (this@GeneralPreferenceFragment.activity as SettingsActivity2).shouldReset = true
+                //(this@GeneralPreferenceFragment.activity as SettingsActivity2).shouldReset = true
                 val intent = Intent(this@GeneralPreferenceFragment.context, SettingsShowActivity::class.java)
                 intent.putExtra("displayText", "Choose What Shows To Display on the Home screen")
                 intent.putExtra("homeScreen", true)
-                startActivity(intent)
+                startActivityForResult(intent, 3)
                 true
             }
 

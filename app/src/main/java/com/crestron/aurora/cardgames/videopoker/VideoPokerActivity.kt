@@ -9,9 +9,10 @@ import android.view.View
 import android.view.animation.OvershootInterpolator
 import android.widget.Button
 import android.widget.ImageView
-import com.crestron.aurora.utilities.AnimationUtility
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
+import com.crestron.aurora.utilities.AnimationUtility
+import com.crestron.aurora.utilities.ViewUtil
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
 import crestron.com.deckofcards.Hand
@@ -20,7 +21,6 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import nl.dionsegijn.steppertouch.OnStepCallback
-import java.lang.IndexOutOfBoundsException
 import kotlin.coroutines.experimental.buildSequence
 
 class VideoPokerActivity : AppCompatActivity() {
@@ -83,6 +83,8 @@ class VideoPokerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_poker)
+
+        ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
         back_button_videopoker.setOnClickListener {
             finish()

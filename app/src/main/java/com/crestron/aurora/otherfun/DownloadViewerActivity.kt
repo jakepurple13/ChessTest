@@ -17,10 +17,13 @@ import com.crestron.aurora.ChoiceActivity
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
-import com.tonyodev.fetch2.*
+import com.crestron.aurora.utilities.ViewUtil
+import com.tonyodev.fetch2.AbstractFetchListener
+import com.tonyodev.fetch2.Download
+import com.tonyodev.fetch2.Error
+import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2core.Func
 import kotlinx.android.synthetic.main.activity_download_viewer.*
-import kotlinx.android.synthetic.main.activity_episode.*
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.annotations.NotNull
@@ -41,6 +44,8 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_download_viewer)
+
+        ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
         backChoice = intent.getBooleanExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
 

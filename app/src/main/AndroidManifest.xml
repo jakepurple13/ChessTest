@@ -25,6 +25,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".boardgames.chess.MainActivity"
+            android:theme="@style/AppTheme.Transparent"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ChooseActivity"
@@ -34,9 +35,11 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".cardgames.BlackJackActivity"
+            android:theme="@style/AppTheme.Transparent"
             android:screenOrientation="portrait" />
         <activity
             android:name=".cardgames.calculation.CalculationActivity"
+            android:theme="@style/AppTheme.Transparent"
             android:screenOrientation="portrait" />
         <activity
             android:name=".boardgames.checkers.CheckersActivity"
@@ -46,20 +49,25 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".cardgames.solitaire.SolitaireActivity"
+            android:theme="@style/AppTheme.Transparent"
             android:screenOrientation="portrait" />
         <activity
             android:name=".cardgames.videopoker.VideoPokerActivity"
+            android:theme="@style/AppTheme.Transparent"
             android:screenOrientation="portrait" />
         <activity
             android:name=".cardgames.matching.MatchingActivity"
+            android:theme="@style/AppTheme.Transparent"
             android:screenOrientation="portrait" />
         <activity android:name=".cardgames.canfield.CanfieldActivity" />
         <activity
             android:name=".cardgames.hilo.HiLoActivity"
+            android:theme="@style/AppTheme.Transparent"
             android:screenOrientation="portrait" />
         <activity android:name=".otherfun.AniDownloadActivity" />
         <activity
             android:name=".otherfun.EpisodeActivity"
+            android:theme="@style/AppTheme.Transparent"
             android:screenOrientation="portrait">
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
@@ -101,6 +109,7 @@
         </activity>
         <activity
             android:name=".otherfun.ShowListActivity"
+            android:theme="@style/AppTheme.Transparent"
             android:screenOrientation="portrait" />
 
         <receiver
@@ -158,6 +167,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".otherfun.DownloadViewerActivity"
+            android:theme="@style/AppTheme.Transparent"
             android:screenOrientation="portrait" />
 
         <meta-data
@@ -175,9 +185,11 @@
         </activity>
         <activity
             android:name=".boardgames.yahtzee.YahtzeeActivity"
+            android:theme="@style/AppTheme.Transparent"
             android:screenOrientation="portrait" />
         <activity
             android:name=".SettingsActivity2"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_settings2" />
 
         <provider
@@ -228,10 +240,19 @@
             android:value="firebase_channel_id"/>
         -->
 
-        <activity android:name=".SettingsShowActivity" />
-        <activity android:name=".otherfun.RssActivity" />
-        <activity android:name=".FormActivity" />
-        <activity android:name=".viewtesting.ViewTesting"></activity>
+        <activity
+            android:name=".SettingsShowActivity"
+            android:theme="@style/AppTheme.Transparent"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".otherfun.RssActivity"
+            android:theme="@style/AppTheme.Transparent"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".FormActivity"
+            android:theme="@style/AppTheme.Transparent"
+            android:screenOrientation="portrait" />
+        <activity android:name=".viewtesting.ViewTesting" />
     </application>
 
 </manifest>

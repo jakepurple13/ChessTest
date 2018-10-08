@@ -11,7 +11,7 @@
         android:id="@+id/back_button_videopoker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_corner"
+        android:background="@drawable/dialog_bg"
         android:backgroundTint="@color/emeraldGreen"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
@@ -38,9 +38,11 @@
         android:id="@+id/play_again"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="5dp"
         android:layout_above="@+id/hold_button_layout_poker"
         android:layout_alignParentStart="true"
-        android:background="@drawable/rounded_corner"
+        android:background="@drawable/dialog_bg"
         android:backgroundTint="@color/emeraldGreen"
         android:text="Play Cards" />
 
@@ -50,7 +52,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignTop="@+id/play_again"
-        android:background="@drawable/rounded_corner"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="5dp"
+        android:background="@drawable/dialog_bg"
         android:backgroundTint="@color/emeraldGreen"
         android:text="Discard" />
 
@@ -60,7 +64,9 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/play_again"
         android:layout_alignParentStart="true"
-        android:background="@drawable/rounded_corner"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="5dp"
+        android:background="@drawable/dialog_bg"
         android:backgroundTint="@color/emeraldGreen"
         android:text="Submit" />
 
@@ -146,6 +152,7 @@
         android:id="@+id/hold_button_layout_poker"
         android:layout_above="@+id/card_layout_poker"
         android:layout_alignParentStart="true"
+        android:layout_marginBottom="5dp"
         android:orientation="horizontal">
 
         <Button

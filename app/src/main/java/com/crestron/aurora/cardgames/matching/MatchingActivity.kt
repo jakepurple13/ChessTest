@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.widget.TableRow
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.TimerUtil
+import com.crestron.aurora.utilities.ViewUtil
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
 import crestron.com.deckofcards.Suit
@@ -75,6 +76,8 @@ class MatchingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_matching)
+
+        ViewUtil.revealing(matching_layouts, intent)
 
         reset()
         setUp()

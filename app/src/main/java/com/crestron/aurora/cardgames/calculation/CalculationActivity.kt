@@ -9,9 +9,10 @@ import android.view.DragEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import com.crestron.aurora.utilities.AnimationUtility
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
+import com.crestron.aurora.utilities.AnimationUtility
+import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.views.TypeWriter
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.CardNotFoundException
@@ -46,6 +47,8 @@ class CalculationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_calculation)
+
+        ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
         try {
             firstList.add(deck.getFirstCardByValue(1))

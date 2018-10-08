@@ -25,6 +25,7 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.utilities.ViewUtil
 import com.like.LikeButton
 import com.like.OnLikeListener
 import com.squareup.picasso.Picasso
@@ -67,6 +68,8 @@ class EpisodeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_episode)
+
+        ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
         val show = ShowDatabase.getDatabase(this@EpisodeActivity)
 

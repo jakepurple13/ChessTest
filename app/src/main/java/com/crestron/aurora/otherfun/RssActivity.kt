@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.ArrayAdapter
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
+import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.views.StickHeaderItemDecoration
 import com.prof.rssparser.Article
 import com.prof.rssparser.Parser
@@ -45,6 +46,8 @@ class RssActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rss)
+
+        ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
         textView5.append("\nCurrent Date is ${SimpleDateFormat("MM/dd/yyyy E hh:mm a").format(System.currentTimeMillis())}")
         spinner.isEnabled = false
