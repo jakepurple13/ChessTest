@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crestron.aurora.R;
+import com.crestron.aurora.views.DeleteDialog;
 import com.tonyodev.fetch2.Download;
 import com.tonyodev.fetch2.Status;
 
@@ -140,11 +140,13 @@ public final class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHold
         //Set delete action
         holder.itemView.setOnLongClickListener(v -> {
             final Uri uri12 = Uri.parse(downloadData.download.getUrl());
-            new AlertDialog.Builder(context)
+            /*new AlertDialog.Builder(context)
                     .setMessage(context.getString(R.string.delete_title, uri12.getLastPathSegment()))
                     .setPositiveButton(R.string.delete, (dialog, which) -> actionListener.onRemoveDownload(downloadData.download.getId()))
                     .setNegativeButton(R.string.cancel, null)
-                    .show();
+                    .show();*/
+
+            new DeleteDialog(context, context.getString(R.string.delete_title, uri12.getLastPathSegment()), downloadData.download).show();
 
             return true;
         });

@@ -86,8 +86,6 @@ class SettingsShowAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
             holder.linkType.performClick()
         }
 
-        //holder.favorite.isChecked = action.isChecked(stuff[position].name)
-
         holder.favorite.isLiked = action.isChecked(stuff[position].name)
 
         /*holder.favorite.setOnCheckedChangeListener { _, b ->

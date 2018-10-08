@@ -300,6 +300,14 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
             Fetch.getDefaultInstance().resume(download)
         }
 
+        fun delete(download: Download) {
+            Fetch.getDefaultInstance().delete(download.id)
+        }
+
+        fun delete(download: Int) {
+            Fetch.getDefaultInstance().delete(download)
+        }
+
         var folderLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/Fun/"
             set(value) {
                 field = value

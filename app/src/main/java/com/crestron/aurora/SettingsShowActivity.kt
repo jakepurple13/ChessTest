@@ -1,20 +1,20 @@
 package com.crestron.aurora
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Rect
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.widget.Toast
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.EpisodeActivity
 import com.crestron.aurora.otherfun.ShowListActivity
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_settings_show.*
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.util.*
 
@@ -35,6 +35,7 @@ class SettingsShowActivity : AppCompatActivity() {
     }
 
     var homeScreen = false
+    var shouldReset = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,19 +60,21 @@ class SettingsShowActivity : AppCompatActivity() {
 
         val stuff = arrayListOf<ShowListActivity.NameAndLink>()
 
-        async {
+        launch {
             val s = ShowDatabase.getDatabase(this@SettingsShowActivity).showDao()
             val showList = s.allShows
+
             showList.sortBy { it.name }
+
             for (s1 in showList)
                 stuff.add(ShowListActivity.NameAndLink(s1.name, s1.link))
+
             runOnUiThread {
                 list_to_choose.adapter = SettingsShowAdapter(stuff, this@SettingsShowActivity, object : ShowHit {
                     override fun longClick(name: String, url: String, checked: Boolean) {
                         super.longClick(name, url, checked)
-                        //if(homeScreen) {
+                        shouldReset = true
                         addOrRemoveToHomescreen(name, url, checked)
-                        //}
                     }
 
                     override fun isChecked(name: String): Boolean {
@@ -90,17 +93,20 @@ class SettingsShowActivity : AppCompatActivity() {
                 })
             }
         }
-
     }
 
     override fun onBackPressed() {
-        //Toast.makeText(this@SettingsShowActivity, "Changes will be made on next restart", Toast.LENGTH_SHORT).show()
-        if(!homeScreen) {
-            val intent = Intent(this@SettingsShowActivity, ChoiceActivity::class.java)
-            startActivity(intent)
+        if (!homeScreen) {
+            //val intent = Intent(this@SettingsShowActivity, ChoiceActivity::class.java)
+            //startActivity(intent)
+            Loged.i("$shouldReset")
+            val returnIntent = Intent()
+            returnIntent.putExtra("restart", shouldReset)
+            setResult(Activity.RESULT_OK, returnIntent)
             finish()
-        } else
+        } else {
             super.onBackPressed()
+        }
     }
 
     open class NameList(var list: ArrayList<NameUrl>)

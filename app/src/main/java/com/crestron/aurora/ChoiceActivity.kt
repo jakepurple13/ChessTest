@@ -30,6 +30,7 @@ import com.crestron.aurora.cardgames.videopoker.VideoPokerActivity
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.*
 import com.crestron.aurora.viewtesting.ViewTesting
+import com.github.florent37.inlineactivityresult.kotlin.startForResult
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 import com.nabinbhandari.android.permissions.PermissionHandler
@@ -103,9 +104,7 @@ class ChoiceActivity : AppCompatActivity() {
 
         //Loged.d(FirebaseInstanceId.getInstance().token!!)
 
-        //val canUpdate = defaultSharedPreferences.getBoolean(ConstantValues.APP_UPDATE, false)
-        //if(canUpdate) {
-        if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false))
+        if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false)) {
             launch {
                 val url = URL(ConstantValues.VERSION_URL).readText()
                 val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
@@ -118,7 +117,7 @@ class ChoiceActivity : AppCompatActivity() {
                     getNewApp(info)
                 }
             }
-        //}
+        }
 
         //FunApplication.startUpdate(this)
         //UpdateJob.scheduleJob()
@@ -145,9 +144,17 @@ class ChoiceActivity : AppCompatActivity() {
                             intent.putExtra(ConstantValues.RECENT_OR_NOT, rec)
                             if (url != null)
                                 intent.putExtra(ConstantValues.SHOW_LINK, url)
-                            startActivity(intent)
-                            if(shouldFinish)
-                                finish()
+                            if (shouldFinish)
+                                startForResult(intent) {
+                                    val shouldReset = it.data?.extras?.getBoolean("restart")
+                                            ?: false
+                                    if (shouldReset)
+                                        this@ChoiceActivity.recreate()
+                                }.onFailed {
+
+                                }
+                            else
+                                startActivity(intent)
                         }
 
                         override fun onDenied(context: Context?, deniedPermissions: java.util.ArrayList<String>?) {
@@ -285,28 +292,14 @@ class ChoiceActivity : AppCompatActivity() {
                             }
                         }
                         ChoiceButton.VIEW_DOWNLOADS -> {
-                            val intent =  Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
+                            val intent = Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
                             intent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
                             startActivity(intent)
                         }
                         ChoiceButton.UPDATE_NOTES -> {
                             launch {
-
-                                //val url = URL(ConstantValues.VERSION_URL).readText()
-
-                                //val url = URL("http://forusnerds.unaux.com/updated1.json").readText()
-                                //val url1 = Jsoup.parse(url).body().text()
-                                //val url = Jsoup.connect("http://forusnerds.unaux.com/updated.json").get().text()
                                 val url = URL(ConstantValues.VERSION_URL).readText()
-                                //Loged.wtf(url1)
                                 Loged.i(url)
-                                /*val reg = "location.href=\"(.*)\";".toRegex().toPattern().matcher(url)
-                                //http://forusnerds.unaux.com/updated1.json?i=1
-                                while (reg.find()) {
-                                    Loged.wtf(reg.group(1))
-                                    val url2 = URL(reg.group(1)).readText()
-                                    Loged.w(url2)
-                                }*/
                                 val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
                                 Loged.w("$info")
 
@@ -318,21 +311,7 @@ class ChoiceActivity : AppCompatActivity() {
                                     builder.setTitle("Notes for version ${info.version}")
                                     builder.setMessage("Your version: $version\n${info.devNotes}")
                                     builder.setNeutralButton("Cool!") { _, _ ->
-
-                                        FunApplication.cancelUpdate(this@ChoiceActivity)
-
-                                        /*val strApkToInstall = getNameFromUrl(info.link)!!.replace(".png", ".apk")
-                                        val path1 = File(File(Environment.getExternalStorageDirectory(), "Download"), strApkToInstall)
-
-                                        val apkUri = GenericFileProvider.getUriForFile(this@ChoiceActivity, applicationContext.packageName + ".otherfun.GenericFileProvider", path1)
-                                        val intent = Intent(Intent.ACTION_INSTALL_PACKAGE)
-                                        intent.data = apkUri
-                                        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                        //intent.setDataAndType(apkUri, "application/vnd.android.package-archive")
-                                        startActivity(intent)
-
-                                        Loged.wtf("${path1.exists()} and ${path1.absolutePath}")*/
-
+                                        //FunApplication.cancelUpdate(this@ChoiceActivity)
                                     }
                                     val dialog = builder.create()
                                     dialog.show()
@@ -420,8 +399,11 @@ class ChoiceActivity : AppCompatActivity() {
                         ChoiceButton.VIEW_FAVORITES -> {
                             val intented = Intent(this@ChoiceActivity, SettingsShowActivity::class.java)
                             intented.putExtra("displayText", "Your Favorites")
-                            startActivity(intented)
-                            finish()
+                            startForResult(intented) {
+                                val shouldReset = it.data?.extras?.getBoolean("restart") ?: false
+                                if (shouldReset)
+                                    this@ChoiceActivity.recreate()
+                            }
                         }
                         ChoiceButton.RSS_FEED -> {
                             val intented = Intent(this@ChoiceActivity, RssActivity::class.java)
@@ -442,7 +424,6 @@ class ChoiceActivity : AppCompatActivity() {
                     intented.putExtra(ConstantValues.NAME_INTENT, bookTitle)
                     startActivity(intented)
                 }
-
             }
         }
 
@@ -482,7 +463,7 @@ class ChoiceActivity : AppCompatActivity() {
         launch {
             val show = ShowDatabase.getDatabase(this@ChoiceActivity).showDao()
             val showList = show.allShows
-            if(showList.size>0) {
+            if (showList.size > 0) {
                 models.add(drawableModel(android.R.drawable.ic_input_get, ChoiceButton.VIEW_FAVORITES))
             }
             showList.shuffle()
@@ -495,24 +476,21 @@ class ChoiceActivity : AppCompatActivity() {
 
             showList1.list.sortBy { it.name }
 
-            for(i in showList1.list) {
+            for (i in showList1.list) {
                 val link = async {
                     val doc1 = Jsoup.connect(i.url).get()
                     doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
                 }
                 val s1 = link.await()
-                //Loged.wtf(s1)
                 models.add(BookModel.urlBookModel(s1, i.url, i.name))
-                //Loged.d("Here now")
                 runOnUiThread {
                     shelfView.loadData(models)
                 }
             }
 
-            //Loged.w("$showList")
-            if(defaultSharedPreferences.getBoolean(ConstantValues.RANDOM_SHOW, true)) {
+            if (defaultSharedPreferences.getBoolean(ConstantValues.RANDOM_SHOW, true)) {
                 val numberOfShowsToDisplay = defaultSharedPreferences.getString(ConstantValues.NUMBER_OF_RANDOM, "1")!!.toInt()
-                val randomShowsToDisplay = showList.filterNot { it.name in showList1.list.groupBy { it.name }.keys }
+                val randomShowsToDisplay = showList.filterNot { it -> it.name in showList1.list.groupBy { it.name }.keys }
                 for (i in 0 until if (randomShowsToDisplay.size > numberOfShowsToDisplay) numberOfShowsToDisplay else randomShowsToDisplay.size) {
                     val s = randomShowsToDisplay[i]
                     Loged.e(s.name)
@@ -521,9 +499,7 @@ class ChoiceActivity : AppCompatActivity() {
                         doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
                     }
                     val s1 = link.await()
-                    //Loged.wtf(s1)
                     models.add(BookModel.urlBookModel(s1, s.link, s.name))
-                    //Loged.d("Here now")
                     runOnUiThread {
                         shelfView.loadData(models)
                     }

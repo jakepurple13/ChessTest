@@ -8,6 +8,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.ViewSwitcher
 import com.crestron.aurora.R
+import com.crestron.aurora.views.DeleteDialog
 import kotlinx.android.synthetic.main.activity_view_testing.*
 
 
@@ -38,6 +39,7 @@ class ViewTesting : AppCompatActivity() {
 
         button.setOnClickListener {
             text_switcher.setText("Num: ${num++}")
+            DeleteDialog(this@ViewTesting, "Title", null).show()
         }
 
         text_switcher.setCurrentText("Num: $num")

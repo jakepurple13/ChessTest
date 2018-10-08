@@ -1,6 +1,7 @@
 package com.crestron.aurora
 
 import android.annotation.TargetApi
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -40,6 +41,8 @@ import java.io.IOException
  */
 class SettingsActivity2 : AppCompatPreferenceActivity() {
 
+    var shouldReset = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Display the fragment as the main content.
@@ -50,8 +53,12 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
     }
 
     override fun onBackPressed() {
-        val intent = Intent(this@SettingsActivity2, ChoiceActivity::class.java)
-        startActivity(intent)
+        //val intent = Intent(this@SettingsActivity2, ChoiceActivity::class.java)
+        //startActivity(intent)
+        //finish()
+        val returnIntent = Intent()
+        returnIntent.putExtra("restart", shouldReset)
+        setResult(Activity.RESULT_OK, returnIntent)
         finish()
         //super.onBackPressed()
     }
@@ -147,6 +154,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
             }
 
             findPreference("show_show").setOnPreferenceClickListener {
+                (this@GeneralPreferenceFragment.activity as SettingsActivity2).shouldReset = true
                 val intent = Intent(this@GeneralPreferenceFragment.context, SettingsShowActivity::class.java)
                 intent.putExtra("displayText", "Choose What Shows To Display on the Home screen")
                 intent.putExtra("homeScreen", true)
@@ -205,7 +213,6 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
 
                     }
                 }
-
 
                 true
             }
