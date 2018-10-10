@@ -188,7 +188,7 @@ class ShowListActivity : AppCompatActivity() {
 
                     fun checkItems(nn: NameAndLink): Boolean {
                         for (s in showList) {
-                            if (nn.name == s.name) {
+                            if (nn.url == s.link) {
                                 return true
                             }
                         }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,7 +10,13 @@
         android:id="@+id/text_switcher"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/button" />
+        android:layout_below="@id/button" />
+
+    <!--<com.wx.wheelview.widget.WheelView
+        android:id="@+id/wheelview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/seekBar" />-->
 
     <Button
         android:id="@+id/button"
@@ -29,5 +36,13 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="179dp" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/text_switcher"
+        android:layout_centerHorizontal="true"
+        app:srcCompat="@drawable/b1fv" />
 
 </RelativeLayout>

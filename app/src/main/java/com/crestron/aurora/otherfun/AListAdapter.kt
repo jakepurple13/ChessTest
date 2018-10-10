@@ -186,6 +186,7 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
                 fun liked(like: Boolean) {
                     launch {
                         if (like) {
+
                             show.showDao().insert(Show(stuff[position].url, stuff[position].name))
 
                             launch {

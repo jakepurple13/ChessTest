@@ -12,7 +12,7 @@ import java.util.List;
 @Dao
 public interface ShowDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(Show show);
 
     //Look at truncate

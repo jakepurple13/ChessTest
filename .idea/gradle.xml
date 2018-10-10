@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/library" />
             <option value="$PROJECT_DIR$/nicespinner" />
             <option value="$PROJECT_DIR$/shelfview" />
+            <option value="$PROJECT_DIR$/wheelview" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

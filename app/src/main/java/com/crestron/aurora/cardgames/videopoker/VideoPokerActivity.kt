@@ -13,6 +13,8 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.AnimationUtility
 import com.crestron.aurora.utilities.ViewUtil
+import com.crestron.aurora.views.VideoPokerDialog
+import com.wx.wheelview.widget.WheelView
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
 import crestron.com.deckofcards.Hand
@@ -51,9 +53,14 @@ class VideoPokerActivity : AppCompatActivity() {
         }*/
     }
 
+    interface DebugListener {
+        fun wheelChange(t: Card?)
+        fun getHand(): Hand
+    }
+
     var betAmount = 3
 
-    open class ViewAndButton(val cardView: ImageView, val holdButton: Button) {
+    open class ViewAndButton(val cardView: ImageView, val holdButton: Button, val listener: DebugListener) {
         var hold = false
             set(value) {
                 holdButton.text = if (value) {
@@ -74,6 +81,17 @@ class VideoPokerActivity : AppCompatActivity() {
             holdButton.setOnClickListener(clickListener)
             cardView.isEnabled = false
             holdButton.isEnabled = false
+            cardView.setOnLongClickListener {
+                if (cardView.isEnabled)
+                    VideoPokerDialog(it.context, card, listener.getHand(), object : WheelView.OnWheelItemSelectedListener<Card> {
+                        override fun onItemSelected(position: Int, t: Card?) {
+                            card = t!!
+                            cardView.setImageResource(t.getImage(it.context))
+                            listener.wheelChange(t)
+                        }
+                    }).show()
+                true
+            }
         }
     }
 
@@ -152,11 +170,23 @@ class VideoPokerActivity : AppCompatActivity() {
         play_cards.isEnabled = false
         discard_button.isEnabled = false
 
-        cardsAndButtons[0] = ViewAndButton(card_one, hold_one)
-        cardsAndButtons[1] = ViewAndButton(card_two, hold_two)
-        cardsAndButtons[2] = ViewAndButton(card_three, hold_three)
-        cardsAndButtons[3] = ViewAndButton(card_four, hold_four)
-        cardsAndButtons[4] = ViewAndButton(card_five, hold_five)
+        fun debugListener(num: Int) = object : DebugListener {
+            override fun wheelChange(t: Card?) {
+                hand.replaceCard(num, t!!)
+                current_hand.text = scores.getWinningHand(hand)
+                score_view.text = Html.fromHtml(scores.htmlValues(scores.getWinningHand(hand), betAmount), Html.FROM_HTML_MODE_COMPACT)
+            }
+
+            override fun getHand(): Hand {
+                return hand
+            }
+        }
+
+        cardsAndButtons[0] = ViewAndButton(card_one, hold_one, debugListener(0))
+        cardsAndButtons[1] = ViewAndButton(card_two, hold_two, debugListener(1))
+        cardsAndButtons[2] = ViewAndButton(card_three, hold_three, debugListener(2))
+        cardsAndButtons[3] = ViewAndButton(card_four, hold_four, debugListener(3))
+        cardsAndButtons[4] = ViewAndButton(card_five, hold_five, debugListener(4))
 
         score_view.text = Html.fromHtml(scores.htmlValues(betAmount), Html.FROM_HTML_MODE_COMPACT)
 
@@ -257,7 +287,6 @@ class VideoPokerActivity : AppCompatActivity() {
                 AnimationUtility.animateCard(cardsAndButtons[i]!!.cardView, Card.BackCard, this@VideoPokerActivity, end = object : AnimationUtility.AnimationEnd {
                     override fun onAnimationEnd() {
                         super.onAnimationEnd()
-
                         launch(UI) {
                             delay(200)
                             AnimationUtility.animateCard(cardsAndButtons[i]!!.cardView, cardsAndButtons[i]!!.card, this@VideoPokerActivity, end = object : AnimationUtility.AnimationEnd {
