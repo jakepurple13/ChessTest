@@ -44,8 +44,6 @@ class EpisodeAdapter(private val items: ArrayList<String>, private val links: Ar
             action.hit(items[position], links[position])
         }
 
-        //holder.slideToDownload.textView.text = items[position]
-
         holder.slideToDownload.setOnSwipeCompleteListener_forward_reverse(object : OnSwipeCompleteListener {
             override fun onSwipe_Forward(p0: Swipe_Button_View?) {
                 action.hit(items[position], links[position])
@@ -55,14 +53,6 @@ class EpisodeAdapter(private val items: ArrayList<String>, private val links: Ar
 
             }
         })
-
-        /*if (slideOrButton) {
-            holder.slideToDownload.visibility = View.VISIBLE
-            holder.episodeDownload.visibility = View.GONE
-        } else {
-            holder.slideToDownload.visibility = View.GONE
-            holder.episodeDownload.visibility = View.VISIBLE
-        }*/
 
         val show = ShowDatabase.getDatabase(this@EpisodeAdapter.context).showDao()
 
