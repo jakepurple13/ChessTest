@@ -34,6 +34,7 @@ import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class SolitaireActivity : AppCompatActivity() {
 
@@ -281,6 +282,16 @@ class SolitaireActivity : AppCompatActivity() {
                 if (lastScore < score)
                     this@SolitaireActivity.defaultSharedPreferences.edit().putInt("solitaire_score", score).apply()
 
+                val lastMove = this@SolitaireActivity.defaultSharedPreferences.getInt("solitaire_moves", Int.MAX_VALUE)
+
+                if (lastMove > moveCount)
+                    this@SolitaireActivity.defaultSharedPreferences.edit().putInt("solitaire_moves", moveCount).apply()
+
+                val lastTime = this@SolitaireActivity.defaultSharedPreferences.getLong("solitaire_time", Long.MAX_VALUE)
+
+                if (lastTime > time.time)
+                    this@SolitaireActivity.defaultSharedPreferences.edit().putLong("solitaire_time", time.time).apply()
+
                 win = true
 
                 time.cancel()
@@ -419,6 +430,14 @@ class SolitaireActivity : AppCompatActivity() {
     private fun winDialog() {
 
         val lastScore = this@SolitaireActivity.defaultSharedPreferences.getInt("solitaire_score", 0)
+        val lastMove = this@SolitaireActivity.defaultSharedPreferences.getInt("solitaire_moves", 0)
+        val lastTime = this@SolitaireActivity.defaultSharedPreferences.getLong("solitaire_time", 0)
+
+        fun getTime(length: Long): String {
+            val m = TimeUnit.MILLISECONDS.toMinutes(length)
+            val s = TimeUnit.MILLISECONDS.toSeconds(length - m * 60 * 1000)
+            return String.format("%02d:%02d", m, s)
+        }
 
         deck_of_cards.setOnClickListener(null)
         val builder = AlertDialog.Builder(this)
@@ -428,6 +447,8 @@ class SolitaireActivity : AppCompatActivity() {
                 "\nWith a score of $score!" +
                 "\nA move count of $moveCount!" +
                 "\nYour high score is $lastScore." +
+                "\nYour lowest move count is $lastMove." +
+                "\nYour fastest time is ${getTime(lastTime)}" +
                 "\nWant to play again?")
         // Add the buttons
         builder.setPositiveButton("Play Again") { _, _ ->

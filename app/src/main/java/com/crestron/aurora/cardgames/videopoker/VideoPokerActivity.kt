@@ -9,6 +9,7 @@ import android.view.View
 import android.view.animation.OvershootInterpolator
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.AnimationUtility
@@ -18,6 +19,7 @@ import com.wx.wheelview.widget.WheelView
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
 import crestron.com.deckofcards.Hand
+import io.kimo.konamicode.KonamiCode
 import kotlinx.android.synthetic.main.activity_video_poker.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.delay
@@ -53,6 +55,10 @@ class VideoPokerActivity : AppCompatActivity() {
         }*/
     }
 
+    companion object VideoDebug {
+        var debugged = false
+    }
+
     interface DebugListener {
         fun wheelChange(t: Card?)
         fun getHand(): Hand
@@ -82,7 +88,7 @@ class VideoPokerActivity : AppCompatActivity() {
             cardView.isEnabled = false
             holdButton.isEnabled = false
             cardView.setOnLongClickListener {
-                if (cardView.isEnabled)
+                if (cardView.isEnabled && debugged)
                     VideoPokerDialog(it.context, card, listener.getHand(), object : WheelView.OnWheelItemSelectedListener<Card> {
                         override fun onItemSelected(position: Int, t: Card?) {
                             card = t!!
@@ -101,6 +107,8 @@ class VideoPokerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_poker)
+
+        debugged = false
 
         ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
@@ -278,6 +286,13 @@ class VideoPokerActivity : AppCompatActivity() {
                 newGame = false
             }
         }
+
+        KonamiCode.Installer(this)
+                .on(this)
+                .callback {
+                    Toast.makeText(this@VideoPokerActivity, "Debug Mode Activated!", Toast.LENGTH_SHORT).show()
+                    debugged = true
+                }.install()
 
     }
 

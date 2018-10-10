@@ -39,6 +39,13 @@
             android:summary="Time between update checks"
             android:title="Time between Checks (By Hour; So .5 = 30 minutes)" />
 
+        <SwitchPreference
+            android:key="slider_or_button"
+            android:title="Use a Slider or a Button to download videos"
+            android:summaryOn="Using Slider"
+            android:summaryOff="Using Button"
+            android:defaultValue="false" />
+
         <Preference
             android:key="show_show"
             android:summary="Show's to Show on Home Screen"

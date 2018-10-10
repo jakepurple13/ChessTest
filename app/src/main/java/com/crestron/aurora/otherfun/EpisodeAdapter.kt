@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.agik.swipe_button.Controller.OnSwipeCompleteListener
+import com.agik.swipe_button.View.Swipe_Button_View
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Episode
@@ -16,7 +18,7 @@ import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
-class EpisodeAdapter(private val items: ArrayList<String>, private val links: ArrayList<String>, private val name: String, val reverse: Boolean = false, val context: Context, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
+class EpisodeAdapter(private val items: ArrayList<String>, private val links: ArrayList<String>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
 
     // Gets the number of animals in the list
     override fun getItemCount(): Int {
@@ -37,6 +39,26 @@ class EpisodeAdapter(private val items: ArrayList<String>, private val links: Ar
         holder.watched.text = items[position]
         holder.episodeDownload.setOnClickListener {
             action.hit(items[position], links[position])
+        }
+
+        //holder.slideToDownload.textView.text = items[position]
+
+        holder.slideToDownload.setOnSwipeCompleteListener_forward_reverse(object : OnSwipeCompleteListener {
+            override fun onSwipe_Forward(p0: Swipe_Button_View?) {
+                action.hit(items[position], links[position])
+            }
+
+            override fun onSwipe_Reverse(p0: Swipe_Button_View?) {
+
+            }
+        })
+
+        if (slideOrButton) {
+            holder.slideToDownload.visibility = View.VISIBLE
+            holder.episodeDownload.visibility = View.GONE
+        } else {
+            holder.slideToDownload.visibility = View.GONE
+            holder.episodeDownload.visibility = View.VISIBLE
         }
 
         val show = ShowDatabase.getDatabase(this@EpisodeAdapter.context).showDao()
@@ -97,8 +119,8 @@ class EpisodeAdapter(private val items: ArrayList<String>, private val links: Ar
 class ViewHolderEpisode(view: View) : RecyclerView.ViewHolder(view) {
     // Holds the TextView that will add each animal to
     val episodeDownload = view.download_episode!!
-    //val episodeName = view.episode_name!!
     val watched = view.watched_button!!
+    val slideToDownload = view.okay_to_download!!
 
     init {
         setIsRecyclable(false)

@@ -21,6 +21,8 @@ import kotlinx.android.synthetic.main.video_poker_dialog.*
 
 class VideoPokerDialog(context: Context?, val currentCard: Card, val hand: Hand, val listener: WheelView.OnWheelItemSelectedListener<Card>) : Dialog(context!!) {
 
+    private var dismissedBy = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -48,7 +50,14 @@ class VideoPokerDialog(context: Context?, val currentCard: Card, val hand: Hand,
         wheelView.setOnWheelItemSelectedListener(listener)
 
         dismiss_button.setOnClickListener {
+            dismissedBy = true
             dismiss()
+        }
+
+        setOnDismissListener {
+            if (!dismissedBy) {
+                listener.onItemSelected(0, currentCard)
+            }
         }
 
     }
