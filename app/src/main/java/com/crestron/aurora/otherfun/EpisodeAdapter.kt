@@ -27,7 +27,10 @@ class EpisodeAdapter(private val items: ArrayList<String>, private val links: Ar
 
     // Inflates the item views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderEpisode {
-        return ViewHolderEpisode(LayoutInflater.from(context).inflate(R.layout.episode_info, parent, false))
+        return if (slideOrButton)
+            ViewHolderEpisode(LayoutInflater.from(context).inflate(R.layout.episode_info, parent, false))
+        else
+            ViewHolderEpisode(LayoutInflater.from(context).inflate(R.layout.episode_info_button, parent, false))
     }
 
     // Binds each animal in the ArrayList to a view
@@ -53,13 +56,13 @@ class EpisodeAdapter(private val items: ArrayList<String>, private val links: Ar
             }
         })
 
-        if (slideOrButton) {
+        /*if (slideOrButton) {
             holder.slideToDownload.visibility = View.VISIBLE
             holder.episodeDownload.visibility = View.GONE
         } else {
             holder.slideToDownload.visibility = View.GONE
             holder.episodeDownload.visibility = View.VISIBLE
-        }
+        }*/
 
         val show = ShowDatabase.getDatabase(this@EpisodeAdapter.context).showDao()
 

@@ -44,6 +44,7 @@ class VideoPokerDialog(context: Context?, val currentCard: Card, val hand: Hand,
         d.addCard(currentCard)
         d.sortByValue()
         d.sortBySuit()
+        d.sortByColor()
         wheelView.setWheelData(d.getDeck())
         wheelView.setSelection(d.getCardLocation(currentCard))
 

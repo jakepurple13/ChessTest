@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
+    android:orientation="horizontal"
+    android:weightSum="2"
     tools:ignore="HardcodedText">
 
     <CheckBox
         android:id="@+id/watched_button"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_toStartOf="@id/download_episode"
-        android:layout_alignBottom="@id/download_episode"
         android:gravity="center_vertical"
         android:text="Episode Name" />
 
@@ -22,23 +21,66 @@
         android:id="@+id/download_episode"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
         android:text="Download"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <com.agik.swipe_button.View.Swipe_Button_View
         android:id="@+id/okay_to_download"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@id/watched_button"
         android:visibility="visible"
         app:sb_swipe_animate_text="true"
         app:sb_swipe_bg_color="@color/emeraldGreen"
+        android:layout_weight="1"
         app:sb_swipe_text="Download"
         app:sb_thumb_bg_color="@color/emeraldGreen">
 
     </com.agik.swipe_button.View.Swipe_Button_View>
 
-</RelativeLayout>
+</LinearLayout>
+
+    <!--
+    <?xml version="1.0" encoding="utf-8"?>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        tools:ignore="HardcodedText">
+
+        <CheckBox
+            android:id="@+id/watched_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@id/download_episode"
+            android:layout_alignBottom="@id/download_episode"
+            android:gravity="center_vertical"
+            android:text="Episode Name" />
+
+        <Button
+            android:id="@+id/download_episode"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:text="Download"
+            android:visibility="visible" />
+
+        <com.agik.swipe_button.View.Swipe_Button_View
+            android:id="@+id/okay_to_download"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@id/watched_button"
+            android:visibility="visible"
+            app:sb_swipe_animate_text="true"
+            app:sb_swipe_bg_color="@color/emeraldGreen"
+            app:sb_swipe_text="Download"
+            app:sb_thumb_bg_color="@color/emeraldGreen">
+
+        </com.agik.swipe_button.View.Swipe_Button_View>
+
+    </RelativeLayout>-->
