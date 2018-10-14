@@ -108,8 +108,11 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
 
             holder.linkType.setOnLongClickListener {
                 //holder.favorite.isChecked != holder.favorite.isChecked
+                action.longhit(stuff[position], holder.linkType)
                 true
             }
+
+            action.longhit(stuff[position], holder.layout)
 
             //holder.favorite.text = ""//stuff[position].name
             /*holder.favorite.setOnClickListener {
@@ -144,6 +147,11 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
             holder.layout.setOnClickListener {
                 holder.linkType.performClick()
             }
+
+            /*holder.layout.setOnLongClickListener {
+                holder.layout.performClick()
+                true
+            }*/
 
             val show = ShowDatabase.getDatabase(context)
 

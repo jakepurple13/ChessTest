@@ -44,7 +44,7 @@
             android:title="Use a Slider or a Button to download videos"
             android:summaryOn="Using Slider"
             android:summaryOff="Using Button"
-            android:defaultValue="false" />
+            android:defaultValue="true" />
 
         <Preference
             android:key="show_show"

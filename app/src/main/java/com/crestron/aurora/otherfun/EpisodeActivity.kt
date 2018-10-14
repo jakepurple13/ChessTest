@@ -270,7 +270,7 @@ class EpisodeActivity : AppCompatActivity() {
                 Picasso.get().load(doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src"))
                         .error(R.drawable.apk).resize((600 * .6).toInt(), (800 * .6).toInt()).into(cover_image)
 
-                val slideOrButton = defaultSharedPreferences.getBoolean(ConstantValues.SLIDE_OR_BUTTON, false)
+                val slideOrButton = defaultSharedPreferences.getBoolean(ConstantValues.SLIDE_OR_BUTTON, true)
 
                 episode_list.adapter = EpisodeAdapter(listOfNames, listOfUrls, name, context = this@EpisodeActivity, slideOrButton = slideOrButton, action = object : EpisodeAction {
                     override fun hit(name: String, url: String) {
@@ -312,7 +312,7 @@ class EpisodeActivity : AppCompatActivity() {
             listOfUrls.reverse()
 
             runOnUiThread {
-                val slideOrButton = defaultSharedPreferences.getBoolean(ConstantValues.SLIDE_OR_BUTTON, false)
+                val slideOrButton = defaultSharedPreferences.getBoolean(ConstantValues.SLIDE_OR_BUTTON, true)
                 episode_list.adapter = EpisodeAdapter(listOfNames, listOfUrls, name, reverse = b, context = this@EpisodeActivity, slideOrButton = slideOrButton, action = object : EpisodeAction {
                     override fun hit(name: String, url: String) {
                         super.hit(name, url)

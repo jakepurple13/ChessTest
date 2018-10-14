@@ -1,26 +1,16 @@
 package com.crestron.aurora;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
 import android.app.Application;
-import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
-import android.arch.persistence.db.SupportSQLiteDatabase;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.migration.Migration;
-import android.bluetooth.BluetoothA2dp;
-import android.bluetooth.BluetoothClass;
-import android.bluetooth.BluetoothProfile;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Environment;
 
 import com.crashlytics.android.Crashlytics;
-import com.crestron.aurora.db.ShowDatabase;
 import com.crestron.aurora.otherfun.FetchingUtils;
 import com.crestron.aurora.otherfun.ShowCheckService;
 import com.crestron.aurora.otherfun.UpdateCheckService;
@@ -33,13 +23,7 @@ import com.tonyodev.fetch2.HttpUrlConnectionDownloader;
 import com.tonyodev.fetch2.NetworkType;
 import com.tonyodev.fetch2core.Downloader;
 
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-
 import io.fabric.sdk.android.Fabric;
-import programmer.box.utilityhelper.UtilAsyncTask;
 import programmer.box.utilityhelper.UtilNotification;
 
 public class FunApplication extends Application {
@@ -73,12 +57,20 @@ public class FunApplication extends Application {
         Fetch.Impl.setDefaultInstanceConfiguration(fetchConfiguration);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //episode update
             UtilNotification.createNotificationChannel(this, "episode_update",
                     "episode_update_info",
                     "episodeUpdate");
             UtilNotification.createNotificationGroup(this,
                     "episode_group_id",
                     "episode_group");
+            //app update
+            UtilNotification.createNotificationChannel(this, "update_notification",
+                    "update_notification",
+                    "update_notification");
+            UtilNotification.createNotificationGroup(this,
+                    "update_notification_group",
+                    "update_notification_group");
         }
         float length = getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE).getFloat("updateCheck", 1f);
 

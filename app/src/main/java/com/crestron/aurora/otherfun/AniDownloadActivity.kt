@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.view.View
 import android.widget.Toast
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
@@ -138,7 +139,6 @@ class AniDownloadActivity : AppCompatActivity() {
                         val intented = Intent(this@AniDownloadActivity, EpisodeActivity::class.java)
                         intented.putExtra("url", url)
                         startActivity(intented)
-
                     }
                 })
             }
@@ -270,6 +270,10 @@ class AniDownloadActivity : AppCompatActivity() {
     interface LinkAction {
         fun hit(name: String, url: String) {
             Loged.wtf("$name: $url")
+        }
+
+        fun longhit(info: ShowListActivity.NameAndLink, views: View) {
+
         }
     }
 

@@ -1,6 +1,7 @@
 package com.crestron.aurora.otherfun
 
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -8,18 +9,26 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
+import android.text.Html
 import android.text.TextWatcher
 import android.view.View
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.utilities.ViewUtil
+import com.peekandpop.shalskar.peekandpop.PeekAndPop
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_show_list.*
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.textColor
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
+import uk.co.deanwild.flowtextview.FlowTextView
 import java.util.*
 
 
@@ -36,6 +45,69 @@ class ShowListActivity : AppCompatActivity() {
             intented.putExtra(ConstantValues.URL_INTENT, url)
             intented.putExtra(ConstantValues.NAME_INTENT, name)
             startActivity(intented)
+
+        }
+
+        override fun longhit(info: NameAndLink, views: View) {
+            val peekAndPop = PeekAndPop.Builder(this@ShowListActivity)
+                    .peekLayout(R.layout.image_dialog_layout)
+                    .longClickViews(views)
+                    .build()
+
+            peekAndPop.setOnGeneralActionListener(object : PeekAndPop.OnGeneralActionListener {
+                override fun onPop(p0: View?, p1: Int) {
+
+                }
+
+                override fun onPeek(p0: View?, p1: Int) {
+                    val peekView = peekAndPop.peekView
+                    val title = peekView.findViewById(R.id.title_dialog) as TextView
+                    val description = peekView.findViewById(R.id.ftv) as FlowTextView
+                    val episodeNumber = peekView.findViewById(R.id.episode_number_dialog) as TextView
+                    val image = peekView.findViewById(R.id.image_dialog) as ImageView
+                    val button = peekView.findViewById(R.id.button_dialog) as Button
+
+                    button.visibility = View.GONE
+                    title.text = Html.fromHtml("<b>${info.name}<b>", Html.FROM_HTML_MODE_COMPACT)
+                    title.textColor = Color.WHITE
+                    //description_dialog.text = description
+                    episodeNumber.text = ""
+                    description.textColor = Color.WHITE
+                    description.setTextSize(episodeNumber.textSize)
+
+                    async {
+                        try {
+                            val doc1 = Jsoup.connect(info.url).get()
+                            runOnUiThread {
+                                Picasso.get().load(doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src"))
+                                        .error(R.drawable.apk).resize((600 * .6).toInt(), (800 * .6).toInt()).into(image)
+                                //Picasso.get().load(info.imgURL).resize(360, 480).into(image)
+                                title.text = info.name
+                                val des = if (doc1.allElements.select("div#series_details").select("span#full_notes").hasText())
+                                    doc1.allElements.select("div#series_details").select("span#full_notes").text().removeSuffix("less")
+                                else {
+                                    val d = doc1.allElements.select("div#series_details").select("div:contains(Description:)").select("div").text()
+                                    try {
+                                        d.substring(d.indexOf("Description: ") + 13, d.indexOf("Category: "))
+                                    } catch (e: StringIndexOutOfBoundsException) {
+                                        Loged.e(e.message!!)
+                                        d
+                                    }
+                                }
+                                description.text = des
+                            }
+                        } catch (e: IllegalArgumentException) {
+
+                        }
+                    }
+                }
+
+            })
+
+            //val dialog = ImageDialog(this@RssAdapter.context, information.title, information.description, information.episodeNumber, information.imageLink)
+            //dialog.show()
+
+            peekAndPop.isEnabled = true
 
         }
     }

@@ -45,6 +45,7 @@ class MessagingFirebase : FirebaseMessagingService() {
             Log.d(TAG, "Message data payload: " + remoteMessage.data)
             if(remoteMessage.data.containsKey("update")) {
                 if(remoteMessage.data["update"]=="true") {
+
                     sendDownloadUpdateNotification("For Us Nerds has an Update!", remoteMessage.notification!!.body!!,
                             this@MessagingFirebase, ChoiceActivity::class.java, 50)
                 }
@@ -170,6 +171,8 @@ class MessagingFirebase : FirebaseMessagingService() {
                     .setSmallIcon(android.R.mipmap.sym_def_app_icon)
                     .setAutoCancel(true)
                     .setContentTitle(title)
+                    .setChannelId("update_notification")
+                    .setGroup("update_notification_group")
                     .setStyle(NotificationCompat.BigTextStyle().bigText(textToUse))
                     .setOnlyAlertOnce(true)
 
