@@ -85,6 +85,7 @@ class SettingsShowActivity : AppCompatActivity() {
                 stuff.add(ShowListActivity.NameAndLink(s1.name, s1.link))
 
             runOnUiThread {
+                favorite_text.append("\nFavorite Count: ${showList.size}")
                 list_to_choose.adapter = SettingsShowAdapter(stuff, this@SettingsShowActivity, object : ShowHit {
                     override fun longClick(name: String, url: String, checked: Boolean) {
                         super.longClick(name, url, checked)
@@ -141,7 +142,7 @@ class SettingsShowActivity : AppCompatActivity() {
                                             Picasso.get().load(doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src"))
                                                     .error(R.drawable.apk).resize((600 * .6).toInt(), (800 * .6).toInt()).into(image)
                                             //Picasso.get().load(info.imgURL).resize(360, 480).into(image)
-                                            title.text = info.name
+                                            //title.text = info.name
                                             val des = if (doc1.allElements.select("div#series_details").select("span#full_notes").hasText())
                                                 doc1.allElements.select("div#series_details").select("span#full_notes").text().removeSuffix("less")
                                             else {

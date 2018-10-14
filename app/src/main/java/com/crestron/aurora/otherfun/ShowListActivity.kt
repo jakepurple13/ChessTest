@@ -82,7 +82,7 @@ class ShowListActivity : AppCompatActivity() {
                                 Picasso.get().load(doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src"))
                                         .error(R.drawable.apk).resize((600 * .6).toInt(), (800 * .6).toInt()).into(image)
                                 //Picasso.get().load(info.imgURL).resize(360, 480).into(image)
-                                title.text = info.name
+                                //title.text = info.name
                                 val des = if (doc1.allElements.select("div#series_details").select("span#full_notes").hasText())
                                     doc1.allElements.select("div#series_details").select("span#full_notes").text().removeSuffix("less")
                                 else {
@@ -103,9 +103,6 @@ class ShowListActivity : AppCompatActivity() {
                 }
 
             })
-
-            //val dialog = ImageDialog(this@RssAdapter.context, information.title, information.description, information.episodeNumber, information.imageLink)
-            //dialog.show()
 
             peekAndPop.isEnabled = true
 
