@@ -7,10 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SectionIndexer
 import com.crestron.aurora.otherfun.ShowListActivity
-import com.like.LikeButton
-import com.like.OnLikeListener
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.text_layout.view.*
+import kotlinx.android.synthetic.main.settings_show_layout.view.*
 import kotlinx.coroutines.experimental.async
 import org.jsoup.Jsoup
 
@@ -61,7 +59,7 @@ class SettingsShowAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
 
     // Inflates the item views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(context).inflate(R.layout.text_layout, parent, false))
+        return ViewHolder(LayoutInflater.from(context).inflate(R.layout.settings_show_layout, parent, false))
     }
 
     // Binds each animal in the ArrayList to a view
@@ -87,22 +85,15 @@ class SettingsShowAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
             holder.linkType.performClick()
         }
 
-        holder.favorite.isLiked = action.isChecked(stuff[position].name)
+        holder.favorite.isChecked = action.isChecked(stuff[position].name)
 
         /*holder.favorite.setOnCheckedChangeListener { _, b ->
             action.longClick(stuff[position].name, stuff[position].url, b)
         }*/
 
-        holder.favorite.setOnLikeListener(object : OnLikeListener {
-            override fun liked(p0: LikeButton?) {
-                action.longClick(stuff[position].name, stuff[position].url, p0!!.isLiked)
-            }
-
-            override fun unLiked(p0: LikeButton?) {
-                action.longClick(stuff[position].name, stuff[position].url, p0!!.isLiked)
-            }
-
-        })
+        holder.favorite.setOnCheckedChangeListener { _, isChecked ->
+            action.longClick(stuff[position].name, stuff[position].url, isChecked)
+        }
     }
 
     private fun getEpisodeList(url: String) = async {
