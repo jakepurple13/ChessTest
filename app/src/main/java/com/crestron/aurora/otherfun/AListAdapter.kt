@@ -1,5 +1,6 @@
 package com.crestron.aurora.otherfun
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -90,6 +91,7 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
     }
 
     // Binds each animal in the ArrayList to a view
+    @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         //holder.cardType.text = "${items[position]}"
         if (items != null) {
@@ -106,52 +108,106 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
                 action.hit(stuff[position].name, stuff[position].url)
             }
 
-            holder.linkType.setOnLongClickListener {
-                //holder.favorite.isChecked != holder.favorite.isChecked
-                action.longhit(stuff[position], holder.linkType)
-                true
-            }
+            /* var dialog: ImageDialog? = null
 
-            action.longhit(stuff[position], holder.layout)
+             async {
+                 dialog = try {
+                     val doc1 = Jsoup.connect(stuff[position].url).get()
 
-            //holder.favorite.text = ""//stuff[position].name
-            /*holder.favorite.setOnClickListener {
-                Loged.wtf("I was pressed")
-                action.hit(stuff[position].name, stuff[position].url)
-            }
+                     val imageLink = doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
+                     //Picasso.get().load(info.imgURL).resize(360, 480).into(image)
+                     //title.text = info.name
+                     val des = if (doc1.allElements.select("div#series_details").select("span#full_notes").hasText())
+                         doc1.allElements.select("div#series_details").select("span#full_notes").text().removeSuffix("less")
+                     else {
+                         val d = doc1.allElements.select("div#series_details").select("div:contains(Description:)").select("div").text()
+                         try {
+                             d.substring(d.indexOf("Description: ") + 13, d.indexOf("Category: "))
+                         } catch (e: StringIndexOutOfBoundsException) {
+                             Loged.e(e.message!!)
+                             d
+                         }
+                     }
+                     ImageDialog(context, stuff[position].name, des, "", imageLink)
+                 } catch (e: IllegalArgumentException) {
+                     null
+                 }
 
-            holder.favorite.setOnLongClickListener {
-                holder.favorite.isChecked != holder.favorite.isChecked
-                true
-            }*/
+             }
 
-            Picasso.get().setIndicatorsEnabled(true)
-            holder.imageView.visibility = View.GONE
+             val gestureDetector = GestureDetector(context, object : GestureDetector.OnGestureListener {
+                 override fun onShowPress(e: MotionEvent?) {
+                     Loged.i("${e!!.action}")
+                 }
 
-            /*async(UI) {
-                Picasso.get().load(getShowIMG(stuff[position].url).await()).resize((600*.6).toInt(), (800*.6).toInt()).into(holder.imageView)
-            }*/
+                 override fun onSingleTapUp(e: MotionEvent?): Boolean {
+                     Loged.i("${e!!.action}")
+                     return false
+                 }
 
-            if(stuff[position].imgURL=="") {
-                holder.imageView.visibility = View.GONE
-                /*Picasso.get().setIndicatorsEnabled(true)
-                async(UI) {
-                    Picasso.get().load(getShowIMG(stuff[position].url).await()).resize((600*.6).toInt(), (800*.6).toInt()).into(holder.imageView)
-                }*/
-            } else {
-                /*async(UI) {
-                    Picasso.get().load(stuff[position].imgURL).resize((600*.6).toInt(), (800*.6).toInt()).into(holder.imageView)
-                }*/
-            }
+                 override fun onDown(e: MotionEvent?): Boolean {
+                     Loged.i("${e!!.action}")
+                     return false
+                 }
+
+                 override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
+                     Loged.i("${e1!!.action}")
+                     return false
+                 }
+
+                 override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+                     Loged.i("${e1!!.action}")
+                     return false
+                 }
+
+                 override fun onLongPress(e: MotionEvent?) {
+                     Loged.i("${e!!.action}")
+                     dialog?.show()
+                 }
+
+             })
+
+             holder.layout.setOnLongClickListener {
+                 //dialog?.show()
+                 true
+             }
+
+             holder.layout.setOnTouchListener { v, event ->
+                 if (event.action == MotionEvent.ACTION_DOWN) {
+                     Loged.d("Touch down")
+                     dialog?.show()
+                 } else if (event.action == MotionEvent.ACTION_UP) {
+                     Loged.d("Touch up")
+                     dialog?.dismiss()
+                 }
+                 false
+                 //gestureDetector.onTouchEvent(event)
+             }*/
 
             holder.layout.setOnClickListener {
                 holder.linkType.performClick()
+            }
+
+            holder.linkType.setOnLongClickListener {
+                //holder.favorite.isChecked != holder.favorite.isChecked
+                //action.longhit(stuff[position], holder.linkType)
+                true
             }
 
             /*holder.layout.setOnLongClickListener {
                 holder.layout.performClick()
                 true
             }*/
+
+            action.longhit(stuff[position], holder.layout)
+
+            Picasso.get().setIndicatorsEnabled(true)
+            holder.imageView.visibility = View.GONE
+
+            if (stuff[position].imgURL == "") {
+                holder.imageView.visibility = View.GONE
+            } else {
+            }
 
             val show = ShowDatabase.getDatabase(context)
 
@@ -237,6 +293,7 @@ class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val favorite = view.checkBox!!
     val layout = view.show_layout!!
     val imageView = view.show_img!!
+
     init {
         setIsRecyclable(false)
     }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<inset xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <inset
+        android:drawable="@drawable/grid_item_background_left"
+        android:insetRight="100dp" />
+
+    <inset android:drawable="@drawable/grid_item_background_center" />
+
+    <inset
+        android:drawable="@drawable/grid_item_background_right"
+        android:insetLeft="100dp" />
+
+</inset>
+
+    <!--
+    <?xml version="1.0" encoding="utf-8"?>
+    <selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <item android:drawable="@drawable/grid_item_background_left"
+            android:state_enabled="false"/>
+
+        <item android:drawable="@drawable/grid_item_background_center"
+            android:state_enabled="true"
+            android:state_pressed="true"/>
+
+        <item android:drawable="@drawable/grid_item_background_right"
+            android:state_enabled="true"
+            android:state_focused="true"/>
+
+    </selector>-->

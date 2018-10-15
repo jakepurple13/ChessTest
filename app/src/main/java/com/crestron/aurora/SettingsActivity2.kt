@@ -218,8 +218,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                         stream.use { streams ->
                             streams.write(string.toByteArray())
                         }
-
-
+                        Toast.makeText(this@GeneralPreferenceFragment.context, "Finished Exporting", Toast.LENGTH_SHORT).show()
                     }
                 }
 
@@ -261,6 +260,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                             }
                         }
                     }
+                    Toast.makeText(this@GeneralPreferenceFragment.context, "Finished Importing", Toast.LENGTH_SHORT).show()
                 }
                 true
             }

@@ -89,6 +89,7 @@ class EpisodeActivity : AppCompatActivity() {
 
             override fun onStarted(download: Download, downloadBlocks: List<DownloadBlock>, totalBlocks: Int) {
                 super.onStarted(download, downloadBlocks, totalBlocks)
+                //mNotificationManager.cancelAll()
                 progressBar2.max = 100
             }
 

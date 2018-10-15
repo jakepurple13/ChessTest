@@ -20,7 +20,7 @@
         <item>#151515</item> <!-- address bar tint -->
         <item>@color/chevronBgColor</item> <!-- new folder hint tint -->
         <item>#2c9633</item> <!-- select button color -->
-        <item>#da6c6c</item> <!-- new folder layour bg -->
+        <item>#da6c6c</item> <!-- new folder layer bg -->
         <item>#2c9633</item> <!-- fab multi color -->
         <item>#151515</item> <!-- address bar bg -->
     </array>
@@ -33,5 +33,19 @@
     <color name="peter_river">#3498db</color>
     <color name="charcoal">#40423F</color>
     <color name="cod_gray">#2D2F31</color>
+
+    <!-- OVERWRITE THESE COLORS FOR A LIGHT THEME -->
+    <!-- MaterialDrawer DEFAULT colors -->
+    <color name="material_drawer_background">#303030</color>
+    <!-- Material DEFAULT text / items colors -->
+    <color name="material_drawer_primary_text">#DEFFFFFF</color>
+    <color name="material_drawer_primary_icon">#8AFFFFFF</color>
+    <color name="material_drawer_secondary_text">#8AFFFFFF</color>
+    <color name="material_drawer_hint_text">#42FFFFFF</color>
+    <color name="material_drawer_divider">#1FFFFFFF</color>
+    <!-- Material DEFAULT drawer colors -->
+    <color name="material_drawer_selected">#1F2196F3</color>
+    <color name="material_drawer_selected_text">@color/material_drawer_primary</color>
+    <color name="material_drawer_header_selection_text">#FFFFFFFF</color>
 
 </resources>

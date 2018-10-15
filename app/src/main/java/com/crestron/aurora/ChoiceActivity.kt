@@ -35,6 +35,11 @@ import com.crestron.aurora.viewtesting.ViewTesting
 import com.github.florent37.inlineactivityresult.kotlin.startForResult
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import com.mikepenz.materialdrawer.Drawer
+import com.mikepenz.materialdrawer.DrawerBuilder
+import com.mikepenz.materialdrawer.model.DividerDrawerItem
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.nabinbhandari.android.permissions.PermissionHandler
 import com.nabinbhandari.android.permissions.Permissions
 import com.tonyodev.fetch2.Download
@@ -99,9 +104,12 @@ class ChoiceActivity : AppCompatActivity() {
         }
     }
 
+    lateinit var result: Drawer
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_choice)
+        //setSupportActionBar(toolbar)
         FirebaseApp.initializeApp(this)
 
         //Loged.d(FirebaseInstanceId.getInstance().token!!)
@@ -471,14 +479,214 @@ class ChoiceActivity : AppCompatActivity() {
         models.add(drawableModel(R.drawable.mov, ChoiceButton.CARTOON_MOVIES))
         models.add(drawableModel(R.drawable.mov, ChoiceButton.VIEW_DOWNLOADS))
 
-        models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.SETTINGS))
-        models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.FEEDBACK))
-        models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.UPDATE_APP))
-        models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.UPDATE_NOTES))
+        //models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.SETTINGS))
+        //models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.FEEDBACK))
+        //models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.UPDATE_APP))
+        //models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.UPDATE_NOTES))
+
         //models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.DELETE_OLD_FILE))
         //models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.DOWNLOAD_APK))
 
         shelfView.loadData(models)
+
+        //if you want to update the items at a later time it is recommended to keep it in a variable
+        val viewDownloadsItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_file_download)
+                .withSelectable(false)
+                .withIdentifier(0)
+                .withName("View Downloads")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    val intent = Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
+                    intent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
+                    ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intent)
+                    true
+                }
+        val settingsItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_settings)
+                .withSelectable(false)
+                .withIdentifier(1)
+                .withName("Settings")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    permissionCheck(SettingsActivity2::class.java, shouldFinish = true)
+                    true
+                }
+        val feedbackItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_feedback)
+                .withSelectable(false)
+                .withIdentifier(2)
+                .withName("Feedback")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    val intented = Intent(this@ChoiceActivity, FormActivity::class.java)
+                    //startActivity(intented)
+                    ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intented)
+                    true
+                }
+        val updateAppItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_system_update)
+                .withSelectable(false)
+                .withIdentifier(3)
+                .withName("Update App")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    launch {
+                        val url = URL(ConstantValues.VERSION_URL).readText()
+                        val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                        Loged.wtf("$info")
+                        try {
+                            val pInfo = packageManager.getPackageInfo(packageName, 0)
+                            val version = pInfo.versionName
+                            Loged.i("version is ${version.toDouble()} and info is ${info.version}")
+                            if (version.toDouble() < info.version) {
+                                getNewApp(info)
+                            } else {
+                                Loged.e("Nope")
+                                runOnUiThread {
+                                    Toast.makeText(this@ChoiceActivity, "You are up to date!", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        } catch (e: PackageManager.NameNotFoundException) {
+                            e.printStackTrace()
+                        }
+                    }
+                    true
+                }
+        val updateNotesItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_update)
+                .withSelectable(false).withIdentifier(4)
+                .withName("Update Notes")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    launch {
+                        val url = URL(ConstantValues.VERSION_URL).readText()
+                        Loged.i(url)
+                        val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                        Loged.w("$info")
+                        val pInfo = packageManager.getPackageInfo(packageName, 0)
+                        val version = pInfo.versionName
+                        runOnUiThread {
+                            val builder = AlertDialog.Builder(this@ChoiceActivity)
+                            builder.setTitle("Notes for version ${info.version}")
+                            builder.setMessage("Your version: $version\n${info.devNotes}")
+                            builder.setNeutralButton("Cool!") { _, _ ->
+                                //FunApplication.cancelUpdate(this@ChoiceActivity)
+                            }
+                            val dialog = builder.create()
+                            dialog.show()
+                        }
+                    }
+                    true
+                }
+
+        //create the drawer and remember the `Drawer` result object
+        result = DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .addDrawerItems(
+                        viewDownloadsItem,
+                        DividerDrawerItem(),
+                        settingsItem,
+                        DividerDrawerItem(),
+                        feedbackItem,
+                        DividerDrawerItem(),
+                        updateAppItem,
+                        DividerDrawerItem(),
+                        updateNotesItem
+                )
+                .withDisplayBelowStatusBar(true)
+                .withTranslucentStatusBar(true)
+                .withCloseOnClick(true)
+                .withSelectedItem(-1)
+                .withSavedInstance(savedInstanceState)
+                .withInnerShadow(true)
+                .build()
+
+        /*result = drawer {
+            closeOnClick = true
+            selectedItem = -1
+            savedInstance = savedInstanceState
+            innerShadow = true
+            displayBelowStatusBar = true
+            primaryItem("Settings") {
+                selectable = false
+                iicon = GoogleMaterial.Icon.gmd_settings
+                onClick { _ ->
+                    result.closeDrawer()
+                    permissionCheck(SettingsActivity2::class.java, shouldFinish = true)
+                    true
+                }
+            }
+            divider {  }
+            primaryItem("Feedback") {
+                selectable = false
+                iicon = GoogleMaterial.Icon.gmd_feedback
+                onClick { _ ->
+                    result.closeDrawer()
+                    val intented = Intent(this@ChoiceActivity, FormActivity::class.java)
+                    //startActivity(intented)
+                    ViewUtil.presentActivity(this@ChoiceActivity.toolbar, this@ChoiceActivity, intented)
+                    true
+                }
+            }
+            divider {  }
+            primaryItem("Update App") {
+                selectable = false
+                iicon = GoogleMaterial.Icon.gmd_system_update
+                onClick { _ ->
+                    result.closeDrawer()
+                    launch {
+                        val url = URL(ConstantValues.VERSION_URL).readText()
+                        val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                        Loged.wtf("$info")
+                        try {
+                            val pInfo = packageManager.getPackageInfo(packageName, 0)
+                            val version = pInfo.versionName
+                            Loged.i("version is ${version.toDouble()} and info is ${info.version}")
+                            if (version.toDouble() < info.version) {
+                                getNewApp(info)
+                            } else {
+                                Loged.e("Nope")
+                                runOnUiThread {
+                                    Toast.makeText(this@ChoiceActivity, "You are up to date!", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        } catch (e: PackageManager.NameNotFoundException) {
+                            e.printStackTrace()
+                        }
+                    }
+                    true
+                }
+            }
+            divider {  }
+            primaryItem("Update Notes") {
+                selectable = false
+                iicon = GoogleMaterial.Icon.gmd_update
+                onClick { _ ->
+                    result.closeDrawer()
+                    launch {
+                        val url = URL(ConstantValues.VERSION_URL).readText()
+                        Loged.i(url)
+                        val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                        Loged.w("$info")
+                        val pInfo = packageManager.getPackageInfo(packageName, 0)
+                        val version = pInfo.versionName
+                        runOnUiThread {
+                            val builder = AlertDialog.Builder(this@ChoiceActivity)
+                            builder.setTitle("Notes for version ${info.version}")
+                            builder.setMessage("Your version: $version\n${info.devNotes}")
+                            builder.setNeutralButton("Cool!") { _, _ ->
+                                //FunApplication.cancelUpdate(this@ChoiceActivity)
+                            }
+                            val dialog = builder.create()
+                            dialog.show()
+                        }
+                    }
+                    true
+                }
+            }
+        }*/
 
         launch {
             val show = ShowDatabase.getDatabase(this@ChoiceActivity).showDao()
@@ -545,7 +753,15 @@ class ChoiceActivity : AppCompatActivity() {
                 }
             }
         }
+    }
 
+    override fun onBackPressed() {
+        //handle the back press :D close the drawer first and if the drawer is closed close the activity
+        if (result.isDrawerOpen) {
+            result.closeDrawer()
+        } else {
+            super.onBackPressed()
+        }
     }
 
     fun sendProgressNotification(title: String, text: String, progress: Int, context: Context, gotoActivity: Class<*>, notification_id: Int) {

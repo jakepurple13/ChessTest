@@ -25,8 +25,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".boardgames.chess.MainActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
         <activity
             android:name=".ChooseActivity"
             android:screenOrientation="portrait" />
@@ -35,12 +35,12 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".cardgames.BlackJackActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
         <activity
             android:name=".cardgames.calculation.CalculationActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
         <activity
             android:name=".boardgames.checkers.CheckersActivity"
             android:screenOrientation="portrait" />
@@ -49,26 +49,26 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".cardgames.solitaire.SolitaireActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
         <activity
             android:name=".cardgames.videopoker.VideoPokerActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
         <activity
             android:name=".cardgames.matching.MatchingActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
         <activity android:name=".cardgames.canfield.CanfieldActivity" />
         <activity
             android:name=".cardgames.hilo.HiLoActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
         <activity android:name=".otherfun.AniDownloadActivity" />
         <activity
             android:name=".otherfun.EpisodeActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent">
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -109,8 +109,8 @@
         </activity>
         <activity
             android:name=".otherfun.ShowListActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
 
         <receiver
             android:name=".otherfun.NotificationBroadcastReceiver"
@@ -167,8 +167,8 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".otherfun.DownloadViewerActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
@@ -185,12 +185,12 @@
         </activity>
         <activity
             android:name=".boardgames.yahtzee.YahtzeeActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
         <activity
             android:name=".SettingsActivity2"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_settings2" />
+            android:label="@string/title_activity_settings2"
+            android:screenOrientation="portrait" />
 
         <provider
             android:name=".otherfun.GenericFileProvider"
@@ -242,17 +242,21 @@
 
         <activity
             android:name=".SettingsShowActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
         <activity
             android:name=".otherfun.RssActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
         <activity
             android:name=".FormActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
         <activity android:name=".viewtesting.ViewTesting" />
+        <activity
+            android:name=".viewtesting.basic_test"
+            android:label="@string/title_activity_basic_test"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
