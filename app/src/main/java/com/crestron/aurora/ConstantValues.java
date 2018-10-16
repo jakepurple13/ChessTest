@@ -25,4 +25,5 @@ public interface ConstantValues {
     String NUMBER_OF_RANDOM = "number_of_random";
     String DOWNLOAD_NOTIFICATION = "notiOrNot";
     String SLIDE_OR_BUTTON = "slider_or_button";
+    String DOWNLOAD_COUNT = "download_count";
 }

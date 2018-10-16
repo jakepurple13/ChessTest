@@ -112,6 +112,8 @@ class ChoiceActivity : AppCompatActivity() {
         //setSupportActionBar(toolbar)
         FirebaseApp.initializeApp(this)
 
+        setUpDrawer(savedInstanceState)
+
         //Loged.d(FirebaseInstanceId.getInstance().token!!)
 
         if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false)) {
@@ -142,45 +144,6 @@ class ChoiceActivity : AppCompatActivity() {
                     Toast.makeText(this@ChoiceActivity, "Super TSR Mode Activated!", Toast.LENGTH_LONG).show()
                 }
                 .install()
-
-        fun permissionCheck(clazz: Class<out Any>, rec: Boolean = false, url: String? = null, shouldFinish: Boolean = false, view: View? = null) {
-            Permissions.check(this@ChoiceActivity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
-                    "Storage permissions are required because so we can download videos",
-                    Permissions.Options().setSettingsDialogTitle("Warning!").setRationaleDialogTitle("Info"),
-                    object : PermissionHandler() {
-                        override fun onGranted() {
-                            //do your task
-                            val intent = Intent(this@ChoiceActivity, clazz)
-                            intent.putExtra(ConstantValues.RECENT_OR_NOT, rec)
-                            if (url != null)
-                                intent.putExtra(ConstantValues.SHOW_LINK, url)
-                            if (shouldFinish) {
-                                startForResult(intent) {
-                                    val shouldReset = it.data?.extras?.getBoolean("restart")
-                                            ?: false
-                                    if (shouldReset)
-                                        this@ChoiceActivity.recreate()
-                                }.onFailed {
-
-                                }
-                            } else {
-                                if (view == null)
-                                    startActivity(intent)
-                                else
-                                    ViewUtil.presentActivity(view, this@ChoiceActivity, intent)
-                            }
-                        }
-
-                        override fun onDenied(context: Context?, deniedPermissions: java.util.ArrayList<String>?) {
-                            super.onDenied(context, deniedPermissions)
-                            val permArray = deniedPermissions!!.toTypedArray()
-                            Permissions.check(this@ChoiceActivity, permArray,
-                                    "Storage permissions are required because so we can download videos",
-                                    Permissions.Options().setSettingsDialogTitle("Warning!").setRationaleDialogTitle("Info"),
-                                    this)
-                        }
-                    })
-        }
 
         val listener = object : BookListener {
 
@@ -489,205 +452,6 @@ class ChoiceActivity : AppCompatActivity() {
 
         shelfView.loadData(models)
 
-        //if you want to update the items at a later time it is recommended to keep it in a variable
-        val viewDownloadsItem = PrimaryDrawerItem()
-                .withIcon(GoogleMaterial.Icon.gmd_file_download)
-                .withSelectable(false)
-                .withIdentifier(0)
-                .withName("View Downloads")
-                .withOnDrawerItemClickListener { _, _, _ ->
-                    result.closeDrawer()
-                    val intent = Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
-                    intent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
-                    ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intent)
-                    true
-                }
-        val settingsItem = PrimaryDrawerItem()
-                .withIcon(GoogleMaterial.Icon.gmd_settings)
-                .withSelectable(false)
-                .withIdentifier(1)
-                .withName("Settings")
-                .withOnDrawerItemClickListener { _, _, _ ->
-                    result.closeDrawer()
-                    permissionCheck(SettingsActivity2::class.java, shouldFinish = true)
-                    true
-                }
-        val feedbackItem = PrimaryDrawerItem()
-                .withIcon(GoogleMaterial.Icon.gmd_feedback)
-                .withSelectable(false)
-                .withIdentifier(2)
-                .withName("Feedback")
-                .withOnDrawerItemClickListener { _, _, _ ->
-                    result.closeDrawer()
-                    val intented = Intent(this@ChoiceActivity, FormActivity::class.java)
-                    //startActivity(intented)
-                    ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intented)
-                    true
-                }
-        val updateAppItem = PrimaryDrawerItem()
-                .withIcon(GoogleMaterial.Icon.gmd_system_update)
-                .withSelectable(false)
-                .withIdentifier(3)
-                .withName("Update App")
-                .withOnDrawerItemClickListener { _, _, _ ->
-                    result.closeDrawer()
-                    launch {
-                        val url = URL(ConstantValues.VERSION_URL).readText()
-                        val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-                        Loged.wtf("$info")
-                        try {
-                            val pInfo = packageManager.getPackageInfo(packageName, 0)
-                            val version = pInfo.versionName
-                            Loged.i("version is ${version.toDouble()} and info is ${info.version}")
-                            if (version.toDouble() < info.version) {
-                                getNewApp(info)
-                            } else {
-                                Loged.e("Nope")
-                                runOnUiThread {
-                                    Toast.makeText(this@ChoiceActivity, "You are up to date!", Toast.LENGTH_LONG).show()
-                                }
-                            }
-                        } catch (e: PackageManager.NameNotFoundException) {
-                            e.printStackTrace()
-                        }
-                    }
-                    true
-                }
-        val updateNotesItem = PrimaryDrawerItem()
-                .withIcon(GoogleMaterial.Icon.gmd_update)
-                .withSelectable(false).withIdentifier(4)
-                .withName("Update Notes")
-                .withOnDrawerItemClickListener { _, _, _ ->
-                    result.closeDrawer()
-                    launch {
-                        val url = URL(ConstantValues.VERSION_URL).readText()
-                        Loged.i(url)
-                        val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-                        Loged.w("$info")
-                        val pInfo = packageManager.getPackageInfo(packageName, 0)
-                        val version = pInfo.versionName
-                        runOnUiThread {
-                            val builder = AlertDialog.Builder(this@ChoiceActivity)
-                            builder.setTitle("Notes for version ${info.version}")
-                            builder.setMessage("Your version: $version\n${info.devNotes}")
-                            builder.setNeutralButton("Cool!") { _, _ ->
-                                //FunApplication.cancelUpdate(this@ChoiceActivity)
-                            }
-                            val dialog = builder.create()
-                            dialog.show()
-                        }
-                    }
-                    true
-                }
-
-        //create the drawer and remember the `Drawer` result object
-        result = DrawerBuilder()
-                .withActivity(this)
-                .withToolbar(toolbar)
-                .addDrawerItems(
-                        viewDownloadsItem,
-                        DividerDrawerItem(),
-                        settingsItem,
-                        DividerDrawerItem(),
-                        feedbackItem,
-                        DividerDrawerItem(),
-                        updateAppItem,
-                        DividerDrawerItem(),
-                        updateNotesItem
-                )
-                .withDisplayBelowStatusBar(true)
-                .withTranslucentStatusBar(true)
-                .withCloseOnClick(true)
-                .withSelectedItem(-1)
-                .withSavedInstance(savedInstanceState)
-                .withInnerShadow(true)
-                .build()
-
-        /*result = drawer {
-            closeOnClick = true
-            selectedItem = -1
-            savedInstance = savedInstanceState
-            innerShadow = true
-            displayBelowStatusBar = true
-            primaryItem("Settings") {
-                selectable = false
-                iicon = GoogleMaterial.Icon.gmd_settings
-                onClick { _ ->
-                    result.closeDrawer()
-                    permissionCheck(SettingsActivity2::class.java, shouldFinish = true)
-                    true
-                }
-            }
-            divider {  }
-            primaryItem("Feedback") {
-                selectable = false
-                iicon = GoogleMaterial.Icon.gmd_feedback
-                onClick { _ ->
-                    result.closeDrawer()
-                    val intented = Intent(this@ChoiceActivity, FormActivity::class.java)
-                    //startActivity(intented)
-                    ViewUtil.presentActivity(this@ChoiceActivity.toolbar, this@ChoiceActivity, intented)
-                    true
-                }
-            }
-            divider {  }
-            primaryItem("Update App") {
-                selectable = false
-                iicon = GoogleMaterial.Icon.gmd_system_update
-                onClick { _ ->
-                    result.closeDrawer()
-                    launch {
-                        val url = URL(ConstantValues.VERSION_URL).readText()
-                        val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-                        Loged.wtf("$info")
-                        try {
-                            val pInfo = packageManager.getPackageInfo(packageName, 0)
-                            val version = pInfo.versionName
-                            Loged.i("version is ${version.toDouble()} and info is ${info.version}")
-                            if (version.toDouble() < info.version) {
-                                getNewApp(info)
-                            } else {
-                                Loged.e("Nope")
-                                runOnUiThread {
-                                    Toast.makeText(this@ChoiceActivity, "You are up to date!", Toast.LENGTH_LONG).show()
-                                }
-                            }
-                        } catch (e: PackageManager.NameNotFoundException) {
-                            e.printStackTrace()
-                        }
-                    }
-                    true
-                }
-            }
-            divider {  }
-            primaryItem("Update Notes") {
-                selectable = false
-                iicon = GoogleMaterial.Icon.gmd_update
-                onClick { _ ->
-                    result.closeDrawer()
-                    launch {
-                        val url = URL(ConstantValues.VERSION_URL).readText()
-                        Loged.i(url)
-                        val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-                        Loged.w("$info")
-                        val pInfo = packageManager.getPackageInfo(packageName, 0)
-                        val version = pInfo.versionName
-                        runOnUiThread {
-                            val builder = AlertDialog.Builder(this@ChoiceActivity)
-                            builder.setTitle("Notes for version ${info.version}")
-                            builder.setMessage("Your version: $version\n${info.devNotes}")
-                            builder.setNeutralButton("Cool!") { _, _ ->
-                                //FunApplication.cancelUpdate(this@ChoiceActivity)
-                            }
-                            val dialog = builder.create()
-                            dialog.show()
-                        }
-                    }
-                    true
-                }
-            }
-        }*/
-
         launch {
             val show = ShowDatabase.getDatabase(this@ChoiceActivity).showDao()
             val showList = show.allShows
@@ -877,6 +641,217 @@ class ChoiceActivity : AppCompatActivity() {
             val dialog = builder.create()
             dialog.show()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val downloadCountItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_cloud_download)
+                .withSelectable(false)
+                .withIdentifier(8)
+                .withName("Downloads: ${FetchingUtils.downloadCount}")
+        result.updateItem(downloadCountItem)
+    }
+
+    private fun setUpDrawer(savedInstanceState: Bundle?) {
+
+        //if you want to update the items at a later time it is recommended to keep it in a variable
+        val downloadCountItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_cloud_download)
+                .withSelectable(false)
+                .withIdentifier(8)
+                .withName("Downloads: ${FetchingUtils.downloadCount}")
+        val pInfo = packageManager.getPackageInfo(packageName, 0)
+        val version = pInfo.versionName
+        val versionItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_android)
+                .withSelectable(false)
+                .withIdentifier(6)
+                .withName("App Version: $version")
+        val favoritesItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_favorite)
+                .withSelectable(false)
+                .withIdentifier(5)
+                .withName("View Favorites")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    val intented = Intent(this@ChoiceActivity, SettingsShowActivity::class.java)
+                    intented.putExtra("displayText", "Your Favorites")
+                    startForResult(intented) {
+                        val shouldReset = it.data?.extras?.getBoolean("restart") ?: false
+                        if (shouldReset)
+                            this@ChoiceActivity.recreate()
+                    }
+                    true
+                }
+        val viewDownloadsItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_file_download)
+                .withSelectable(false)
+                .withIdentifier(0)
+                .withName("View Downloads")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    val intent = Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
+                    intent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
+                    ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intent)
+                    true
+                }
+        val settingsItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_settings)
+                .withSelectable(false)
+                .withIdentifier(1)
+                .withName("Settings")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    permissionCheck(SettingsActivity2::class.java, shouldFinish = true)
+                    true
+                }
+        val feedbackItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_feedback)
+                .withSelectable(false)
+                .withIdentifier(2)
+                .withName("Feedback")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    val intented = Intent(this@ChoiceActivity, FormActivity::class.java)
+                    //startActivity(intented)
+                    ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intented)
+                    true
+                }
+        val updateAppItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_system_update)
+                .withSelectable(false)
+                .withIdentifier(3)
+                .withName("Update App")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    launch {
+                        val url = URL(ConstantValues.VERSION_URL).readText()
+                        val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                        Loged.wtf("$info")
+                        try {
+                            Loged.i("version is ${version.toDouble()} and info is ${info.version}")
+                            if (version.toDouble() < info.version) {
+                                getNewApp(info)
+                            } else {
+                                Loged.e("Nope")
+                                runOnUiThread {
+                                    Toast.makeText(this@ChoiceActivity, "You are up to date!", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        } catch (e: PackageManager.NameNotFoundException) {
+                            e.printStackTrace()
+                        }
+                    }
+                    true
+                }
+        val updateNotesItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_update)
+                .withSelectable(false).withIdentifier(4)
+                .withName("Update Notes")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    launch {
+                        val url = URL(ConstantValues.VERSION_URL).readText()
+                        Loged.i(url)
+                        val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                        Loged.w("$info")
+                        runOnUiThread {
+                            val builder = AlertDialog.Builder(this@ChoiceActivity)
+                            builder.setTitle("Notes for version ${info.version}")
+                            builder.setMessage("Your version: $version\n${info.devNotes}")
+                            builder.setNeutralButton("Cool!") { _, _ ->
+                                //FunApplication.cancelUpdate(this@ChoiceActivity)
+                            }
+                            val dialog = builder.create()
+                            dialog.show()
+                        }
+                    }
+                    true
+                }
+
+        //create the drawer and remember the `Drawer` result object
+        result = DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .addDrawerItems(
+                        versionItem,
+                        downloadCountItem,
+                        DividerDrawerItem(),
+                        settingsItem,
+                        DividerDrawerItem(),
+                        viewDownloadsItem,
+                        DividerDrawerItem(),
+                        favoritesItem,
+                        DividerDrawerItem(),
+                        feedbackItem,
+                        DividerDrawerItem(),
+                        updateAppItem,
+                        DividerDrawerItem(),
+                        updateNotesItem
+                )
+                .withDisplayBelowStatusBar(true)
+                .withTranslucentStatusBar(true)
+                .withCloseOnClick(false)
+                .withSelectedItem(-1)
+                .withSavedInstance(savedInstanceState)
+                .withInnerShadow(true)
+                .build()
+
+        launch {
+
+            val show = ShowDatabase.getDatabase(this@ChoiceActivity).showDao()
+            val showList = show.allShows
+            if (showList.size > 0) {
+                val favoriteCountItem = PrimaryDrawerItem()
+                        .withIcon(GoogleMaterial.Icon.gmd_star)
+                        .withSelectable(false)
+                        .withIdentifier(7)
+                        .withName("Number of favorites: ${showList.size} ")
+                result.addItemsAtPosition(1, favoriteCountItem)
+            }
+
+        }
+
+    }
+
+    fun permissionCheck(clazz: Class<out Any>, rec: Boolean = false, url: String? = null, shouldFinish: Boolean = false, view: View? = null) {
+        Permissions.check(this@ChoiceActivity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
+                "Storage permissions are required because so we can download videos",
+                Permissions.Options().setSettingsDialogTitle("Warning!").setRationaleDialogTitle("Info"),
+                object : PermissionHandler() {
+                    override fun onGranted() {
+                        //do your task
+                        val intent = Intent(this@ChoiceActivity, clazz)
+                        intent.putExtra(ConstantValues.RECENT_OR_NOT, rec)
+                        if (url != null)
+                            intent.putExtra(ConstantValues.SHOW_LINK, url)
+                        if (shouldFinish) {
+                            startForResult(intent) {
+                                val shouldReset = it.data?.extras?.getBoolean("restart")
+                                        ?: false
+                                if (shouldReset)
+                                    this@ChoiceActivity.recreate()
+                            }.onFailed {
+
+                            }
+                        } else {
+                            if (view == null)
+                                startActivity(intent)
+                            else
+                                ViewUtil.presentActivity(view, this@ChoiceActivity, intent)
+                        }
+                    }
+
+                    override fun onDenied(context: Context?, deniedPermissions: java.util.ArrayList<String>?) {
+                        super.onDenied(context, deniedPermissions)
+                        val permArray = deniedPermissions!!.toTypedArray()
+                        Permissions.check(this@ChoiceActivity, permArray,
+                                "Storage permissions are required because so we can download videos",
+                                Permissions.Options().setSettingsDialogTitle("Warning!").setRationaleDialogTitle("Info"),
+                                this)
+                    }
+                })
     }
 
 }

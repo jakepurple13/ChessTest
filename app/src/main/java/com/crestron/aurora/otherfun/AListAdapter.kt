@@ -92,7 +92,7 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
 
     // Binds each animal in the ArrayList to a view
     @SuppressLint("ClickableViewAccessibility")
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         //holder.cardType.text = "${items[position]}"
         if (items != null) {
             holder.linkType.text = items!![position]
@@ -108,98 +108,11 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
                 action.hit(stuff[position].name, stuff[position].url)
             }
 
-            /* var dialog: ImageDialog? = null
-
-             async {
-                 dialog = try {
-                     val doc1 = Jsoup.connect(stuff[position].url).get()
-
-                     val imageLink = doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
-                     //Picasso.get().load(info.imgURL).resize(360, 480).into(image)
-                     //title.text = info.name
-                     val des = if (doc1.allElements.select("div#series_details").select("span#full_notes").hasText())
-                         doc1.allElements.select("div#series_details").select("span#full_notes").text().removeSuffix("less")
-                     else {
-                         val d = doc1.allElements.select("div#series_details").select("div:contains(Description:)").select("div").text()
-                         try {
-                             d.substring(d.indexOf("Description: ") + 13, d.indexOf("Category: "))
-                         } catch (e: StringIndexOutOfBoundsException) {
-                             Loged.e(e.message!!)
-                             d
-                         }
-                     }
-                     ImageDialog(context, stuff[position].name, des, "", imageLink)
-                 } catch (e: IllegalArgumentException) {
-                     null
-                 }
-
-             }
-
-             val gestureDetector = GestureDetector(context, object : GestureDetector.OnGestureListener {
-                 override fun onShowPress(e: MotionEvent?) {
-                     Loged.i("${e!!.action}")
-                 }
-
-                 override fun onSingleTapUp(e: MotionEvent?): Boolean {
-                     Loged.i("${e!!.action}")
-                     return false
-                 }
-
-                 override fun onDown(e: MotionEvent?): Boolean {
-                     Loged.i("${e!!.action}")
-                     return false
-                 }
-
-                 override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
-                     Loged.i("${e1!!.action}")
-                     return false
-                 }
-
-                 override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
-                     Loged.i("${e1!!.action}")
-                     return false
-                 }
-
-                 override fun onLongPress(e: MotionEvent?) {
-                     Loged.i("${e!!.action}")
-                     dialog?.show()
-                 }
-
-             })
-
-             holder.layout.setOnLongClickListener {
-                 //dialog?.show()
-                 true
-             }
-
-             holder.layout.setOnTouchListener { v, event ->
-                 if (event.action == MotionEvent.ACTION_DOWN) {
-                     Loged.d("Touch down")
-                     dialog?.show()
-                 } else if (event.action == MotionEvent.ACTION_UP) {
-                     Loged.d("Touch up")
-                     dialog?.dismiss()
-                 }
-                 false
-                 //gestureDetector.onTouchEvent(event)
-             }*/
-
             holder.layout.setOnClickListener {
                 holder.linkType.performClick()
             }
 
-            holder.linkType.setOnLongClickListener {
-                //holder.favorite.isChecked != holder.favorite.isChecked
-                //action.longhit(stuff[position], holder.linkType)
-                true
-            }
-
-            /*holder.layout.setOnLongClickListener {
-                holder.layout.performClick()
-                true
-            }*/
-
-            action.longhit(stuff[position], holder.layout)
+            action.longhit(stuff[position], holder.layout, holder.linkType)
 
             Picasso.get().setIndicatorsEnabled(true)
             holder.imageView.visibility = View.GONE

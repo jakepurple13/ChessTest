@@ -272,7 +272,7 @@ class AniDownloadActivity : AppCompatActivity() {
             Loged.wtf("$name: $url")
         }
 
-        fun longhit(info: ShowListActivity.NameAndLink, views: View) {
+        fun longhit(info: ShowListActivity.NameAndLink, vararg views: View) {
 
         }
     }

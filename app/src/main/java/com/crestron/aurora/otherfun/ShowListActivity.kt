@@ -48,10 +48,15 @@ class ShowListActivity : AppCompatActivity() {
 
         }
 
-        override fun longhit(info: NameAndLink, views: View) {
+        override fun longhit(info: NameAndLink, vararg views: View) {
             val peekAndPop = PeekAndPop.Builder(this@ShowListActivity)
                     .peekLayout(R.layout.image_dialog_layout)
-                    .longClickViews(views)
+                    .apply {
+                        for (v in views) {
+                            longClickViews(v)
+                        }
+                    }
+                    //.longClickViews(views)
                     .build()
 
             peekAndPop.setOnGeneralActionListener(object : PeekAndPop.OnGeneralActionListener {

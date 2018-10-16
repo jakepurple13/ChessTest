@@ -322,6 +322,19 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
                 }
             }
 
+        var downloadCount = 0
+            set(value) {
+                field = value
+                val shared = FunApplication.getAppContext().getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, Context.MODE_PRIVATE).edit()
+                shared.putInt(ConstantValues.DOWNLOAD_COUNT, value)
+                shared.apply()
+            }
+            get() {
+                return FunApplication.getAppContext()
+                        .getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, Context.MODE_PRIVATE)
+                        .getInt(ConstantValues.DOWNLOAD_COUNT, 0)
+            }
+
         fun getMimeType(context: Context, uri: Uri): String {
             val cR = context.contentResolver
             val mime = MimeTypeMap.getSingleton()
@@ -426,6 +439,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         override fun onCompleted(download: Download) {
             Loged.d("Completed ${download.file}")
             Fetch.getDefaultInstance().removeAllWithStatus(Status.COMPLETED)
+            //downloadCount++
         }
 
         override fun onDeleted(download: Download) {

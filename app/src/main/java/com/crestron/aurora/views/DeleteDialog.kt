@@ -21,7 +21,7 @@ class DeleteDialog(context: Context?, val title: String, val download: Download?
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.delete_dialog_layout)
 
-        window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         if (download != null)
             FetchingUtils.pause(download)
         setTitle("Delete $title")
@@ -41,6 +41,7 @@ class DeleteDialog(context: Context?, val title: String, val download: Download?
                 if (download != null)
                     FetchingUtils.delete(download)
                 this@DeleteDialog.dismiss()
+                FetchingUtils.downloadCount--
             }
 
             override fun onSwipe_Reverse(p0: Swipe_Button_View?) {

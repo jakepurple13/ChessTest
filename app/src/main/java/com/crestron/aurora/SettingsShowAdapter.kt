@@ -70,13 +70,8 @@ class SettingsShowAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
             action.click(stuff[position].name, stuff[position].url)
         }
 
-        holder.linkType.setOnLongClickListener {
-            //holder.favorite.isChecked != holder.favorite.isChecked
-            true
-        }
-
         //holder.favorite.text = ""//stuff[position].name
-        action.longhit(stuff[position], holder.layout)
+        action.longhit(stuff[position], holder.layout, holder.linkType)
 
         Picasso.get().setIndicatorsEnabled(true)
         holder.imageView.visibility = View.GONE

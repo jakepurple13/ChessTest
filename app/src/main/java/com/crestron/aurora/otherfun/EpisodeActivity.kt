@@ -276,6 +276,7 @@ class EpisodeActivity : AppCompatActivity() {
                 episode_list.adapter = EpisodeAdapter(listOfNames, listOfUrls, name, context = this@EpisodeActivity, slideOrButton = slideOrButton, action = object : EpisodeAction {
                     override fun hit(name: String, url: String) {
                         super.hit(name, url)
+                        FetchingUtils.downloadCount++
                         Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
                         launch {
                             fetching.getVideo(url, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
@@ -317,6 +318,7 @@ class EpisodeActivity : AppCompatActivity() {
                 episode_list.adapter = EpisodeAdapter(listOfNames, listOfUrls, name, reverse = b, context = this@EpisodeActivity, slideOrButton = slideOrButton, action = object : EpisodeAction {
                     override fun hit(name: String, url: String) {
                         super.hit(name, url)
+                        FetchingUtils.downloadCount++
                         Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
                         launch {
                             fetching.getVideo(url, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
@@ -361,6 +363,8 @@ class EpisodeActivity : AppCompatActivity() {
                                     add(listOfUrls[selectedIds[i]])
                                 }
                             }
+
+                            FetchingUtils.downloadCount += urlList.size
 
                             launch {
                                 fetching.getVideo(urlList, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,

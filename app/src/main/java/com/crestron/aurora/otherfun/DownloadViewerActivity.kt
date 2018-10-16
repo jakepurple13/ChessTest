@@ -80,13 +80,12 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                         }) // the multi select model list with ids and name
                         .onSubmit(object : MultiSelectDialog.SubmitCallbackListener {
                             override fun onSelected(selectedIds: java.util.ArrayList<Int>?, selectedNames: java.util.ArrayList<String>?, dataString: String?) {
-
                                 launch {
-                                    fetch!!.cancel(selectedIds!!)
+                                    FetchingUtils.downloadCount -= selectedIds!!.size
+                                    fetch!!.cancel(selectedIds)
                                     fetch!!.delete(selectedIds)
                                     fetch!!.remove(selectedIds)
                                 }
-
                             }
 
                             override fun onCancel() {
@@ -147,6 +146,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             val mNotificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             mNotificationManager.cancel(download.id)
             mNotificationManager.cancelAll()
+            //FetchingUtils.downloadCount+=1
             sendNotification(this@DownloadViewerActivity, android.R.mipmap.sym_def_app_icon,
                     download.file.substring(download.file.lastIndexOf("/") + 1),
                     "All Finished!",
