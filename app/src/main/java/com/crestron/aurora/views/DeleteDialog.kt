@@ -28,8 +28,7 @@ class DeleteDialog(context: Context?, val title: String, val download: Download?
         textView6.append(title)
 
         if (download != null) {
-            val info = "Current Progress: ${context.getString(R.string.percent_progress, download.progress)}"//\n" +
-            //"Current Downloaded: ${download.downloaded}/${download.total}"
+            val info = "Current Progress: ${context.getString(R.string.percent_progress, download.progress)}"
 
             all_download_info.text = info
         }
@@ -37,7 +36,6 @@ class DeleteDialog(context: Context?, val title: String, val download: Download?
         slide_button.setOnSwipeCompleteListener_forward_reverse(object : OnSwipeCompleteListener {
             override fun onSwipe_Forward(p0: Swipe_Button_View?) {
                 Loged.w("Forward")
-                //actionListener.onRemoveDownload(download.id)
                 if (download != null)
                     FetchingUtils.delete(download)
                 this@DeleteDialog.dismiss()

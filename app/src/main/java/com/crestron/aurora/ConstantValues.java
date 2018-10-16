@@ -21,6 +21,7 @@ public interface ConstantValues {
     String SHOW_LINK = "show_link";
     String APP_UPDATE = "appUpdate";
     String VERSION_URL = "https://raw.githubusercontent.com/jakepurple13/ForUsNerds/master/updated.json";
+    String PAST_VERSION_URL = "https://raw.githubusercontent.com/jakepurple13/ForUsNerds/master/pastversions.json";
     String RANDOM_SHOW = "random_show";
     String NUMBER_OF_RANDOM = "number_of_random";
     String DOWNLOAD_NOTIFICATION = "notiOrNot";

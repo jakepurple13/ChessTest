@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -36,16 +37,17 @@ import com.github.florent37.inlineactivityresult.kotlin.startForResult
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
+import com.mikepenz.materialdrawer.holder.BadgeStyle
 import com.mikepenz.materialdrawer.model.DividerDrawerItem
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem
 import com.nabinbhandari.android.permissions.PermissionHandler
 import com.nabinbhandari.android.permissions.Permissions
-import com.tonyodev.fetch2.Download
-import com.tonyodev.fetch2.FetchConfiguration
-import com.tonyodev.fetch2.HttpUrlConnectionDownloader
-import com.tonyodev.fetch2.Request
+import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
 import com.tonyodev.fetch2core.Downloader
 import com.tonyodev.fetch2core.Func
@@ -57,6 +59,7 @@ import org.jetbrains.anko.defaultSharedPreferences
 import org.jsoup.Jsoup
 import java.io.File
 import java.net.URL
+import java.util.*
 
 
 class ChoiceActivity : AppCompatActivity() {
@@ -611,6 +614,11 @@ class ChoiceActivity : AppCompatActivity() {
                                 download.id)
                     }
 
+                    override fun onError(download: Download, error: Error, throwable: Throwable?) {
+                        super.onError(download, error, throwable)
+                        FetchingUtils.retry(download)
+                    }
+
                     override fun onCompleted(download: Download) {
                         super.onCompleted(download)
 
@@ -661,13 +669,11 @@ class ChoiceActivity : AppCompatActivity() {
                 .withSelectable(false)
                 .withIdentifier(8)
                 .withName("Downloads: ${FetchingUtils.downloadCount}")
-        val pInfo = packageManager.getPackageInfo(packageName, 0)
-        val version = pInfo.versionName
         val versionItem = PrimaryDrawerItem()
                 .withIcon(GoogleMaterial.Icon.gmd_android)
                 .withSelectable(false)
                 .withIdentifier(6)
-                .withName("App Version: $version")
+                .withName("App Version Notes")
         val favoritesItem = PrimaryDrawerItem()
                 .withIcon(GoogleMaterial.Icon.gmd_favorite)
                 .withSelectable(false)
@@ -718,13 +724,14 @@ class ChoiceActivity : AppCompatActivity() {
                     ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intented)
                     true
                 }
+        val pInfo = packageManager.getPackageInfo(packageName, 0)
+        val version = pInfo.versionName
         val updateAppItem = PrimaryDrawerItem()
                 .withIcon(GoogleMaterial.Icon.gmd_system_update)
                 .withSelectable(false)
                 .withIdentifier(3)
                 .withName("Update App")
                 .withOnDrawerItemClickListener { _, _, _ ->
-                    result.closeDrawer()
                     launch {
                         val url = URL(ConstantValues.VERSION_URL).readText()
                         val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
@@ -732,6 +739,7 @@ class ChoiceActivity : AppCompatActivity() {
                         try {
                             Loged.i("version is ${version.toDouble()} and info is ${info.version}")
                             if (version.toDouble() < info.version) {
+                                result.closeDrawer()
                                 getNewApp(info)
                             } else {
                                 Loged.e("Nope")
@@ -770,10 +778,24 @@ class ChoiceActivity : AppCompatActivity() {
                     true
                 }
 
+        // Create the AccountHeader
+        val headerResult = AccountHeaderBuilder()
+                .withActivity(this)
+                .withDividerBelowHeader(true)
+                .withCurrentProfileHiddenInList(true)
+                .withOnlyMainProfileImageVisible(false)
+                .addProfiles(
+                        ProfileDrawerItem()
+                                .withName("For Us Nerds")
+                                .withEmail("App Version: $version")
+                                .withIcon(GoogleMaterial.Icon.gmd_android)
+                ).build()
+
         //create the drawer and remember the `Drawer` result object
         result = DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
+                .withAccountHeader(headerResult)
                 .addDrawerItems(
                         versionItem,
                         downloadCountItem,
@@ -786,9 +808,9 @@ class ChoiceActivity : AppCompatActivity() {
                         DividerDrawerItem(),
                         feedbackItem,
                         DividerDrawerItem(),
-                        updateAppItem,
+                        updateNotesItem,
                         DividerDrawerItem(),
-                        updateNotesItem
+                        updateAppItem
                 )
                 .withDisplayBelowStatusBar(true)
                 .withTranslucentStatusBar(true)
@@ -808,9 +830,40 @@ class ChoiceActivity : AppCompatActivity() {
                         .withSelectable(false)
                         .withIdentifier(7)
                         .withName("Number of favorites: ${showList.size} ")
-                result.addItemsAtPosition(1, favoriteCountItem)
+                result.addItemsAtPosition(2, favoriteCountItem)
             }
 
+        }
+
+        launch {
+            val url = URL(ConstantValues.PAST_VERSION_URL).readText()
+            val info = Gson().fromJson(url, PastAppInfo::class.java)
+            for (appVersion in info.versions) {
+                versionItem.withSubItems(SecondaryDrawerItem()
+                        .withName("Version ${appVersion.version} Notes")
+                        .withSelectable(false)
+                        .withLevel(3)
+                        .withIcon(GoogleMaterial.Icon.gmd_android)
+                        .withOnDrawerItemClickListener { _, _, _ ->
+                            Loged.w("$info")
+                            runOnUiThread {
+                                val builder = AlertDialog.Builder(this@ChoiceActivity)
+                                builder.setTitle("Notes for version ${appVersion.version}")
+                                builder.setMessage(appVersion.devNotes)
+                                builder.setNeutralButton("Cool!") { _, _ ->
+                                    //FunApplication.cancelUpdate(this@ChoiceActivity)
+                                }
+                                val dialog = builder.create()
+                                dialog.show()
+                            }
+                            true
+                        })
+            }
+            versionItem.withBadge("${info.versions.size}")
+            versionItem.withBadgeStyle(BadgeStyle(Color.RED, Color.RED))
+            runOnUiThread {
+                result.updateItem(versionItem)
+            }
         }
 
     }
