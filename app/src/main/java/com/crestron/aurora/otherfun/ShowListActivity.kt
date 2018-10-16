@@ -84,8 +84,12 @@ class ShowListActivity : AppCompatActivity() {
                         try {
                             val doc1 = Jsoup.connect(info.url).get()
                             runOnUiThread {
-                                Picasso.get().load(doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src"))
-                                        .error(R.drawable.apk).resize((600 * .6).toInt(), (800 * .6).toInt()).into(image)
+                                try {
+                                    Picasso.get().load(doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src"))
+                                            .error(R.drawable.apk).resize((600 * .6).toInt(), (800 * .6).toInt()).into(image)
+                                } catch (e: java.lang.IllegalArgumentException) {
+                                    Picasso.get().load(android.R.drawable.stat_notify_error).resize((600 * .6).toInt(), (800 * .6).toInt()).into(image)
+                                }
                                 //Picasso.get().load(info.imgURL).resize(360, 480).into(image)
                                 //title.text = info.name
                                 val des = if (doc1.allElements.select("div#series_details").select("span#full_notes").hasText())
@@ -99,7 +103,7 @@ class ShowListActivity : AppCompatActivity() {
                                         d
                                     }
                                 }
-                                description.text = des
+                                description.text = if (des.isNullOrBlank()) "Sorry, an error has occurred" else des
                             }
                         } catch (e: IllegalArgumentException) {
 
@@ -191,7 +195,7 @@ class ShowListActivity : AppCompatActivity() {
                 Loged.wtf("${e.message}")
             }
 
-            if(!recentChoice)
+            if (!recentChoice)
                 listOfNameAndLink.sortBy { it.name }
 
             runOnUiThread {
@@ -203,6 +207,7 @@ class ShowListActivity : AppCompatActivity() {
             Loged.d("${(show_info.adapter!! as AListAdapter).itemCount}")
             refresh_list.isRefreshing = false
         }
+
         fun getStuff() = async {
             Loged.i(url)
             getListOfAnime(url)

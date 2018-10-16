@@ -821,7 +821,6 @@ class ChoiceActivity : AppCompatActivity() {
                 .build()
 
         launch {
-
             val show = ShowDatabase.getDatabase(this@ChoiceActivity).showDao()
             val showList = show.allShows
             if (showList.size > 0) {
@@ -832,7 +831,6 @@ class ChoiceActivity : AppCompatActivity() {
                         .withName("Number of favorites: ${showList.size} ")
                 result.addItemsAtPosition(2, favoriteCountItem)
             }
-
         }
 
         launch {
