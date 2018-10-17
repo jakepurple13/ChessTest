@@ -11,6 +11,7 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.showapi.ShowInfo
 import com.like.LikeButton
 import com.like.OnLikeListener
 import com.squareup.picasso.Picasso
@@ -51,9 +52,9 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
     lateinit var links: ArrayList<String>
     var context: Context
     var action: AniDownloadActivity.LinkAction
-    lateinit var stuff: List<ShowListActivity.NameAndLink>
+    lateinit var stuff: List<ShowInfo>
 
-    constructor(stuff: List<ShowListActivity.NameAndLink>, context: Context, action: AniDownloadActivity.LinkAction = object : AniDownloadActivity.LinkAction {}) {
+    constructor(stuff: List<ShowInfo>, context: Context, action: AniDownloadActivity.LinkAction = object : AniDownloadActivity.LinkAction {}) {
         this.stuff = stuff
         this.context = context
         this.action = action
@@ -116,11 +117,6 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
 
             Picasso.get().setIndicatorsEnabled(true)
             holder.imageView.visibility = View.GONE
-
-            if (stuff[position].imgURL == "") {
-                holder.imageView.visibility = View.GONE
-            } else {
-            }
 
             val show = ShowDatabase.getDatabase(context)
 

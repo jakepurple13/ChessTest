@@ -19,6 +19,10 @@ import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.showapi.EpisodeApi
+import com.crestron.aurora.showapi.ShowApi
+import com.crestron.aurora.showapi.ShowInfo
+import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.ViewUtil
 import com.peekandpop.shalskar.peekandpop.PeekAndPop
 import com.squareup.picasso.Picasso
@@ -26,8 +30,6 @@ import kotlinx.android.synthetic.main.activity_show_list.*
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.textColor
-import org.jsoup.HttpStatusException
-import org.jsoup.Jsoup
 import uk.co.deanwild.flowtextview.FlowTextView
 import java.util.*
 
@@ -36,19 +38,17 @@ class ShowListActivity : AppCompatActivity() {
 
     private val listOfLinks = arrayListOf<String>()
     private val listOfNames = arrayListOf<String>()
-    private val listOfNameAndLink = arrayListOf<NameAndLink>()
+    private val listOfNameAndLink = arrayListOf<ShowInfo>()
     private val actionHit = object : AniDownloadActivity.LinkAction {
         override fun hit(name: String, url: String) {
             super.hit(name, url)
-
             val intented = Intent(this@ShowListActivity, EpisodeActivity::class.java)
             intented.putExtra(ConstantValues.URL_INTENT, url)
             intented.putExtra(ConstantValues.NAME_INTENT, name)
             startActivity(intented)
-
         }
 
-        override fun longhit(info: NameAndLink, vararg views: View) {
+        override fun longhit(info: ShowInfo, vararg views: View) {
             val peekAndPop = PeekAndPop.Builder(this@ShowListActivity)
                     .peekLayout(R.layout.image_dialog_layout)
                     .apply {
@@ -80,30 +80,18 @@ class ShowListActivity : AppCompatActivity() {
                     description.textColor = Color.WHITE
                     description.setTextSize(episodeNumber.textSize)
 
-                    async {
+                    launch {
                         try {
-                            val doc1 = Jsoup.connect(info.url).get()
+                            val episode = EpisodeApi(info)
                             runOnUiThread {
                                 try {
-                                    Picasso.get().load(doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src"))
+                                    Picasso.get().load(episode.image)
                                             .error(R.drawable.apk).resize((600 * .6).toInt(), (800 * .6).toInt()).into(image)
                                 } catch (e: java.lang.IllegalArgumentException) {
                                     Picasso.get().load(android.R.drawable.stat_notify_error).resize((600 * .6).toInt(), (800 * .6).toInt()).into(image)
                                 }
-                                //Picasso.get().load(info.imgURL).resize(360, 480).into(image)
-                                //title.text = info.name
-                                val des = if (doc1.allElements.select("div#series_details").select("span#full_notes").hasText())
-                                    doc1.allElements.select("div#series_details").select("span#full_notes").text().removeSuffix("less")
-                                else {
-                                    val d = doc1.allElements.select("div#series_details").select("div:contains(Description:)").select("div").text()
-                                    try {
-                                        d.substring(d.indexOf("Description: ") + 13, d.indexOf("Category: "))
-                                    } catch (e: StringIndexOutOfBoundsException) {
-                                        Loged.e(e.message!!)
-                                        d
-                                    }
-                                }
-                                description.text = if (des.isNullOrBlank()) "Sorry, an error has occurred" else des
+                                title.text = info.name
+                                description.text = episode.description
                             }
                         } catch (e: IllegalArgumentException) {
 
@@ -148,52 +136,9 @@ class ShowListActivity : AppCompatActivity() {
 
         fun getListOfAnime(urlToUse: String) {
 
-            try {
+            val showApi = ShowApi(Source.getSourceFromUrl(urlToUse))
 
-                if (recentChoice) {
-
-                    Loged.i("We are beginning")
-
-                    val doc = Jsoup.connect(urlToUse).get()
-
-                    val lists = doc.allElements
-
-                    var listOfStuff = lists.select("div.left_col").select("table#updates").select("a[href^=http]")
-                    Loged.wtf(listOfStuff.size.toString())
-                    if (listOfStuff.size == 0) {
-                        listOfStuff = lists.select("div.s_left_col").select("table#updates").select("a[href^=http]")
-                    }
-
-                    for (element in listOfStuff) {
-
-                        val nameAndLink = NameAndLink(element.text(), element.attr("abs:href"))
-
-                        if (!element.text().contains("Episode"))
-                            listOfNameAndLink.add(nameAndLink)
-                    }
-
-                } else {
-
-                    Loged.i("We are beginning")
-
-                    val doc = Jsoup.connect(urlToUse).get()
-
-                    val lists = doc.allElements
-
-                    val listOfStuff = lists.select("td").select("a[href^=http]")
-
-                    for (element in listOfStuff) {
-                        //Loged.wtf("$i: ${element.html()}")
-                        listOfNames.add(element.text())
-                        listOfLinks.add(element.attr("abs:href"))
-                        listOfNameAndLink.add(NameAndLink(element.text(), element.attr("abs:href")))
-                    }
-
-                }
-
-            } catch (e: HttpStatusException) {
-                Loged.wtf("${e.message}")
-            }
+            listOfNameAndLink.addAll(showApi.showInfoList)
 
             if (!recentChoice)
                 listOfNameAndLink.sortBy { it.name }
@@ -265,7 +210,7 @@ class ShowListActivity : AppCompatActivity() {
                         nnList.add(NameAndLink(i.name, i.link))
                     }
 
-                    fun checkItems(nn: NameAndLink): Boolean {
+                    fun checkItems(nn: ShowInfo): Boolean {
                         for (s in showList) {
                             if (nn.url == s.link) {
                                 return true
@@ -286,5 +231,5 @@ class ShowListActivity : AppCompatActivity() {
 
     }
 
-    class NameAndLink(val name: String, val url: String, var imgURL: String = "")
+    class NameAndLink(val name: String, val url: String)
 }

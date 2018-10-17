@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.Toast
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
+import com.crestron.aurora.showapi.ShowInfo
 import com.google.gson.Gson
 import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2core.DownloadBlock
@@ -272,7 +273,7 @@ class AniDownloadActivity : AppCompatActivity() {
             Loged.wtf("$name: $url")
         }
 
-        fun longhit(info: ShowListActivity.NameAndLink, vararg views: View) {
+        fun longhit(info: ShowInfo, vararg views: View) {
 
         }
     }

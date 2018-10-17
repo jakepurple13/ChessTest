@@ -6,16 +6,15 @@ import android.app.job.JobParameters
 import android.app.job.JobService
 import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.db.ShowDatabase
-import kotlinx.coroutines.experimental.async
+import com.crestron.aurora.showapi.EpisodeApi
+import com.crestron.aurora.showapi.ShowInfo
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
-import org.jsoup.Jsoup
 
 
 class ShowCheckService : JobService() {
@@ -36,18 +35,18 @@ class ShowCheckService : JobService() {
 
     override fun onStartJob(p0: JobParameters?): Boolean {
         Loged.d("Starting!")
-        if(started) {
+        if (started) {
             started = false
             //if(wifiOnly()) {
             val nStyle = NotificationCompat.InboxStyle()
-            val mNotificationManager = this@ShowCheckService.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            //val mNotificationManager = this@ShowCheckService.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             //mNotificationManager.activeNotifications.filter { it.id == 1 }[0].notification.
             val showDatabase = ShowDatabase.getDatabase(this@ShowCheckService)
             launch {
                 var count = 0
                 val shows = showDatabase.showDao().allShows
                 for (i in shows) {
-                    val showList = getEpisodeList(i.link).await()
+                    val showList = EpisodeApi(ShowInfo(i.name, i.link)).episodeList.size
                     if (i.showNum < showList) {
                         nStyle.addLine("${i.name} Updated: Episode $showList")
                         i.showNum = showList
@@ -78,12 +77,7 @@ class ShowCheckService : JobService() {
         return true
     }
 
-    private fun getEpisodeList(url: String) = async {
-        val doc1 = Jsoup.connect(url).get()
-        val stuffList = doc1.allElements.select("div#videos").select("a[href^=http]")
-        stuffList.size
-    }
-
+    /*
     private fun wifiOnly(): Boolean {
         return if (defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false))
             isWifiConnected()
@@ -94,7 +88,7 @@ class ShowCheckService : JobService() {
     private fun isWifiConnected(): Boolean {
         val cm = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return cm.activeNetworkInfo != null && cm.activeNetworkInfo.type == 1
-    }
+    }*/
 
 
     private fun sendNotification(context: Context, smallIconId: Int, title: String, messages: NotificationCompat.Style = NotificationCompat.InboxStyle(), channel_id: String, gotoActivity: Class<*>, notification_id: Int) {

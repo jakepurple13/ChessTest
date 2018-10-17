@@ -12,13 +12,15 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.showapi.ShowInfo
 import kotlinx.android.synthetic.main.episode_info.view.*
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
-class EpisodeAdapter(private val items: ArrayList<String>, private val links: ArrayList<String>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
+//class EpisodeAdapter(private val items: ArrayList<String>, private val links: ArrayList<String>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
+class EpisodeAdapter(private val items: ArrayList<ShowInfo>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
 
     // Gets the number of animals in the list
     override fun getItemCount(): Int {
@@ -39,14 +41,15 @@ class EpisodeAdapter(private val items: ArrayList<String>, private val links: Ar
         //holder.episodeName.text = items[position]
         //holder.episodeName.text = ""
 
-        holder.watched.text = items[position]
+        holder.watched.text = items[position].name
         holder.episodeDownload.setOnClickListener {
-            action.hit(items[position], links[position])
+            action.hit(items[position].name, items[position].url)
         }
 
         holder.slideToDownload.setOnSwipeCompleteListener_forward_reverse(object : OnSwipeCompleteListener {
             override fun onSwipe_Forward(p0: Swipe_Button_View?) {
-                action.hit(items[position], links[position])
+                //action.hit(items[position], links[position])
+                action.hit(items[position].name, items[position].url)
             }
 
             override fun onSwipe_Reverse(p0: Swipe_Button_View?) {
@@ -65,7 +68,7 @@ class EpisodeAdapter(private val items: ArrayList<String>, private val links: Ar
                         .replace("(", "\\(")
                         .replace(")", "\\)")
                         .replace("\"", "\\\"")
-                        .replace(".", "\\.")} (.*) ${it.episodeNumber + 1}".toRegex().matches(items[position]) || "$name (.*) ${it.episodeNumber + 1} (.*)".toRegex().matches(items[position])
+                        .replace(".", "\\.")} (.*) ${it.episodeNumber + 1}".toRegex().matches(items[position].name) || "$name (.*) ${it.episodeNumber + 1} (.*)".toRegex().matches(items[position].name)
             }
 
             /*for (i in episodes) {

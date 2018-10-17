@@ -31,6 +31,9 @@ import com.crestron.aurora.cardgames.solitaire.SolitaireActivity
 import com.crestron.aurora.cardgames.videopoker.VideoPokerActivity
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.*
+import com.crestron.aurora.showapi.EpisodeApi
+import com.crestron.aurora.showapi.ShowInfo
+import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.viewtesting.ViewTesting
 import com.github.florent37.inlineactivityresult.kotlin.startForResult
@@ -228,27 +231,27 @@ class ChoiceActivity : AppCompatActivity() {
                             permissionCheck(SettingsActivity2::class.java, shouldFinish = true)
                         }
                         ChoiceButton.ANIME -> {
-                            permissionCheck(ShowListActivity::class.java, url = "http://www.animeplus.tv/anime-list", view = view)
+                            permissionCheck(ShowListActivity::class.java, url = Source.ANIME.link, view = view)
                         }
                         ChoiceButton.CARTOON -> {
-                            permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/cartoon", view = view)
+                            permissionCheck(ShowListActivity::class.java, url = Source.CARTOON.link, view = view)
                         }
                         ChoiceButton.DUBBED -> {
-                            permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/dubbed-anime", view = view)
+                            permissionCheck(ShowListActivity::class.java, url = Source.DUBBED.link, view = view)
                         }
                         ChoiceButton.ANIME_MOVIES -> {
-                            permissionCheck(ShowListActivity::class.java, url = "http://www.animeplus.tv/anime-movies", view = view)
+                            permissionCheck(ShowListActivity::class.java, url = Source.ANIME_MOVIES.link, view = view)
                         }
                         ChoiceButton.CARTOON_MOVIES -> {
-                            permissionCheck(ShowListActivity::class.java, url = "http://www.animetoon.org/movies", view = view)
+                            permissionCheck(ShowListActivity::class.java, url = Source.CARTOON_MOVIES.link, view = view)
                         }
                         ChoiceButton.RECENT_ANIME -> {
                             defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT, 0).apply()
-                            permissionCheck(ShowListActivity::class.java, true, url = "http://www.animeplus.tv/anime-updates", view = view)
+                            permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_ANIME.link, view = view)
                         }
                         ChoiceButton.RECENT_CARTOON -> {
                             //defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT, 0).apply()
-                            permissionCheck(ShowListActivity::class.java, true, url = "http://www.animetoon.org/updates", view = view)
+                            permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_CARTOON.link, view = view)
                         }
                         ChoiceButton.UPDATE_APP -> {
                             launch {
@@ -777,6 +780,37 @@ class ChoiceActivity : AppCompatActivity() {
                     }
                     true
                 }
+        val checkForUpdateItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_cloud_upload)
+                .withSelectable(false).withIdentifier(9)
+                .withName("Check For Show Updates")
+        checkForUpdateItem.withOnDrawerItemClickListener { _, _, _ ->
+            result.closeDrawer()
+            val nStyle = NotificationCompat.InboxStyle()
+            //val mNotificationManager = this@ShowCheckService.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            //mNotificationManager.activeNotifications.filter { it.id == 1 }[0].notification.
+            val showDatabase = ShowDatabase.getDatabase(this@ChoiceActivity)
+            launch {
+                var count = 0
+                val shows = showDatabase.showDao().allShows
+                for (i in shows) {
+                    val showList = EpisodeApi(ShowInfo(i.name, i.link)).episodeList.size
+                    if (i.showNum < showList) {
+                        nStyle.addLine("${i.name} Updated: Episode $showList")
+                        i.showNum = showList
+                        showDatabase.showDao().updateShow(i)
+                        count++
+                    }
+                    Loged.wtf("${i.name} and size is $showList")
+                }
+                if (count > 0) {
+                    checkForUpdateItem.withBadge("$count")
+                    checkForUpdateItem.withBadgeStyle(BadgeStyle(Color.RED, Color.RED))
+                    result.updateItem(checkForUpdateItem)
+                }
+            }
+            true
+        }
 
         // Create the AccountHeader
         val headerResult = AccountHeaderBuilder()
@@ -805,6 +839,7 @@ class ChoiceActivity : AppCompatActivity() {
                         viewDownloadsItem,
                         DividerDrawerItem(),
                         favoritesItem,
+                        checkForUpdateItem,
                         DividerDrawerItem(),
                         feedbackItem,
                         DividerDrawerItem(),
@@ -840,7 +875,7 @@ class ChoiceActivity : AppCompatActivity() {
                 versionItem.withSubItems(SecondaryDrawerItem()
                         .withName("Version ${appVersion.version} Notes")
                         .withSelectable(false)
-                        .withLevel(3)
+                        .withLevel(2)
                         .withIcon(GoogleMaterial.Icon.gmd_android)
                         .withOnDrawerItemClickListener { _, _, _ ->
                             Loged.w("$info")
@@ -853,12 +888,13 @@ class ChoiceActivity : AppCompatActivity() {
                                 }
                                 val dialog = builder.create()
                                 dialog.show()
+                                runOnUiThread {
+                                    result.updateItem(versionItem)
+                                }
                             }
                             true
                         })
             }
-            versionItem.withBadge("${info.versions.size}")
-            versionItem.withBadgeStyle(BadgeStyle(Color.RED, Color.RED))
             runOnUiThread {
                 result.updateItem(versionItem)
             }

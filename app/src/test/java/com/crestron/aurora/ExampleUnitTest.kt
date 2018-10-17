@@ -1,25 +1,20 @@
 package com.crestron.aurora
 
-import org.junit.Test
-
-import org.junit.Assert.*
-import android.system.Os.accept
-import android.system.Os.socket
 import com.crestron.aurora.boardgames.yahtzee.Dice
 import com.crestron.aurora.boardgames.yahtzee.YahtzeeScores
+import com.crestron.aurora.showapi.EpisodeApi
+import com.crestron.aurora.showapi.ShowApi
+import com.crestron.aurora.showapi.Source
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
 import crestron.com.deckofcards.Suit
+import kotlinx.coroutines.experimental.runBlocking
 import kotlinx.html.*
-import kotlinx.html.dom.createHTMLDocument
 import kotlinx.html.stream.appendHTML
 import kotlinx.html.stream.createHTML
+import org.junit.Assert.assertEquals
 import org.junit.Before
-import java.net.InetSocketAddress
-import java.net.SocketAddress
-import java.nio.ByteBuffer
-import java.nio.channels.ServerSocketChannel
-import java.nio.channels.SocketChannel
+import org.junit.Test
 
 
 /**
@@ -127,7 +122,7 @@ class ExampleUnitTest {
                 break
             }
         }
-        //currentIndex++
+        currentIndex++
 
         val fullClassName = stackTraceElement[currentIndex].className
         val methodName = stackTraceElement[currentIndex].methodName
@@ -185,6 +180,35 @@ class ExampleUnitTest {
             }
         }
 
+    }
+
+    @Test
+    fun showTest() {
+        val result = runBlocking {
+
+            val show = ShowApi(Source.RECENT_ANIME)
+
+            val list = show.showInfoList
+
+            log("${list.size}")
+
+            val pieced = list.find { it.name == "Conception" }
+
+            val episodeApi = EpisodeApi(pieced!!)
+
+            log(episodeApi.name)
+
+            val episodeList = episodeApi.episodeList
+
+            log("${episodeList.size}")
+
+            //assertEquals("One Piece Episode Count",350, episodeList.size)
+
+            log(episodeApi.description)
+
+        }
+        result
+        log("Hello")
     }
 
 }

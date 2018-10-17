@@ -25,6 +25,8 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.showapi.EpisodeApi
+import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.utilities.ViewUtil
 import com.like.LikeButton
 import com.like.OnLikeListener
@@ -34,10 +36,8 @@ import com.tonyodev.fetch2.Error
 import com.tonyodev.fetch2.NetworkType
 import com.tonyodev.fetch2core.DownloadBlock
 import kotlinx.android.synthetic.main.activity_episode.*
-import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
-import org.jsoup.Jsoup
 import programmer.box.utilityhelper.UtilNotification
 import java.util.*
 
@@ -46,6 +46,7 @@ class EpisodeActivity : AppCompatActivity() {
 
     private val listOfUrls = arrayListOf<String>()
     private val listOfNames = arrayListOf<String>()
+    private val listOfEpisodes = arrayListOf<ShowInfo>()
 
     lateinit var mNotificationManager: NotificationManager
     lateinit var url: String
@@ -213,51 +214,15 @@ class EpisodeActivity : AppCompatActivity() {
 
         fun getList() = launch {
 
-            fun getStuff(url: String) {
-                val doc1 = Jsoup.connect(url).get()
+            val epApi = EpisodeApi(ShowInfo(name, url))
 
-                val stuffList = doc1.allElements.select("div#videos").select("a[href^=http]")
-
-                for (i in stuffList) {
-                    Loged.d(i.attr("abs:href"))
-                    listOfUrls.add(i.attr("abs:href"))
-                    listOfNames.add(i.text())
-                }
-            }
-
-            val doc1 = Jsoup.connect(url).get()
-            val stuffList = doc1.allElements.select("div#videos").select("a[href^=http]")
-
-            for (i in stuffList) {
-                Loged.d(i.attr("abs:href"))
-                listOfUrls.add(i.attr("abs:href"))
-                listOfNames.add(i.text())
-            }
-
-            val stuffLists = doc1.allElements.select("ul.pagination").select(" button[href^=http]")
-
-            for (i in stuffLists) {
-                Loged.d(i.attr("abs:href"))
-                getStuff(i.attr("abs:href"))
-            }
+            listOfEpisodes.addAll(epApi.episodeList)
 
             if (name == "fun.getting") {
-                name = doc1.select("div.right_col h1").text()
+                name = epApi.name
             }
 
             runOnUiThread {
-
-                val des = if (doc1.allElements.select("div#series_details").select("span#full_notes").hasText())
-                    doc1.allElements.select("div#series_details").select("span#full_notes").text().removeSuffix("less")
-                else {
-                    val d = doc1.allElements.select("div#series_details").select("div:contains(Description:)").select("div").text()
-                    try {
-                        d.substring(d.indexOf("Description: ") + 13, d.indexOf("Category: "))
-                    } catch (e: StringIndexOutOfBoundsException) {
-                        Loged.e(e.message!!)
-                        d
-                    }
-                }
 
                 launch {
                     if (show.showDao().isUrlInDatabase(url) > 0) {
@@ -266,14 +231,16 @@ class EpisodeActivity : AppCompatActivity() {
                     }
                 }
 
-                download_info.text = nameUrl(des)
+                download_info.text = nameUrl(epApi.description)
 
-                Picasso.get().load(doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src"))
-                        .error(R.drawable.apk).resize((600 * .6).toInt(), (800 * .6).toInt()).into(cover_image)
+                Picasso.get().load(epApi.image)
+                        .error(R.drawable.apk)
+                        .resize((600 * .6).toInt(), (800 * .6).toInt())
+                        .into(cover_image)
 
                 val slideOrButton = defaultSharedPreferences.getBoolean(ConstantValues.SLIDE_OR_BUTTON, true)
 
-                episode_list.adapter = EpisodeAdapter(listOfNames, listOfUrls, name, context = this@EpisodeActivity, slideOrButton = slideOrButton, action = object : EpisodeAction {
+                episode_list.adapter = EpisodeAdapter(listOfEpisodes, name, context = this@EpisodeActivity, slideOrButton = slideOrButton, action = object : EpisodeAction {
                     override fun hit(name: String, url: String) {
                         super.hit(name, url)
                         FetchingUtils.downloadCount++
@@ -312,10 +279,11 @@ class EpisodeActivity : AppCompatActivity() {
 
             listOfNames.reverse()
             listOfUrls.reverse()
+            listOfEpisodes.reverse()
 
             runOnUiThread {
                 val slideOrButton = defaultSharedPreferences.getBoolean(ConstantValues.SLIDE_OR_BUTTON, true)
-                episode_list.adapter = EpisodeAdapter(listOfNames, listOfUrls, name, reverse = b, context = this@EpisodeActivity, slideOrButton = slideOrButton, action = object : EpisodeAction {
+                episode_list.adapter = EpisodeAdapter(listOfEpisodes, name, reverse = b, context = this@EpisodeActivity, slideOrButton = slideOrButton, action = object : EpisodeAction {
                     override fun hit(name: String, url: String) {
                         super.hit(name, url)
                         FetchingUtils.downloadCount++
@@ -421,19 +389,13 @@ class EpisodeActivity : AppCompatActivity() {
             }
 
             fun liked(like: Boolean) {
-                fun getEpisodeList(url: String) = async {
-                    val doc1 = Jsoup.connect(url).get()
-                    val stuffList = doc1.allElements.select("div#videos").select("a[href^=http]")
-                    stuffList.size
-                }
-
                 launch {
                     if (like) {
                         show.showDao().insert(Show(url, name))
 
                         launch {
                             val s = show.showDao().getShow(name)
-                            val showList = getEpisodeList(url).await()
+                            val showList = listOfEpisodes.size
                             if (s.showNum < showList) {
                                 s.showNum = showList
                                 show.showDao().updateShow(s)
@@ -524,18 +486,6 @@ class EpisodeActivity : AppCompatActivity() {
             name = intent.getStringExtra(ConstantValues.NAME_INTENT)
 
         }
-
-    }
-
-    private fun toTitleCase(givenString: String): String {
-        val arr = givenString.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        val sb = StringBuffer()
-
-        for (i in arr.indices) {
-            sb.append(Character.toUpperCase(arr[i][0]))
-                    .append(arr[i].substring(1)).append(" ")
-        }
-        return sb.toString().trim { it <= ' ' }
     }
 
     fun sendProgressNotification(title: String, text: String, progress: Int, context: Context, gotoActivity: Class<*>, notification_id: Int) {
