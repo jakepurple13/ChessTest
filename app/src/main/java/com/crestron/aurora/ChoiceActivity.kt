@@ -29,10 +29,11 @@ import com.crestron.aurora.cardgames.hilo.HiLoActivity
 import com.crestron.aurora.cardgames.matching.MatchingActivity
 import com.crestron.aurora.cardgames.solitaire.SolitaireActivity
 import com.crestron.aurora.cardgames.videopoker.VideoPokerActivity
+import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.*
 import com.crestron.aurora.showapi.EpisodeApi
-import com.crestron.aurora.showapi.ShowInfo
+import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.viewtesting.ViewTesting
@@ -61,6 +62,7 @@ import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jsoup.Jsoup
 import java.io.File
+import java.net.SocketTimeoutException
 import java.net.URL
 import java.util.*
 
@@ -772,7 +774,7 @@ class ChoiceActivity : AppCompatActivity() {
                             builder.setTitle("Notes for version ${info.version}")
                             builder.setMessage("Your version: $version\n${info.devNotes}")
                             builder.setNeutralButton("Cool!") { _, _ ->
-                                //FunApplication.cancelUpdate(this@ChoiceActivity)
+
                             }
                             val dialog = builder.create()
                             dialog.show()
@@ -786,27 +788,38 @@ class ChoiceActivity : AppCompatActivity() {
                 .withName("Check For Show Updates")
         checkForUpdateItem.withOnDrawerItemClickListener { _, _, _ ->
             result.closeDrawer()
-            val nStyle = NotificationCompat.InboxStyle()
             //val mNotificationManager = this@ShowCheckService.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             //mNotificationManager.activeNotifications.filter { it.id == 1 }[0].notification.
             val showDatabase = ShowDatabase.getDatabase(this@ChoiceActivity)
             launch {
                 var count = 0
+                val showApi = ShowApi(Source.RECENT_ANIME).showInfoList
+                showApi.addAll(ShowApi(Source.RECENT_CARTOON).showInfoList)
+                val filteredList = showApi.distinctBy { it.url }
                 val shows = showDatabase.showDao().allShows
-                for (i in shows) {
-                    val showList = EpisodeApi(ShowInfo(i.name, i.link)).episodeList.size
-                    if (i.showNum < showList) {
-                        nStyle.addLine("${i.name} Updated: Episode $showList")
-                        i.showNum = showList
-                        showDatabase.showDao().updateShow(i)
-                        count++
+
+                val aColIds = shows.asSequence().map { it.link }.toSet()
+                val bColIds = filteredList.filter { it.url in aColIds }
+
+                //Loged.wtf(bColIds.joinToString(", "))
+                for (i in bColIds) {
+                    val showList = EpisodeApi(i).episodeList.size
+                    if (showDatabase.showDao().getShow(i.name).showNum < showList) {
+                        try {
+                            Loged.i(i.name)
+                            showDatabase.showDao().updateShow(Show(i.name, i.url, showList))
+                            count++
+                        } catch (e: SocketTimeoutException) {
+                            continue
+                        }
                     }
-                    Loged.wtf("${i.name} and size is $showList")
                 }
                 if (count > 0) {
-                    checkForUpdateItem.withBadge("$count")
-                    checkForUpdateItem.withBadgeStyle(BadgeStyle(Color.RED, Color.RED))
-                    result.updateItem(checkForUpdateItem)
+                    runOnUiThread {
+                        checkForUpdateItem.withBadge("$count")
+                        checkForUpdateItem.withBadgeStyle(BadgeStyle(Color.RED, Color.RED))
+                        result.updateItem(checkForUpdateItem)
+                    }
                 }
             }
             true

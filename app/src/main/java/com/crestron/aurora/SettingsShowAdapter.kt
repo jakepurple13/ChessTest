@@ -9,8 +9,6 @@ import android.widget.SectionIndexer
 import com.crestron.aurora.otherfun.ShowListActivity
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.settings_show_layout.view.*
-import kotlinx.coroutines.experimental.async
-import org.jsoup.Jsoup
 
 class SettingsShowAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
                           var context: Context,
@@ -89,17 +87,6 @@ class SettingsShowAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
         holder.favorite.setOnCheckedChangeListener { _, isChecked ->
             action.longClick(stuff[position].name, stuff[position].url, isChecked)
         }
-    }
-
-    private fun getEpisodeList(url: String) = async {
-        val doc1 = Jsoup.connect(url).get()
-        val stuffList = doc1.allElements.select("div#videos").select("a[href^=http]")
-        stuffList.size
-    }
-
-    private fun getShowIMG(url: String) = async {
-        val doc1 = Jsoup.connect(url).get()
-        doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
     }
 
 }

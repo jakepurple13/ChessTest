@@ -29,7 +29,11 @@ enum class Source(val link: String, val recent: Boolean = false) {
     }
 }
 
-class ShowInfo(val name: String, val url: String)
+class ShowInfo(val name: String, val url: String) {
+    override fun toString(): String {
+        return "$name: $url"
+    }
+}
 
 class ShowApi(private val source: Source) {
     private var doc: Document = Jsoup.connect(source.link).get()

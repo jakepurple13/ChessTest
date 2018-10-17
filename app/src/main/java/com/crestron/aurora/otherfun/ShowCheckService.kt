@@ -10,11 +10,14 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
+import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeApi
-import com.crestron.aurora.showapi.ShowInfo
+import com.crestron.aurora.showapi.ShowApi
+import com.crestron.aurora.showapi.Source
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
+import java.net.SocketTimeoutException
 
 
 class ShowCheckService : JobService() {
@@ -44,16 +47,26 @@ class ShowCheckService : JobService() {
             val showDatabase = ShowDatabase.getDatabase(this@ShowCheckService)
             launch {
                 var count = 0
+                val showApi = ShowApi(Source.RECENT_ANIME).showInfoList
+                showApi.addAll(ShowApi(Source.RECENT_CARTOON).showInfoList)
+                val filteredList = showApi.distinctBy { it.url }
                 val shows = showDatabase.showDao().allShows
-                for (i in shows) {
-                    val showList = EpisodeApi(ShowInfo(i.name, i.link)).episodeList.size
-                    if (i.showNum < showList) {
-                        nStyle.addLine("${i.name} Updated: Episode $showList")
-                        i.showNum = showList
-                        showDatabase.showDao().updateShow(i)
-                        count++
+
+                val aColIds = shows.asSequence().map { it.link }.toSet()
+                val bColIds = filteredList.filter { it.url in aColIds }
+
+                for (i in bColIds) {
+                    try {
+                        val showList = EpisodeApi(i).episodeList.size
+                        if (showDatabase.showDao().getShow(i.name).showNum < showList) {
+                            nStyle.addLine("${i.name} Updated: Episode $showList")
+                            showDatabase.showDao().updateShow(Show(i.name, i.url, showList))
+                            count++
+                        }
+                        Loged.wtf("${i.name} and size is $showList")
+                    } catch (e: SocketTimeoutException) {
+                        continue
                     }
-                    Loged.wtf("${i.name} and size is $showList")
                 }
                 if (count > 0) {
                     defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT,

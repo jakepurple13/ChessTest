@@ -17,6 +17,8 @@ import android.widget.TextView
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.EpisodeActivity
 import com.crestron.aurora.otherfun.ShowListActivity
+import com.crestron.aurora.showapi.EpisodeApi
+import com.crestron.aurora.showapi.ShowInfo
 import com.google.gson.Gson
 import com.peekandpop.shalskar.peekandpop.PeekAndPop
 import com.squareup.picasso.Picasso
@@ -25,7 +27,6 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.textColor
-import org.jsoup.Jsoup
 import uk.co.deanwild.flowtextview.FlowTextView
 import java.util.*
 
@@ -133,31 +134,21 @@ class SettingsShowActivity : AppCompatActivity() {
                                 button.visibility = View.GONE
                                 title.text = Html.fromHtml("<b>${info.name}<b>", Html.FROM_HTML_MODE_COMPACT)
                                 title.textColor = Color.WHITE
-                                //description_dialog.text = description
                                 episodeNumber.text = ""
                                 description.textColor = Color.WHITE
                                 description.setTextSize(episodeNumber.textSize)
 
                                 async {
                                     try {
-                                        val doc1 = Jsoup.connect(info.url).get()
+                                        val epiApi = EpisodeApi(ShowInfo(info.name, info.url))
                                         runOnUiThread {
-                                            Picasso.get().load(doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src"))
-                                                    .error(R.drawable.apk).resize((600 * .6).toInt(), (800 * .6).toInt()).into(image)
-                                            //Picasso.get().load(info.imgURL).resize(360, 480).into(image)
-                                            //title.text = info.name
-                                            val des = if (doc1.allElements.select("div#series_details").select("span#full_notes").hasText())
-                                                doc1.allElements.select("div#series_details").select("span#full_notes").text().removeSuffix("less")
-                                            else {
-                                                val d = doc1.allElements.select("div#series_details").select("div:contains(Description:)").select("div").text()
-                                                try {
-                                                    d.substring(d.indexOf("Description: ") + 13, d.indexOf("Category: "))
-                                                } catch (e: StringIndexOutOfBoundsException) {
-                                                    Loged.e(e.message!!)
-                                                    d
-                                                }
+                                            try {
+                                                Picasso.get().load(epiApi.image)
+                                                        .error(R.drawable.apk).resize((600 * .6).toInt(), (800 * .6).toInt()).into(image)
+                                            } catch (e: java.lang.IllegalArgumentException) {
+                                                Picasso.get().load(android.R.drawable.stat_notify_error).resize((600 * .6).toInt(), (800 * .6).toInt()).into(image)
                                             }
-                                            description.text = des
+                                            description.text = epiApi.description
                                         }
                                     } catch (e: IllegalArgumentException) {
 
@@ -166,12 +157,9 @@ class SettingsShowActivity : AppCompatActivity() {
                             }
 
                         })
-
                         //val dialog = ImageDialog(this@RssAdapter.context, information.title, information.description, information.episodeNumber, information.imageLink)
                         //dialog.show()
-
                         peekAndPop.isEnabled = true
-
                     }
 
                 })
@@ -180,21 +168,11 @@ class SettingsShowActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (!homeScreen) {
-            //val intent = Intent(this@SettingsShowActivity, ChoiceActivity::class.java)
-            //startActivity(intent)
-            Loged.i("$shouldReset")
-            val returnIntent = Intent()
-            returnIntent.putExtra("restart", shouldReset)
-            setResult(Activity.RESULT_OK, returnIntent)
-            finish()
-        } else {
-            val returnIntent = Intent()
-            returnIntent.putExtra("restart", shouldReset)
-            setResult(3, returnIntent)
-            finish()
-            //super.onBackPressed()
-        }
+        Loged.i("$shouldReset")
+        val returnIntent = Intent()
+        returnIntent.putExtra("restart", shouldReset)
+        setResult(if (!homeScreen) Activity.RESULT_OK else 3, returnIntent)
+        finish()
     }
 
     open class NameList(var list: ArrayList<NameUrl>)

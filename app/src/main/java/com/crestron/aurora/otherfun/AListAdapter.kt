@@ -11,6 +11,7 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.like.LikeButton
 import com.like.OnLikeListener
@@ -18,7 +19,6 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.text_layout.view.*
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
-import org.jsoup.Jsoup
 
 class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
 
@@ -76,16 +76,6 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
         }
     }
 
-    /*fun getView(position: Int, convertView: View, parent: ViewGroup) {
-        var view: ImageView? = convertView as ImageView
-        if (view == null) {
-            view = ImageView(context)
-        }
-        val url = items[position]
-
-        Picasso.get().load(url).into(view)
-    }*/
-
     // Inflates the item views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(context).inflate(R.layout.text_layout, parent, false))
@@ -94,7 +84,6 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
     // Binds each animal in the ArrayList to a view
     @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
-        //holder.cardType.text = "${items[position]}"
         if (items != null) {
             holder.linkType.text = items!![position]
             holder.linkType.setOnClickListener {
@@ -102,7 +91,6 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
                 action.hit(items!![position], links[position])
             }
         } else {
-            //holder.linkType.visibility = View.GONE
             holder.linkType.text = stuff[position].name
             holder.linkType.setOnClickListener {
                 Loged.wtf("I was pressed")
@@ -126,27 +114,6 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
                 }
             }
 
-            /*holder.favorite.setOnCheckedChangeListener { _, b ->
-                async {
-                    if (b) {
-                        show.showDao().insert(Show(stuff[position].url, stuff[position].name))
-
-                        async {
-                            val s = show.showDao().getShow(stuff[position].name)
-                            val showList = getEpisodeList(stuff[position].url).await()
-                            if (s.showNum < showList) {
-                                s.showNum = showList
-                                show.showDao().updateShow(s)
-                            }
-                            Loged.wtf("${s.name} and size is $showList")
-                        }
-
-                    } else {
-                        show.showDao().deleteShow(stuff[position].name)
-                    }
-                }
-            }*/
-
             holder.favorite.setOnLikeListener(object : OnLikeListener {
                 override fun liked(p0: LikeButton?) {
                     liked(p0!!.isLiked)
@@ -164,7 +131,7 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
 
                             launch {
                                 val s = show.showDao().getShow(stuff[position].name)
-                                val showList = getEpisodeList(stuff[position].url).await()
+                                val showList = getEpisodeList(stuff[position]).await()
                                 if (s.showNum < showList) {
                                     s.showNum = showList
                                     show.showDao().updateShow(s)
@@ -183,15 +150,8 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
         }
     }
 
-    private fun getEpisodeList(url: String) = async {
-        val doc1 = Jsoup.connect(url).get()
-        val stuffList = doc1.allElements.select("div#videos").select("a[href^=http]")
-        stuffList.size
-    }
-
-    private fun getShowIMG(url: String) = async {
-        val doc1 = Jsoup.connect(url).get()
-        doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
+    private fun getEpisodeList(show: ShowInfo) = async {
+        EpisodeApi(show).episodeList.size
     }
 
 }
