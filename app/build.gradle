@@ -124,7 +124,8 @@ dependencies {
         transitive = true
     }
 
-    implementation 'com.mikepenz:google-material-typeface:3.0.1.3.original@aar' //Google Material Icons
+    implementation 'com.mikepenz:google-material-typeface:3.0.1.3.original@aar'
+    //Google Material Icons
     implementation 'com.mikepenz:fontawesome-typeface:5.3.1.1@aar'     //FontAwesome
     //implementation 'co.zsmb:materialdrawer-kt:1.3.7'
 

@@ -256,7 +256,8 @@
         <activity
             android:name=".viewtesting.basic_test"
             android:label="@string/title_activity_basic_test"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
+        <activity android:name=".otherfun.ViewVideosActivity"></activity>
     </application>
 
 </manifest>

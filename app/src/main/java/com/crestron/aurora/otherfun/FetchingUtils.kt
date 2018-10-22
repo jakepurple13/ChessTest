@@ -22,6 +22,7 @@ import java.net.URL
 import java.text.DecimalFormat
 import java.util.*
 
+
 class FetchingUtils(val context: Context, private var fetchAction: FetchAction = object : FetchAction {}) {
 
     var filePath: String? = null
@@ -306,6 +307,14 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
 
         fun delete(download: Int) {
             Fetch.getDefaultInstance().delete(download)
+        }
+
+        fun remove(download: Download) {
+            Fetch.getDefaultInstance().remove(download.id)
+        }
+
+        fun remove(download: Int) {
+            Fetch.getDefaultInstance().remove(download)
         }
 
         var folderLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/Fun/"

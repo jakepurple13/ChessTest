@@ -146,6 +146,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             val mNotificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             mNotificationManager.cancel(download.id)
             mNotificationManager.cancelAll()
+            FetchingUtils.remove(download)
             //FetchingUtils.downloadCount+=1
             sendNotification(this@DownloadViewerActivity, android.R.mipmap.sym_def_app_icon,
                     download.file.substring(download.file.lastIndexOf("/") + 1),

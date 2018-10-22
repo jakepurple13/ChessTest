@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -31,6 +32,7 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.textColor
 import uk.co.deanwild.flowtextview.FlowTextView
+import java.net.SocketTimeoutException
 import java.util.*
 
 
@@ -136,21 +138,38 @@ class ShowListActivity : AppCompatActivity() {
 
         fun getListOfAnime(urlToUse: String) {
 
-            val showApi = ShowApi(Source.getSourceFromUrl(urlToUse))
+            try {
 
-            listOfNameAndLink.addAll(showApi.showInfoList)
+                val showApi = ShowApi(Source.getSourceFromUrl(urlToUse))
 
-            if (!recentChoice)
-                listOfNameAndLink.sortBy { it.name }
+                listOfNameAndLink.addAll(showApi.showInfoList)
 
-            runOnUiThread {
-                show_info.adapter = AListAdapter(listOfNameAndLink, this@ShowListActivity, actionHit)
-                favorite_show.isEnabled = true//!recentChoice
-                search_info.isEnabled = true
+                if (!recentChoice)
+                    listOfNameAndLink.sortBy { it.name }
+
+                runOnUiThread {
+                    show_info.adapter = AListAdapter(listOfNameAndLink, this@ShowListActivity, actionHit)
+                    favorite_show.isEnabled = true//!recentChoice
+                    search_info.isEnabled = true
+                }
+
+                Loged.d("${(show_info.adapter!! as AListAdapter).itemCount}")
+                refresh_list.isRefreshing = false
+
+            } catch (e: SocketTimeoutException) {
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle("An error has occurred")
+                builder.setMessage("Please send feedback and explain what you were doing when you found this error. I am sorry for your inconvenience.")
+                // Add the buttons
+                builder.setPositiveButton("OK") { _, _ ->
+                    finish()
+                }
+                builder.setCancelable(false)
+                val dialog = builder.create()
+                runOnUiThread {
+                    dialog.show()
+                }
             }
-
-            Loged.d("${(show_info.adapter!! as AListAdapter).itemCount}")
-            refresh_list.isRefreshing = false
         }
 
         fun getStuff() = async {

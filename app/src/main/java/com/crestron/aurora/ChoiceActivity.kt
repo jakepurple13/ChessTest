@@ -29,11 +29,11 @@ import com.crestron.aurora.cardgames.hilo.HiLoActivity
 import com.crestron.aurora.cardgames.matching.MatchingActivity
 import com.crestron.aurora.cardgames.solitaire.SolitaireActivity
 import com.crestron.aurora.cardgames.videopoker.VideoPokerActivity
-import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.*
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
+import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.viewtesting.ViewTesting
@@ -88,6 +88,7 @@ class ChoiceActivity : AppCompatActivity() {
         RECENT_CARTOON("recent_cartoon", "Recent Cartoon"),
         UPDATE_APP("update_app", "Update App"),
         VIEW_DOWNLOADS("view_downloads", "View Downloads"),
+        VIEW_VIDEOS("view_videos", "View Videos"),
         UPDATE_NOTES("update_notes", "Update Notes"),
         DOWNLOAD_APK("download_apk", "Download Apk"),
         DELETE_OLD_FILE("delete_old_file", "Delete Old File\n(Sorry still working on this)"),
@@ -290,6 +291,10 @@ class ChoiceActivity : AppCompatActivity() {
                             ViewUtil.presentActivity(view, this@ChoiceActivity, intent)
                             //startActivity(intent)
                         }
+                        ChoiceButton.VIEW_VIDEOS -> {
+                            val intent = Intent(this@ChoiceActivity, ViewVideosActivity::class.java)
+                            ViewUtil.presentActivity(view, this@ChoiceActivity, intent)
+                        }
                         ChoiceButton.UPDATE_NOTES -> {
                             launch {
                                 val url = URL(ConstantValues.VERSION_URL).readText()
@@ -449,6 +454,7 @@ class ChoiceActivity : AppCompatActivity() {
         models.add(drawableModel(R.drawable.jack1, ChoiceButton.CARTOON))
         models.add(drawableModel(R.drawable.mov, ChoiceButton.CARTOON_MOVIES))
         models.add(drawableModel(R.drawable.mov, ChoiceButton.VIEW_DOWNLOADS))
+        models.add(drawableModel(R.drawable.mov, ChoiceButton.VIEW_VIDEOS))
 
         //models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.SETTINGS))
         //models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.FEEDBACK))
@@ -477,14 +483,20 @@ class ChoiceActivity : AppCompatActivity() {
             showList1.list.sortBy { it.name }
 
             for (i in showList1.list) {
-                val link = async {
-                    val doc1 = Jsoup.connect(i.url).get()
-                    doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
-                }
-                val s1 = link.await()
-                models.add(BookModel.urlBookModel(s1, i.url, i.name))
-                runOnUiThread {
-                    shelfView.loadData(models)
+                try {
+                    val link = async {
+                        val episodeApi = EpisodeApi(ShowInfo(i.name, i.url))
+                        //val doc1 = Jsoup.connect(i.url).get()
+                        //doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
+                        episodeApi.image
+                    }
+                    val s1 = link.await()
+                    models.add(BookModel.urlBookModel(s1, i.url, i.name))
+                    runOnUiThread {
+                        shelfView.loadData(models)
+                    }
+                } catch (e: SocketTimeoutException) {
+
                 }
             }
 
@@ -707,6 +719,18 @@ class ChoiceActivity : AppCompatActivity() {
                     ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intent)
                     true
                 }
+        val viewVideosItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_video_library)
+                .withSelectable(false)
+                .withIdentifier(11)
+                .withName("View Videos")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    //val intent = Intent(this@ChoiceActivity, ViewVideosActivity::class.java)
+                    //ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intent)
+                    permissionCheck(view = toolbar, clazz = ViewVideosActivity::class.java)
+                    true
+                }
         val settingsItem = PrimaryDrawerItem()
                 .withIcon(GoogleMaterial.Icon.gmd_settings)
                 .withSelectable(false)
@@ -787,7 +811,7 @@ class ChoiceActivity : AppCompatActivity() {
                 .withSelectable(false).withIdentifier(9)
                 .withName("Check For Show Updates")
         checkForUpdateItem.withOnDrawerItemClickListener { _, _, _ ->
-            result.closeDrawer()
+            //result.closeDrawer()
             //val mNotificationManager = this@ShowCheckService.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             //mNotificationManager.activeNotifications.filter { it.id == 1 }[0].notification.
             val showDatabase = ShowDatabase.getDatabase(this@ChoiceActivity)
@@ -801,14 +825,20 @@ class ChoiceActivity : AppCompatActivity() {
                 val aColIds = shows.asSequence().map { it.link }.toSet()
                 val bColIds = filteredList.filter { it.url in aColIds }
 
-                //Loged.wtf(bColIds.joinToString(", "))
                 for (i in bColIds) {
                     val showList = EpisodeApi(i).episodeList.size
                     if (showDatabase.showDao().getShow(i.name).showNum < showList) {
                         try {
                             Loged.i(i.name)
-                            showDatabase.showDao().updateShow(Show(i.name, i.url, showList))
+                            val show = showDatabase.showDao().getShow(i.name)
+                            show.showNum = showList
+                            showDatabase.showDao().updateShow(show)
                             count++
+                            /*checkForUpdateItem.withSubItems(SecondaryDrawerItem()
+                                    .withLevel(2)
+                                    .withName(i.name)
+                                    .withSelectable(false)
+                                    .withIcon(GoogleMaterial.Icon.gmd_adb))*/
                         } catch (e: SocketTimeoutException) {
                             continue
                         }
@@ -850,6 +880,7 @@ class ChoiceActivity : AppCompatActivity() {
                         settingsItem,
                         DividerDrawerItem(),
                         viewDownloadsItem,
+                        viewVideosItem,
                         DividerDrawerItem(),
                         favoritesItem,
                         checkForUpdateItem,

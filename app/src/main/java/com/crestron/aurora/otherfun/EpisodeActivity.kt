@@ -39,6 +39,7 @@ import kotlinx.android.synthetic.main.activity_episode.*
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import programmer.box.utilityhelper.UtilNotification
+import java.net.SocketTimeoutException
 import java.util.*
 
 
@@ -214,12 +215,17 @@ class EpisodeActivity : AppCompatActivity() {
 
         fun getList() = launch {
 
-            val epApi = EpisodeApi(ShowInfo(name, url))
+            val epApi = try {
+                EpisodeApi(ShowInfo(name, url))
+            } catch (e: SocketTimeoutException) {
+                null
+            }
 
-            listOfEpisodes.addAll(epApi.episodeList)
+            if (epApi != null)
+                listOfEpisodes.addAll(epApi.episodeList)
 
             if (name == "fun.getting") {
-                name = epApi.name
+                name = epApi?.name ?: name
             }
 
             runOnUiThread {
@@ -231,12 +237,20 @@ class EpisodeActivity : AppCompatActivity() {
                     }
                 }
 
-                download_info.text = nameUrl(epApi.description)
+                download_info.text = if (epApi != null) nameUrl(epApi.description) else "An error has occured"
 
-                Picasso.get().load(epApi.image)
-                        .error(R.drawable.apk)
-                        .resize((600 * .6).toInt(), (800 * .6).toInt())
-                        .into(cover_image)
+                if (epApi != null) {
+                    try {
+                        Picasso.get().load(epApi.image)
+                                .error(R.drawable.apk)
+                                .resize((600 * .6).toInt(), (800 * .6).toInt())
+                                .into(cover_image)
+                    } catch (e: java.lang.IllegalArgumentException) {
+                        Picasso.get().load(android.R.drawable.stat_notify_error).resize((600 * .6).toInt(), (800 * .6).toInt()).into(cover_image)
+                    }
+                } else {
+                    Picasso.get().load(android.R.drawable.stat_notify_error).resize((600 * .6).toInt(), (800 * .6).toInt()).into(cover_image)
+                }
 
                 val slideOrButton = defaultSharedPreferences.getBoolean(ConstantValues.SLIDE_OR_BUTTON, true)
 
@@ -311,10 +325,10 @@ class EpisodeActivity : AppCompatActivity() {
                     .positiveText("Done")
                     .negativeText("Cancel")
                     .setMinSelectionLimit(0) //you can set minimum checkbox selection limit (Optional)
-                    .setMaxSelectionLimit(listOfNames.size) //you can set maximum checkbox selection limit (Optional)
+                    .setMaxSelectionLimit(listOfEpisodes.size) //you can set maximum checkbox selection limit (Optional)
                     .multiSelectList(ArrayList<MultiSelectModel>().apply {
-                        for (i in 0 until listOfNames.size) {
-                            add(MultiSelectModel(i, listOfNames[i]))
+                        for (i in 0 until listOfEpisodes.size) {
+                            add(MultiSelectModel(i, listOfEpisodes[i].name))
                         }
                     }) // the multi select model list with ids and name
                     .onSubmit(object : MultiSelectDialog.SubmitCallbackListener {
@@ -328,7 +342,7 @@ class EpisodeActivity : AppCompatActivity() {
                                     Loged.e("Selected Ids : " + selectedIds[i] + "\n" +
                                             "Selected Names : " + selectedNames!![i] + "\n" +
                                             "DataString : " + dataString)
-                                    add(listOfUrls[selectedIds[i]])
+                                    add(listOfEpisodes[selectedIds[i]].url)
                                 }
                             }
 

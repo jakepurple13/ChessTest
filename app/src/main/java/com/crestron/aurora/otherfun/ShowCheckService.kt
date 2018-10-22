@@ -10,7 +10,6 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
-import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
@@ -60,7 +59,9 @@ class ShowCheckService : JobService() {
                         val showList = EpisodeApi(i).episodeList.size
                         if (showDatabase.showDao().getShow(i.name).showNum < showList) {
                             nStyle.addLine("${i.name} Updated: Episode $showList")
-                            showDatabase.showDao().updateShow(Show(i.name, i.url, showList))
+                            val show = showDatabase.showDao().getShow(i.name)
+                            show.showNum = showList
+                            showDatabase.showDao().updateShow(show)
                             count++
                         }
                         Loged.wtf("${i.name} and size is $showList")
