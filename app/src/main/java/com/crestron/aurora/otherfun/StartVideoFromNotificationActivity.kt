@@ -20,11 +20,13 @@ class StartVideoFromNotificationActivity : AppCompatActivity() {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(path))
             intent.setDataAndType(Uri.parse(path), "video/mp4")
             startActivity(intent)
+            finish()
         } else {
             startActivity(Intent(this, VideoPlayerActivity::class.java).apply {
                 putExtra("video_path", path)
                 putExtra("video_name", name)
             })
+            finish()
         }
     }
 }
