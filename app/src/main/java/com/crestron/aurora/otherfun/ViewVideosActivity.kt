@@ -18,6 +18,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.ViewUtil
@@ -100,6 +101,7 @@ class ViewVideosActivity : AppCompatActivity() {
             holder.videoName.text = stuff[position].name
 
             try {
+                //Video runtime text
                 val mp = MediaPlayer.create(context, Uri.parse(stuff[position].path))
                 val duration = mp.duration.toLong()
                 mp.release()
@@ -111,25 +113,27 @@ class ViewVideosActivity : AppCompatActivity() {
                 formatter.timeZone = TimeZone.getTimeZone("UTC")
                 val dateFormatted = formatter.format(Date(duration))*/
                 holder.videoRuntime.text = runTimeString
-            } catch (e: IllegalStateException) {
-                holder.videoRuntime.text = "???"
-            }
-            try {
+                //Thumbnail image
                 val thumbnail = ThumbnailUtils.createVideoThumbnail(stuff[position].path, MediaStore.Video.Thumbnails.MINI_KIND)
                 holder.videoThumbnail.setImageBitmap(thumbnail)
+                //to play video
+                holder.videoLayout.setOnClickListener {
+                    if (context.defaultSharedPreferences.getBoolean("videoPlayer", false)) {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(stuff[position].path))
+                        intent.setDataAndType(Uri.parse(stuff[position].path), "video/mp4")
+                        context.startActivity(intent)
+                    } else {
+                        context.startActivity(Intent(context, VideoPlayerActivity::class.java).apply {
+                            putExtra("video_path", stuff[position].path)
+                            putExtra("video_name", stuff[position].name)
+                        })
+                    }
+                }
             } catch (e: IllegalStateException) {
+                holder.videoRuntime.text = "???"
                 holder.videoThumbnail.setImageResource(android.R.drawable.stat_notify_error)
-            }
-            holder.videoLayout.setOnClickListener {
-                if (context.defaultSharedPreferences.getBoolean("videoPlayer", false)) {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(stuff[position].path))
-                    intent.setDataAndType(Uri.parse(stuff[position].path), "video/mp4")
-                    context.startActivity(intent)
-                } else {
-                    context.startActivity(Intent(context, VideoPlayerActivity::class.java).apply {
-                        putExtra("video_path", stuff[position].path)
-                        putExtra("video_name", stuff[position].name)
-                    })
+                holder.videoLayout.setOnClickListener {
+                    Toast.makeText(context, "Still Downloading", Toast.LENGTH_SHORT).show()
                 }
             }
         }

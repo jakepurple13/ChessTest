@@ -135,7 +135,7 @@ class ChoiceActivity : AppCompatActivity() {
                 Loged.i("version is ${version.toDouble()} and info is ${info.version}")
 
                 if (version.toDouble() < info.version) {
-                    getNewApp(info)
+                    getAppPermissions(info)
                 }
             }
         }
@@ -271,7 +271,7 @@ class ChoiceActivity : AppCompatActivity() {
                                     Loged.i("version is ${version.toDouble()} and info is ${info.version}")
 
                                     if (version.toDouble() < info.version) {
-                                        getNewApp(info)
+                                        getAppPermissions(info)
                                     } else {
                                         Loged.e("Nope")
                                         runOnUiThread {
@@ -586,6 +586,27 @@ class ChoiceActivity : AppCompatActivity() {
         return Uri.parse(url).lastPathSegment
     }
 
+    fun getAppPermissions(info: AppInfo) {
+        Permissions.check(this@ChoiceActivity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
+                "Storage permissions are required because so we can download videos",
+                Permissions.Options().setSettingsDialogTitle("Warning!").setRationaleDialogTitle("Info"),
+                object : PermissionHandler() {
+                    override fun onGranted() {
+                        //do your task
+                        getNewApp(info)
+                    }
+
+                    override fun onDenied(context: Context?, deniedPermissions: java.util.ArrayList<String>?) {
+                        super.onDenied(context, deniedPermissions)
+                        val permArray = deniedPermissions!!.toTypedArray()
+                        Permissions.check(this@ChoiceActivity, permArray,
+                                "Storage permissions are required because so we can download videos",
+                                Permissions.Options().setSettingsDialogTitle("Warning!").setRationaleDialogTitle("Info"),
+                                this)
+                    }
+                })
+    }
+
     fun getNewApp(info: AppInfo) {
         runOnUiThread {
             val pInfo = packageManager.getPackageInfo(packageName, 0)
@@ -773,7 +794,7 @@ class ChoiceActivity : AppCompatActivity() {
                             Loged.i("version is ${version.toDouble()} and info is ${info.version}")
                             if (version.toDouble() < info.version) {
                                 result.closeDrawer()
-                                getNewApp(info)
+                                getAppPermissions(info)
                             } else {
                                 Loged.e("Nope")
                                 runOnUiThread {
