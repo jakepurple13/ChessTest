@@ -7,17 +7,18 @@
     android:weightSum="2"
     android:orientation="horizontal">
 
-    <VideoView
-        android:id="@+id/video_view"
-        android:layout_weight="1"
-        android:layout_width="360px"
-        android:layout_height="480px" />
+    <include
+        layout="@layout/video_with_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
 
     <TextView
         android:id="@+id/video_name"
         android:layout_weight="1"
         android:layout_gravity="center"
         android:paddingStart="5dp"
+        android:paddingEnd="0dp"
         android:text="This is sample text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

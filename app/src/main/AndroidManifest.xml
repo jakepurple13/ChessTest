@@ -257,7 +257,9 @@
             android:name=".viewtesting.basic_test"
             android:label="@string/title_activity_basic_test"
             android:theme="@style/AppTheme" />
-        <activity android:name=".otherfun.ViewVideosActivity" />
+        <activity
+            android:name=".otherfun.ViewVideosActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".otherfun.VideoPlayerActivity"
             android:screenOrientation="sensorLandscape" />

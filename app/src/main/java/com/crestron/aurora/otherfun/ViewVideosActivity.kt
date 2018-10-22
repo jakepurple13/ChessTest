@@ -3,8 +3,11 @@ package com.crestron.aurora.otherfun
 import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
+import android.media.MediaPlayer
+import android.media.ThumbnailUtils
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -12,18 +15,20 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.VideoView
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.ViewUtil
 import kotlinx.android.synthetic.main.activity_view_videos.*
 import kotlinx.android.synthetic.main.video_layout.view.*
+import kotlinx.android.synthetic.main.video_with_text.view.*
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.File
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 class ViewVideosActivity : AppCompatActivity() {
@@ -53,19 +58,13 @@ class ViewVideosActivity : AppCompatActivity() {
         launch {
             val list = getListFiles2(File(FetchingUtils.folderLocation))
             for (i in list) {
-                Loged.i("${i.name}")
+                Loged.i(i.name)
             }
             runOnUiThread {
                 view_videos_recyclerview.adapter = VideoAdapter(list, this@ViewVideosActivity)
             }
         }
 
-    }
-
-    fun openVideo(path: String) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(path))
-        intent.setDataAndType(Uri.parse(path), "video/mp4")
-        startActivity(intent)
     }
 
     private fun getListFiles2(parentDir: File): List<File> {
@@ -99,8 +98,17 @@ class ViewVideosActivity : AppCompatActivity() {
         // Binds each animal in the ArrayList to a view
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.videoName.text = stuff[position].name
-            holder.videoThumbnail.setVideoPath(stuff[position].path)
-            holder.videoThumbnail.seekTo(100)
+
+            val mp = MediaPlayer.create(context, Uri.parse(stuff[position].path))
+            val duration = mp.duration.toLong()
+            mp.release()
+            /*convert millis to appropriate time*/
+            val runTimeString = String.format("%02d:%02d",
+                    TimeUnit.MILLISECONDS.toMinutes(duration),
+                    TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration)))
+            holder.videoRuntime.text = runTimeString
+            val thumbnail = ThumbnailUtils.createVideoThumbnail(stuff[position].path, MediaStore.Video.Thumbnails.MINI_KIND)
+            holder.videoThumbnail.setImageBitmap(thumbnail)
             holder.videoLayout.setOnClickListener {
                 if (context.defaultSharedPreferences.getBoolean("videoPlayer", false)) {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(stuff[position].path))
@@ -118,7 +126,8 @@ class ViewVideosActivity : AppCompatActivity() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         // Holds the TextView that will add each animal to
-        val videoThumbnail: VideoView = view.video_view!!
+        val videoThumbnail: ImageView = view.video_thumbnail!!
+        val videoRuntime: TextView = view.video_runtime!!
         val videoName: TextView = view.video_name!!
         val videoLayout: LinearLayout = view.videos_layout!!
 

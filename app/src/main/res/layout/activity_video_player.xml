@@ -5,8 +5,8 @@
     android:layout_height="match_parent"
     tools:context=".otherfun.VideoPlayerActivity">
 
-    <hb.xvideoplayer.MxVideoPlayerWidget
-        android:id="@+id/mpw_video_player"
+    <com.jarvanmo.exoplayerview.ui.ExoVideoView
+        android:id="@+id/videoView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
