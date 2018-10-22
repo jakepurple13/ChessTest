@@ -22,6 +22,7 @@ import android.widget.Toast
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.ViewUtil
+import com.crestron.aurora.views.DeleteDialog
 import kotlinx.android.synthetic.main.activity_view_videos.*
 import kotlinx.android.synthetic.main.video_layout.view.*
 import kotlinx.android.synthetic.main.video_with_text.view.*
@@ -56,15 +57,24 @@ class ViewVideosActivity : AppCompatActivity() {
         view_videos_recyclerview.addItemDecoration(dividerItemDecoration)
         view_videos_recyclerview.addItemDecoration(ItemOffsetDecoration(20))
 
-        launch {
+        fun getStuff() = launch {
             val list = getListFiles2(File(FetchingUtils.folderLocation))
             for (i in list) {
                 Loged.i(i.name)
             }
             runOnUiThread {
-                view_videos_recyclerview.adapter = VideoAdapter(list, this@ViewVideosActivity)
+                view_videos_recyclerview.adapter = VideoAdapter(list, this@ViewVideosActivity, object : DeleteDialog.DeleteDialogListener {
+                    override fun onDelete() {
+                        val list1 = getListFiles2(File(FetchingUtils.folderLocation))
+                        runOnUiThread {
+                            view_videos_recyclerview.adapter = VideoAdapter(list1, this@ViewVideosActivity, this)
+                        }
+                    }
+                })
             }
         }
+
+        getStuff()
 
     }
 
@@ -84,7 +94,7 @@ class ViewVideosActivity : AppCompatActivity() {
     }
 
     class VideoAdapter(private var stuff: List<File>,
-                       var context: Context) : RecyclerView.Adapter<ViewHolder>() {
+                       var context: Context, val dialogListener: DeleteDialog.DeleteDialogListener) : RecyclerView.Adapter<ViewHolder>() {
 
         // Gets the number of animals in the list
         override fun getItemCount(): Int {
@@ -128,6 +138,10 @@ class ViewVideosActivity : AppCompatActivity() {
                             putExtra("video_name", stuff[position].name)
                         })
                     }
+                }
+                holder.videoLayout.setOnLongClickListener {
+                    DeleteDialog(context, stuff[position].name, file = stuff[position], listener = dialogListener).show()
+                    true
                 }
             } catch (e: IllegalStateException) {
                 holder.videoRuntime.text = "???"

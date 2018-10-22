@@ -933,7 +933,13 @@ class ChoiceActivity : AppCompatActivity() {
                         .withSelectable(false)
                         .withIdentifier(7)
                         .withName("Number of favorites: ${showList.size} ")
-                result.addItemsAtPosition(2, favoriteCountItem)
+                try {
+                    runOnUiThread {
+                        result.addItemsAtPosition(2, favoriteCountItem)
+                    }
+                } catch (e: IllegalStateException) {
+
+                }
             }
         }
 

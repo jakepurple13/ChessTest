@@ -146,7 +146,7 @@ public final class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHold
                     .setNegativeButton(R.string.cancel, null)
                     .show();*/
 
-            new DeleteDialog(context, context.getString(R.string.delete_title, uri12.getLastPathSegment()), downloadData.download).show();
+            new DeleteDialog(context, context.getString(R.string.delete_title, uri12.getLastPathSegment()), downloadData.download, null, null).show();
 
             return true;
         });

@@ -185,7 +185,7 @@ class EpisodeActivity : AppCompatActivity() {
                 mNotificationManager.cancel(download.id)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     //UtilNotification.sendNotification(this@EpisodeActivity, android.R.mipmap.sym_def_app_icon, download.file.substring(download.file.lastIndexOf("/") + 1), "All Finished!", "showDownload", ChooseActivity::class.java, download.id)
-                    sendNotification(this@EpisodeActivity,
+                    /*sendNotification(this@EpisodeActivity,
                             android.R.mipmap.sym_def_app_icon,
                             download.file.substring(download.file.lastIndexOf("/") + 1),
                             "All Finished!",
@@ -193,7 +193,16 @@ class EpisodeActivity : AppCompatActivity() {
                             EpisodeActivity::class.java,
                             download.id,
                             KeyAndValue(ConstantValues.URL_INTENT, url),
-                            KeyAndValue(ConstantValues.NAME_INTENT, name))
+                            KeyAndValue(ConstantValues.NAME_INTENT, name))*/
+                    sendNotification(this@EpisodeActivity,
+                            android.R.mipmap.sym_def_app_icon,
+                            download.file.substring(download.file.lastIndexOf("/") + 1),
+                            "All Finished!",
+                            ConstantValues.CHANNEL_ID,
+                            StartVideoFromNotificationActivity::class.java,
+                            download.id,
+                            KeyAndValue("video_path", download.file),
+                            KeyAndValue("video_name", name))
                 }
             }
 

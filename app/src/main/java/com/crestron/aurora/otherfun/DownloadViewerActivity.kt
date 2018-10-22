@@ -148,13 +148,20 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             mNotificationManager.cancelAll()
             FetchingUtils.remove(download)
             //FetchingUtils.downloadCount+=1
-            sendNotification(this@DownloadViewerActivity, android.R.mipmap.sym_def_app_icon,
+            /*sendNotification(this@DownloadViewerActivity, android.R.mipmap.sym_def_app_icon,
                     download.file.substring(download.file.lastIndexOf("/") + 1),
                     "All Finished!",
                     ConstantValues.CHANNEL_ID,
                     EpisodeActivity::class.java, download.id,
                     EpisodeActivity.KeyAndValue(ConstantValues.URL_INTENT, "${download.extras.map[ConstantValues.URL_INTENT]}"),
-                    EpisodeActivity.KeyAndValue(ConstantValues.NAME_INTENT, "${download.extras.map[ConstantValues.NAME_INTENT]}"))
+                    EpisodeActivity.KeyAndValue(ConstantValues.NAME_INTENT, "${download.extras.map[ConstantValues.NAME_INTENT]}"))*/
+            sendNotification(this@DownloadViewerActivity, android.R.mipmap.sym_def_app_icon,
+                    download.file.substring(download.file.lastIndexOf("/") + 1),
+                    "All Finished!",
+                    ConstantValues.CHANNEL_ID,
+                    StartVideoFromNotificationActivity::class.java, download.id,
+                    EpisodeActivity.KeyAndValue("video_path", download.file),
+                    EpisodeActivity.KeyAndValue("video_name", download.file))
         }
 
         override fun onError(download: Download, error: Error, throwable: Throwable?) {

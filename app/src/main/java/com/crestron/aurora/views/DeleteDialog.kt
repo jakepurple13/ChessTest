@@ -13,8 +13,15 @@ import com.crestron.aurora.R
 import com.crestron.aurora.otherfun.FetchingUtils
 import com.tonyodev.fetch2.Download
 import kotlinx.android.synthetic.main.delete_dialog_layout.*
+import java.io.File
 
-class DeleteDialog(context: Context?, val title: String, val download: Download? = null) : Dialog(context!!) {
+class DeleteDialog(context: Context?, val title: String, val download: Download? = null, val file: File? = null, val listener: DeleteDialogListener? = null) : Dialog(context!!) {
+
+    interface DeleteDialogListener {
+        fun onDelete() {
+
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,13 +40,21 @@ class DeleteDialog(context: Context?, val title: String, val download: Download?
             all_download_info.text = info
         }
 
+        if (file != null) {
+            all_download_info.text = file.path
+        }
+
         slide_button.setOnSwipeCompleteListener_forward_reverse(object : OnSwipeCompleteListener {
             override fun onSwipe_Forward(p0: Swipe_Button_View?) {
                 Loged.w("Forward")
-                if (download != null)
+                if (download != null) {
                     FetchingUtils.delete(download)
+                    FetchingUtils.downloadCount--
+                }
+                if (file != null)
+                    file.delete()
                 this@DeleteDialog.dismiss()
-                FetchingUtils.downloadCount--
+                listener?.onDelete()
             }
 
             override fun onSwipe_Reverse(p0: Swipe_Button_View?) {

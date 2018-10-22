@@ -263,6 +263,7 @@
         <activity
             android:name=".otherfun.VideoPlayerActivity"
             android:screenOrientation="sensorLandscape" />
+        <activity android:name=".otherfun.StartVideoFromNotificationActivity"></activity>
     </application>
 
 </manifest>
