@@ -99,16 +99,27 @@ class ViewVideosActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.videoName.text = stuff[position].name
 
-            val mp = MediaPlayer.create(context, Uri.parse(stuff[position].path))
-            val duration = mp.duration.toLong()
-            mp.release()
-            /*convert millis to appropriate time*/
-            val runTimeString = String.format("%02d:%02d",
-                    TimeUnit.MILLISECONDS.toMinutes(duration),
-                    TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration)))
-            holder.videoRuntime.text = runTimeString
-            val thumbnail = ThumbnailUtils.createVideoThumbnail(stuff[position].path, MediaStore.Video.Thumbnails.MINI_KIND)
-            holder.videoThumbnail.setImageBitmap(thumbnail)
+            try {
+                val mp = MediaPlayer.create(context, Uri.parse(stuff[position].path))
+                val duration = mp.duration.toLong()
+                mp.release()
+                /*convert millis to appropriate time*/
+                val runTimeString = String.format("%02d:%02d",
+                        TimeUnit.MILLISECONDS.toMinutes(duration),
+                        TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration)))
+                /*val formatter = SimpleDateFormat("mm:ss")
+                formatter.timeZone = TimeZone.getTimeZone("UTC")
+                val dateFormatted = formatter.format(Date(duration))*/
+                holder.videoRuntime.text = runTimeString
+            } catch (e: IllegalStateException) {
+                holder.videoRuntime.text = "???"
+            }
+            try {
+                val thumbnail = ThumbnailUtils.createVideoThumbnail(stuff[position].path, MediaStore.Video.Thumbnails.MINI_KIND)
+                holder.videoThumbnail.setImageBitmap(thumbnail)
+            } catch (e: IllegalStateException) {
+                holder.videoThumbnail.setImageResource(android.R.drawable.stat_notify_error)
+            }
             holder.videoLayout.setOnClickListener {
                 if (context.defaultSharedPreferences.getBoolean("videoPlayer", false)) {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(stuff[position].path))

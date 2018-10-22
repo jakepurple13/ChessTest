@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:ignore="HardcodedText">
+
+    <Button
+        android:id="@+id/skip_backward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1:30" />
+
+    <Button
+        android:id="@+id/half_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="15s" />
+
+    <Button
+        android:id="@+id/half_for"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="15s" />
+
+    <Button
+        android:id="@+id/skip_forward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1:30" />
+</LinearLayout>
