@@ -670,12 +670,16 @@ class ChoiceActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val downloadCountItem = PrimaryDrawerItem()
-                .withIcon(GoogleMaterial.Icon.gmd_cloud_download)
-                .withSelectable(false)
-                .withIdentifier(8)
-                .withName("Downloads: ${FetchingUtils.downloadCount}")
-        result.updateItem(downloadCountItem)
+        try {
+            val downloadCountItem = PrimaryDrawerItem()
+                    .withIcon(GoogleMaterial.Icon.gmd_cloud_download)
+                    .withSelectable(false)
+                    .withIdentifier(8)
+                    .withName("Downloads: ${FetchingUtils.downloadCount}")
+            result.updateItem(downloadCountItem)
+        } catch (e: IndexOutOfBoundsException) {
+
+        }
     }
 
     private fun setUpDrawer(savedInstanceState: Bundle?) {

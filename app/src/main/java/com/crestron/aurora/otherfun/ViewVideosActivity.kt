@@ -21,6 +21,7 @@ import com.crestron.aurora.utilities.ViewUtil
 import kotlinx.android.synthetic.main.activity_view_videos.*
 import kotlinx.android.synthetic.main.video_layout.view.*
 import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.defaultSharedPreferences
 import java.io.File
 import java.util.*
 
@@ -101,9 +102,16 @@ class ViewVideosActivity : AppCompatActivity() {
             holder.videoThumbnail.setVideoPath(stuff[position].path)
             holder.videoThumbnail.seekTo(100)
             holder.videoLayout.setOnClickListener {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(stuff[position].path))
-                intent.setDataAndType(Uri.parse(stuff[position].path), "video/mp4")
-                context.startActivity(intent)
+                if (context.defaultSharedPreferences.getBoolean("videoPlayer", false)) {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(stuff[position].path))
+                    intent.setDataAndType(Uri.parse(stuff[position].path), "video/mp4")
+                    context.startActivity(intent)
+                } else {
+                    context.startActivity(Intent(context, VideoPlayerActivity::class.java).apply {
+                        putExtra("video_path", stuff[position].path)
+                        putExtra("video_name", stuff[position].name)
+                    })
+                }
             }
         }
     }

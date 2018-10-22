@@ -20,6 +20,13 @@
             android:summary="Check for updates and downloads only on Wifi"
             android:title="Wifi Only" />
 
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="videoPlayer"
+            android:summaryOff="Use app's built in video player"
+            android:summaryOn="Use your own video player"
+            android:title="Video Player" />
+
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="autoRetry"
