@@ -7,6 +7,12 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
 import com.crestron.aurora.R
+import com.google.android.exoplayer2.ExoPlaybackException
+import com.google.android.exoplayer2.PlaybackParameters
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.Timeline
+import com.google.android.exoplayer2.source.TrackGroupArray
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.jarvanmo.exoplayerview.media.SimpleMediaSource
 import com.jarvanmo.exoplayerview.ui.ExoVideoPlaybackControlView
 import kotlinx.android.synthetic.main.activity_video_player.*
@@ -66,22 +72,22 @@ class VideoPlayerActivity : AppCompatActivity() {
                     e.printStackTrace()
                 }
             }
-            text = "15s >>"
-        }
-        view.skip_backward.apply {
-            setOnClickListener {
-                try {
-                    videoView.player.seekTo(videoView.player.currentPosition - 90000)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-            text = "<< 15s"
+            text = "15s >"
         }
         view.half_back.apply {
             setOnClickListener {
                 try {
                     videoView.player.seekTo(videoView.player.currentPosition - 15000)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            text = "< 15s"
+        }
+        view.skip_backward.apply {
+            setOnClickListener {
+                try {
+                    videoView.player.seekTo(videoView.player.currentPosition - 90000)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -93,6 +99,51 @@ class VideoPlayerActivity : AppCompatActivity() {
             this@VideoPlayerActivity.onBackPressed()
             true
         }
+        videoView.player.addListener(object : Player.EventListener {
+            override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters?) {
+                //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onSeekProcessed() {
+                //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onTracksChanged(trackGroups: TrackGroupArray?, trackSelections: TrackSelectionArray?) {
+                //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onPlayerError(error: ExoPlaybackException?) {
+                //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onLoadingChanged(isLoading: Boolean) {
+                //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onPositionDiscontinuity(reason: Int) {
+                //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onRepeatModeChanged(repeatMode: Int) {
+                //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
+                //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onTimelineChanged(timeline: Timeline?, manifest: Any?, reason: Int) {
+                //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                //To change body of created functions use File | Settings | File Templates.
+                when (playbackState) {
+                    Player.STATE_ENDED -> this@VideoPlayerActivity.onBackPressed()
+                }
+            }
+
+        })
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

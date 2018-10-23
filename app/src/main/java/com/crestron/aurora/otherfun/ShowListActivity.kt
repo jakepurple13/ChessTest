@@ -58,6 +58,7 @@ class ShowListActivity : AppCompatActivity() {
                             longClickViews(v)
                         }
                     }
+                    .flingTypes(true, true)
                     //.longClickViews(views)
                     .build()
 
