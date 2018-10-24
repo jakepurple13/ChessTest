@@ -774,7 +774,6 @@ class ChoiceActivity : AppCompatActivity() {
                 .withOnDrawerItemClickListener { _, _, _ ->
                     result.closeDrawer()
                     val intented = Intent(this@ChoiceActivity, FormActivity::class.java)
-                    //startActivity(intented)
                     ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intented)
                     true
                 }
@@ -851,6 +850,7 @@ class ChoiceActivity : AppCompatActivity() {
                 val bColIds = filteredList.filter { it.url in aColIds }
 
                 for (i in bColIds) {
+                    Loged.i(i.name)
                     val showList = EpisodeApi(i).episodeList.size
                     if (showDatabase.showDao().getShow(i.name).showNum < showList) {
                         try {

@@ -112,6 +112,7 @@ class ShowCheckService : JobService() {
                 .setContentTitle(title)
                 .setStyle(messages)
                 .setChannelId(channel_id)
+                .setAutoCancel(true)
         // Creates an explicit intent for an Activity in your app
         val resultIntent = Intent(context, gotoActivity)
         resultIntent.putExtra(ConstantValues.RECENT_OR_NOT, true)

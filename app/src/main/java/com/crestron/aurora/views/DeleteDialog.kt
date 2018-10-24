@@ -18,7 +18,8 @@ import java.io.File
 class DeleteDialog(context: Context?, val title: String, val download: Download? = null, val file: File? = null, val listener: DeleteDialogListener? = null) : Dialog(context!!) {
 
     interface DeleteDialogListener {
-        fun onDelete() {
+        fun onDelete()
+        fun onCancel() {
 
         }
     }
@@ -36,7 +37,6 @@ class DeleteDialog(context: Context?, val title: String, val download: Download?
 
         if (download != null) {
             val info = "Current Progress: ${context.getString(R.string.percent_progress, download.progress)}"
-
             all_download_info.text = info
         }
 
@@ -51,8 +51,7 @@ class DeleteDialog(context: Context?, val title: String, val download: Download?
                     FetchingUtils.delete(download)
                     FetchingUtils.downloadCount--
                 }
-                if (file != null)
-                    file.delete()
+                file?.delete()
                 this@DeleteDialog.dismiss()
                 listener?.onDelete()
             }
@@ -67,6 +66,7 @@ class DeleteDialog(context: Context?, val title: String, val download: Download?
         }
 
         setOnDismissListener {
+            listener?.onCancel()
             if (download != null)
                 FetchingUtils.resume(download.id)
         }

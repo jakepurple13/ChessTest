@@ -10,6 +10,7 @@ import kotlinx.coroutines.experimental.async
 import org.jetbrains.anko.defaultSharedPreferences
 import java.net.URL
 
+
 class UpdateCheckService : JobService() {
 
     private companion object {

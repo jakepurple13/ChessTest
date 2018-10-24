@@ -634,6 +634,8 @@ class EpisodeActivity : AppCompatActivity() {
                 .setContentTitle(title)
                 .setContentText(message)
                 .setChannelId(channel_id)
+                .setGroup("downloaded_group")
+                .setAutoCancel(true)
         // Creates an explicit intent for an Activity in your app
 
         //val resultIntent = Intent(Intent.ACTION_VIEW)

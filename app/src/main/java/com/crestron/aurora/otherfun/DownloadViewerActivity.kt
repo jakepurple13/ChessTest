@@ -145,7 +145,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             fileAdapter!!.update(download, UNKNOWN_REMAINING_TIME, UNKNOWN_DOWNLOADED_BYTES_PER_SECOND)
             val mNotificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             mNotificationManager.cancel(download.id)
-            mNotificationManager.cancelAll()
+            //mNotificationManager.cancelAll()
             FetchingUtils.remove(download)
             //FetchingUtils.downloadCount+=1
             /*sendNotification(this@DownloadViewerActivity, android.R.mipmap.sym_def_app_icon,
@@ -364,9 +364,11 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                 .setSmallIcon(smallIconId)
                 .setContentTitle(title)
                 .setContentText(message)
+                .setGroup("downloaded_group")
                 .setChannelId(channel_id)
+                .setAutoCancel(true)
+        
         // Creates an explicit intent for an Activity in your app
-
         val resultIntent = Intent(context, gotoActivity)
         resultIntent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, false)
 
@@ -395,6 +397,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
         // notification. For example, to cancel the notification, you can pass its ID
         // number to NotificationManager.cancel().
         mNotificationManager.notify(notification_id, mBuilder.build())
+
     }
 
     override fun onPauseDownload(id: Int) {
