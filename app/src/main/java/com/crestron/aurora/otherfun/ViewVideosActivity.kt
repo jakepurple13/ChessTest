@@ -73,6 +73,7 @@ class ViewVideosActivity : AppCompatActivity() {
 
         fun getStuff() {
             listOfFiles = getListFiles2(File(FetchingUtils.folderLocation))
+            listOfFiles.sortBy { it.name }
             for (i in listOfFiles) {
                 Loged.i(i.name)
             }

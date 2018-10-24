@@ -49,15 +49,17 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
     }
 
     private var items: ArrayList<String>? = null
-    lateinit var links: ArrayList<String>
+    private lateinit var links: ArrayList<String>
     var context: Context
     var action: AniDownloadActivity.LinkAction
     lateinit var stuff: List<ShowInfo>
+    lateinit var show: ShowDatabase
 
-    constructor(stuff: List<ShowInfo>, context: Context, action: AniDownloadActivity.LinkAction = object : AniDownloadActivity.LinkAction {}) {
+    constructor(stuff: List<ShowInfo>, context: Context, showDatabase: ShowDatabase, action: AniDownloadActivity.LinkAction = object : AniDownloadActivity.LinkAction {}) {
         this.stuff = stuff
         this.context = context
         this.action = action
+        this.show = showDatabase
     }
 
     constructor(items: ArrayList<String>, links: ArrayList<String>, context: Context, action: AniDownloadActivity.LinkAction = object : AniDownloadActivity.LinkAction {}) {
@@ -106,46 +108,80 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
             Picasso.get().setIndicatorsEnabled(true)
             holder.imageView.visibility = View.GONE
 
-            val show = ShowDatabase.getDatabase(context)
-
             launch {
-                if (show.showDao().isUrlInDatabase(stuff[position].url) > 0) {
-                    holder.favorite.isLiked = true
-                }
-            }
 
-            holder.favorite.setOnLikeListener(object : OnLikeListener {
-                override fun liked(p0: LikeButton?) {
-                    liked(p0!!.isLiked)
-                }
+                holder.favorite.apply {
+                    isLiked = show.showDao().isUrlInDatabase(stuff[position].url) > 0
 
-                override fun unLiked(p0: LikeButton?) {
-                    liked(p0!!.isLiked)
-                }
+                    setOnLikeListener(object : OnLikeListener {
+                        override fun liked(p0: LikeButton?) {
+                            liked(p0!!.isLiked)
+                        }
 
-                fun liked(like: Boolean) {
-                    launch {
-                        if (like) {
+                        override fun unLiked(p0: LikeButton?) {
+                            liked(p0!!.isLiked)
+                        }
 
-                            show.showDao().insert(Show(stuff[position].url, stuff[position].name))
-
+                        fun liked(like: Boolean) {
                             launch {
-                                val s = show.showDao().getShow(stuff[position].name)
-                                val showList = getEpisodeList(stuff[position]).await()
-                                if (s.showNum < showList) {
-                                    s.showNum = showList
-                                    show.showDao().updateShow(s)
-                                }
-                                Loged.wtf("${s.name} and size is $showList")
-                            }
+                                if (like) {
 
-                        } else {
-                            show.showDao().deleteShow(stuff[position].name)
+                                    show.showDao().insert(Show(stuff[position].url, stuff[position].name))
+
+                                    launch {
+                                        val s = show.showDao().getShow(stuff[position].name)
+                                        val showList = getEpisodeList(stuff[position]).await()
+                                        if (s.showNum < showList) {
+                                            s.showNum = showList
+                                            show.showDao().updateShow(s)
+                                        }
+                                        Loged.wtf("${s.name} and size is $showList")
+                                    }
+
+                                } else {
+                                    show.showDao().deleteShow(stuff[position].name)
+                                }
+                            }
+                        }
+
+                    })
+                }
+
+                //holder.favorite.isLiked = show.showDao().isUrlInDatabase(stuff[position].url) > 0
+
+                /*holder.favorite.setOnLikeListener(object : OnLikeListener {
+                    override fun liked(p0: LikeButton?) {
+                        liked(p0!!.isLiked)
+                    }
+
+                    override fun unLiked(p0: LikeButton?) {
+                        liked(p0!!.isLiked)
+                    }
+
+                    fun liked(like: Boolean) {
+                        launch {
+                            if (like) {
+
+                                show.showDao().insert(Show(stuff[position].url, stuff[position].name))
+
+                                launch {
+                                    val s = show.showDao().getShow(stuff[position].name)
+                                    val showList = getEpisodeList(stuff[position]).await()
+                                    if (s.showNum < showList) {
+                                        s.showNum = showList
+                                        show.showDao().updateShow(s)
+                                    }
+                                    Loged.wtf("${s.name} and size is $showList")
+                                }
+
+                            } else {
+                                show.showDao().deleteShow(stuff[position].name)
+                            }
                         }
                     }
-                }
 
-            })
+                })*/
+            }
 
         }
     }

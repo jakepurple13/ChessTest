@@ -41,6 +41,7 @@ class FormActivity : AppCompatActivity() {
                 required = true
                 //rightToLeft = false
                 error = "Please enter feedback"
+                value = if (intent.hasExtra("error_feedback")) intent.getStringExtra("error_feedback") else ""
                 //titleTextColor = getColor(R.color.chevronBgColor)
                 //valueTextColor = Color.WHITE
                 //backgroundColor = getColor(R.color.background_material_dark)

@@ -17,6 +17,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import com.crestron.aurora.ConstantValues
+import com.crestron.aurora.FormActivity
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.ShowDatabase
@@ -149,7 +150,7 @@ class ShowListActivity : AppCompatActivity() {
                     listOfNameAndLink.sortBy { it.name }
 
                 runOnUiThread {
-                    show_info.adapter = AListAdapter(listOfNameAndLink, this@ShowListActivity, actionHit)
+                    show_info.adapter = AListAdapter(listOfNameAndLink, this@ShowListActivity, showDatabase, actionHit)
                     favorite_show.isEnabled = true//!recentChoice
                     search_info.isEnabled = true
                 }
@@ -158,18 +159,7 @@ class ShowListActivity : AppCompatActivity() {
                 refresh_list.isRefreshing = false
 
             } catch (e: SocketTimeoutException) {
-                val builder = AlertDialog.Builder(this)
-                builder.setTitle("An error has occurred")
-                builder.setMessage("Please send feedback and explain what you were doing when you found this error. I am sorry for your inconvenience.")
-                // Add the buttons
-                builder.setPositiveButton("OK") { _, _ ->
-                    finish()
-                }
-                builder.setCancelable(false)
-                val dialog = builder.create()
-                runOnUiThread {
-                    dialog.show()
-                }
+                errorHasOccurred(e.message!!)
             }
         }
 
@@ -202,10 +192,8 @@ class ShowListActivity : AppCompatActivity() {
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 runOnUiThread {
-
                     val filtered = listOfNameAndLink.filter { it.name.contains(search_info.text.toString(), ignoreCase = true) }
-                    show_info.adapter = AListAdapter(filtered, this@ShowListActivity, actionHit)
-
+                    show_info.adapter = AListAdapter(filtered, this@ShowListActivity, showDatabase, actionHit)
                 }
             }
 
@@ -244,11 +232,29 @@ class ShowListActivity : AppCompatActivity() {
                     listOfNameAndLink
                 }.distinctBy { it.name }
                 runOnUiThread {
-                    show_info.adapter = AListAdapter(listToShow, this@ShowListActivity, actionHit)
+                    show_info.adapter = AListAdapter(listToShow, this@ShowListActivity, showDatabase, actionHit)
                 }
             }
         }
 
+    }
+
+    fun errorHasOccurred(message: String) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("An error has occurred")
+        builder.setMessage("Please send feedback and explain what you were doing when you found this error. I am sorry for your inconvenience.")
+        // Add the buttons
+        builder.setPositiveButton("OK") { _, _ ->
+            startActivity(Intent(this@ShowListActivity, FormActivity::class.java).apply {
+                putExtra("error_feedback", message)
+            })
+            finish()
+        }
+        builder.setCancelable(false)
+        val dialog = builder.create()
+        runOnUiThread {
+            dialog.show()
+        }
     }
 
     class NameAndLink(val name: String, val url: String)
