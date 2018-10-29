@@ -1072,12 +1072,13 @@ class ChoiceActivity : AppCompatActivity() {
         }
     }
 
-    class BroadcastReceiverUpdate() : BroadcastReceiver() {
+    class BroadcastReceiverUpdate : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
+            Loged.i("Starting up")
             //start activity
             val i = Intent()
-            i.setClassName(context.packageName, context.packageName + "ChoiceActivity")
+            i.setClassName(context.packageName, context.packageName + ".ChoiceActivity")
             i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(i)
             StringBuilder().apply {

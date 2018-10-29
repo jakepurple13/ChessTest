@@ -43,13 +43,16 @@ class VideoPlayerActivity : AppCompatActivity() {
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         currentVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
 
-        mpw_video_player.autoStartPlay(path, MxVideoPlayer.FULLSCREEN_ORIENTATION, name)
-        mpw_video_player.startWindowFullscreen()
-        //mpw_video_player.mFullscreenButton.isEnabled = false
+        mpw_video_player.hideFullScreenButton = true
+        mpw_video_player.autoStartPlay(path, MxVideoPlayer.SCREEN_WINDOW_FULLSCREEN, name)
 
         mpw_video_player.playerListener = object : MxPlayerListener {
             override fun onComplete() {
-                this@VideoPlayerActivity.onBackPressed()
+                try {
+                    this@VideoPlayerActivity.onBackPressed()
+                } catch (e: NullPointerException) {
+
+                }
             }
         }
     }
@@ -57,6 +60,7 @@ class VideoPlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audio.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0)
+        MxVideoPlayer.releaseAllVideos()
         super.onDestroy()
     }
 
@@ -69,24 +73,9 @@ class VideoPlayerActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        //MxVideoPlayer.releaseAllVideos()
-        //videoView.releasePlayer()
-        //player.release()
-        MxVideoPlayer.releaseAllVideos()
     }
 
-/*override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-    return if (keyCode == KeyEvent.KEYCODE_BACK) {
-        videoView.onKeyDown(keyCode, event)
-    } else super.onKeyDown(keyCode, event)
-}*/
-
     override fun onBackPressed() {
-        /*if (MxVideoPlayer.backPress()) {
-            return
-        }*/
-        //videoView.releasePlayer()
-        //player.release()
         if (MxVideoPlayer.backPress()) {
             return
         }

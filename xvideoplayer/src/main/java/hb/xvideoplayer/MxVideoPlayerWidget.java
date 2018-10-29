@@ -49,6 +49,7 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
     private boolean mIsAutoPlay = false;
     private boolean mIsAutoProcessUI = false;
     private UIStatusChangeListener mUIListener;
+    public boolean hideFullScreenButton = false;
 
     protected DismissControlViewTimerTask mDismissControlViewTimerTask;
 
@@ -122,6 +123,8 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
             mTitleTextView.setText(objects[0].toString());
             if (mCurrentScreen == SCREEN_WINDOW_FULLSCREEN) {
                 mFullscreenButton.setImageResource(R.drawable.mx_shrink);
+                if (hideFullScreenButton)
+                    mFullscreenButton.setVisibility(View.GONE);
                 mBackButton.setVisibility(View.VISIBLE);
                 mTinyBackImageView.setVisibility(View.INVISIBLE);
             } else if (mCurrentScreen == SCREEN_LAYOUT_LIST ||
