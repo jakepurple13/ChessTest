@@ -147,6 +147,8 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             mNotificationManager.cancel(download.id)
             //mNotificationManager.cancelAll()
             FetchingUtils.remove(download)
+            ChoiceActivity.downloadCast(this@DownloadViewerActivity, ChoiceActivity.BroadCastInfo.KVObject("view_download_item_count", "1"))
+            ViewVideosActivity.videoCast(this@DownloadViewerActivity)
             //FetchingUtils.downloadCount+=1
             /*sendNotification(this@DownloadViewerActivity, android.R.mipmap.sym_def_app_icon,
                     download.file.substring(download.file.lastIndexOf("/") + 1),

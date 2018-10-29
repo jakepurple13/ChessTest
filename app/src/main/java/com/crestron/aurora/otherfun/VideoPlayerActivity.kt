@@ -1,22 +1,16 @@
 package com.crestron.aurora.otherfun
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.media.AudioManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
 import com.crestron.aurora.R
-import com.google.android.exoplayer2.ExoPlaybackException
-import com.google.android.exoplayer2.PlaybackParameters
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Timeline
-import com.google.android.exoplayer2.source.TrackGroupArray
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray
-import com.jarvanmo.exoplayerview.media.SimpleMediaSource
-import com.jarvanmo.exoplayerview.ui.ExoVideoPlaybackControlView
+import hb.xvideoplayer.MxPlayerListener
+import hb.xvideoplayer.MxVideoPlayer
 import kotlinx.android.synthetic.main.activity_video_player.*
-import kotlinx.android.synthetic.main.custom_player_view.view.*
 
 
 class VideoPlayerActivity : AppCompatActivity() {
@@ -27,6 +21,8 @@ class VideoPlayerActivity : AppCompatActivity() {
             or View.SYSTEM_UI_FLAG_FULLSCREEN
             or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
             or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+
+    var currentVolume: Int = 0
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,107 +39,25 @@ class VideoPlayerActivity : AppCompatActivity() {
         }
         val name = intent.getStringExtra("video_name")
         val path = intent.getStringExtra("video_path")
-        val mediaSource = SimpleMediaSource(path)//uri also supported
-        mediaSource.setDisplayName(name)
-        videoView.play(mediaSource, true)
-        videoView.isPortrait = false
-        videoView.setFastForwardIncrementMs(1000)
-        videoView.setRewindIncrementMs(1000)
-        videoView.controllerAutoShow = true
-        videoView.controllerHideOnTouch = true
-        videoView.controllerShowTimeoutMs = 2500
-        videoView.setShowMultiWindowTimeBar(true)
-        val view = layoutInflater.inflate(R.layout.custom_player_view, null, false)
-        view.skip_forward.apply {
-            setOnClickListener {
-                try {
-                    videoView.player.seekTo(videoView.player.currentPosition + 90000)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+
+        val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        currentVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
+
+        mpw_video_player.autoStartPlay(path, MxVideoPlayer.FULLSCREEN_ORIENTATION, name)
+        mpw_video_player.startWindowFullscreen()
+        //mpw_video_player.mFullscreenButton.isEnabled = false
+
+        mpw_video_player.playerListener = object : MxPlayerListener {
+            override fun onComplete() {
+                this@VideoPlayerActivity.onBackPressed()
             }
-            text = "1:30 >>"
         }
-        view.half_for.apply {
-            setOnClickListener {
-                try {
-                    videoView.player.seekTo(videoView.player.currentPosition + 15000)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-            text = "15s >"
-        }
-        view.half_back.apply {
-            setOnClickListener {
-                try {
-                    videoView.player.seekTo(videoView.player.currentPosition - 15000)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-            text = "< 15s"
-        }
-        view.skip_backward.apply {
-            setOnClickListener {
-                try {
-                    videoView.player.seekTo(videoView.player.currentPosition - 90000)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-            text = "<< 1:30"
-        }
-        videoView.addCustomView(ExoVideoPlaybackControlView.CUSTOM_VIEW_TOP_LANDSCAPE, view)
-        videoView.setBackListener { _, _ ->
-            this@VideoPlayerActivity.onBackPressed()
-            true
-        }
-        videoView.player.addListener(object : Player.EventListener {
-            override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters?) {
-                //To change body of created functions use File | Settings | File Templates.
-            }
+    }
 
-            override fun onSeekProcessed() {
-                //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onTracksChanged(trackGroups: TrackGroupArray?, trackSelections: TrackSelectionArray?) {
-                //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onPlayerError(error: ExoPlaybackException?) {
-                //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onLoadingChanged(isLoading: Boolean) {
-                //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onPositionDiscontinuity(reason: Int) {
-                //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onRepeatModeChanged(repeatMode: Int) {
-                //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
-                //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onTimelineChanged(timeline: Timeline?, manifest: Any?, reason: Int) {
-                //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                //To change body of created functions use File | Settings | File Templates.
-                when (playbackState) {
-                    Player.STATE_ENDED -> this@VideoPlayerActivity.onBackPressed()
-                }
-            }
-
-        })
+    override fun onDestroy() {
+        val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audio.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0)
+        super.onDestroy()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -156,21 +70,28 @@ class VideoPlayerActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         //MxVideoPlayer.releaseAllVideos()
-        videoView.releasePlayer()
+        //videoView.releasePlayer()
+        //player.release()
+        MxVideoPlayer.releaseAllVideos()
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        return if (keyCode == KeyEvent.KEYCODE_BACK) {
-            videoView.onKeyDown(keyCode, event)
-        } else super.onKeyDown(keyCode, event)
-    }
+/*override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+    return if (keyCode == KeyEvent.KEYCODE_BACK) {
+        videoView.onKeyDown(keyCode, event)
+    } else super.onKeyDown(keyCode, event)
+}*/
 
     override fun onBackPressed() {
         /*if (MxVideoPlayer.backPress()) {
             return
         }*/
-        videoView.releasePlayer()
+        //videoView.releasePlayer()
+        //player.release()
+        if (MxVideoPlayer.backPress()) {
+            return
+        }
         super.onBackPressed()
     }
+
 
 }

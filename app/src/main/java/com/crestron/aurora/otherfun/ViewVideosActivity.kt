@@ -1,7 +1,9 @@
 package com.crestron.aurora.otherfun
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Rect
 import android.media.MediaPlayer
 import android.media.ThumbnailUtils
@@ -22,6 +24,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.abdeveloper.library.MultiSelectDialog
 import com.abdeveloper.library.MultiSelectModel
+import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.ViewUtil
@@ -95,9 +98,18 @@ class ViewVideosActivity : AppCompatActivity() {
                     , true)
             val helper = ItemTouchHelper(callback)
             helper.attachToRecyclerView(view_videos_recyclerview)
+            runOnUiThread {
+                video_refresh.isRefreshing = false
+            }
         }
 
         getStuff()
+
+        video_refresh.setOnRefreshListener {
+            listOfFiles.clear()
+            video_refresh.isRefreshing = true
+            getStuff()
+        }
 
         delete_multiple.setOnClickListener { _ ->
             val multiSelectDialog = MultiSelectDialog()
@@ -141,6 +153,15 @@ class ViewVideosActivity : AppCompatActivity() {
             }
         }
 
+        val br = BroadcastReceiverVideoView(object : VideoBroadcast {
+            override fun onCall(intent: Intent) {
+                adapter.notifyDataSetChanged()
+            }
+        })
+        val filter = IntentFilter().apply {
+            addAction(ConstantValues.BROADCAST_VIDEO)
+        }
+        registerReceiver(br, filter)
     }
 
     private fun getListFiles2(parentDir: File): ArrayList<File> {
@@ -156,6 +177,45 @@ class ViewVideosActivity : AppCompatActivity() {
             }
         }
         return inFiles
+    }
+
+    override fun onDestroy() {
+        try {
+            unregisterReceiver(BroadcastReceiverVideoView())
+        } catch (e: IllegalArgumentException) {
+
+        }
+        super.onDestroy()
+    }
+
+    companion object BroadCastInfo {
+
+        interface VideoBroadcast {
+            fun onCall(intent: Intent)
+        }
+
+        fun videoCast(context: Context) {
+            Intent().also { intent ->
+                intent.action = ConstantValues.BROADCAST_VIDEO
+                intent.putExtra("data", "Notice me senpai!")
+                context.sendBroadcast(intent)
+            }
+        }
+    }
+
+    class BroadcastReceiverVideoView(private val listener: VideoBroadcast? = null) : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+            listener?.onCall(intent)
+            StringBuilder().apply {
+                append("Action: ${intent.action}\n")
+                append("URI: ${intent.toUri(Intent.URI_INTENT_SCHEME)}\n")
+                toString().also { log ->
+                    Loged.d(log)
+                    //Toast.makeText(context, log, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     class VideoRequestHandler : RequestHandler() {
@@ -243,6 +303,7 @@ class ViewVideosActivity : AppCompatActivity() {
                             putExtra("video_path", stuff[position].path)
                             putExtra("video_name", stuff[position].name)
                         })
+                        //MxVideoPlayerWidget.startFullscreen(context, MxVideoPlayerWidget::class.java, stuff[position].path, stuff[position].name)
                     }
                 }
                 holder.videoLayout.setOnLongClickListener {

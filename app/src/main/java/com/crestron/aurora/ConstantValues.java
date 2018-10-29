@@ -27,4 +27,6 @@ public interface ConstantValues {
     String DOWNLOAD_NOTIFICATION = "notiOrNot";
     String SLIDE_OR_BUTTON = "slider_or_button";
     String DOWNLOAD_COUNT = "download_count";
+    String BROADCAST_DOWNLOAD = "cast.Download";
+    String BROADCAST_VIDEO = "cast.Video";
 }

@@ -263,7 +263,27 @@
         <activity
             android:name=".otherfun.VideoPlayerActivity"
             android:screenOrientation="sensorLandscape" />
-        <activity android:name=".otherfun.StartVideoFromNotificationActivity"></activity>
+        <activity android:name=".otherfun.StartVideoFromNotificationActivity" />
+
+        <receiver android:name=".ChoiceActivity$BroadcastReceiverDownload">
+            <intent-filter>
+                <!--<action android:name="android.intent.action.PACKAGE_REPLACED"/>-->
+                <action android:name="cast.Download" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".otherfun.ViewVideosActivity$BroadcastReceiverVideoView">
+            <intent-filter>
+                <action android:name="cast.Video" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".ChoiceActivity$BroadcastReceiverUpdate">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -116,6 +116,7 @@ class ShowCheckService : JobService() {
         // Creates an explicit intent for an Activity in your app
         val resultIntent = Intent(context, gotoActivity)
         resultIntent.putExtra(ConstantValues.RECENT_OR_NOT, true)
+        resultIntent.putExtra(ConstantValues.SHOW_LINK, Source.RECENT_ANIME.link)
 
         // The stack builder object will contain an artificial back stack for the
         // started Activity.

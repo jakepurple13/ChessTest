@@ -6,14 +6,22 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
+import android.graphics.drawable.Icon;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 
 import com.crashlytics.android.Crashlytics;
+import com.crestron.aurora.cardgames.solitaire.SolitaireActivity;
 import com.crestron.aurora.otherfun.FetchingUtils;
 import com.crestron.aurora.otherfun.ShowCheckService;
+import com.crestron.aurora.otherfun.ShowListActivity;
 import com.crestron.aurora.otherfun.UpdateCheckService;
+import com.crestron.aurora.showapi.Source;
 import com.evernote.android.job.JobManager;
 import com.facebook.stetho.Stetho;
 import com.google.firebase.FirebaseApp;
@@ -22,6 +30,9 @@ import com.tonyodev.fetch2.FetchConfiguration;
 import com.tonyodev.fetch2.HttpUrlConnectionDownloader;
 import com.tonyodev.fetch2.NetworkType;
 import com.tonyodev.fetch2core.Downloader;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
 import programmer.box.utilityhelper.UtilNotification;
@@ -81,6 +92,63 @@ public class FunApplication extends Application {
         Loged.INSTANCE.wtf(FetchingUtils.Fetched.getETAString((long) (1000 * 60 * 60 * 0.0169), false), "TAG", true);
 
         //startUpdate(this);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1) {
+
+            List<ShortcutInfo> scl = new ArrayList<>();
+            ShortcutManager shortcutManager = getSystemService(ShortcutManager.class);
+
+            if (shortcutManager.getDynamicShortcuts().size() == 0) {
+                // Application restored. Need to re-publish dynamic shortcuts.
+                if (shortcutManager.getPinnedShortcuts().size() > 0) {
+                    // Pinned shortcuts have been restored. Use
+                    // updateShortcuts() to make sure they contain
+                    // up-to-date information.
+                    shortcutManager.removeAllDynamicShortcuts();
+                }
+            }
+
+            Intent intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, ShowListActivity.class);
+            intent.putExtra(ConstantValues.RECENT_OR_NOT, true);
+            intent.putExtra(ConstantValues.SHOW_LINK, Source.RECENT_ANIME.getLink());
+
+            ShortcutInfo recentAnime = new ShortcutInfo.Builder(context, "id1")
+                    .setShortLabel("Recent Anime")
+                    .setLongLabel("Recent Anime")
+                    .setIcon(Icon.createWithResource(context, R.drawable.apk))
+                    .setIntent(intent)
+                    .build();
+
+            scl.add(recentAnime);
+
+            intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, ShowListActivity.class);
+            intent.putExtra(ConstantValues.RECENT_OR_NOT, true);
+            intent.putExtra(ConstantValues.SHOW_LINK, Source.RECENT_CARTOON.getLink());
+
+            ShortcutInfo recentCartoon = new ShortcutInfo.Builder(context, "id2")
+                    .setShortLabel("Recent Cartoon")
+                    .setLongLabel("Recent Cartoon")
+                    .setIcon(Icon.createWithResource(context, R.drawable.apk))
+                    .setIntent(intent)
+                    .build();
+
+            scl.add(recentCartoon);
+
+            intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, SolitaireActivity.class);
+            intent.putExtra(ConstantValues.DRAW_AMOUNT, getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE).getInt(ConstantValues.DRAW_AMOUNT, 1));
+
+            ShortcutInfo solitaireSC = new ShortcutInfo.Builder(context, "id3")
+                    .setShortLabel("Solitaire")
+                    .setLongLabel("Solitaire")
+                    .setIcon(Icon.createWithResource(context, R.drawable.solitairelogo))
+                    .setIntent(intent)
+                    .build();
+
+            scl.add(solitaireSC);
+
+            shortcutManager.setDynamicShortcuts(scl);
+        }
+
     }
 
     /*public static void setUpdateAlarm(Context context) {

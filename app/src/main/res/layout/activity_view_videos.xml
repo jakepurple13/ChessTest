@@ -5,11 +5,19 @@
     android:layout_height="match_parent"
     tools:context=".otherfun.ViewVideosActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/view_videos_recyclerview"
-        android:layout_above="@id/delete_multiple"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/video_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_above="@id/delete_multiple">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/view_videos_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/delete_multiple" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <Button
         android:id="@+id/delete_multiple"

@@ -182,6 +182,7 @@ class EpisodeActivity : AppCompatActivity() {
                 super.onCompleted(download)
                 Toast.makeText(this@EpisodeActivity, "Finished Downloading", Toast.LENGTH_LONG).show()
                 progressBar2.progress = 0
+                ChoiceActivity.downloadCast(this@EpisodeActivity, ChoiceActivity.BroadCastInfo.KVObject("view_download_item_count", "1"))
                 mNotificationManager.cancel(download.id)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     //UtilNotification.sendNotification(this@EpisodeActivity, android.R.mipmap.sym_def_app_icon, download.file.substring(download.file.lastIndexOf("/") + 1), "All Finished!", "showDownload", ChooseActivity::class.java, download.id)
@@ -287,6 +288,7 @@ class EpisodeActivity : AppCompatActivity() {
         episode_refresh.setOnRefreshListener {
             listOfUrls.clear()
             listOfNames.clear()
+            listOfEpisodes.clear()
             // Your code to refresh the list here.
             // Make sure you call swipeContainer.setRefreshing(false)
             // once the network request has completed successfully.

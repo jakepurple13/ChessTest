@@ -3,8 +3,10 @@ package com.crestron.aurora
 import android.Manifest
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
@@ -60,7 +62,6 @@ import kotlinx.android.synthetic.main.activity_choice.*
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.defaultSharedPreferences
-import org.jsoup.Jsoup
 import java.io.File
 import java.net.SocketTimeoutException
 import java.net.URL
@@ -507,8 +508,8 @@ class ChoiceActivity : AppCompatActivity() {
                     val s = randomShowsToDisplay[i]
                     Loged.e(s.name)
                     val link = async {
-                        val doc1 = Jsoup.connect(s.link).get()
-                        doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
+                        val epApi = EpisodeApi(ShowInfo(s.name, s.link))
+                        epApi.image
                     }
                     val s1 = link.await()
                     models.add(BookModel.urlBookModel(s1, s.link, s.name))
@@ -546,6 +547,15 @@ class ChoiceActivity : AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onDestroy() {
+        try {
+            unregisterReceiver(BroadcastReceiverDownload())
+        } catch (e: IllegalArgumentException) {
+
+        }
+        super.onDestroy()
     }
 
     fun sendProgressNotification(title: String, text: String, progress: Int, context: Context, gotoActivity: Class<*>, notification_id: Int) {
@@ -738,6 +748,21 @@ class ChoiceActivity : AppCompatActivity() {
                 .withIdentifier(0)
                 .withName("View Downloads")
                 .withOnDrawerItemClickListener { _, _, _ ->
+                    val viewDownloadsItem = PrimaryDrawerItem()
+                            .withIcon(GoogleMaterial.Icon.gmd_file_download)
+                            .withSelectable(false)
+                            .withIdentifier(0)
+                            .withName("View Downloads")
+                            .withOnDrawerItemClickListener { _, _, _ ->
+                                result.closeDrawer()
+                                val intent = Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
+                                intent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
+                                ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intent)
+                                true
+                            }
+                    runOnUiThread {
+                        result.updateItem(viewDownloadsItem)
+                    }
                     result.closeDrawer()
                     val intent = Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
                     intent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
@@ -973,8 +998,97 @@ class ChoiceActivity : AppCompatActivity() {
             runOnUiThread {
                 result.updateItem(versionItem)
             }
+
+            val br: BroadcastReceiver = BroadcastReceiverDownload(object : DownloadBroadcast {
+                override fun onCall(intent: Intent) {
+                    val viewDownloadsItemUpdate = PrimaryDrawerItem()
+                            .withIcon(GoogleMaterial.Icon.gmd_file_download)
+                            .withSelectable(false)
+                            .withIdentifier(0)
+                            .withName("View Downloads")
+                            .withOnDrawerItemClickListener { _, _, _ ->
+                                result.closeDrawer()
+                                val intent1 = Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
+                                intent1.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
+                                ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intent1)
+                                true
+                            }
+
+                    try {
+                        val downloaded = intent.getStringExtra("view_download_item_count").toInt()
+                        if (downloaded > 0) {
+                            viewDownloadsItemUpdate.withBadge("$downloaded")
+                                    .withBadgeStyle(BadgeStyle(Color.RED, Color.RED))
+                        }
+                    } catch (e: Exception) {
+
+                    }
+                    runOnUiThread {
+                        result.updateItem(viewDownloadsItemUpdate)
+                    }
+                }
+            })
+            val filter = IntentFilter().apply {
+                addAction(ConstantValues.BROADCAST_DOWNLOAD)
+            }
+            registerReceiver(br, filter)
+
         }
 
+    }
+
+    companion object BroadCastInfo {
+
+        interface DownloadBroadcast {
+            fun onCall(intent: Intent)
+        }
+
+        open class KVObject(val key: String, val value: String)
+
+        fun downloadCast(context: Context, vararg keyAndValue: KVObject) {
+            Intent().also { intent ->
+                intent.action = ConstantValues.BROADCAST_DOWNLOAD
+                for (kv in keyAndValue) {
+                    intent.putExtra(kv.key, kv.value)
+                }
+                intent.putExtra("data", "Notice me senpai!")
+                context.sendBroadcast(intent)
+            }
+        }
+    }
+
+    class BroadcastReceiverDownload(private val listener: DownloadBroadcast? = null) : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+            listener?.onCall(intent)
+            StringBuilder().apply {
+                append("Action: ${intent.action}\n")
+                append("URI: ${intent.toUri(Intent.URI_INTENT_SCHEME)}\n")
+                toString().also { log ->
+                    Loged.d(log)
+                    //Toast.makeText(context, log, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    class BroadcastReceiverUpdate() : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+            //start activity
+            val i = Intent()
+            i.setClassName(context.packageName, context.packageName + "ChoiceActivity")
+            i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(i)
+            StringBuilder().apply {
+                append("Action: ${intent.action}\n")
+                append("URI: ${intent.toUri(Intent.URI_INTENT_SCHEME)}\n")
+                toString().also { log ->
+                    Loged.d(log)
+                    //Toast.makeText(context, log, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     fun permissionCheck(clazz: Class<out Any>, rec: Boolean = false, url: String? = null, shouldFinish: Boolean = false, view: View? = null) {

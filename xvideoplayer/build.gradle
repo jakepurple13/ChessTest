@@ -1,0 +1,58 @@
+apply plugin: 'com.android.library'
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'MxVideoPlayer'
+
+    publishedGroupId = 'com.henryblue.mxvideoplayer'
+    libraryName = 'xvideoplayer'
+    artifact = 'xvideoplayer'
+
+    libraryDescription = 'widget for support to play video'
+
+    siteUrl = 'https://github.com/henry-blue/MxVideoPlayer'
+    gitUrl = 'https://github.com/henry-blue/MxVideoPlayer.git'
+
+    libraryVersion = '1.2.0'
+
+    developerId = 'henry'
+    developerName = 'henry-blue'
+    developerEmail = '18363002785@163.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+android {
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
+
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.2.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    //compile 'tv.danmaku.ijk.media:ijkplayer-java:0.7.7.1'
+    //compile 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.7.7.1'
+    implementation 'com.henryblue.ijkplayerlibrary:ijkplayer-java:1.0.1'
+}
+
+//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
