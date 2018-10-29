@@ -2,6 +2,7 @@ package com.crestron.aurora;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
+import android.app.WallpaperManager;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
@@ -10,10 +11,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.support.v7.graphics.Palette;
 
 import com.crashlytics.android.Crashlytics;
 import com.crestron.aurora.cardgames.solitaire.SolitaireActivity;
@@ -21,10 +27,13 @@ import com.crestron.aurora.otherfun.FetchingUtils;
 import com.crestron.aurora.otherfun.ShowCheckService;
 import com.crestron.aurora.otherfun.ShowListActivity;
 import com.crestron.aurora.otherfun.UpdateCheckService;
+import com.crestron.aurora.otherfun.ViewVideosActivity;
 import com.crestron.aurora.showapi.Source;
 import com.evernote.android.job.JobManager;
 import com.facebook.stetho.Stetho;
 import com.google.firebase.FirebaseApp;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 import com.tonyodev.fetch2.Fetch;
 import com.tonyodev.fetch2.FetchConfiguration;
 import com.tonyodev.fetch2.HttpUrlConnectionDownloader;
@@ -146,9 +155,45 @@ public class FunApplication extends Application {
 
             scl.add(solitaireSC);
 
+            intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, ViewVideosActivity.class);
+
+            final WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
+            final Drawable wallpaperDrawable = wallpaperManager.getDrawable();
+            Bitmap bitmap = ((BitmapDrawable) wallpaperDrawable).getBitmap();
+            int p = Palette.from(bitmap).generate().getDominantColor(Color.BLACK);
+
+            Icon icon = Icon.createWithBitmap(new IconicsDrawable(this)
+                    .icon(GoogleMaterial.Icon.gmd_video_library)
+                    .color(getComplimentColor(p))
+                    .toBitmap());
+
+            ShortcutInfo videoView = new ShortcutInfo.Builder(context, "id4")
+                    .setShortLabel("View Videos")
+                    .setLongLabel("View Videos")
+                    .setIcon(icon)
+                    .setIntent(intent)
+                    .build();
+
+            scl.add(videoView);
+
             shortcutManager.setDynamicShortcuts(scl);
         }
 
+    }
+
+    public static int getComplimentColor(int color) {
+        // get existing colors
+        int alpha = Color.alpha(color);
+        int red = Color.red(color);
+        int blue = Color.blue(color);
+        int green = Color.green(color);
+
+        // find compliments
+        red = (~red) & 0xff;
+        blue = (~blue) & 0xff;
+        green = (~green) & 0xff;
+
+        return Color.argb(alpha, red, green, blue);
     }
 
     /*public static void setUpdateAlarm(Context context) {

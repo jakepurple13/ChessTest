@@ -457,6 +457,7 @@ class ChoiceActivity : AppCompatActivity() {
         models.add(drawableModel(R.drawable.mov, ChoiceButton.VIEW_DOWNLOADS))
         models.add(drawableModel(R.drawable.mov, ChoiceButton.VIEW_VIDEOS))
 
+
         //models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.SETTINGS))
         //models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.FEEDBACK))
         //models.add(drawableModel(android.R.drawable.ic_menu_preferences, ChoiceButton.UPDATE_APP))
@@ -564,6 +565,7 @@ class ChoiceActivity : AppCompatActivity() {
                 .setSmallIcon(android.R.mipmap.sym_def_app_icon)
                 .setOngoing(true)
                 .setContentTitle(title)
+                .setChannelId("update_notification")
                 .setStyle(NotificationCompat.BigTextStyle().bigText(text))
                 .setProgress(100, progress, false)
                 .setOnlyAlertOnce(true)
