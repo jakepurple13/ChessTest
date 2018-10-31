@@ -4,15 +4,15 @@ import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
-import android.view.animation.Animation
-import android.widget.Button
 import android.widget.ImageView
 import com.crestron.aurora.Loged
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Suit
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.android.Main
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @SuppressLint("ViewConstructor")
 class CardButton(context: Context?, private val card: Card, private val action: MatchingActivity.CardButtonFlip) : ImageView(context), View.OnClickListener {
@@ -49,7 +49,7 @@ class CardButton(context: Context?, private val card: Card, private val action: 
         })
     }
 
-    private fun checkCo(cardFlipped: Card, buttonFlipped: CardButton) = launch(UI) {
+    private fun checkCo(cardFlipped: Card, buttonFlipped: CardButton) = GlobalScope.launch(Dispatchers.Main) {
         delay(500)
         if (cardFlipped.equals(card)) {
             isEnabled = false

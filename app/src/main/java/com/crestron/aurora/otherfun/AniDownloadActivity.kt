@@ -16,7 +16,8 @@ import com.google.gson.Gson
 import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2core.DownloadBlock
 import kotlinx.android.synthetic.main.activity_ani_download.*
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import org.json.JSONArray
 import org.json.JSONObject
 import org.jsoup.Jsoup
@@ -71,7 +72,7 @@ class AniDownloadActivity : AppCompatActivity() {
             }
         })
 
-        fun getVideo(urlToUse: String) = async {
+        fun getVideo(urlToUse: String) = GlobalScope.async {
             //Loged.d("${fetching.canReachSite(urlToUse).await()}")
 
             //ex "http://www.animeplus.tv/satsuriku-no-tenshi-episode-5-online"
@@ -154,10 +155,8 @@ class AniDownloadActivity : AppCompatActivity() {
 
         download_stuff.setOnClickListener { _ ->
 
-            async {
-
+            GlobalScope.async {
                 getListOfAnime()
-
             }
         }
 

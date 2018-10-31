@@ -10,9 +10,11 @@ import com.thejuki.kformmaster.model.FormMultiLineEditTextElement
 import com.thejuki.kformmaster.model.FormSingleLineEditTextElement
 import com.thejuki.kformmaster.model.FormSliderElement
 import kotlinx.android.synthetic.main.activity_form.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.android.Main
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -111,7 +113,7 @@ class FormActivity : AppCompatActivity() {
 
     }
 
-    private fun finalSubmit(feedback: String, rating: String, name: String?) = launch(UI) {
+    private fun finalSubmit(feedback: String, rating: String, name: String?) = GlobalScope.launch(Dispatchers.Main) {
         val req = submit(feedback, rating, name)
         if (req.await()) {
             finish()

@@ -36,7 +36,8 @@ import com.tonyodev.fetch2.Error
 import com.tonyodev.fetch2.NetworkType
 import com.tonyodev.fetch2core.DownloadBlock
 import kotlinx.android.synthetic.main.activity_episode.*
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import programmer.box.utilityhelper.UtilNotification
 import java.net.SocketTimeoutException
@@ -86,6 +87,15 @@ class EpisodeActivity : AppCompatActivity() {
 
         download_info.linksClickable = true
         download_info.text = nameUrl()
+
+        runOnUiThread {
+            GlobalScope.launch {
+                if (show.showDao().isUrlInDatabase(url) > 0) {
+                    //fav_episode.isChecked = true
+                    fav_episode.isLiked = true
+                }
+            }
+        }
 
         val fetching = FetchingUtils(this, object : FetchingUtils.FetchAction {
 
@@ -223,7 +233,7 @@ class EpisodeActivity : AppCompatActivity() {
         episode_list.addItemDecoration(dividerItemDecoration)
         episode_list.addItemDecoration(ItemOffsetDecoration(20))
 
-        fun getList() = launch {
+        fun getList() = GlobalScope.launch {
 
             val epApi = try {
                 EpisodeApi(ShowInfo(name, url))
@@ -239,13 +249,6 @@ class EpisodeActivity : AppCompatActivity() {
             }
 
             runOnUiThread {
-
-                launch {
-                    if (show.showDao().isUrlInDatabase(url) > 0) {
-                        //fav_episode.isChecked = true
-                        fav_episode.isLiked = true
-                    }
-                }
 
                 download_info.text = if (epApi != null) nameUrl(epApi.description) else "An error has occured"
 
@@ -269,7 +272,7 @@ class EpisodeActivity : AppCompatActivity() {
                         super.hit(name, url)
                         FetchingUtils.downloadCount++
                         Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
-                        launch {
+                        GlobalScope.launch {
                             fetching.getVideo(url, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
                                     KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
                                     KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
@@ -313,7 +316,7 @@ class EpisodeActivity : AppCompatActivity() {
                         super.hit(name, url)
                         FetchingUtils.downloadCount++
                         Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
-                        launch {
+                        GlobalScope.launch {
                             fetching.getVideo(url, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
                                     KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
                                     KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
@@ -359,7 +362,7 @@ class EpisodeActivity : AppCompatActivity() {
 
                             FetchingUtils.downloadCount += urlList.size
 
-                            launch {
+                            GlobalScope.launch {
                                 fetching.getVideo(urlList, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
                                         KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
                                         KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
@@ -414,7 +417,7 @@ class EpisodeActivity : AppCompatActivity() {
             }
 
             fun liked(like: Boolean) {
-                launch {
+                GlobalScope.launch {
                     if (like) {
                         show.showDao().insert(Show(url, name))
 

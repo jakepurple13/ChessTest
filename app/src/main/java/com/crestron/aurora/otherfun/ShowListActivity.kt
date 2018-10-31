@@ -29,8 +29,9 @@ import com.crestron.aurora.utilities.ViewUtil
 import com.peekandpop.shalskar.peekandpop.PeekAndPop
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_show_list.*
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.textColor
 import uk.co.deanwild.flowtextview.FlowTextView
 import java.net.SocketTimeoutException
@@ -84,7 +85,7 @@ class ShowListActivity : AppCompatActivity() {
                     description.textColor = Color.WHITE
                     description.setTextSize(episodeNumber.textSize)
 
-                    launch {
+                    GlobalScope.launch {
                         try {
                             val episode = EpisodeApi(info)
                             runOnUiThread {
@@ -163,7 +164,7 @@ class ShowListActivity : AppCompatActivity() {
             }
         }
 
-        fun getStuff() = async {
+        fun getStuff() = GlobalScope.async {
             Loged.i(url)
             getListOfAnime(url)
         }
@@ -210,7 +211,7 @@ class ShowListActivity : AppCompatActivity() {
         favorite_show.isEnabled = false
 
         favorite_show.setOnCheckedChangeListener { _, b ->
-            launch {
+            GlobalScope.launch {
                 val listToShow = if (b) {
                     val showList = showDatabase.showDao().allShows
                     val nnList = arrayListOf<NameAndLink>()

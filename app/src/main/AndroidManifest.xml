@@ -262,7 +262,10 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".otherfun.VideoPlayerActivity"
-            android:screenOrientation="sensorLandscape" />
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:resizeableActivity="true"
+            android:screenOrientation="sensorLandscape"
+            android:supportsPictureInPicture="true" />
         <activity android:name=".otherfun.StartVideoFromNotificationActivity" />
 
         <receiver android:name=".ChoiceActivity$BroadcastReceiverDownload">
@@ -280,6 +283,7 @@
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
+
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>

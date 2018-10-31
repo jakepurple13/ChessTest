@@ -2,7 +2,6 @@ package com.crestron.aurora.cardgames.videopoker
 
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Hand
-import kotlin.coroutines.experimental.buildSequence
 
 class Scores {
 
@@ -82,7 +81,7 @@ class Scores {
             else -> 0
         }
 
-        val seq = buildSequence {
+        val seq = sequence {
             while(true)
                 yield("\u2007")
         }
@@ -170,7 +169,7 @@ class Scores {
         var value = 1.0
         var next: Int
 
-        val seq = buildSequence {
+        val seq = sequence {
             while(true)
                 yield("\u2007")
         }

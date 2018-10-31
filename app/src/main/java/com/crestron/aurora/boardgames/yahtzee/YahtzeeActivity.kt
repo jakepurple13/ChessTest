@@ -16,9 +16,11 @@ import com.crestron.aurora.utilities.AnimationUtility
 import com.crestron.aurora.utilities.ViewUtil
 import com.plattysoft.leonids.ParticleSystem
 import kotlinx.android.synthetic.main.activity_yahtzee.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.android.Main
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.util.*
 
@@ -232,7 +234,7 @@ class YahtzeeActivity : AppCompatActivity() {
 
         fun rollDice(diceButton: DiceButton) {
             if (!diceButton.hold) {
-                launch(UI) {
+                GlobalScope.launch(Dispatchers.Main) {
                     for (i in 0..10) {
                         delay(50)
                         //diceButton.dice = Dice(getRandomNum())

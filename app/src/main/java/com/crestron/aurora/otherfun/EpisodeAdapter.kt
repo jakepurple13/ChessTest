@@ -14,8 +14,9 @@ import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.ShowInfo
 import kotlinx.android.synthetic.main.episode_info.view.*
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
@@ -59,7 +60,7 @@ class EpisodeAdapter(private val items: ArrayList<ShowInfo>, private val name: S
 
         val show = ShowDatabase.getDatabase(this@EpisodeAdapter.context).showDao()
 
-        launch {
+        GlobalScope.launch {
             val episodes = show.getEpisodeFromShow(name)
             Loged.wtf("$episodes")
 
@@ -91,7 +92,7 @@ class EpisodeAdapter(private val items: ArrayList<ShowInfo>, private val name: S
         }
 
         holder.watched.setOnCheckedChangeListener { _, b ->
-            async {
+            GlobalScope.async {
                 try {
                     if (b) {
                         Loged.e("Inserted ${items[position]}")

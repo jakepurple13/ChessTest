@@ -4,9 +4,11 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import com.crestron.aurora.Loged
+import org.jetbrains.anko.defaultSharedPreferences
 import java.io.IOException
 import java.io.OutputStreamWriter
 import java.util.*
@@ -14,6 +16,11 @@ import java.util.*
 class KUtility {
 
     companion object Util {
+
+        fun getSharedPref(context: Context): SharedPreferences {
+            return context.defaultSharedPreferences
+        }
+
         private fun sendNotification(context: Context, smallIconId: Int, title: String, message: String, channel_id: String, gotoActivity: Class<*>, notification_id: Int) {
             // The id of the channel.
             val mBuilder = NotificationCompat.Builder(context, channel_id)

@@ -17,8 +17,9 @@ import com.like.LikeButton
 import com.like.OnLikeListener
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.text_layout.view.*
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
 
@@ -108,7 +109,7 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
             Picasso.get().setIndicatorsEnabled(true)
             holder.imageView.visibility = View.GONE
 
-            launch {
+            GlobalScope.launch {
 
                 holder.favorite.apply {
                     isLiked = show.showDao().isUrlInDatabase(stuff[position].url) > 0
@@ -186,7 +187,7 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
         }
     }
 
-    private fun getEpisodeList(show: ShowInfo) = async {
+    private fun getEpisodeList(show: ShowInfo) = GlobalScope.async {
         EpisodeApi(show).episodeList.size
     }
 

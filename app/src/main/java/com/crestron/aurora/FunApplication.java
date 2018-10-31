@@ -29,6 +29,7 @@ import com.crestron.aurora.otherfun.ShowListActivity;
 import com.crestron.aurora.otherfun.UpdateCheckService;
 import com.crestron.aurora.otherfun.ViewVideosActivity;
 import com.crestron.aurora.showapi.Source;
+import com.crestron.aurora.utilities.KUtility;
 import com.evernote.android.job.JobManager;
 import com.facebook.stetho.Stetho;
 import com.google.firebase.FirebaseApp;
@@ -137,14 +138,14 @@ public class FunApplication extends Application {
             ShortcutInfo recentCartoon = new ShortcutInfo.Builder(context, "id2")
                     .setShortLabel("Recent Cartoon")
                     .setLongLabel("Recent Cartoon")
-                    .setIcon(Icon.createWithResource(context, R.drawable.apk))
+                    .setIcon(Icon.createWithResource(context, R.drawable.cartoon_recent_cover))
                     .setIntent(intent)
                     .build();
 
             scl.add(recentCartoon);
 
             intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, SolitaireActivity.class);
-            intent.putExtra(ConstantValues.DRAW_AMOUNT, getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE).getInt(ConstantValues.DRAW_AMOUNT, 1));
+            intent.putExtra(ConstantValues.DRAW_AMOUNT, KUtility.Util.getSharedPref(this).getInt(ConstantValues.DRAW_AMOUNT, 1));
 
             ShortcutInfo solitaireSC = new ShortcutInfo.Builder(context, "id3")
                     .setShortLabel("Solitaire")

@@ -37,7 +37,8 @@ import github.nisrulz.recyclerviewhelper.RVHItemTouchHelperCallback
 import kotlinx.android.synthetic.main.activity_view_videos.*
 import kotlinx.android.synthetic.main.video_layout.view.*
 import kotlinx.android.synthetic.main.video_with_text.view.*
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.runOnUiThread
 import java.io.File
@@ -126,7 +127,7 @@ class ViewVideosActivity : AppCompatActivity() {
                     }) // the multi select model list with ids and name
                     .onSubmit(object : MultiSelectDialog.SubmitCallbackListener {
                         override fun onSelected(selectedIds: java.util.ArrayList<Int>?, selectedNames: java.util.ArrayList<String>?, dataString: String?) {
-                            launch {
+                            GlobalScope.launch {
                                 for (f in listOfFiles) {
                                     if (selectedNames!!.any { it == f.name }) {
                                         f.delete()

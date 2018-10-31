@@ -1,14 +1,14 @@
 package com.crestron.aurora.boardgames.tictactoe
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Button
 import com.crestron.aurora.R
 import kotlinx.android.synthetic.main.activity_ttt.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.android.UI
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class TTTActivity : AppCompatActivity() {
 

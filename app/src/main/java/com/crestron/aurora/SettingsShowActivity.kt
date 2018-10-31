@@ -23,8 +23,9 @@ import com.google.gson.Gson
 import com.peekandpop.shalskar.peekandpop.PeekAndPop
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_settings_show.*
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.textColor
 import uk.co.deanwild.flowtextview.FlowTextView
@@ -76,7 +77,7 @@ class SettingsShowActivity : AppCompatActivity() {
 
         val stuff = arrayListOf<ShowListActivity.NameAndLink>()
 
-        launch {
+        GlobalScope.launch {
             val s = ShowDatabase.getDatabase(this@SettingsShowActivity).showDao()
             val showList = s.allShows
 

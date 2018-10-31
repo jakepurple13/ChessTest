@@ -5,7 +5,8 @@ import com.evernote.android.job.Job
 import com.evernote.android.job.JobManager
 import com.evernote.android.job.JobRequest
 import com.google.gson.Gson
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import org.jetbrains.anko.defaultSharedPreferences
 import programmer.box.utilityhelper.UtilNotification
 import java.net.URL
@@ -28,7 +29,7 @@ class UpdateJob : Job() {
     }
 
     override fun onRunJob(params: Params): Result {
-        async {
+        GlobalScope.async {
             val url = URL(ConstantValues.VERSION_URL).readText()
 
             val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)

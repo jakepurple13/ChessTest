@@ -14,7 +14,8 @@ import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.Source
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.net.SocketTimeoutException
 
@@ -44,7 +45,7 @@ class ShowCheckService : JobService() {
             //val mNotificationManager = this@ShowCheckService.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             //mNotificationManager.activeNotifications.filter { it.id == 1 }[0].notification.
             val showDatabase = ShowDatabase.getDatabase(this@ShowCheckService)
-            launch {
+            GlobalScope.launch {
                 var count = 0
                 val showApi = ShowApi(Source.RECENT_ANIME).showInfoList
                 showApi.addAll(ShowApi(Source.RECENT_CARTOON).showInfoList)

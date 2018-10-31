@@ -8,8 +8,10 @@ import android.view.ViewAnimationUtils
 import android.view.animation.Interpolator
 import android.widget.ImageView
 import crestron.com.deckofcards.Card
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.android.Main
+import kotlinx.coroutines.launch
 
 class AnimationUtility {
 
@@ -67,7 +69,7 @@ class AnimationUtility {
             animator.start()
         }
 
-        fun animateCard(cardView: ImageView, card: Card, context: Context, speed: Long = cardView.animate().duration, reverse: Boolean = false, end: AnimationEnd = object : AnimationEnd {}) = launch(UI) {
+        fun animateCard(cardView: ImageView, card: Card, context: Context, speed: Long = cardView.animate().duration, reverse: Boolean = false, end: AnimationEnd = object : AnimationEnd {}) = GlobalScope.launch(Dispatchers.Main) {
             cardView.rotationY = if (reverse) 360f else 0f
             cardView.animate().setDuration(speed).rotationY(if (reverse) 270f else 90f).setListener(object : Animator.AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {
@@ -103,7 +105,7 @@ class AnimationUtility {
             })
         }
 
-        fun animateCardWin(cardView: ImageView, card: Card, context: Context, speed: Long = cardView.animate().duration, reverse: Boolean = false, end: AnimationEnd = object : AnimationEnd {}) = launch(UI) {
+        fun animateCardWin(cardView: ImageView, card: Card, context: Context, speed: Long = cardView.animate().duration, reverse: Boolean = false, end: AnimationEnd = object : AnimationEnd {}) = GlobalScope.launch(Dispatchers.Main) {
             val zero = 0f
             val full = 360f
             val ninety = 90f

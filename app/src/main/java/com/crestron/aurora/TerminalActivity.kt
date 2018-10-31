@@ -8,8 +8,10 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.crestron.aurora.utilities.Utility
 import kotlinx.android.synthetic.main.activity_terminal.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.android.Main
+import kotlinx.coroutines.async
 
 class TerminalActivity : AppCompatActivity() {
 
@@ -19,7 +21,7 @@ class TerminalActivity : AppCompatActivity() {
 
         runButton.setOnClickListener {
             Loged.wtf(editText.text.toString())
-            fun a() = async(UI) {
+            fun a() = GlobalScope.async(Dispatchers.Main) {
                 var s: String
                 try {
                     s = Utility.runAsRoot(editText.text.toString())

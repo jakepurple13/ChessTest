@@ -21,7 +21,8 @@ import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.FetchingUtils
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.File
 import java.io.FileInputStream
@@ -204,7 +205,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                 // get path that the user has chosen
                 chooser.setOnSelectListener { path ->
                     //folder_location_info.text = FetchingUtils.folderLocation
-                    launch {
+                    GlobalScope.launch {
                         val show = ShowDatabase.getDatabase(this@GeneralPreferenceFragment.context).showDao().allShows
                         val string = Gson().toJson(show)
 
@@ -250,7 +251,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                 // get path that the user has chosen
                 chooser.setOnSelectListener { path ->
                     if (path.contains("fun.json")) {
-                        launch {
+                        GlobalScope.launch {
                             val show = ShowDatabase.getDatabase(this@GeneralPreferenceFragment.context).showDao()
                             val g = Gson().fromJson(mReadJsonData(path), Array<Show>::class.java)
                             for (i in g) {

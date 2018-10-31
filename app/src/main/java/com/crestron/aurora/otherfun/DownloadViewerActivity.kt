@@ -24,7 +24,8 @@ import com.tonyodev.fetch2.Error
 import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2core.Func
 import kotlinx.android.synthetic.main.activity_download_viewer.*
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.annotations.NotNull
 import java.util.*
@@ -55,9 +56,9 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
         fileAdapter = FileAdapter(this)
         download_list.adapter = fileAdapter
 
-        multiple_download_delete.setOnClickListener { _ ->
+        multiple_download_delete.setOnClickListener {
 
-            launch {
+            GlobalScope.launch {
 
                 val downloadList = fileAdapter!!.downloads
 

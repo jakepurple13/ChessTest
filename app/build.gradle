@@ -60,8 +60,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.21'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.21'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.27.0-eap13'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.27.0-eap13'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation project(':deckofcards')
     implementation project(':library')

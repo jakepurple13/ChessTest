@@ -6,7 +6,8 @@ import android.widget.Toast
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.google.gson.Gson
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import org.jetbrains.anko.defaultSharedPreferences
 import java.net.URL
 
@@ -24,7 +25,7 @@ class UpdateCheckService : JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
         if(starting) {
             starting = false
-            async {
+            GlobalScope.async {
                 val url = URL(ConstantValues.VERSION_URL).readText()
 
                 val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)

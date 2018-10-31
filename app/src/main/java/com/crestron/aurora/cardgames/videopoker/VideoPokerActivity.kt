@@ -21,11 +21,12 @@ import crestron.com.deckofcards.Deck
 import crestron.com.deckofcards.Hand
 import io.kimo.konamicode.KonamiCode
 import kotlinx.android.synthetic.main.activity_video_poker.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.android.Main
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import nl.dionsegijn.steppertouch.OnStepCallback
-import kotlin.coroutines.experimental.buildSequence
 
 class VideoPokerActivity : AppCompatActivity() {
 
@@ -144,7 +145,7 @@ class VideoPokerActivity : AppCompatActivity() {
 
             override fun shuffle() {
                 super.shuffle()
-                launch(UI) {
+                GlobalScope.launch(Dispatchers.Main) {
 
                     for (i in hand.hand.indices) {
                         cardsAndButtons[i]!!.holdButton.isEnabled = false
@@ -155,18 +156,18 @@ class VideoPokerActivity : AppCompatActivity() {
                     discard_button.isEnabled = false
                     play_again.isEnabled = false
                     val delayTime = 50
-                    val seq = buildSequence {
+                    val seq = sequence {
                         while (true)
                             yield(".")
                     }
                     for (i in 0..3) {
                         for (j in 0..3) {
                             back_button_videopoker.text = "Shuffling${seq.take(j).joinToString("")}"
-                            delay(delayTime)
+                            delay(delayTime.toLong())
                         }
                         for (j in 3 downTo 0) {
                             back_button_videopoker.text = "Shuffling${seq.take(j).joinToString("")}"
-                            delay(delayTime)
+                            delay(delayTime.toLong())
                         }
                     }
                     back_button_videopoker.text = "Back\n${deckOfCards.deckCount()} Cards Left"
@@ -302,7 +303,7 @@ class VideoPokerActivity : AppCompatActivity() {
                 AnimationUtility.animateCard(cardsAndButtons[i]!!.cardView, Card.BackCard, this@VideoPokerActivity, end = object : AnimationUtility.AnimationEnd {
                     override fun onAnimationEnd() {
                         super.onAnimationEnd()
-                        launch(UI) {
+                        GlobalScope.launch(Dispatchers.Main) {
                             delay(200)
                             AnimationUtility.animateCard(cardsAndButtons[i]!!.cardView, cardsAndButtons[i]!!.card, this@VideoPokerActivity, end = object : AnimationUtility.AnimationEnd {
                                 override fun onAnimationEnd() {

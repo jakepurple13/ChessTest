@@ -16,9 +16,11 @@ import crestron.com.deckofcards.CardNotFoundException
 import crestron.com.deckofcards.Deck
 import id.co.ionsoft.randomnumberanimationlibrary.RandomNumberAnimation
 import kotlinx.android.synthetic.main.activity_black_jack.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.android.Main
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 
@@ -39,7 +41,7 @@ class BlackJackActivity : AppCompatActivity() {
     private var numberOfDecks = 1
     private fun animateFun() {
         val randomNumberAnimation = RandomNumberAnimation(win_count)
-        launch(UI) {
+        GlobalScope.launch(Dispatchers.Main) {
             randomNumberAnimation.start()
             delay(1500)
             randomNumberAnimation.stop(keepChange = false)
@@ -105,7 +107,7 @@ Back = Rewind Button
             stay.performClick()
         }
 
-        fun dealerMoved() = launch(UI) {
+        fun dealerMoved() = GlobalScope.launch(Dispatchers.Main) {
             newCard.isEnabled = false
             stay.isEnabled = false
             playerCards.isEnabled = false
@@ -178,7 +180,7 @@ Back = Rewind Button
     }
 
     @SuppressLint("SetTextI18n")
-    fun start() = launch(UI) {
+    fun start() = GlobalScope.launch(Dispatchers.Main) {
 
         playerMove()
         delay(1000)

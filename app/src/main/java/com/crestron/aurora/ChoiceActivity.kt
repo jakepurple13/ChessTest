@@ -59,8 +59,9 @@ import com.tonyodev.fetch2core.Downloader
 import com.tonyodev.fetch2core.Func
 import io.kimo.konamicode.KonamiCode
 import kotlinx.android.synthetic.main.activity_choice.*
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.File
 import java.net.SocketTimeoutException
@@ -127,7 +128,7 @@ class ChoiceActivity : AppCompatActivity() {
         //Loged.d(FirebaseInstanceId.getInstance().token!!)
 
         if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false)) {
-            launch {
+            GlobalScope.launch {
                 val url = URL(ConstantValues.VERSION_URL).readText()
                 val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
                 val pInfo = packageManager.getPackageInfo(packageName, 0)
@@ -258,7 +259,7 @@ class ChoiceActivity : AppCompatActivity() {
                             permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_CARTOON.link, view = view)
                         }
                         ChoiceButton.UPDATE_APP -> {
-                            launch {
+                            GlobalScope.launch {
                                 val url = URL(ConstantValues.VERSION_URL).readText()
 
                                 val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
@@ -297,7 +298,7 @@ class ChoiceActivity : AppCompatActivity() {
                             ViewUtil.presentActivity(view, this@ChoiceActivity, intent)
                         }
                         ChoiceButton.UPDATE_NOTES -> {
-                            launch {
+                            GlobalScope.launch {
                                 val url = URL(ConstantValues.VERSION_URL).readText()
                                 Loged.i(url)
                                 val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
@@ -320,7 +321,7 @@ class ChoiceActivity : AppCompatActivity() {
                         }
                         ChoiceButton.DOWNLOAD_APK -> {
 
-                            launch {
+                            GlobalScope.launch {
 
                                 val url = URL(ConstantValues.VERSION_URL).readText()
 
@@ -372,7 +373,7 @@ class ChoiceActivity : AppCompatActivity() {
 
                         }
                         ChoiceButton.DELETE_OLD_FILE -> {
-                            launch {
+                            GlobalScope.launch {
                                 val url = URL(ConstantValues.VERSION_URL).readText()
                                 val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
                                 val strApkToInstall = getNameFromUrl(info.link)!!.replace(".png", ".apk")
@@ -450,10 +451,10 @@ class ChoiceActivity : AppCompatActivity() {
         models.add(drawableModel(R.drawable.recents, ChoiceButton.RECENT_ANIME, defaultSharedPreferences.getInt(ConstantValues.UPDATE_COUNT, 0)))
         models.add(drawableModel(R.drawable.ten2, ChoiceButton.ANIME))
         models.add(drawableModel(R.drawable.mov, ChoiceButton.ANIME_MOVIES))
-        models.add(drawableModel(R.drawable.recents, ChoiceButton.RECENT_CARTOON))
         models.add(drawableModel(R.drawable.ten4, ChoiceButton.DUBBED))
-        models.add(drawableModel(R.drawable.jack1, ChoiceButton.CARTOON))
-        models.add(drawableModel(R.drawable.mov, ChoiceButton.CARTOON_MOVIES))
+        models.add(drawableModel(R.drawable.cartoon_recent_cover, ChoiceButton.RECENT_CARTOON))
+        models.add(drawableModel(R.drawable.cartoon_cover, ChoiceButton.CARTOON))
+        models.add(drawableModel(R.drawable.cartoon_movies_cover, ChoiceButton.CARTOON_MOVIES))
         models.add(drawableModel(R.drawable.mov, ChoiceButton.VIEW_DOWNLOADS))
         models.add(drawableModel(R.drawable.mov, ChoiceButton.VIEW_VIDEOS))
 
@@ -468,7 +469,7 @@ class ChoiceActivity : AppCompatActivity() {
 
         shelfView.loadData(models)
 
-        launch {
+        GlobalScope.launch {
             val show = ShowDatabase.getDatabase(this@ChoiceActivity).showDao()
             val showList = show.allShows
             if (showList.size > 0) {
@@ -522,7 +523,7 @@ class ChoiceActivity : AppCompatActivity() {
         }
 
         if (defaultSharedPreferences.getBoolean("delete_file", false)) {
-            launch {
+            GlobalScope.launch {
                 val url = URL(ConstantValues.VERSION_URL).readText()
                 val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
                 val strApkToInstall = getNameFromUrl(info.link)!!.replace(".png", ".apk")
@@ -812,7 +813,7 @@ class ChoiceActivity : AppCompatActivity() {
                 .withIdentifier(3)
                 .withName("Update App")
                 .withOnDrawerItemClickListener { _, _, _ ->
-                    launch {
+                    GlobalScope.launch {
                         val url = URL(ConstantValues.VERSION_URL).readText()
                         val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
                         Loged.wtf("$info")
@@ -839,7 +840,7 @@ class ChoiceActivity : AppCompatActivity() {
                 .withName("Update Notes")
                 .withOnDrawerItemClickListener { _, _, _ ->
                     result.closeDrawer()
-                    launch {
+                    GlobalScope.launch {
                         val url = URL(ConstantValues.VERSION_URL).readText()
                         Loged.i(url)
                         val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
@@ -866,7 +867,7 @@ class ChoiceActivity : AppCompatActivity() {
             //val mNotificationManager = this@ShowCheckService.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             //mNotificationManager.activeNotifications.filter { it.id == 1 }[0].notification.
             val showDatabase = ShowDatabase.getDatabase(this@ChoiceActivity)
-            launch {
+            GlobalScope.launch {
                 var count = 0
                 val showApi = ShowApi(Source.RECENT_ANIME).showInfoList
                 showApi.addAll(ShowApi(Source.RECENT_CARTOON).showInfoList)
@@ -951,7 +952,7 @@ class ChoiceActivity : AppCompatActivity() {
                 .withInnerShadow(true)
                 .build()
 
-        launch {
+        GlobalScope.launch {
             val show = ShowDatabase.getDatabase(this@ChoiceActivity).showDao()
             val showList = show.allShows
             if (showList.size > 0) {
@@ -970,7 +971,7 @@ class ChoiceActivity : AppCompatActivity() {
             }
         }
 
-        launch {
+        GlobalScope.launch {
             val url = URL(ConstantValues.PAST_VERSION_URL).readText()
             val info = Gson().fromJson(url, PastAppInfo::class.java)
             for (appVersion in info.versions) {

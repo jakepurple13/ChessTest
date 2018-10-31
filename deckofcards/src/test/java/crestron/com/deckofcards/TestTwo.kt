@@ -1,11 +1,7 @@
 package crestron.com.deckofcards
 
-import android.text.Html
 import junit.framework.Assert.assertEquals
 import org.junit.Test
-import java.util.Spliterators.iterator
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.EmptyCoroutineContext
 import kotlin.properties.Delegates
 
 class TestTwo {

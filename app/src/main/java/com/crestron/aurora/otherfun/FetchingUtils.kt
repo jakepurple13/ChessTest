@@ -12,7 +12,8 @@ import com.google.gson.Gson
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
 import com.tonyodev.fetch2core.Func
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
@@ -138,7 +139,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         return file
     }
 
-    fun getVideo(urlToUse: String, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = async {
+    fun getVideo(urlToUse: String, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.async {
         //Loged.d("${fetching.canReachSite(urlToUse).await()}")
 
         //ex "http://www.animeplus.tv/satsuriku-no-tenshi-episode-5-online"
@@ -221,7 +222,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         }
     }
 
-    fun getVideo(urlToUse: Collection<String>, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = async {
+    fun getVideo(urlToUse: Collection<String>, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.async {
         //Loged.d("${fetching.canReachSite(urlToUse).await()}")
 
         //ex "http://www.animeplus.tv/satsuriku-no-tenshi-episode-5-online"
@@ -397,7 +398,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
             }
         }
 
-        fun canReachSite(url: String) = async {
+        fun canReachSite(url: String) = GlobalScope.async {
             val urlChecker = URL(url)
             val connection = urlChecker.openConnection() as HttpURLConnection
             val code = connection.responseCode

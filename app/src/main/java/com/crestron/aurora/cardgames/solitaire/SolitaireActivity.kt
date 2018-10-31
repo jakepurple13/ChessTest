@@ -29,9 +29,11 @@ import crestron.com.deckofcards.CardNotFoundException
 import crestron.com.deckofcards.Deck
 import crestron.com.deckofcards.Suit
 import kotlinx.android.synthetic.main.activity_solitaire.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.android.Main
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -296,7 +298,7 @@ class SolitaireActivity : AppCompatActivity() {
 
                 time.cancel()
 
-                launch(UI) {
+                GlobalScope.launch(Dispatchers.Main) {
                     winAnimation(foundation_1, foundation1)
                     delay(500)
                     winAnimation(foundation_2, foundation2)
@@ -463,13 +465,13 @@ class SolitaireActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun winAnimation(cardView: ImageView, listOfCard: ArrayList<Card>) = launch(UI) {
+    private fun winAnimation(cardView: ImageView, listOfCard: ArrayList<Card>) = GlobalScope.launch(Dispatchers.Main) {
         var i = listOfCard.lastIndex
         var upOrDown = true
         AnimationUtility.animateCardWin(cardView, listOfCard[i], this@SolitaireActivity, reverse = gen.nextBoolean(), end = object : AnimationUtility.AnimationEnd {
             override fun onAnimationEnd() {
                 val an = this
-                launch(UI) {
+                launch(Dispatchers.Main) {
                     delay(500)
                     if (i >= 0 && upOrDown) {
                         i--

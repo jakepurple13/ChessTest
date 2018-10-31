@@ -19,7 +19,8 @@ import com.tonyodev.fetch2.Request
 import com.tonyodev.fetch2core.DownloadBlock
 import com.tonyodev.fetch2core.Downloader
 import com.tonyodev.fetch2core.Func
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.File
 import java.net.URL
@@ -28,7 +29,7 @@ class DownloadUpdateReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         val notificationId = intent?.getIntExtra("firebase_channel_id", 0) ?: 0
         Log.d("", "NotificationBroadcastReceiver: notificationId = $notificationId")
-        launch {
+        GlobalScope.launch {
             getNewApp(context!!)
         }
     }

@@ -1,8 +1,10 @@
 package com.crestron.aurora.utilities
 
 import android.widget.TextView
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.android.Main
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -14,7 +16,7 @@ class TimerUtil(var time: Long = 0L, var timeAction: TimerAction? = null, privat
         cancel()
         timer.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
-                launch(UI) {
+                GlobalScope.launch(Dispatchers.Main) {
                     time = setInterval(upOrDown)
                     view?.text = getTime()
                 }

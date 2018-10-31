@@ -13,12 +13,11 @@ import android.view.ViewTreeObserver
 import android.view.animation.AccelerateInterpolator
 import android.widget.TextView
 import com.crestron.aurora.Loged
-import kotlin.coroutines.experimental.buildSequence
 
 
 class ViewUtil {
     companion object Utils {
-        fun seq(character: CharSequence = "\u2007") = buildSequence {
+        fun seq(character: CharSequence = "\u2007") = sequence {
             while (true)
                 yield(character)
         }

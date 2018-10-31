@@ -12,7 +12,8 @@ import com.crestron.aurora.otherfun.DownloadUpdateReceiver
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.net.URL
 
 
@@ -161,7 +162,7 @@ class MessagingFirebase : FirebaseMessagingService() {
         mNotificationManager.notify(notification_id, mBuilder.build())
     }
 
-    private fun sendDownloadUpdateNotification(title: String, text: String, context: Context, gotoActivity: Class<*>, notification_id: Int) = launch {
+    private fun sendDownloadUpdateNotification(title: String, text: String, context: Context, gotoActivity: Class<*>, notification_id: Int) = GlobalScope.launch {
 
             val texts = URL(ConstantValues.VERSION_URL).readText()
             val info: AppInfo = Gson().fromJson(texts, AppInfo::class.java)

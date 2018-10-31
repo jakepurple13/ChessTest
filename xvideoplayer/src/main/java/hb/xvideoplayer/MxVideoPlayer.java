@@ -18,6 +18,7 @@ import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -122,6 +123,8 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
 
     public static long mLastAutoFullscreenTime = 0;
 
+    public GestureDetector gesture;
+
     public static AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener =
             new AudioManager.OnAudioFocusChangeListener() {
                 @Override
@@ -150,6 +153,54 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
     }
 
     public void initView(Context context) {
+        gesture = new GestureDetector(context, new GestureDetector.OnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public void onShowPress(MotionEvent e) {
+
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                return false;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                return false;
+            }
+        });
+        gesture.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener() {
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                onClick(mPlayControllerButton);
+                return true;
+            }
+
+            @Override
+            public boolean onDoubleTapEvent(MotionEvent e) {
+                return false;
+            }
+        });
         View.inflate(context, getLayoutId(), this);
         mPlayControllerButton = (ImageView) findViewById(R.id.mx_start);
         mFullscreenButton = (ImageView) findViewById(R.id.mx_fullscreen);
@@ -246,10 +297,12 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
                 MxMediaManager.getInstance().getPlayer().pause();
                 setUiPlayState(CURRENT_STATE_PAUSE);
                 refreshCache();
+                playerListener.onStopped();
             } else if (mCurrentState == CURRENT_STATE_PAUSE) {
                 onActionEvent(MxUserAction.ON_CLICK_RESUME);
                 MxMediaManager.getInstance().getPlayer().start();
                 setUiPlayState(CURRENT_STATE_PLAYING);
+                playerListener.onStarted();
             } else if (mCurrentState == CURRENT_STATE_AUTO_COMPLETE) {
                 onActionEvent(MxUserAction.ON_CLICK_START_AUTO_COMPLETE);
                 preparePlayVideo();
@@ -275,6 +328,7 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        gesture.onTouchEvent(event);
         float x = event.getX();
         float y = event.getY();
         int id = v.getId();
@@ -736,6 +790,7 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
         }
         MxMediaManager.getInstance().getPlayer().start();
         setUiPlayState(CURRENT_STATE_PLAYING);
+        playerListener.onStarted();
     }
 
     @Override

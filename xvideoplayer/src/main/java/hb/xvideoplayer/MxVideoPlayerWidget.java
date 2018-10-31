@@ -15,6 +15,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -368,6 +372,7 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
 
     public void setAllControlsVisible(int topCon, int bottomCon, int startBtn, int loadingPro,
                                       int thumbImg, int bottomPro) {
+
         mTopContainer.setVisibility(topCon);
         mBottomContainer.setVisibility(bottomCon);
         mPlayControllerButton.setVisibility(startBtn);
@@ -430,6 +435,29 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
             }
             backPress();
         }
+    }
+
+    public void playVideo() {
+        mCurrentState = CURRENT_STATE_PAUSE;
+        onClick(mPlayControllerButton);
+    }
+
+    public void pauseVideo() {
+        mCurrentState = CURRENT_STATE_PLAYING;
+        onClick(mPlayControllerButton);
+    }
+
+    public boolean isPlaying() {
+        return mCurrentState == CURRENT_STATE_PLAYING;
+    }
+
+    public void hideControls() {
+        setAllControlsVisible(View.INVISIBLE,
+                View.INVISIBLE,
+                View.INVISIBLE,
+                View.INVISIBLE,
+                View.INVISIBLE,
+                View.INVISIBLE);
     }
 
     @Override
@@ -645,10 +673,27 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
                     ((Activity) getContext()).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
+                            Animation fadeIn = new AlphaAnimation(0, 1);
+                            fadeIn.setInterpolator(new DecelerateInterpolator()); //add this
+                            fadeIn.setDuration(1000);
+
+                            Animation fadeOut = new AlphaAnimation(1, 0);
+                            fadeOut.setInterpolator(new AccelerateInterpolator()); //and this
+                            fadeOut.setStartOffset(1000);
+                            fadeOut.setDuration(1000);
+                            if (mBottomContainer.getVisibility() == View.VISIBLE)
+                                mBottomContainer.startAnimation(fadeOut);
+                            if (mTopContainer.getVisibility() == View.VISIBLE)
+                                mTopContainer.startAnimation(fadeOut);
+                            if (mPlayControllerButton.getVisibility() == View.VISIBLE)
+                                mPlayControllerButton.startAnimation(fadeOut);
+
                             mBottomContainer.setVisibility(View.INVISIBLE);
                             mTopContainer.setVisibility(View.INVISIBLE);
                             mPlayControllerButton.setVisibility(View.INVISIBLE);
                             if (mCurrentScreen != SCREEN_WINDOW_TINY && mIsShowBottomProgressBar) {
+                                mBottomProgressBar.startAnimation(fadeIn);
                                 mBottomProgressBar.setVisibility(View.VISIBLE);
                             }
                         }

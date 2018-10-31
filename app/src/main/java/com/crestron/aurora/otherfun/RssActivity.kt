@@ -17,7 +17,8 @@ import com.crestron.aurora.views.StickHeaderItemDecoration
 import com.prof.rssparser.Article
 import com.prof.rssparser.Parser
 import kotlinx.android.synthetic.main.activity_rss.*
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import org.jsoup.Jsoup
 import java.text.SimpleDateFormat
 
@@ -52,7 +53,7 @@ class RssActivity : AppCompatActivity() {
         textView5.append("\nCurrent Date is ${SimpleDateFormat("MM/dd/yyyy E hh:mm a").format(System.currentTimeMillis())}")
         spinner.isEnabled = false
 
-        fun getStuff() = async {
+        fun getStuff() = GlobalScope.async {
 
             fun livechartRss() = async {
 
