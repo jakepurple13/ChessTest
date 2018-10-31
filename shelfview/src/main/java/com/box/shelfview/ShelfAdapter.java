@@ -1,7 +1,6 @@
 package com.box.shelfview;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.widget.CardView;
@@ -14,8 +13,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.minibugdev.drawablebadge.BadgePosition;
-import com.minibugdev.drawablebadge.DrawableBadge;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -165,11 +162,6 @@ class ShelfAdapter extends BaseAdapter {
                             .load(Integer.parseInt(bookCover))
                             .resize(mTargetWidth, mTargetHeight)
                             .into(holder.imvBookCover, callback);
-
-                    if (model.getBadgeCount() > 0) {
-                        holder.imvBookCover.setBadgeValue(model.getBadgeCount());
-                    }
-
                     break;
                 case RAW:
                     String path = getRawPath() + bookCover;
@@ -185,6 +177,10 @@ class ShelfAdapter extends BaseAdapter {
                             .resize(mTargetWidth, mTargetHeight)
                             .into(holder.imvBookCover, callback);
                     break;
+            }
+            if (model.getBadgeCount() > 0) {
+                holder.imvBookCover.setBadgeValue(model.getBadgeCount());
+                //context.registerReceiver()
             }
         } else {
             holder.cvBookBackground.setVisibility(View.GONE);

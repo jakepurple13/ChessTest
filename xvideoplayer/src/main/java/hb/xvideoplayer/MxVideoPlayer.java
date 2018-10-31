@@ -294,15 +294,20 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
             } else if (mCurrentState == CURRENT_STATE_PLAYING) {
                 obtainCache();
                 onActionEvent(MxUserAction.ON_CLICK_PAUSE);
-                MxMediaManager.getInstance().getPlayer().pause();
+                try {
+                    MxMediaManager.getInstance().getPlayer().pause();
+                } catch (IllegalStateException ignored) {
+                }
                 setUiPlayState(CURRENT_STATE_PAUSE);
                 refreshCache();
-                playerListener.onStopped();
+                if (playerListener != null)
+                    playerListener.onStopped();
             } else if (mCurrentState == CURRENT_STATE_PAUSE) {
                 onActionEvent(MxUserAction.ON_CLICK_RESUME);
                 MxMediaManager.getInstance().getPlayer().start();
                 setUiPlayState(CURRENT_STATE_PLAYING);
-                playerListener.onStarted();
+                if (playerListener != null)
+                    playerListener.onStarted();
             } else if (mCurrentState == CURRENT_STATE_AUTO_COMPLETE) {
                 onActionEvent(MxUserAction.ON_CLICK_START_AUTO_COMPLETE);
                 preparePlayVideo();
@@ -790,7 +795,8 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
         }
         MxMediaManager.getInstance().getPlayer().start();
         setUiPlayState(CURRENT_STATE_PLAYING);
-        playerListener.onStarted();
+        if (playerListener != null)
+            playerListener.onStarted();
     }
 
     @Override
@@ -895,6 +901,8 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
                 }
                 MxMediaManager.getInstance().releaseMediaPlayer();
                 showSupportActionBar(getContext());
+                Log.d("Here", "Right here");
+                //playerListener.onBackPress();
                 return true;
             }
             ViewGroup vp = (ViewGroup) scanForActivity(getContext())
@@ -910,6 +918,7 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
             } else {
                 MxVideoPlayerManager.completeAll();
             }
+            Log.d("There", "Right There");
             return true;
         }
         return false;

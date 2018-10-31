@@ -82,6 +82,7 @@ dependencies {
     //implementation "org.jetbrains.anko:anko:+"
     implementation 'com.tonyodev.fetch2:fetch2:2.2.0-RC16'
     implementation 'com.tonyodev.fetch2okhttp:fetch2okhttp:2.2.0-RC16'
+    implementation 'com.tonyodev.fetch2fileserver:fetch2fileserver:2.2.0-RC16'
     implementation 'org.jsoup:jsoup:1.11.3'
     // Room components
     implementation "android.arch.persistence.room:runtime:$rootProject.roomVersion"
@@ -101,7 +102,6 @@ dependencies {
     implementation 'com.github.DanielMartinus:Stepper-Touch:0.6'
     implementation 'com.jaredrummler:android-device-names:1.1.7'
     implementation 'com.github.antonKozyriatskyi:DevDrawer:1.0'
-    implementation 'com.tonyodev.fetch2fileserver:fetch2fileserver:2.2.0-RC11'
     implementation 'com.github.kittinunf.fuel:fuel-android:1.15.0'
     implementation 'com.evernote:android-job:1.2.6'
     implementation 'com.github.myinnos:AlphabetIndex-Fast-Scroll-RecyclerView:1.0.92'

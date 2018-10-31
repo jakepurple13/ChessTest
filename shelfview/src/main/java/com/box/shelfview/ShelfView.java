@@ -214,6 +214,7 @@ public class ShelfView extends GridView implements AdapterView.OnItemClickListen
         this.mBookClickListener = bookClickListener;
     }
 
+
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (mShelfModels.get(position).getShow()) {

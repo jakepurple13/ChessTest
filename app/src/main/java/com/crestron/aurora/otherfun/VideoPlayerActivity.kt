@@ -148,6 +148,7 @@ class VideoPlayerActivity : AppCompatActivity() {
             override fun onComplete() {
                 try {
                     this@VideoPlayerActivity.onBackPressed()
+                    //finish()
                 } catch (e: NullPointerException) {
 
                 }
@@ -161,6 +162,10 @@ class VideoPlayerActivity : AppCompatActivity() {
             override fun onStopped() {
                 updatePictureInPictureActions(R.drawable.ic_media_play_dark, labelPlay,
                         CONTROL_TYPE_PLAY, REQUEST_PLAY)
+            }
+
+            override fun onBackPress() {
+                finish()
             }
         }
 
@@ -201,6 +206,7 @@ class VideoPlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audio.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0)
+        MxVideoPlayer.backPress()
         MxVideoPlayer.releaseAllVideos()
         super.onDestroy()
     }
