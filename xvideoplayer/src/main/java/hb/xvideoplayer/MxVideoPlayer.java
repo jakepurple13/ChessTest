@@ -73,6 +73,8 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
 
     protected static boolean WIFI_TIP_DIALOG_SHOWED = false;
 
+    public boolean mLocked = false;
+
     public static int FULLSCREEN_ORIENTATION = ActivityInfo.SCREEN_ORIENTATION_SENSOR; //由物理感应器决定显示方向
     public static int NORMAL_ORIENTATION = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;   //竖屏
 
@@ -412,6 +414,7 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
                     dismissProgressDialog();
                     dismissVolumeDialog();
                     dismissBrightnessDialog();
+                    dismissLockDialog();
                     if (mChangePosition) {
                         onActionEvent(MxUserAction.ON_TOUCH_SCREEN_SEEK_POSITION);
                         MxMediaManager.getInstance().getPlayer().seekTo(mSeekTimePosition);
@@ -432,6 +435,14 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
             }
         }
         return false;
+    }
+
+    public void seekToPosition(long seek) {
+        onActionEvent(MxUserAction.ON_TOUCH_SCREEN_SEEK_POSITION);
+        MxMediaManager.getInstance().getPlayer().seekTo(seek);
+        int duration = getDuration();
+        int progress = (int) (seek * 100 / (duration == 0 ? 1 : duration));
+        mProgressBar.setProgress(progress);
     }
 
     private void startWindowTiny() {
@@ -1144,9 +1155,13 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
 
     protected abstract void showVolumeDialog(float v, int volumePercent);
 
+    protected abstract void showLockDialog();
+
     protected abstract void dismissVolumeDialog();
 
     protected abstract void dismissBrightnessDialog();
 
     protected abstract void dismissProgressDialog();
+
+    protected abstract void dismissLockDialog();
 }

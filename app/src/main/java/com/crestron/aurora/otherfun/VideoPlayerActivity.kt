@@ -25,6 +25,7 @@ import com.crestron.aurora.R
 import hb.xvideoplayer.MxPlayerListener
 import hb.xvideoplayer.MxVideoPlayer
 import kotlinx.android.synthetic.main.activity_video_player.*
+import org.jetbrains.anko.defaultSharedPreferences
 
 
 class VideoPlayerActivity : AppCompatActivity() {
@@ -122,6 +123,8 @@ class VideoPlayerActivity : AppCompatActivity() {
     lateinit var path: String
     lateinit var name: String
 
+    var currentPos: Long = 0
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -155,11 +158,13 @@ class VideoPlayerActivity : AppCompatActivity() {
             }
 
             override fun onStarted() {
+                mpw_video_player.seekToPosition(defaultSharedPreferences.getLong(path, 0))
                 updatePictureInPictureActions(R.drawable.ic_media_pause_dark, labelPause,
                         CONTROL_TYPE_PAUSE, REQUEST_PAUSE)
             }
 
             override fun onStopped() {
+                currentPos = mpw_video_player.videoPosition
                 updatePictureInPictureActions(R.drawable.ic_media_play_dark, labelPlay,
                         CONTROL_TYPE_PLAY, REQUEST_PLAY)
             }
@@ -173,7 +178,6 @@ class VideoPlayerActivity : AppCompatActivity() {
 
     override fun onUserLeaveHint() {
         //super.onUserLeaveHint()
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             minimize()
         }
@@ -204,6 +208,9 @@ class VideoPlayerActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        val position = currentPos
+        Loged.wtf("$path at $position")
+        defaultSharedPreferences.edit().putLong(path, position).apply()
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audio.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0)
         MxVideoPlayer.backPress()
@@ -226,6 +233,7 @@ class VideoPlayerActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        currentPos = mpw_video_player.videoPosition
         if (MxVideoPlayer.backPress()) {
             return
         }

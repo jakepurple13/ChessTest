@@ -29,7 +29,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import mxvideoplayer.app.com.xvideoplayer.R;
-
 public class MxVideoPlayerWidget extends MxVideoPlayer {
 
     protected static Timer DISMISS_CONTROL_VIEW_TIMER;
@@ -40,12 +39,14 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
     public ImageView mThumbImageView;
     public ImageView mTinyBackImageView;
 
+    protected Dialog mLockDialog;
     protected Dialog mProgressDialog;
     protected Dialog mVolumeDialog;
     protected Dialog mBrightnessDialog;
     protected ProgressBar mDialogVolumeProgressBar;
     protected ProgressBar mDialogBrightnessProgressBar;
     protected ProgressBar mDialogProgressBar;
+    //protected PreviewSeekBar mDialogProgressBar;
     protected TextView mDialogSeekTime;
     protected TextView mDialogTotalTime;
     protected ImageView mDialogIcon;
@@ -527,6 +528,10 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
         return false;
     }
 
+    public long getVideoPosition() {
+        return MxMediaManager.getInstance().getPlayer().getCurrentPosition();
+    }
+
     private void showWifiDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setMessage(getResources().getString(R.string.tips_not_wifi));
@@ -549,12 +554,14 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
         builder.create().show();
     }
 
+
     @Override
     protected void showProgressDialog(float deltaX, String seekTime,
                                       int seekTimePosition, String totalTime, int totalTimeDuration) {
         if (mProgressDialog == null) {
             View localView = View.inflate(getContext(), R.layout.mx_progress_dialog, null);
             mDialogProgressBar = ((ProgressBar) localView.findViewById(R.id.duration_progressbar));
+            //mDialogProgressBar = ((PreviewSeekBar) localView.findViewById(R.id.duration_progressbar));
             mDialogSeekTime = ((TextView) localView.findViewById(R.id.video_current));
             mDialogTotalTime = ((TextView) localView.findViewById(R.id.video_duration));
             mDialogIcon = ((ImageView) localView.findViewById(R.id.duration_image_tip));
@@ -577,6 +584,7 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
             mProgressDialog.show();
         }
 
+        //mDialogSeekTime.setText("("+seekTimePosition+") " + seekTime);
         mDialogSeekTime.setText(seekTime);
         mDialogTotalTime.setText(String.format(" / %s", totalTime));
         mDialogProgressBar.setProgress(totalTimeDuration <= 0 ? 0 : (seekTimePosition * 100 / totalTimeDuration));
@@ -642,6 +650,32 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
     }
 
     @Override
+    protected void showLockDialog() {
+        if (mLockDialog == null) {
+            View localView = View.inflate(getContext(), R.layout.mx_lock_dialog, null);
+            ImageView mDialogLockView = ((ImageView) localView.findViewById(R.id.mx_lock));
+            mLockDialog = new Dialog(getContext(), R.style.mx_style_dialog_progress);
+            mLockDialog.setContentView(localView);
+            if (mLockDialog.getWindow() != null) {
+                mLockDialog.getWindow().addFlags(8);
+                mLockDialog.getWindow().addFlags(32);
+                mLockDialog.getWindow().addFlags(16);
+                mLockDialog.getWindow().setLayout(-2, -2);
+            }
+            WindowManager.LayoutParams params = mLockDialog.getWindow().getAttributes();
+            params.gravity = 49;
+            params.y = getContext().getResources()
+                    .getDimensionPixelOffset(R.dimen.mx_volume_dialog_margin_top) / 2;
+            params.width = getContext().getResources()
+                    .getDimensionPixelOffset(R.dimen.mx_mobile_dialog_width);
+            mLockDialog.getWindow().setAttributes(params);
+        }
+        if (!mLockDialog.isShowing()) {
+            mLockDialog.show();
+        }
+    }
+
+    @Override
     protected void dismissVolumeDialog() {
         if (mVolumeDialog != null) {
             mVolumeDialog.dismiss();
@@ -652,6 +686,13 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
     protected void dismissBrightnessDialog() {
         if (mBrightnessDialog != null) {
             mBrightnessDialog.dismiss();
+        }
+    }
+
+    @Override
+    protected void dismissLockDialog() {
+        if (mLockDialog != null) {
+            mLockDialog.dismiss();
         }
     }
 

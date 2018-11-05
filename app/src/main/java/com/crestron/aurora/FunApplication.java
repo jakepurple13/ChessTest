@@ -22,14 +22,13 @@ import android.os.Environment;
 import android.support.v7.graphics.Palette;
 
 import com.crashlytics.android.Crashlytics;
-import com.crestron.aurora.cardgames.solitaire.SolitaireActivity;
+import com.crestron.aurora.otherfun.DownloadViewerActivity;
 import com.crestron.aurora.otherfun.FetchingUtils;
 import com.crestron.aurora.otherfun.ShowCheckService;
 import com.crestron.aurora.otherfun.ShowListActivity;
 import com.crestron.aurora.otherfun.UpdateCheckService;
 import com.crestron.aurora.otherfun.ViewVideosActivity;
 import com.crestron.aurora.showapi.Source;
-import com.crestron.aurora.utilities.KUtility;
 import com.evernote.android.job.JobManager;
 import com.facebook.stetho.Stetho;
 import com.google.firebase.FirebaseApp;
@@ -144,7 +143,7 @@ public class FunApplication extends Application {
 
             scl.add(recentCartoon);
 
-            intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, SolitaireActivity.class);
+            /*intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, SolitaireActivity.class);
             intent.putExtra(ConstantValues.DRAW_AMOUNT, KUtility.Util.getSharedPref(this).getInt(ConstantValues.DRAW_AMOUNT, 1));
 
             ShortcutInfo solitaireSC = new ShortcutInfo.Builder(context, "id3")
@@ -154,7 +153,7 @@ public class FunApplication extends Application {
                     .setIntent(intent)
                     .build();
 
-            scl.add(solitaireSC);
+            scl.add(solitaireSC);*/
 
             intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, ViewVideosActivity.class);
 
@@ -176,6 +175,22 @@ public class FunApplication extends Application {
                     .build();
 
             scl.add(videoView);
+
+            intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, DownloadViewerActivity.class);
+
+            Icon downloadIcon = Icon.createWithBitmap(new IconicsDrawable(this)
+                    .icon(GoogleMaterial.Icon.gmd_file_download)
+                    .color(getComplimentColor(p))
+                    .toBitmap());
+
+            ShortcutInfo downloadViewer = new ShortcutInfo.Builder(context, "id5")
+                    .setShortLabel("View Downloads")
+                    .setLongLabel("View Downloads")
+                    .setIcon(downloadIcon)
+                    .setIntent(intent)
+                    .build();
+
+            scl.add(downloadViewer);
 
             shortcutManager.setDynamicShortcuts(scl);
         }

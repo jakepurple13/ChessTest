@@ -32,6 +32,7 @@ import com.crestron.aurora.views.DeleteDialog
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Request
 import com.squareup.picasso.RequestHandler
+import com.tonyodev.fetch2.Fetch
 import github.nisrulz.recyclerviewhelper.RVHAdapter
 import github.nisrulz.recyclerviewhelper.RVHItemTouchHelperCallback
 import kotlinx.android.synthetic.main.activity_view_videos.*
@@ -88,6 +89,7 @@ class ViewVideosActivity : AppCompatActivity() {
 
             adapter = VideoAdapter(listOfFiles, this@ViewVideosActivity, object : DeleteVideoListener {
                 override fun videoDelete(position: Int) {
+                    defaultSharedPreferences.edit().remove(listOfFiles[position].path).apply()
                     listOfFiles.removeAt(position)
                     adapter.notifyItemRemoved(position)
                 }
@@ -130,6 +132,7 @@ class ViewVideosActivity : AppCompatActivity() {
                             GlobalScope.launch {
                                 for (f in listOfFiles) {
                                     if (selectedNames!!.any { it == f.name }) {
+                                        defaultSharedPreferences.edit().remove(f.path).apply()
                                         f.delete()
                                         runOnUiThread {
                                             val index = listOfFiles.indexOf(f)
@@ -162,7 +165,8 @@ class ViewVideosActivity : AppCompatActivity() {
         val filter = IntentFilter().apply {
             addAction(ConstantValues.BROADCAST_VIDEO)
         }
-        registerReceiver(br, filter)
+        if (Fetch.getDefaultInstance().hasActiveDownloads)
+            registerReceiver(br, filter)
     }
 
     private fun getListFiles2(parentDir: File): ArrayList<File> {

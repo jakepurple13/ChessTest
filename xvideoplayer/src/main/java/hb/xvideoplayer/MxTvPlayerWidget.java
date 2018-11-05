@@ -579,6 +579,16 @@ public class MxTvPlayerWidget extends MxVideoPlayer {
         }
     }
 
+    @Override
+    protected void dismissLockDialog() {
+
+    }
+
+    @Override
+    protected void showLockDialog() {
+
+    }
+
     public interface OnPlayStateListener {
         void onPlayPrepared();
 
