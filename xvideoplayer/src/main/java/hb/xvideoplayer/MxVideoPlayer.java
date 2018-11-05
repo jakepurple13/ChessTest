@@ -337,105 +337,104 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        gesture.onTouchEvent(event);
-        float x = event.getX();
-        float y = event.getY();
-        int id = v.getId();
-        //showLockDialog();
-        if (id == R.id.mx_surface_container) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    Log.i(TAG, "onTouch: surfaceContainer actionDown [" + this.hashCode() + "] ");
-                    mTouchingProgressBar = true;
-                    mDownX = x;
-                    mDownY = y;
-                    mChangeLight = false;
-                    mChangeVolume = false;
-                    mChangePosition = false;
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    Log.i(TAG, "onTouch: surfaceContainer actionMove [" + this.hashCode() + "] ");
-                    float deltaX = x - mDownX;
-                    float deltaY = y - mDownY;
-                    float absDeltaX = Math.abs(deltaX);
-                    float absDeltaY = Math.abs(deltaY);
-                    if (mCurrentScreen == SCREEN_WINDOW_FULLSCREEN) {
-                        if (!mChangePosition && !mChangeVolume && !mChangeLight) {
-                            if (absDeltaX > THRESHOLD || absDeltaY > THRESHOLD) {
-                                cancelProgressTimer();
-                                if (absDeltaX >= THRESHOLD) { // adjust progress
-                                    if (mCurrentState != CURRENT_STATE_ERROR) {
-                                        mChangePosition = true;
-                                        mDownPosition = getCurrentPositionWhenPlaying();
-                                    }
-                                } else {
-                                    if (x <= MxMediaManager.mTextureView.getWidth() / 2) {  // adjust the volume
-                                        mChangeVolume = true;
-                                        mGestureDownVolume = mAudioManager.
-                                                getStreamVolume(AudioManager.STREAM_MUSIC);
-                                    } else {  // adjust the light
-                                        mChangeLight = true;
-                                        mGestureDownBrightness = MxUtils.getScreenBrightness((Activity) getContext());
+        if (!mLocked) {
+            gesture.onTouchEvent(event);
+            float x = event.getX();
+            float y = event.getY();
+            int id = v.getId();
+            if (id == R.id.mx_surface_container) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        Log.i(TAG, "onTouch: surfaceContainer actionDown [" + this.hashCode() + "] ");
+                        mTouchingProgressBar = true;
+                        mDownX = x;
+                        mDownY = y;
+                        mChangeLight = false;
+                        mChangeVolume = false;
+                        mChangePosition = false;
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        Log.i(TAG, "onTouch: surfaceContainer actionMove [" + this.hashCode() + "] ");
+                        float deltaX = x - mDownX;
+                        float deltaY = y - mDownY;
+                        float absDeltaX = Math.abs(deltaX);
+                        float absDeltaY = Math.abs(deltaY);
+                        if (mCurrentScreen == SCREEN_WINDOW_FULLSCREEN) {
+                            if (!mChangePosition && !mChangeVolume && !mChangeLight) {
+                                if (absDeltaX > THRESHOLD || absDeltaY > THRESHOLD) {
+                                    cancelProgressTimer();
+                                    if (absDeltaX >= THRESHOLD) { // adjust progress
+                                        if (mCurrentState != CURRENT_STATE_ERROR) {
+                                            mChangePosition = true;
+                                            mDownPosition = getCurrentPositionWhenPlaying();
+                                        }
+                                    } else {
+                                        if (x <= MxMediaManager.mTextureView.getWidth() / 2) {  // adjust the volume
+                                            mChangeVolume = true;
+                                            mGestureDownVolume = mAudioManager.
+                                                    getStreamVolume(AudioManager.STREAM_MUSIC);
+                                        } else {  // adjust the light
+                                            mChangeLight = true;
+                                            mGestureDownBrightness = MxUtils.getScreenBrightness((Activity) getContext());
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    if (mChangePosition) {
-                        int totalTimeDuration = getDuration();
-                        mSeekTimePosition = (int) (mDownPosition + deltaX * 100);
-                        if (mSeekTimePosition > totalTimeDuration) {
-                            mSeekTimePosition = totalTimeDuration;
+                        if (mChangePosition) {
+                            int totalTimeDuration = getDuration();
+                            mSeekTimePosition = (int) (mDownPosition + deltaX * 100);
+                            if (mSeekTimePosition > totalTimeDuration) {
+                                mSeekTimePosition = totalTimeDuration;
+                            }
+                            String seekTime = MxUtils.stringForTime(mSeekTimePosition);
+                            String totalTime = MxUtils.stringForTime(totalTimeDuration);
+                            showProgressDialog(deltaX, seekTime, mSeekTimePosition, totalTime, totalTimeDuration);
                         }
-                        String seekTime = MxUtils.stringForTime(mSeekTimePosition);
-                        String totalTime = MxUtils.stringForTime(totalTimeDuration);
-                        showProgressDialog(deltaX, seekTime, mSeekTimePosition, totalTime, totalTimeDuration);
-                    }
-                    if (mChangeVolume) {
-                        deltaY = -deltaY;  // up is -, down is +
-                        int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-                        int deltaV = (int) (maxVolume * deltaY * 3 / mScreenHeight);
-                        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mGestureDownVolume + deltaV, 0);
-                        int volumePercent = (int) (mGestureDownVolume * 100 / maxVolume + deltaY * 3 * 100 / mScreenHeight);
-                        showVolumeDialog(-deltaY, volumePercent);
-                    }
-                    if (mChangeLight) {
-                        deltaY = -deltaY;  // up is -, down is +
-                        int deltaV = (int) (255 * deltaY * 3 / mScreenHeight);
-                        //MxUtils.setScreenManualMode(getContext());
-                        int brightnessValue = mGestureDownBrightness + deltaV;
-                        if (brightnessValue >= 0 && brightnessValue <= 255) {
-                            MxUtils.setWindowBrightness((Activity) getContext(), brightnessValue);
+                        if (mChangeVolume) {
+                            deltaY = -deltaY;  // up is -, down is +
+                            int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                            int deltaV = (int) (maxVolume * deltaY * 3 / mScreenHeight);
+                            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mGestureDownVolume + deltaV, 0);
+                            int volumePercent = (int) (mGestureDownVolume * 100 / maxVolume + deltaY * 3 * 100 / mScreenHeight);
+                            showVolumeDialog(-deltaY, volumePercent);
                         }
-                        int brightnessPercent = (int) (mGestureDownBrightness + deltaY * 255 * 3 / mScreenHeight);
-                        showBrightnessDialog(-deltaY, brightnessPercent);
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    Log.i(TAG, "onTouch: surfaceContainer actionUp [" + this.hashCode() + "] ");
-                    mTouchingProgressBar = false;
-                    dismissProgressDialog();
-                    dismissVolumeDialog();
-                    dismissBrightnessDialog();
-                    //if(!mLocked)
-                    //dismissLockDialog();
-                    if (mChangePosition) {
-                        onActionEvent(MxUserAction.ON_TOUCH_SCREEN_SEEK_POSITION);
-                        MxMediaManager.getInstance().getPlayer().seekTo(mSeekTimePosition);
-                        int duration = getDuration();
-                        int progress = mSeekTimePosition * 100 / (duration == 0 ? 1 : duration);
-                        mProgressBar.setProgress(progress);
-                    }
-                    if (mChangeVolume) {
-                        onActionEvent(MxUserAction.ON_TOUCH_SCREEN_SEEK_VOLUME);
-                    }
-                    if (mChangeLight) {
-                        onActionEvent(MxUserAction.ON_TOUCH_SCREEN_SEEK_BRIGHTNESS);
-                    }
-                    startProgressTimer();
-                    break;
-                default:
-                    break;
+                        if (mChangeLight) {
+                            deltaY = -deltaY;  // up is -, down is +
+                            int deltaV = (int) (255 * deltaY * 3 / mScreenHeight);
+                            //MxUtils.setScreenManualMode(getContext());
+                            int brightnessValue = mGestureDownBrightness + deltaV;
+                            if (brightnessValue >= 0 && brightnessValue <= 255) {
+                                MxUtils.setWindowBrightness((Activity) getContext(), brightnessValue);
+                            }
+                            int brightnessPercent = (int) (mGestureDownBrightness + deltaY * 255 * 3 / mScreenHeight);
+                            showBrightnessDialog(-deltaY, brightnessPercent);
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        Log.i(TAG, "onTouch: surfaceContainer actionUp [" + this.hashCode() + "] ");
+                        mTouchingProgressBar = false;
+                        dismissProgressDialog();
+                        dismissVolumeDialog();
+                        dismissBrightnessDialog();
+                        if (mChangePosition) {
+                            onActionEvent(MxUserAction.ON_TOUCH_SCREEN_SEEK_POSITION);
+                            MxMediaManager.getInstance().getPlayer().seekTo(mSeekTimePosition);
+                            int duration = getDuration();
+                            int progress = mSeekTimePosition * 100 / (duration == 0 ? 1 : duration);
+                            mProgressBar.setProgress(progress);
+                        }
+                        if (mChangeVolume) {
+                            onActionEvent(MxUserAction.ON_TOUCH_SCREEN_SEEK_VOLUME);
+                        }
+                        if (mChangeLight) {
+                            onActionEvent(MxUserAction.ON_TOUCH_SCREEN_SEEK_BRIGHTNESS);
+                        }
+                        startProgressTimer();
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         return false;
@@ -810,8 +809,10 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
         }
         MxMediaManager.getInstance().getPlayer().start();
         setUiPlayState(CURRENT_STATE_PLAYING);
-        if (playerListener != null)
+        if (playerListener != null) {
             playerListener.onStarted();
+            playerListener.onPrepared();
+        }
     }
 
     @Override

@@ -149,6 +149,7 @@ class VideoPlayerActivity : AppCompatActivity() {
 
         val pos = defaultSharedPreferences.getLong(path, 0)
         Loged.wtf("$path at $pos")
+        //mpw_video_player.seekToPosition(pos)
 
         mpw_video_player.playerListener = object : MxPlayerListener {
             override fun onComplete() {
@@ -161,7 +162,6 @@ class VideoPlayerActivity : AppCompatActivity() {
             }
 
             override fun onStarted() {
-                mpw_video_player.seekToPosition(pos)
                 updatePictureInPictureActions(R.drawable.ic_media_pause_dark, labelPause,
                         CONTROL_TYPE_PAUSE, REQUEST_PAUSE)
             }
@@ -175,6 +175,10 @@ class VideoPlayerActivity : AppCompatActivity() {
             override fun onBackPress() {
                 //currentPos = mpw_video_player.currentPositionInVideo
                 finish()
+            }
+
+            override fun onPrepared() {
+                mpw_video_player.seekToPosition(pos)
             }
         }
 

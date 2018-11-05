@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -27,10 +28,14 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
 import mxvideoplayer.app.com.xvideoplayer.R;
+
 public class MxVideoPlayerWidget extends MxVideoPlayer {
 
     protected static Timer DISMISS_CONTROL_VIEW_TIMER;
@@ -45,6 +50,7 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
     protected Dialog mProgressDialog;
     protected Dialog mVolumeDialog;
     protected Dialog mBrightnessDialog;
+    protected ImageButton mDialogLockView;
     protected ProgressBar mDialogVolumeProgressBar;
     protected ProgressBar mDialogBrightnessProgressBar;
     protected ProgressBar mDialogProgressBar;
@@ -199,33 +205,36 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        int id = v.getId();
-        if (id == R.id.mx_surface_container) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_UP:
-                    startDismissControlViewTimer();
-                    if (mChangePosition) {
-                        int duration = getDuration();
-                        int progress = mSeekTimePosition * 100 / (duration == 0 ? 1 : duration);
-                        mBottomProgressBar.setProgress(progress);
-                    }
-                    if (!mChangePosition && !mChangeVolume) {
-                        onClickUiToggle();
-                    }
-                    break;
-                default:
-                    break;
-            }
-        } else if (id == R.id.mx_progress) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    cancelDismissControlViewTimer();
-                    break;
-                case MotionEvent.ACTION_UP:
-                    startDismissControlViewTimer();
-                    break;
-                default:
-                    break;
+        showLockDialog();
+        if (!mLocked) {
+            int id = v.getId();
+            if (id == R.id.mx_surface_container) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_UP:
+                        startDismissControlViewTimer();
+                        if (mChangePosition) {
+                            int duration = getDuration();
+                            int progress = mSeekTimePosition * 100 / (duration == 0 ? 1 : duration);
+                            mBottomProgressBar.setProgress(progress);
+                        }
+                        if (!mChangePosition && !mChangeVolume) {
+                            onClickUiToggle();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            } else if (id == R.id.mx_progress) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        cancelDismissControlViewTimer();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        startDismissControlViewTimer();
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         return super.onTouch(v, event);
@@ -655,16 +664,33 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
     protected void showLockDialog() {
         if (mLockDialog == null) {
             View localView = View.inflate(getContext(), R.layout.mx_lock_dialog, null);
-            final ImageButton mDialogLockView = ((ImageButton) localView.findViewById(R.id.mx_lock));
+            mDialogLockView = ((ImageButton) localView.findViewById(R.id.mx_lock));
+            mDialogLockView.setImageDrawable(new IconicsDrawable(getContext())
+                    .icon(mLocked ? FontAwesome.Icon.faw_lock : FontAwesome.Icon.faw_unlock).sizeDp(24));
             mDialogLockView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mLocked = !mLocked;
-
                     if (mLocked)
-                        mDialogLockView.setImageResource(android.R.drawable.ic_lock_silent_mode);
+                        mDialogLockView.setImageDrawable(new IconicsDrawable(getContext())
+                                .icon(FontAwesome.Icon.faw_lock).sizeDp(24));
                     else
-                        mDialogLockView.setImageResource(android.R.drawable.ic_lock_silent_mode_off);
+                        mDialogLockView.setImageDrawable(new IconicsDrawable(getContext())
+                                .icon(FontAwesome.Icon.faw_unlock).sizeDp(24));
+
+                    Log.v("ShowLockDialog", "mLocked is " + mLocked);
+                }
+            });
+            localView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mLocked = !mLocked;
+                    if (mLocked)
+                        mDialogLockView.setImageDrawable(new IconicsDrawable(getContext())
+                                .icon(FontAwesome.Icon.faw_lock).sizeDp(24));
+                    else
+                        mDialogLockView.setImageDrawable(new IconicsDrawable(getContext())
+                                .icon(FontAwesome.Icon.faw_unlock).sizeDp(24));
 
                     Log.v("ShowLockDialog", "mLocked is " + mLocked);
                 }
@@ -673,16 +699,16 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
             mLockDialog.setContentView(localView);
             if (mLockDialog.getWindow() != null) {
                 mLockDialog.getWindow().addFlags(8);
-                mLockDialog.getWindow().addFlags(32);
-                mLockDialog.getWindow().addFlags(16);
+                //mLockDialog.getWindow().addFlags(32);
+                //mLockDialog.getWindow().addFlags(16);
                 mLockDialog.getWindow().setLayout(-2, -2);
             }
             WindowManager.LayoutParams params = mLockDialog.getWindow().getAttributes();
-            params.gravity = 49;
+            params.gravity = Gravity.END | Gravity.TOP;
             params.y = getContext().getResources()
                     .getDimensionPixelOffset(R.dimen.mx_volume_dialog_margin_top) / 2;
             params.width = getContext().getResources()
-                    .getDimensionPixelOffset(R.dimen.mx_mobile_dialog_width);
+                    .getDimensionPixelOffset(R.dimen.mx_volume_dialog_margin_top) / 2;
             mLockDialog.getWindow().setAttributes(params);
         }
         if (!mLockDialog.isShowing()) {
@@ -744,6 +770,9 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
                                 mTopContainer.startAnimation(fadeOut);
                             if (mPlayControllerButton.getVisibility() == View.VISIBLE)
                                 mPlayControllerButton.startAnimation(fadeOut);
+
+                            if (!mLocked)
+                                dismissLockDialog();
 
                             mBottomContainer.setVisibility(View.INVISIBLE);
                             mTopContainer.setVisibility(View.INVISIBLE);

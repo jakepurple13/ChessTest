@@ -1,5 +1,6 @@
 package com.crestron.aurora
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
@@ -124,6 +125,7 @@ class SettingsShowActivity : AppCompatActivity() {
 
                             }
 
+                            @SuppressLint("SetTextI18n")
                             override fun onPeek(p0: View?, p1: Int) {
                                 val peekView = peekAndPop.peekView
                                 val title = peekView.findViewById(R.id.title_dialog) as TextView

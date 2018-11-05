@@ -1,5 +1,6 @@
 package com.crestron.aurora.otherfun
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
@@ -69,6 +70,7 @@ class ShowListActivity : AppCompatActivity() {
 
                 }
 
+                @SuppressLint("SetTextI18n")
                 override fun onPeek(p0: View?, p1: Int) {
                     val peekView = peekAndPop.peekView
                     val title = peekView.findViewById(R.id.title_dialog) as TextView
