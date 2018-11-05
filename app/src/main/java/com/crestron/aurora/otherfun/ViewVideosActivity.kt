@@ -82,6 +82,17 @@ class ViewVideosActivity : AppCompatActivity() {
             for (i in listOfFiles) {
                 Loged.i(i.name)
             }
+            //to get rid of any preferences of any videos that have been deleted else where
+            val prefs = defaultSharedPreferences.all.keys
+            val fileRegex = "(\\/[^*|\"<>?\\n]*)|(\\\\\\\\.*?\\\\.*)".toRegex()
+            val filePrefs = prefs.filter { fileRegex.containsMatchIn(it) }
+            for (p in filePrefs) {
+                Loged.i(p)
+                if (!listOfFiles.any { it.path == p }) {
+                    Loged.d(p)
+                    defaultSharedPreferences.edit().remove(p).apply()
+                }
+            }
 
             val instance = Picasso.Builder(this@ViewVideosActivity)
                     .addRequestHandler(VideoRequestHandler())
@@ -104,6 +115,7 @@ class ViewVideosActivity : AppCompatActivity() {
             runOnUiThread {
                 video_refresh.isRefreshing = false
             }
+
         }
 
         getStuff()

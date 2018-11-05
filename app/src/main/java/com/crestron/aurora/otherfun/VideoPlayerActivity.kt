@@ -147,6 +147,9 @@ class VideoPlayerActivity : AppCompatActivity() {
         mpw_video_player.hideFullScreenButton = true
         mpw_video_player.autoStartPlay(path, MxVideoPlayer.SCREEN_WINDOW_FULLSCREEN, name)
 
+        val pos = defaultSharedPreferences.getLong(path, 0)
+        Loged.wtf("$path at $pos")
+
         mpw_video_player.playerListener = object : MxPlayerListener {
             override fun onComplete() {
                 try {
@@ -158,18 +161,19 @@ class VideoPlayerActivity : AppCompatActivity() {
             }
 
             override fun onStarted() {
-                mpw_video_player.seekToPosition(defaultSharedPreferences.getLong(path, 0))
+                mpw_video_player.seekToPosition(pos)
                 updatePictureInPictureActions(R.drawable.ic_media_pause_dark, labelPause,
                         CONTROL_TYPE_PAUSE, REQUEST_PAUSE)
             }
 
             override fun onStopped() {
-                currentPos = mpw_video_player.videoPosition
+                currentPos = mpw_video_player.currentPositionInVideo
                 updatePictureInPictureActions(R.drawable.ic_media_play_dark, labelPlay,
                         CONTROL_TYPE_PLAY, REQUEST_PLAY)
             }
 
             override fun onBackPress() {
+                //currentPos = mpw_video_player.currentPositionInVideo
                 finish()
             }
         }
@@ -233,7 +237,7 @@ class VideoPlayerActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        currentPos = mpw_video_player.videoPosition
+        currentPos = mpw_video_player.currentPositionInVideo
         if (MxVideoPlayer.backPress()) {
             return
         }

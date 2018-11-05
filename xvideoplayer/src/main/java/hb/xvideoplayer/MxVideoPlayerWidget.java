@@ -10,6 +10,7 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -583,9 +585,9 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
         if (!mProgressDialog.isShowing()) {
             mProgressDialog.show();
         }
-
-        //mDialogSeekTime.setText("("+seekTimePosition+") " + seekTime);
-        mDialogSeekTime.setText(seekTime);
+        long seekedTime = Math.abs(getCurrentPositionWhenPlaying() - seekTimePosition);
+        String seekTimeText = "(" + MxUtils.stringForTime(seekedTime) + ") " + seekTime;
+        mDialogSeekTime.setText(seekTimeText);
         mDialogTotalTime.setText(String.format(" / %s", totalTime));
         mDialogProgressBar.setProgress(totalTimeDuration <= 0 ? 0 : (seekTimePosition * 100 / totalTimeDuration));
         if (deltaX > 0) {
@@ -653,7 +655,20 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
     protected void showLockDialog() {
         if (mLockDialog == null) {
             View localView = View.inflate(getContext(), R.layout.mx_lock_dialog, null);
-            ImageView mDialogLockView = ((ImageView) localView.findViewById(R.id.mx_lock));
+            final ImageButton mDialogLockView = ((ImageButton) localView.findViewById(R.id.mx_lock));
+            mDialogLockView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mLocked = !mLocked;
+
+                    if (mLocked)
+                        mDialogLockView.setImageResource(android.R.drawable.ic_lock_silent_mode);
+                    else
+                        mDialogLockView.setImageResource(android.R.drawable.ic_lock_silent_mode_off);
+
+                    Log.v("ShowLockDialog", "mLocked is " + mLocked);
+                }
+            });
             mLockDialog = new Dialog(getContext(), R.style.mx_style_dialog_progress);
             mLockDialog.setContentView(localView);
             if (mLockDialog.getWindow() != null) {

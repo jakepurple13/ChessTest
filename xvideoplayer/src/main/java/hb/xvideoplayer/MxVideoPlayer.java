@@ -127,6 +127,8 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
 
     public GestureDetector gesture;
 
+    public long currentPositionInVideo = 0;
+
     public static AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener =
             new AudioManager.OnAudioFocusChangeListener() {
                 @Override
@@ -339,6 +341,7 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
         float x = event.getX();
         float y = event.getY();
         int id = v.getId();
+        //showLockDialog();
         if (id == R.id.mx_surface_container) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
@@ -414,7 +417,8 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
                     dismissProgressDialog();
                     dismissVolumeDialog();
                     dismissBrightnessDialog();
-                    dismissLockDialog();
+                    //if(!mLocked)
+                    //dismissLockDialog();
                     if (mChangePosition) {
                         onActionEvent(MxUserAction.ON_TOUCH_SCREEN_SEEK_POSITION);
                         MxMediaManager.getInstance().getPlayer().seekTo(mSeekTimePosition);
@@ -1111,6 +1115,7 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
+                        currentPositionInVideo = MxMediaManager.getInstance().getPlayer().getCurrentPosition();
                         setTextAndProgress(MxMediaManager.getInstance().bufferPercent);
                     }
                 });
