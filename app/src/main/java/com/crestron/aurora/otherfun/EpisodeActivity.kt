@@ -28,6 +28,7 @@ import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.utilities.ViewUtil
+import com.crestron.aurora.views.DownloadsWidget
 import com.like.LikeButton
 import com.like.OnLikeListener
 import com.squareup.picasso.Picasso
@@ -103,6 +104,7 @@ class EpisodeActivity : AppCompatActivity() {
                 super.onStarted(download, downloadBlocks, totalBlocks)
                 //mNotificationManager.cancelAll()
                 progressBar2.max = 100
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onProgress(download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
@@ -124,6 +126,7 @@ class EpisodeActivity : AppCompatActivity() {
                             DownloadViewerActivity::class.java,
                             download.id)
                 }
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onCancelled(download: Download) {
@@ -138,6 +141,7 @@ class EpisodeActivity : AppCompatActivity() {
                 }
                 progressBar2.progress = 0
                 //download_info.text = nameUrl("0% at 0 b/s with 0 secs left")
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onPaused(download: Download) {
@@ -149,6 +153,7 @@ class EpisodeActivity : AppCompatActivity() {
                         this@EpisodeActivity,
                         DownloadViewerActivity::class.java,
                         download.id)
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onResumed(download: Download) {
@@ -160,6 +165,7 @@ class EpisodeActivity : AppCompatActivity() {
                         this@EpisodeActivity,
                         DownloadViewerActivity::class.java,
                         download.id)
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onDeleted(download: Download) {
@@ -172,6 +178,7 @@ class EpisodeActivity : AppCompatActivity() {
                 } catch (e: java.lang.NullPointerException) {
                     e.printStackTrace()
                 }
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onError(download: Download, error: Error, throwable: Throwable?) {
@@ -215,6 +222,7 @@ class EpisodeActivity : AppCompatActivity() {
                             KeyAndValue("video_path", download.file),
                             KeyAndValue("video_name", name))
                 }
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
         })

@@ -157,40 +157,46 @@ public class FunApplication extends Application {
 
             intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, ViewVideosActivity.class);
 
-            final WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
-            final Drawable wallpaperDrawable = wallpaperManager.getDrawable();
-            Bitmap bitmap = ((BitmapDrawable) wallpaperDrawable).getBitmap();
-            int p = Palette.from(bitmap).generate().getDominantColor(Color.BLACK);
+            try {
 
-            Icon icon = Icon.createWithBitmap(new IconicsDrawable(this)
-                    .icon(GoogleMaterial.Icon.gmd_video_library)
-                    .color(getComplimentColor(p))
-                    .toBitmap());
+                final WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
+                final Drawable wallpaperDrawable = wallpaperManager.getDrawable();
+                Bitmap bitmap = ((BitmapDrawable) wallpaperDrawable).getBitmap();
+                int p = Palette.from(bitmap).generate().getDominantColor(Color.BLACK);
 
-            ShortcutInfo videoView = new ShortcutInfo.Builder(context, "id4")
-                    .setShortLabel("View Videos")
-                    .setLongLabel("View Videos")
-                    .setIcon(icon)
-                    .setIntent(intent)
-                    .build();
+                Icon icon = Icon.createWithBitmap(new IconicsDrawable(this)
+                        .icon(GoogleMaterial.Icon.gmd_video_library)
+                        .color(getComplimentColor(p))
+                        .toBitmap());
 
-            scl.add(videoView);
+                ShortcutInfo videoView = new ShortcutInfo.Builder(context, "id4")
+                        .setShortLabel("View Videos")
+                        .setLongLabel("View Videos")
+                        .setIcon(icon)
+                        .setIntent(intent)
+                        .build();
 
-            intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, DownloadViewerActivity.class);
+                scl.add(videoView);
 
-            Icon downloadIcon = Icon.createWithBitmap(new IconicsDrawable(this)
-                    .icon(GoogleMaterial.Icon.gmd_file_download)
-                    .color(getComplimentColor(p))
-                    .toBitmap());
+                intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, DownloadViewerActivity.class);
 
-            ShortcutInfo downloadViewer = new ShortcutInfo.Builder(context, "id5")
-                    .setShortLabel("View Downloads")
-                    .setLongLabel("View Downloads")
-                    .setIcon(downloadIcon)
-                    .setIntent(intent)
-                    .build();
+                Icon downloadIcon = Icon.createWithBitmap(new IconicsDrawable(this)
+                        .icon(GoogleMaterial.Icon.gmd_file_download)
+                        .color(getComplimentColor(p))
+                        .toBitmap());
 
-            scl.add(downloadViewer);
+                ShortcutInfo downloadViewer = new ShortcutInfo.Builder(context, "id5")
+                        .setShortLabel("View Downloads")
+                        .setLongLabel("View Downloads")
+                        .setIcon(downloadIcon)
+                        .setIntent(intent)
+                        .build();
+
+                scl.add(downloadViewer);
+
+            } catch (SecurityException e) {
+                Loged.INSTANCE.wtf(e.getMessage(), Loged.INSTANCE.getTAG(), true);
+            }
 
             shortcutManager.setDynamicShortcuts(scl);
         }

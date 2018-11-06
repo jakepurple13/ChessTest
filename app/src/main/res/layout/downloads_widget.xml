@@ -1,0 +1,60 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/rounded_corner"
+    android:backgroundTint="@color/cod_gray"
+    android:clipChildren="true"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/widgetTitleLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:text="Downloads"
+            android:textAllCaps="true"
+            android:textColor="@color/md_white_1000"
+            android:textSize="18dp" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_below="@id/title_bar"
+        android:layout_above="@id/download_count_bar"
+        android:id="@+id/widget_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ListView
+            android:id="@+id/download_list_widget"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="#eeeeee"
+            android:dividerHeight="1dp"
+            tools:listitem="@layout/widget_item" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/download_count_bar"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/widget_download_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/md_white_1000"
+            android:textSize="18dp"
+            android:text="Download Count" />
+
+    </LinearLayout>
+
+</RelativeLayout>

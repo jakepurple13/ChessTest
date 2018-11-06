@@ -18,6 +18,7 @@ import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.ViewUtil
+import com.crestron.aurora.views.DownloadsWidget
 import com.tonyodev.fetch2.AbstractFetchListener
 import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2.Error
@@ -165,6 +166,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                     StartVideoFromNotificationActivity::class.java, download.id,
                     EpisodeActivity.KeyAndValue("video_path", download.file),
                     EpisodeActivity.KeyAndValue("video_name", download.file))
+            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onError(download: Download, error: Error, throwable: Throwable?) {
@@ -194,6 +196,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                     this@DownloadViewerActivity,
                     DownloadViewerActivity::class.java,
                     download.id)
+            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onPaused(@NotNull download: Download) {
@@ -218,6 +221,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                     this@DownloadViewerActivity,
                     DownloadViewerActivity::class.java,
                     download.id)
+            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onCancelled(@NotNull download: Download) {
@@ -231,6 +235,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             } catch (e: java.lang.NullPointerException) {
                 e.printStackTrace()
             }
+            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onRemoved(@NotNull download: Download) {
@@ -250,6 +255,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             } catch (e: java.lang.NullPointerException) {
                 e.printStackTrace()
             }
+            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
     }
 

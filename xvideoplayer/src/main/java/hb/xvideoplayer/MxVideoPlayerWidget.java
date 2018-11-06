@@ -771,8 +771,7 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
                             if (mPlayControllerButton.getVisibility() == View.VISIBLE)
                                 mPlayControllerButton.startAnimation(fadeOut);
 
-                            if (!mLocked)
-                                dismissLockDialog();
+                            dismissLockDialog();
 
                             mBottomContainer.setVisibility(View.INVISIBLE);
                             mTopContainer.setVisibility(View.INVISIBLE);

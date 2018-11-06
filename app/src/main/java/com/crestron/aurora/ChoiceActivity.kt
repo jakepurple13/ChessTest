@@ -38,6 +38,7 @@ import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.ViewUtil
+import com.crestron.aurora.views.DownloadsWidget
 import com.crestron.aurora.viewtesting.ViewTesting
 import com.github.florent37.inlineactivityresult.kotlin.startForResult
 import com.google.firebase.FirebaseApp
@@ -124,6 +125,13 @@ class ChoiceActivity : AppCompatActivity() {
         FirebaseApp.initializeApp(this)
 
         setUpDrawer(savedInstanceState)
+
+        runOnUiThread {
+            //Toast.makeText(this, "New task created", Toast.LENGTH_LONG).show()
+            //getTodoList()
+            //this will send the broadcast to update the appwidget
+            DownloadsWidget.sendRefreshBroadcast(this)
+        }
 
         //Loged.d(FirebaseInstanceId.getInstance().token!!)
 
