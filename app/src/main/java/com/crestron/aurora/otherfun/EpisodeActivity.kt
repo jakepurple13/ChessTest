@@ -119,12 +119,12 @@ class EpisodeActivity : AppCompatActivity() {
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
+                    /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
                             info,
                             download.progress,
                             this@EpisodeActivity,
                             DownloadViewerActivity::class.java,
-                            download.id)
+                            download.id)*/
                 }
                 DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
@@ -147,24 +147,24 @@ class EpisodeActivity : AppCompatActivity() {
             override fun onPaused(download: Download) {
                 super.onPaused(download)
                 stats = StatusPlay.PAUSE
-                sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
+                /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
                         "Paused",
                         download.progress,
                         this@EpisodeActivity,
                         DownloadViewerActivity::class.java,
-                        download.id)
+                        download.id)*/
                 DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onResumed(download: Download) {
                 super.onResumed(download)
                 stats = StatusPlay.PLAY
-                sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
+                /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
                         "Resumed",
                         download.progress,
                         this@EpisodeActivity,
                         DownloadViewerActivity::class.java,
-                        download.id)
+                        download.id)*/
                 DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
@@ -186,13 +186,14 @@ class EpisodeActivity : AppCompatActivity() {
                 Crashlytics.log("${error.throwable?.message}")
                 if (defaultSharedPreferences.getBoolean(ConstantValues.AUTO_RETRY, false))
                     FetchingUtils.retry(download)
-                else
+                /*else
                     sendRetryNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
                             "An error has occurred",
                             download.progress,
                             this@EpisodeActivity,
                             DownloadViewerActivity::class.java,
-                            download.id)
+                            download.id)*/
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onCompleted(download: Download) {
@@ -524,122 +525,6 @@ class EpisodeActivity : AppCompatActivity() {
         }
     }
 
-    fun sendProgressNotification(title: String, text: String, progress: Int, context: Context, gotoActivity: Class<*>, notification_id: Int) {
-
-        val mBuilder = NotificationCompat.Builder(this@EpisodeActivity, ConstantValues.CHANNEL_ID)
-                .setSmallIcon(android.R.mipmap.sym_def_app_icon)
-                .setOngoing(true)
-                .setContentTitle(title)
-                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
-                .setProgress(100, progress, false)
-                .setOnlyAlertOnce(true)
-
-        // Creates an explicit intent for an Activity in your app
-        val resultIntent = Intent(context, gotoActivity)
-        resultIntent.putExtra(ConstantValues.URL_INTENT, url)
-        resultIntent.putExtra(ConstantValues.NAME_INTENT, name)
-        resultIntent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, false)
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your app to the Home screen.
-        val stackBuilder = TaskStackBuilder.create(context)
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(gotoActivity)
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent)
-        val resultPendingIntent = stackBuilder.getPendingIntent(
-                0,
-                PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        mBuilder.setContentIntent(resultPendingIntent)
-
-        fun getPauseOrResumeAction(): NotificationCompat.Action {
-            return when (stats) {
-                StatusPlay.PLAY -> {
-                    val pauseIntent = Intent(applicationContext, PauseReceiver::class.java).apply {
-                        action = "fun.com.crestron.PAUSE_DOWNLOAD"
-                        putExtra(ConstantValues.NOTIFICATION_ID, notification_id)
-                    }
-                    val pendingPauseIntent = PendingIntent.getBroadcast(applicationContext, 1, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-                    NotificationCompat.Action(android.R.drawable.ic_media_pause, "Pause", pendingPauseIntent)
-                }
-                StatusPlay.PAUSE -> {
-                    val pauseIntent = Intent(applicationContext, ResumeReceiver::class.java).apply {
-                        action = "fun.com.crestron.RESUME_DOWNLOAD"
-                        putExtra(ConstantValues.NOTIFICATION_ID, notification_id)
-                    }
-                    val pendingPauseIntent = PendingIntent.getBroadcast(applicationContext, 1, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-                    NotificationCompat.Action(android.R.drawable.ic_media_play, "Resume", pendingPauseIntent)
-                }
-            }
-        }
-        mBuilder.addAction(getPauseOrResumeAction())
-
-        val cancelIntent = Intent(applicationContext, NotificationBroadcastReceiver::class.java).apply {
-            action = "fun.com.crestron.CANCEL_DOWNLOAD"
-            putExtra(ConstantValues.NOTIFICATION_ID, notification_id)
-        }
-
-        val pendingIntent = PendingIntent.getBroadcast(applicationContext, 1, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        mBuilder.addAction(android.R.drawable.ic_delete, "Cancel", pendingIntent)
-
-        // mNotificationId is a unique integer your app uses to identify the
-        // notification. For example, to cancel the notification, you can pass its ID
-        // number to NotificationManager.cancel().
-        mNotificationManager.notify(notification_id, mBuilder.build())
-    }
-
-    fun sendRetryNotification(title: String, text: String, progress: Int, context: Context, gotoActivity: Class<*>, notification_id: Int) {
-
-        val mBuilder = NotificationCompat.Builder(this@EpisodeActivity, ConstantValues.CHANNEL_ID)
-                .setSmallIcon(android.R.mipmap.sym_def_app_icon)
-                .setOngoing(true)
-                .setContentTitle(title)
-                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
-                .setProgress(100, progress, false)
-                .setOnlyAlertOnce(true)
-
-        // Creates an explicit intent for an Activity in your app
-        val resultIntent = Intent(context, gotoActivity)
-        resultIntent.putExtra(ConstantValues.URL_INTENT, url)
-        resultIntent.putExtra(ConstantValues.NAME_INTENT, name)
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your app to the Home screen.
-        val stackBuilder = TaskStackBuilder.create(context)
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(gotoActivity)
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent)
-        val resultPendingIntent = stackBuilder.getPendingIntent(
-                0,
-                PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        mBuilder.setContentIntent(resultPendingIntent)
-
-        val retryIntent = Intent(applicationContext, RetryReceiver::class.java).apply {
-            action = "fun.com.crestron.RETRY"
-            putExtra(ConstantValues.NOTIFICATION_ID, notification_id)
-        }
-        val pendingIntent = PendingIntent.getBroadcast(applicationContext, 1, retryIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        mBuilder.addAction(android.R.drawable.ic_delete, "Retry", pendingIntent)
-
-        val cancelIntent = Intent(applicationContext, NotificationBroadcastReceiver::class.java).apply {
-            action = "fun.com.crestron.CANCEL_DOWNLOAD"
-            putExtra(ConstantValues.NOTIFICATION_ID, notification_id)
-        }
-
-        val pendingIntent1 = PendingIntent.getBroadcast(applicationContext, 1, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        mBuilder.addAction(android.R.drawable.ic_delete, "Cancel", pendingIntent1)
-
-        // mNotificationId is a unique integer your app uses to identify the
-        // notification. For example, to cancel the notification, you can pass its ID
-        // number to NotificationManager.cancel().
-        mNotificationManager.notify(notification_id, mBuilder.build())
-    }
-
     fun sendNotification(context: Context, smallIconId: Int, title: String, message: String, channel_id: String, gotoActivity: Class<*>, notification_id: Int, vararg dataToPass: KeyAndValue) {
         // The id of the channel.
         val mBuilder = NotificationCompat.Builder(context, channel_id)
@@ -681,7 +566,7 @@ class EpisodeActivity : AppCompatActivity() {
         // mNotificationId is a unique integer your app uses to identify the
         // notification. For example, to cancel the notification, you can pass its ID
         // number to NotificationManager.cancel().
-        mNotificationManager.notify(notification_id, mBuilder.build())
+        mNotificationManager.notify(notification_id * 2, mBuilder.build())
     }
 
     data class KeyAndValue(val key: String, val value: String)

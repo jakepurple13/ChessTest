@@ -11,8 +11,6 @@ import android.widget.RemoteViewsService
 import com.crestron.aurora.R
 import com.crestron.aurora.otherfun.DownloadViewerActivity
 import com.crestron.aurora.otherfun.FetchingUtils
-import com.crestron.aurora.otherfun.PauseReceiver
-import com.crestron.aurora.otherfun.ResumeReceiver
 import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2.Status
@@ -142,42 +140,13 @@ class MyWidgetRemoteViewsFactory(private val mContext: Context, intent: Intent) 
         }
         val rv = RemoteViews(mContext.packageName, R.layout.widget_item)
         rv.setTextViewText(R.id.widgetItemTaskNameLabel, name)
-        rv.setTextViewText(R.id.info_speed, "$progress%")
+        rv.setTextViewText(R.id.info_speed, if (prog < 0) downloadList[position].status.name else "$progress%")
         rv.setProgressBar(R.id.download_progress, 100, prog.toInt(), false)
         rv.setImageViewResource(R.id.play_pause_button, if (downloadList[position].status == Status.DOWNLOADING) R.drawable.mr_media_pause_dark else R.drawable.mr_media_play_dark)
-
-        fun getPlayOrPause(): PendingIntent {
-            val pauseIntent: Intent? = when (downloadList[position].status) {
-                Status.DOWNLOADING -> {
-                    Intent(mContext, PauseReceiver::class.java).apply {
-                        action = "fun.com.crestron.PAUSE_DOWNLOAD"
-                    }
-                }
-                Status.PAUSED -> {
-                    Intent(mContext, ResumeReceiver::class.java).apply {
-                        action = "fun.com.crestron.RESUME_DOWNLOAD"
-                    }
-                }
-                else -> {
-                    Intent()
-                }
-            }
-            return PendingIntent.getBroadcast(mContext, 1, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        }
 
         val fillInIntent = Intent()
         fillInIntent.putExtra("show_to_pause_or_play", downloadList[position].id)
         rv.setOnClickFillInIntent(R.id.play_pause_button, fillInIntent)
-
-        // Next, set a fill-intent, which will be used to fill in the pending intent template
-        // that is set on the collection view in StackWidgetProvider.
-        /*val extras = Bundle()
-        extras.putInt("widget_location", position)
-        val fillInIntent = Intent()
-        fillInIntent.putExtras(extras)
-        // Make it possible to distinguish the individual on-click
-        // action of a given item
-        rv.setOnClickFillInIntent(R.id.play_pause_button, fillInIntent)*/
 
         return rv
     }

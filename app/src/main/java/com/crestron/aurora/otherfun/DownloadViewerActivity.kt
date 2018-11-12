@@ -185,13 +185,14 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             fileAdapter!!.update(download, UNKNOWN_REMAINING_TIME, UNKNOWN_DOWNLOADED_BYTES_PER_SECOND)
             if (defaultSharedPreferences.getBoolean(ConstantValues.AUTO_RETRY, false))
                 FetchingUtils.retry(download)
-            else
+            /*else
                 sendRetryNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
                         "An error has occurred",
                         download.progress,
                         this@DownloadViewerActivity,
                         DownloadViewerActivity::class.java,
-                        download.id)
+                        download.id)*/
+            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onProgress(@NotNull download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
@@ -200,12 +201,12 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             val info = "$progress% " +
                     "at ${FetchingUtils.getDownloadSpeedString(downloadedBytesPerSecond)} " +
                     "with ${FetchingUtils.getETAString(etaInMilliSeconds)}"
-            sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
+            /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
                     info,
                     download.progress,
                     this@DownloadViewerActivity,
                     DownloadViewerActivity::class.java,
-                    download.id)
+                    download.id)*/
             DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
 
             //DefaultFetchNotificationManager(this@DownloadViewerActivity).postNotificationUpdate(download, etaInMilliSeconds, downloadedBytesPerSecond)
@@ -216,24 +217,24 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             //val mNotificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             //mNotificationManager.cancel(download.id)
             stats = EpisodeActivity.StatusPlay.PAUSE
-            sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
+            /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
                     "Paused",
                     download.progress,
                     this@DownloadViewerActivity,
                     DownloadViewerActivity::class.java,
-                    download.id)
+                    download.id)*/
             DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onResumed(@NotNull download: Download) {
             fileAdapter!!.update(download, UNKNOWN_REMAINING_TIME, UNKNOWN_DOWNLOADED_BYTES_PER_SECOND)
             stats = EpisodeActivity.StatusPlay.PLAY
-            sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
+            /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
                     "Resumed",
                     download.progress,
                     this@DownloadViewerActivity,
                     DownloadViewerActivity::class.java,
-                    download.id)
+                    download.id)*/
             DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
@@ -255,6 +256,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             fileAdapter!!.update(download, UNKNOWN_REMAINING_TIME, UNKNOWN_DOWNLOADED_BYTES_PER_SECOND)
             //val mNotificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             //mNotificationManager.cancel(download.id)
+            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onDeleted(@NotNull download: Download) {
@@ -270,114 +272,6 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             }
             DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
-    }
-
-    fun sendProgressNotification(title: String, text: String, progress: Int, context: Context, gotoActivity: Class<*>, notification_id: Int) {
-
-        val mBuilder = NotificationCompat.Builder(this@DownloadViewerActivity, ConstantValues.CHANNEL_ID)
-                .setSmallIcon(android.R.mipmap.sym_def_app_icon)
-                .setOngoing(true)
-                .setContentTitle(title)
-                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
-                .setProgress(100, progress, false)
-                .setOnlyAlertOnce(true)
-
-        // Creates an explicit intent for an Activity in your app
-        val resultIntent = Intent(context, gotoActivity)
-        resultIntent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, false)
-        //resultIntent.putExtra("url", "")
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your app to the Home screen.
-        val stackBuilder = TaskStackBuilder.create(context)
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(gotoActivity)
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent)
-        val resultPendingIntent = stackBuilder.getPendingIntent(
-                0,
-                PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        mBuilder.setContentIntent(resultPendingIntent)
-
-        fun getPauseOrResumeAction(): NotificationCompat.Action {
-            return when (stats) {
-                EpisodeActivity.StatusPlay.PLAY -> {
-                    val pauseIntent = Intent(applicationContext, PauseReceiver::class.java).apply {
-                        action = "fun.com.crestron.PAUSE_DOWNLOAD"
-                        putExtra(ConstantValues.NOTIFICATION_ID, notification_id)
-                    }
-                    val pendingPauseIntent = PendingIntent.getBroadcast(applicationContext, 1, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-                    NotificationCompat.Action(android.R.drawable.ic_media_pause, "Pause", pendingPauseIntent)
-                }
-                EpisodeActivity.StatusPlay.PAUSE -> {
-                    val pauseIntent = Intent(applicationContext, ResumeReceiver::class.java).apply {
-                        action = "fun.com.crestron.RESUME_DOWNLOAD"
-                        putExtra(ConstantValues.NOTIFICATION_ID, notification_id)
-                    }
-                    val pendingPauseIntent = PendingIntent.getBroadcast(applicationContext, 1, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-                    NotificationCompat.Action(android.R.drawable.ic_media_play, "Resume", pendingPauseIntent)
-                }
-            }
-        }
-        mBuilder.addAction(getPauseOrResumeAction())
-
-        val cancelIntent = Intent(applicationContext, NotificationBroadcastReceiver::class.java).apply {
-            action = "fun.com.crestron.CANCEL_DOWNLOAD"
-            putExtra(ConstantValues.NOTIFICATION_ID, notification_id)
-        }
-        val pendingIntent = PendingIntent.getBroadcast(applicationContext, 1, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        mBuilder.addAction(android.R.drawable.ic_delete, "Cancel", pendingIntent)
-
-        val mNotificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        // mNotificationId is a unique integer your app uses to identify the
-        // notification. For example, to cancel the notification, you can pass its ID
-        // number to NotificationManager.cancel().
-        mNotificationManager.notify(notification_id, mBuilder.build())
-    }
-
-    fun sendRetryNotification(title: String, text: String, progress: Int, context: Context, gotoActivity: Class<*>, notification_id: Int) {
-
-        val mBuilder = NotificationCompat.Builder(this@DownloadViewerActivity, ConstantValues.CHANNEL_ID)
-                .setSmallIcon(android.R.mipmap.sym_def_app_icon)
-                .setOngoing(true)
-                .setContentTitle(title)
-                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
-                .setProgress(100, progress, false)
-                .setOnlyAlertOnce(true)
-
-        // Creates an explicit intent for an Activity in your app
-        val resultIntent = Intent(context, gotoActivity)
-        resultIntent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, false)
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your app to the Home screen.
-        val stackBuilder = TaskStackBuilder.create(context)
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(gotoActivity)
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent)
-        val resultPendingIntent = stackBuilder.getPendingIntent(
-                0,
-                PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        mBuilder.setContentIntent(resultPendingIntent)
-
-        val retryIntent = Intent(applicationContext, RetryReceiver::class.java).apply {
-            action = "fun.com.crestron.RETRY"
-            putExtra(ConstantValues.NOTIFICATION_ID, notification_id)
-        }
-        val pendingIntent = PendingIntent.getBroadcast(applicationContext, 1, retryIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        mBuilder.addAction(android.R.drawable.ic_delete, "Retry", pendingIntent)
-
-        // mNotificationId is a unique integer your app uses to identify the
-        // notification. For example, to cancel the notification, you can pass its ID
-        // number to NotificationManager.cancel().
-        val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        mNotificationManager.notify(notification_id, mBuilder.build())
     }
 
     fun sendNotification(context: Context, smallIconId: Int, title: String, message: String, channel_id: String, gotoActivity: Class<*>, notification_id: Int, vararg dataToPass: EpisodeActivity.KeyAndValue) {
@@ -418,7 +312,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
         // mNotificationId is a unique integer your app uses to identify the
         // notification. For example, to cancel the notification, you can pass its ID
         // number to NotificationManager.cancel().
-        mNotificationManager.notify(notification_id, mBuilder.build())
+        mNotificationManager.notify(notification_id * 2, mBuilder.build())
 
     }
 

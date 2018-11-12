@@ -29,6 +29,7 @@ import com.crestron.aurora.otherfun.ShowListActivity;
 import com.crestron.aurora.otherfun.UpdateCheckService;
 import com.crestron.aurora.otherfun.ViewVideosActivity;
 import com.crestron.aurora.showapi.Source;
+import com.crestron.aurora.utilities.CustomFetchNotiManager;
 import com.evernote.android.job.JobManager;
 import com.facebook.stetho.Stetho;
 import com.google.firebase.FirebaseApp;
@@ -73,7 +74,7 @@ public class FunApplication extends Application {
                 .setGlobalNetworkType(wifiOnly ? NetworkType.WIFI_ONLY : NetworkType.ALL)
                 .setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
                 .setDownloadConcurrentLimit(sharedPreferences.getInt("downloadNumber", 1))
-                //.setNotificationManager(new DefaultFetchNotificationManager(this))
+                .setNotificationManager(new CustomFetchNotiManager(this))
                 .build();
         Fetch.Impl.setDefaultInstanceConfiguration(fetchConfiguration);
 
