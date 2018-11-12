@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import crestron.com.deckofcards.Card
 import kotlinx.android.synthetic.main.card_item.view.*
@@ -33,15 +32,16 @@ class CardAdapter(private val items : ArrayList<Card>, val context: Context, pri
             items[position].getImage(context)
         }
         holder.cardType.setImageResource(id)
+        holder.cardType.contentDescription = items[position].toString()
         // = "${items[position]}"
         holder.cardType.setOnClickListener {
             action.action(position, items[position], location)
         }
 
-        holder.cardType.setOnLongClickListener {
+        /*holder.cardType.setOnLongClickListener {
             Loged.wtf("$items")
             true
-        }
+        }*/
 
         if(position==items.size-1) {
             lastView = holder.cardType
