@@ -23,15 +23,20 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
+import github.nisrulz.recyclerviewhelper.RVHAdapter;
+
+public final class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> implements RVHAdapter {
 
     @NonNull
     private final List<DownloadData> downloads = new ArrayList<>();
     @NonNull
     private final ActionListener actionListener;
 
-    FileAdapter(@NonNull final ActionListener actionListener) {
+    private final Context context;
+
+    FileAdapter(@NonNull final ActionListener actionListener, Context context) {
         this.actionListener = actionListener;
+        this.context = context;
     }
 
     @NonNull
@@ -225,6 +230,29 @@ public final class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHold
             default:
                 return "Unknown";
         }
+    }
+
+    @Override
+    public void onItemDismiss(int position, int direction) {
+        DeleteDialog.DeleteDialogListener listener = new DeleteDialog.DeleteDialogListener() {
+            @Override
+            public void onDelete() {
+                downloads.remove(position);
+                notifyItemRemoved(position);
+            }
+
+            @Override
+            public void onCancel() {
+                notifyDataSetChanged();
+            }
+        };
+        new DeleteDialog(context, downloads.get(position).download.getFile(), downloads.get(position).download, null, listener).show();
+
+    }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        return false;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

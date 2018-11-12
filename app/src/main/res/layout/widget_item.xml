@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widgetItemContainer"
+    android:layout_marginStart="5dp"
+    android:layout_marginEnd="5dp"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -32,13 +36,27 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/widgetItemTaskNameLabel" />
 
-    <Button
+    <!--<Button
         android:id="@+id/play_pause_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/info_speed"
         android:layout_alignParentEnd="true"
         android:visibility="gone"
+        android:text="Play" />-->
+
+    <ImageButton
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:id="@+id/play_pause_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/widgetItemTaskNameLabel"
+        android:layout_below="@id/widgetItemTaskNameLabel"
+        android:layout_alignBottom="@id/info_speed"
+        android:layout_alignParentEnd="true"
+        android:visibility="visible"
+        android:src="@drawable/mr_media_play_dark"
         android:text="Play" />
 
 </RelativeLayout>

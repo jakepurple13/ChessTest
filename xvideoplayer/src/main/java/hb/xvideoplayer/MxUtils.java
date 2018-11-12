@@ -15,9 +15,9 @@ import android.view.WindowManager;
 import java.util.Formatter;
 import java.util.Locale;
 
-class MxUtils {
+public class MxUtils {
 
-    static String stringForTime(long milliseconds) {
+    public static String stringForTime(long milliseconds) {
         if (milliseconds < 0 || milliseconds >= 24 * 60 * 60 * 1000) {
             return "00:00";
         }

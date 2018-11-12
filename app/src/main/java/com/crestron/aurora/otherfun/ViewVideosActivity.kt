@@ -1,5 +1,6 @@
 package com.crestron.aurora.otherfun
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -35,6 +36,7 @@ import com.squareup.picasso.RequestHandler
 import com.tonyodev.fetch2.Fetch
 import github.nisrulz.recyclerviewhelper.RVHAdapter
 import github.nisrulz.recyclerviewhelper.RVHItemTouchHelperCallback
+import hb.xvideoplayer.MxUtils
 import kotlinx.android.synthetic.main.activity_view_videos.*
 import kotlinx.android.synthetic.main.video_layout.view.*
 import kotlinx.android.synthetic.main.video_with_text.view.*
@@ -289,8 +291,9 @@ class ViewVideosActivity : AppCompatActivity() {
         }
 
         // Binds each animal in the ArrayList to a view
+        @SuppressLint("SetTextI18n")
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.videoName.text = stuff[position].name
+            holder.videoName.text = "${stuff[position].name} ${if (context.defaultSharedPreferences.contains(stuff[position].path)) "\nat ${MxUtils.stringForTime(context.defaultSharedPreferences.getLong(stuff[position].path, 0))}" else ""}"
 
             try {
                 //Video runtime text

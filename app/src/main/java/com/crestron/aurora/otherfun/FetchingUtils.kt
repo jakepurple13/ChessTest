@@ -106,8 +106,6 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
 
         fetch.enqueue(requestList, Func {
 
-        }, Func {
-
         })
     }
 

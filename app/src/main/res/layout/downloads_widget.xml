@@ -52,7 +52,6 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textColor="@color/md_white_1000"
-            android:textSize="18dp"
             android:text="Download Count" />
 
     </LinearLayout>

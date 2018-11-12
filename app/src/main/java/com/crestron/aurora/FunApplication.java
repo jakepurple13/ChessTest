@@ -73,6 +73,7 @@ public class FunApplication extends Application {
                 .setGlobalNetworkType(wifiOnly ? NetworkType.WIFI_ONLY : NetworkType.ALL)
                 .setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
                 .setDownloadConcurrentLimit(sharedPreferences.getInt("downloadNumber", 1))
+                //.setNotificationManager(new DefaultFetchNotificationManager(this))
                 .build();
         Fetch.Impl.setDefaultInstanceConfiguration(fetchConfiguration);
 

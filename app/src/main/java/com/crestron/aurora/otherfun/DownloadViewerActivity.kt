@@ -10,6 +10,7 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.helper.ItemTouchHelper
 import com.abdeveloper.library.MultiSelectDialog
 import com.abdeveloper.library.MultiSelectModel
 import com.crashlytics.android.Crashlytics
@@ -24,6 +25,7 @@ import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2.Error
 import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2core.Func
+import github.nisrulz.recyclerviewhelper.RVHItemTouchHelperCallback
 import kotlinx.android.synthetic.main.activity_download_viewer.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -54,8 +56,15 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
         fetch = Fetch.getDefaultInstance()
 
         download_list.layoutManager = LinearLayoutManager(this)
-        fileAdapter = FileAdapter(this)
+        fileAdapter = FileAdapter(this, this)
         download_list.adapter = fileAdapter
+
+        val callback = RVHItemTouchHelperCallback(fileAdapter
+                , false
+                , true
+                , true)
+        val helper = ItemTouchHelper(callback)
+        helper.attachToRecyclerView(download_list)
 
         multiple_download_delete.setOnClickListener {
 
@@ -141,6 +150,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
         override fun onQueued(@NotNull download: Download, waitingOnNetwork: Boolean) {
             fileAdapter!!.addDownload(download)
             fileAdapter!!.update(download, UNKNOWN_REMAINING_TIME, UNKNOWN_DOWNLOADED_BYTES_PER_SECOND)
+            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onCompleted(@NotNull download: Download) {
@@ -197,6 +207,8 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                     DownloadViewerActivity::class.java,
                     download.id)
             DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
+
+            //DefaultFetchNotificationManager(this@DownloadViewerActivity).postNotificationUpdate(download, etaInMilliSeconds, downloadedBytesPerSecond)
         }
 
         override fun onPaused(@NotNull download: Download) {
@@ -210,6 +222,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                     this@DownloadViewerActivity,
                     DownloadViewerActivity::class.java,
                     download.id)
+            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onResumed(@NotNull download: Download) {

@@ -126,13 +126,6 @@ class ChoiceActivity : AppCompatActivity() {
 
         setUpDrawer(savedInstanceState)
 
-        runOnUiThread {
-            //Toast.makeText(this, "New task created", Toast.LENGTH_LONG).show()
-            //getTodoList()
-            //this will send the broadcast to update the appwidget
-            DownloadsWidget.sendRefreshBroadcast(this)
-        }
-
         //Loged.d(FirebaseInstanceId.getInstance().token!!)
 
         if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false)) {
@@ -548,6 +541,12 @@ class ChoiceActivity : AppCompatActivity() {
                 }
             }
         }
+        runOnUiThread {
+            //Toast.makeText(this, "New task created", Toast.LENGTH_LONG).show()
+            //getTodoList()
+            //this will send the broadcast to update the appwidget
+            DownloadsWidget.sendRefreshBroadcast(this@ChoiceActivity)
+        }
     }
 
     override fun onBackPressed() {
@@ -813,6 +812,17 @@ class ChoiceActivity : AppCompatActivity() {
                     ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intented)
                     true
                 }
+        val clearNotiItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_notifications_off)
+                .withSelectable(false)
+                .withIdentifier(2)
+                .withName("Clear Notifications")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    val mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    mNotificationManager.cancelAll()
+                    true
+                }
         val pInfo = packageManager.getPackageInfo(packageName, 0)
         val version = pInfo.versionName
         val updateAppItem = PrimaryDrawerItem()
@@ -947,6 +957,8 @@ class ChoiceActivity : AppCompatActivity() {
                         checkForUpdateItem,
                         DividerDrawerItem(),
                         feedbackItem,
+                        DividerDrawerItem(),
+                        clearNotiItem,
                         DividerDrawerItem(),
                         updateNotesItem,
                         DividerDrawerItem(),

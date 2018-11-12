@@ -11,8 +11,11 @@ import android.widget.RemoteViewsService
 import com.crestron.aurora.R
 import com.crestron.aurora.otherfun.DownloadViewerActivity
 import com.crestron.aurora.otherfun.FetchingUtils
+import com.crestron.aurora.otherfun.PauseReceiver
+import com.crestron.aurora.otherfun.ResumeReceiver
 import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2.Fetch
+import com.tonyodev.fetch2.Status
 import com.tonyodev.fetch2core.Func
 
 
@@ -55,12 +58,13 @@ class DownloadsWidget : AppWidgetProvider() {
             val intent = Intent(context, MyWidgetRemoteViewsService::class.java)
             views.setRemoteAdapter(R.id.download_list_widget, intent)
 
-            /*// template to handle the click listener for each item
-            val clickIntentTemplate = Intent(context, DownloadViewerActivity::class.java)
-            val clickPendingIntentTemplate = TaskStackBuilder.create(context)
+            // template to handle the click listener for each item
+            val clickIntentTemplate = Intent(context, PlayPauseWidgetService::class.java)
+            /*val clickPendingIntentTemplate = TaskStackBuilder.create(context)
                     .addNextIntentWithParentStack(clickIntentTemplate)
-                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
-            views.setPendingIntentTemplate(R.id.download_list_widget, clickPendingIntentTemplate)*/
+                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)*/
+            val clickPendingIntentTemplate = PendingIntent.getService(context, 0, clickIntentTemplate, 0)
+            views.setPendingIntentTemplate(R.id.download_list_widget, clickPendingIntentTemplate)
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
@@ -140,6 +144,30 @@ class MyWidgetRemoteViewsFactory(private val mContext: Context, intent: Intent) 
         rv.setTextViewText(R.id.widgetItemTaskNameLabel, name)
         rv.setTextViewText(R.id.info_speed, "$progress%")
         rv.setProgressBar(R.id.download_progress, 100, prog.toInt(), false)
+        rv.setImageViewResource(R.id.play_pause_button, if (downloadList[position].status == Status.DOWNLOADING) R.drawable.mr_media_pause_dark else R.drawable.mr_media_play_dark)
+
+        fun getPlayOrPause(): PendingIntent {
+            val pauseIntent: Intent? = when (downloadList[position].status) {
+                Status.DOWNLOADING -> {
+                    Intent(mContext, PauseReceiver::class.java).apply {
+                        action = "fun.com.crestron.PAUSE_DOWNLOAD"
+                    }
+                }
+                Status.PAUSED -> {
+                    Intent(mContext, ResumeReceiver::class.java).apply {
+                        action = "fun.com.crestron.RESUME_DOWNLOAD"
+                    }
+                }
+                else -> {
+                    Intent()
+                }
+            }
+            return PendingIntent.getBroadcast(mContext, 1, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+
+        val fillInIntent = Intent()
+        fillInIntent.putExtra("show_to_pause_or_play", downloadList[position].id)
+        rv.setOnClickFillInIntent(R.id.play_pause_button, fillInIntent)
 
         // Next, set a fill-intent, which will be used to fill in the pending intent template
         // that is set on the collection view in StackWidgetProvider.
