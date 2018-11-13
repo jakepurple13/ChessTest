@@ -197,10 +197,10 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
 
         override fun onProgress(@NotNull download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
             fileAdapter!!.update(download, etaInMilliSeconds, downloadedBytesPerSecond)
-            val progress = "%.2f".format(FetchingUtils.getProgress(download.downloaded, download.total))
+            /*val progress = "%.2f".format(FetchingUtils.getProgress(download.downloaded, download.total))
             val info = "$progress% " +
                     "at ${FetchingUtils.getDownloadSpeedString(downloadedBytesPerSecond)} " +
-                    "with ${FetchingUtils.getETAString(etaInMilliSeconds)}"
+                    "with ${FetchingUtils.getETAString(etaInMilliSeconds)}"*/
             /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
                     info,
                     download.progress,

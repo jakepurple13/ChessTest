@@ -142,6 +142,7 @@ open class CustomFetchNotiManager(context: Context) : FetchNotificationManager {
                 .setSubText("$speed at $currentProgress%")
                 .setGroup(downloadNotification.groupId.toString())
                 .setGroupSummary(false)
+                .setOnlyAlertOnce(true)
         if (downloadNotification.isFailed) {
             notificationBuilder.setProgress(0, 0, false)
         } else {
@@ -314,6 +315,7 @@ open class CustomFetchNotiManager(context: Context) : FetchNotificationManager {
                     .setContentText(null)
                     .setContentIntent(null)
                     .setGroupSummary(false)
+                    .setOnlyAlertOnce(true)
                     .setOngoing(false)
                     .setGroup(groupId.toString())
                     .setSmallIcon(android.R.drawable.stat_sys_download_done)

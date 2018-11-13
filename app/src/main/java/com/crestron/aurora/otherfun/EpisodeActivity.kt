@@ -109,10 +109,10 @@ class EpisodeActivity : AppCompatActivity() {
 
             override fun onProgress(download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
                 super.onProgress(download, etaInMilliSeconds, downloadedBytesPerSecond)
-                val progress = "%.2f".format(FetchingUtils.getProgress(download.downloaded, download.total))
+                /*val progress = "%.2f".format(FetchingUtils.getProgress(download.downloaded, download.total))
                 val info = "$progress% " +
                         "at ${FetchingUtils.getDownloadSpeedString(downloadedBytesPerSecond)} " +
-                        "with ${FetchingUtils.getETAString(etaInMilliSeconds)}"
+                        "with ${FetchingUtils.getETAString(etaInMilliSeconds)}"*/
                 runOnUiThread {
                     progressBar2.setProgress(download.progress, true)
                     //download_info.text = nameUrl(info)

@@ -14,22 +14,89 @@ class Deck {
     var deckListener: DeckListener? = null
     private val emptyDeck = CardNotFoundException("Deck is Empty")
 
+    class DeckBuilder {
+
+        private val cards = mutableListOf<Card>()
+
+        fun card(block: CardBuilder.() -> Unit) {
+            cards.add(CardBuilder().apply(block).build())
+        }
+
+        fun build(): Deck = Deck(cards)
+
+        /**
+         * add an entire 52 card deck
+         */
+        fun addNormalDeck() {
+            cards.addAll(Deck().deckOfCards)
+        }
+
+        /**
+         * add a card with #suit and a value
+         */
+        fun card(suit: Suit, value: Int) {
+            cards.add(Card(suit, value))
+        }
+
+        /**
+         * add a random card into the deck
+         */
+        fun randomCard() {
+            fun randomNumber(low: Int, high: Int): Int {
+                return low + (Math.random() * ((high - low) + 1)).toInt()
+            }
+
+            val suit: Suit? = when (randomNumber(1, 4)) {
+                1 -> Suit.SPADES
+                2 -> Suit.CLUBS
+                3 -> Suit.DIAMONDS
+                4 -> Suit.HEARTS
+                else -> {
+                    null
+                }
+            }
+            cards.add(Card(suit!!, randomNumber(1, 13)))
+        }
+
+    }
+
+    class CardBuilder {
+
+        var suit: Suit = Suit.SPADES
+        var value = 1
+        var card: Card? = null
+
+        fun build(): Card {
+            return card ?: Card(suit, value)
+        }
+
+    }
+
+    private constructor(cards: Collection<Card>) {
+        deckOfCards.addAll(cards)
+    }
+
     companion object Builder {
+
+        fun deck(block: DeckBuilder.() -> Unit): Deck = DeckBuilder().apply(block).build()
+
         fun suitOnly(vararg suit: Suit): Deck {
             val d = Deck(null)
             d.initialize(Suit.SPADES in suit, Suit.CLUBS in suit, Suit.DIAMONDS in suit, Suit.HEARTS in suit)
             return d
         }
+
         fun numberOnly(vararg num: Int): Deck {
             val d = Deck(null)
-            for(i in num) {
-                d+=Card(Suit.SPADES, i)
-                d+=Card(Suit.CLUBS, i)
-                d+=Card(Suit.DIAMONDS, i)
-                d+=Card(Suit.HEARTS, i)
+            for (i in num) {
+                d += Card(Suit.SPADES, i)
+                d += Card(Suit.CLUBS, i)
+                d += Card(Suit.DIAMONDS, i)
+                d += Card(Suit.HEARTS, i)
             }
             return d
         }
+
         fun colorOnly(color: Color): Deck {
             val d = Deck(null)
             when (color) {

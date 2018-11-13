@@ -272,7 +272,17 @@ class ViewVideosActivity : AppCompatActivity() {
                         notifyDataSetChanged()
                     }
                 }
-                DeleteDialog(context, stuff[position].name, file = stuff[position], listener = listener).show()
+                //DeleteDialog(context, stuff[position].name, file = stuff[position], listener = listener).show()
+                DeleteDialog.deleteDialog(context, file = stuff[position]) {
+                    title = stuff[position].name
+                    this.listener = listener
+                }.show()
+                /*DeleteDialog.DialogBuilder().deleteDialog {
+                    title = stuff[position].name
+                    this.file = stuff[position]
+                    this.dialogListener = listener
+                    this.context = context
+                }.show()*/
             }
         }
 

@@ -39,6 +39,7 @@
             android:numeric="decimal"
             android:summary="Time between update checks"
             android:title="Time between Checks" />-->
+
         <EditTextPreference
             android:inputType="numberDecimal"
             android:key="updateChecks"

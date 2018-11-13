@@ -15,7 +15,25 @@ import com.tonyodev.fetch2.Download
 import kotlinx.android.synthetic.main.delete_dialog_layout.*
 import java.io.File
 
-class DeleteDialog(context: Context?, val title: String, val download: Download? = null, val file: File? = null, val listener: DeleteDialogListener? = null) : Dialog(context!!) {
+class DeleteDialog(context: Context?, var title: String = "", val download: Download? = null, val file: File? = null, var listener: DeleteDialogListener? = null) : Dialog(context!!) {
+
+    companion object {
+        fun deleteDialog(context: Context?, download: Download? = null, file: File? = null, block: DeleteDialog.() -> Unit): DeleteDialog = DeleteDialog(context, file = file, download = download).apply(block)
+    }
+
+    class DialogBuilder {
+        var title = ""
+        var download: Download? = null
+        var file: File? = null
+        var dialogListener: DeleteDialogListener? = null
+        var context: Context? = null
+
+        fun deleteDialog(block: DialogBuilder.() -> Unit): DeleteDialog {
+            return DialogBuilder().apply(block).build()
+        }
+
+        fun build(): DeleteDialog = DeleteDialog(context, title, download, file, dialogListener)
+    }
 
     interface DeleteDialogListener {
         fun onDelete()
