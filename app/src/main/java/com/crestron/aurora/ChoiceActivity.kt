@@ -64,6 +64,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
+import spencerstudios.com.bungeelib.Bungee
 import java.io.File
 import java.net.SocketTimeoutException
 import java.net.URL
@@ -117,6 +118,7 @@ class ChoiceActivity : AppCompatActivity() {
     }
 
     lateinit var result: Drawer
+    lateinit var br: BroadcastReceiverDownload
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -165,8 +167,9 @@ class ChoiceActivity : AppCompatActivity() {
                     val book = getBook(bookId, bookTitle)
                     when (book) {
                         ChoiceButton.BLACKJACK -> {
-                            //startActivity(Intent(this@ChoiceActivity, BlackJackActivity::class.java))
-                            ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, BlackJackActivity::class.java))
+                            startActivity(Intent(this@ChoiceActivity, BlackJackActivity::class.java))
+                            Bungee.swipeLeft(this@ChoiceActivity)
+                            //ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, BlackJackActivity::class.java))
                         }
                         ChoiceButton.SOLITAIRE -> {
                             val intent = Intent(this@ChoiceActivity, SolitaireActivity::class.java)
@@ -426,8 +429,9 @@ class ChoiceActivity : AppCompatActivity() {
                     val intented = Intent(this@ChoiceActivity, EpisodeActivity::class.java)
                     intented.putExtra(ConstantValues.URL_INTENT, bookId)
                     intented.putExtra(ConstantValues.NAME_INTENT, bookTitle)
-                    //startActivity(intented)
-                    ViewUtil.presentActivity(view, this@ChoiceActivity, intented)
+                    startActivity(intented)
+                    Bungee.slideLeft(this@ChoiceActivity)
+                    //ViewUtil.presentActivity(view, this@ChoiceActivity, intented)
                     //ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
                 }
@@ -554,6 +558,7 @@ class ChoiceActivity : AppCompatActivity() {
         if (result.isDrawerOpen) {
             result.closeDrawer()
         } else {
+            unregisterReceiver(br)
             super.onBackPressed()
         }
     }
@@ -1022,7 +1027,7 @@ class ChoiceActivity : AppCompatActivity() {
                 result.updateItem(versionItem)
             }
 
-            val br: BroadcastReceiver = BroadcastReceiverDownload(object : DownloadBroadcast {
+            br = BroadcastReceiverDownload(object : DownloadBroadcast {
                 override fun onCall(intent: Intent) {
                     val viewDownloadsItemUpdate = PrimaryDrawerItem()
                             .withIcon(GoogleMaterial.Icon.gmd_file_download)
@@ -1055,7 +1060,6 @@ class ChoiceActivity : AppCompatActivity() {
                 addAction(ConstantValues.BROADCAST_DOWNLOAD)
             }
             registerReceiver(br, filter)
-
         }
 
     }

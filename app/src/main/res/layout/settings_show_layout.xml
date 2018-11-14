@@ -21,6 +21,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/checkBox"
+        android:transitionName="show_name_trans"
         android:layout_toStartOf="@+id/show_img"
         android:gravity="start|center_vertical"
         android:text="TextView"

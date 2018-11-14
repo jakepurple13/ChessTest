@@ -35,6 +35,7 @@ import kotlinx.coroutines.android.Main
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
+import spencerstudios.com.bungeelib.Bungee
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -193,7 +194,6 @@ class SolitaireActivity : AppCompatActivity() {
             try {
                 //list.add(deckOfCards.getCard(c))
                 list.add(deckOfCards - c)
-
                 /* when {
                      foundation1.isEmpty() -> foundation1
                      foundation2.isEmpty() -> foundation2
@@ -375,6 +375,7 @@ class SolitaireActivity : AppCompatActivity() {
                 intent.putExtra(ConstantValues.DRAW_AMOUNT, drawAmount)
                 finish()
                 startActivity(intent)
+                Bungee.windmill(this@SolitaireActivity)
             }
             builder.setNegativeButton("Nope") { _, _ ->
                 time.startTimer(solitaire_timer)
@@ -394,6 +395,7 @@ class SolitaireActivity : AppCompatActivity() {
             // Add the buttons
             builder.setPositiveButton("Yes, I want to stop") { _, _ ->
                 finish()
+                Bungee.windmill(this@SolitaireActivity)
             }
             builder.setNegativeButton("No, I do not want to stop") { _, _ ->
                 if (!win)
@@ -457,21 +459,23 @@ class SolitaireActivity : AppCompatActivity() {
             intent.putExtra(ConstantValues.DRAW_AMOUNT, drawAmount)
             finish()
             startActivity(intent)
+            Bungee.swipeLeft(this@SolitaireActivity)
         }
         builder.setNegativeButton("Nope") { _, _ ->
             finish()
+            Bungee.windmill(this@SolitaireActivity)
         }
         val dialog = builder.create()
         dialog.show()
     }
 
-    private fun winAnimation(cardView: ImageView, listOfCard: ArrayList<Card>) = GlobalScope.launch(Dispatchers.Main) {
+    private fun winAnimation(cardView: ImageView, listOfCard: ArrayList<Card>) {
         var i = listOfCard.lastIndex
         var upOrDown = true
         AnimationUtility.animateCardWin(cardView, listOfCard[i], this@SolitaireActivity, reverse = gen.nextBoolean(), end = object : AnimationUtility.AnimationEnd {
             override fun onAnimationEnd() {
                 val an = this
-                launch(Dispatchers.Main) {
+                GlobalScope.launch(Dispatchers.Main) {
                     delay(500)
                     if (i >= 0 && upOrDown) {
                         i--
@@ -480,7 +484,6 @@ class SolitaireActivity : AppCompatActivity() {
                         i++
                         upOrDown = i == listOfCard.lastIndex
                     }
-
                     if (i >= 0) {
                         AnimationUtility.animateCardWin(cardView, listOfCard[i], this@SolitaireActivity, reverse = gen.nextBoolean(), end = an)
                     }

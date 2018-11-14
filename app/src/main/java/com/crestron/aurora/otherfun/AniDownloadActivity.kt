@@ -7,11 +7,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.view.View
 import android.widget.Toast
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
-import com.crestron.aurora.showapi.ShowInfo
 import com.google.gson.Gson
 import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2core.DownloadBlock
@@ -133,7 +131,7 @@ class AniDownloadActivity : AppCompatActivity() {
                 listOfLinks.add(element.attr("abs:href"))
             }
 
-            runOnUiThread {
+            /*runOnUiThread {
                 anime_list.adapter = AListAdapter(listOfNames, listOfLinks, this@AniDownloadActivity, object : LinkAction {
                     override fun hit(name: String, url: String) {
                         super.hit(name, url)
@@ -143,7 +141,7 @@ class AniDownloadActivity : AppCompatActivity() {
                         startActivity(intented)
                     }
                 })
-            }
+            }*/
 
             Loged.d("${(anime_list.adapter!! as AListAdapter).itemCount}")
         }
@@ -267,14 +265,14 @@ class AniDownloadActivity : AppCompatActivity() {
         return html.toString()
     }
 
-    interface LinkAction {
-        fun hit(name: String, url: String) {
+    /*interface LinkAction {
+        fun hit(name: String, url: String, view: View) {
             Loged.wtf("$name: $url")
         }
 
         fun longhit(info: ShowInfo, vararg views: View) {
 
         }
-    }
+    }*/
 
 }

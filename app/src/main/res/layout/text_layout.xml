@@ -24,6 +24,7 @@
         android:layout_toEndOf="@+id/checkBox"
         android:layout_toStartOf="@+id/show_img"
         android:gravity="start|center_vertical"
+        android:transitionName="show_name_trans"
         android:text="TextView"
         tools:ignore="HardcodedText" />
 

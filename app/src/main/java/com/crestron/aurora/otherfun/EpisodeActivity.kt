@@ -27,7 +27,6 @@ import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
-import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.views.DownloadsWidget
 import com.like.LikeButton
 import com.like.OnLikeListener
@@ -41,6 +40,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import programmer.box.utilityhelper.UtilNotification
+import spencerstudios.com.bungeelib.Bungee
 import java.net.SocketTimeoutException
 import java.util.*
 
@@ -72,8 +72,6 @@ class EpisodeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_episode)
-
-        ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
         val show = ShowDatabase.getDatabase(this@EpisodeActivity)
 
@@ -484,11 +482,14 @@ class EpisodeActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         if (backChoice)
-            super.onBackPressed()
+        //super.onBackPressed()
+            supportFinishAfterTransition()
         else {
             val intent = Intent(this@EpisodeActivity, ChoiceActivity::class.java)
             startActivity(intent)
             finish()
+            Bungee.slideRight(this@EpisodeActivity)
+            //supportFinishAfterTransition()
         }
     }
 

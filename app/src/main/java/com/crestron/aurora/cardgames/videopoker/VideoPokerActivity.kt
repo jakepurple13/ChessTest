@@ -322,4 +322,9 @@ class VideoPokerActivity : AppCompatActivity() {
 
     }
 
+    override fun onBackPressed() {
+        //super.onBackPressed()
+        back_button_videopoker.performClick()
+    }
+
 }

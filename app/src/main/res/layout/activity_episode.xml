@@ -83,6 +83,7 @@
                     android:id="@+id/download_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:transitionName="show_name_trans"
                     android:autoLink="web"
                     android:gravity="center"
                     android:text="TextView" />

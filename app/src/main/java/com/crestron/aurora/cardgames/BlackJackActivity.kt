@@ -10,7 +10,6 @@ import android.widget.Toast
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.AnimationUtility
-import com.crestron.aurora.utilities.ViewUtil
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.CardNotFoundException
 import crestron.com.deckofcards.Deck
@@ -21,6 +20,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.android.Main
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import spencerstudios.com.bungeelib.Bungee
 import java.util.*
 
 
@@ -70,8 +70,7 @@ class BlackJackActivity : AppCompatActivity() {
         setContentView(R.layout.activity_black_jack)
 
         //blackjack_layout.setBackgroundResource(R.drawable.drkgreen)
-
-        ViewUtil.revealing(blackjack_layout, intent)
+        //ViewUtil.revealing(blackjack_layout, intent)
 
         deckOfCards.deckListener = shuffleListener
 
@@ -175,7 +174,10 @@ Back = Rewind Button
 
         }
 
-        backButtonJack.setOnClickListener { finish() }
+        backButtonJack.setOnClickListener {
+            finish()
+            Bungee.swipeRight(this@BlackJackActivity)
+        }
 
     }
 
@@ -276,6 +278,11 @@ Back = Rewind Button
             animateFun()
             winner.text = "Dealer Busted!\nYou Win!"
         }
+    }
+
+    override fun onBackPressed() {
+        //super.onBackPressed()
+        backButtonJack.performClick()
     }
 
 }

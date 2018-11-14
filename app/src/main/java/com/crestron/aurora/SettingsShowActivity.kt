@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
+import android.support.v4.app.ActivityOptionsCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -39,7 +40,7 @@ class SettingsShowActivity : AppCompatActivity() {
 
         }
 
-        fun click(name: String, url: String) {
+        fun click(name: String, url: String, view: View) {
 
         }
 
@@ -102,12 +103,13 @@ class SettingsShowActivity : AppCompatActivity() {
                         return showLists.list.any { it.name == name }
                     }
 
-                    override fun click(name: String, url: String) {
-                        super.click(name, url)
+                    override fun click(name: String, url: String, view: View) {
+                        super.click(name, url, view)
                         val intented = Intent(this@SettingsShowActivity, EpisodeActivity::class.java)
                         intented.putExtra(ConstantValues.URL_INTENT, url)
                         intented.putExtra(ConstantValues.NAME_INTENT, name)
-                        startActivity(intented)
+                        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this@SettingsShowActivity, view, "show_name_trans")
+                        startActivity(intented, options.toBundle())
                     }
 
                     override fun longhit(info: ShowListActivity.NameAndLink, vararg view: View) {

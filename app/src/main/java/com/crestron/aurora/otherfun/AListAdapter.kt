@@ -52,18 +52,18 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
     private var items: ArrayList<String>? = null
     private lateinit var links: ArrayList<String>
     var context: Context
-    var action: AniDownloadActivity.LinkAction
+    var action: ShowListActivity.LinkAction
     lateinit var stuff: List<ShowInfo>
     lateinit var show: ShowDatabase
 
-    constructor(stuff: List<ShowInfo>, context: Context, showDatabase: ShowDatabase, action: AniDownloadActivity.LinkAction = object : AniDownloadActivity.LinkAction {}) {
+    constructor(stuff: List<ShowInfo>, context: Context, showDatabase: ShowDatabase, action: ShowListActivity.LinkAction = object : ShowListActivity.LinkAction {}) {
         this.stuff = stuff
         this.context = context
         this.action = action
         this.show = showDatabase
     }
 
-    constructor(items: ArrayList<String>, links: ArrayList<String>, context: Context, action: AniDownloadActivity.LinkAction = object : AniDownloadActivity.LinkAction {}) {
+    constructor(items: ArrayList<String>, links: ArrayList<String>, context: Context, action: ShowListActivity.LinkAction = object : ShowListActivity.LinkAction {}) {
         this.items = items
         this.links = links
         this.context = context
@@ -91,13 +91,13 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
             holder.linkType.text = items!![position]
             holder.linkType.setOnClickListener {
                 Loged.wtf("I was pressed")
-                action.hit(items!![position], links[position])
+                action.hit(items!![position], links[position], it)
             }
         } else {
             holder.linkType.text = stuff[position].name
             holder.linkType.setOnClickListener {
                 Loged.wtf("I was pressed")
-                action.hit(stuff[position].name, stuff[position].url)
+                action.hit(stuff[position].name, stuff[position].url, it)
             }
 
             holder.layout.setOnClickListener {

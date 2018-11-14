@@ -65,7 +65,7 @@ class SettingsShowAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
         holder.linkType.text = stuff[position].name
 
         holder.linkType.setOnClickListener {
-            action.click(stuff[position].name, stuff[position].url)
+            action.click(stuff[position].name, stuff[position].url, it)
         }
 
         //holder.favorite.text = ""//stuff[position].name

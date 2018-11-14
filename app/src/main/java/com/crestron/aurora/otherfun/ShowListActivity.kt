@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
+import android.support.v4.app.ActivityOptionsCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
@@ -44,13 +45,14 @@ class ShowListActivity : AppCompatActivity() {
     private val listOfLinks = arrayListOf<String>()
     private val listOfNames = arrayListOf<String>()
     private val listOfNameAndLink = arrayListOf<ShowInfo>()
-    private val actionHit = object : AniDownloadActivity.LinkAction {
-        override fun hit(name: String, url: String) {
-            super.hit(name, url)
+    private val actionHit = object : LinkAction {
+        override fun hit(name: String, url: String, view: View) {
+            super.hit(name, url, view)
             val intented = Intent(this@ShowListActivity, EpisodeActivity::class.java)
             intented.putExtra(ConstantValues.URL_INTENT, url)
             intented.putExtra(ConstantValues.NAME_INTENT, name)
-            startActivity(intented)
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this@ShowListActivity, view, "show_name_trans")
+            startActivity(intented, options.toBundle())
         }
 
         override fun longhit(info: ShowInfo, vararg views: View) {
@@ -206,7 +208,7 @@ class ShowListActivity : AppCompatActivity() {
 
         random_button.setOnClickListener {
             val nameAndLink = listOfNameAndLink[gen.nextInt(listOfNameAndLink.size)]
-            actionHit.hit(nameAndLink.name, nameAndLink.url)
+            actionHit.hit(nameAndLink.name, nameAndLink.url, it)
         }
 
         search_info.isEnabled = false
@@ -261,4 +263,14 @@ class ShowListActivity : AppCompatActivity() {
     }
 
     class NameAndLink(val name: String, val url: String)
+
+    interface LinkAction {
+        fun hit(name: String, url: String, view: View) {
+            Loged.wtf("$name: $url")
+        }
+
+        fun longhit(info: ShowInfo, vararg views: View) {
+
+        }
+    }
 }
