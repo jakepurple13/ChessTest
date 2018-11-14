@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.support.v4.app.ActivityOptionsCompat
+import android.support.v4.util.Pair
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
@@ -28,6 +29,7 @@ import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.ViewUtil
+import com.like.LikeButton
 import com.peekandpop.shalskar.peekandpop.PeekAndPop
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_show_list.*
@@ -46,13 +48,21 @@ class ShowListActivity : AppCompatActivity() {
     private val listOfNames = arrayListOf<String>()
     private val listOfNameAndLink = arrayListOf<ShowInfo>()
     private val actionHit = object : LinkAction {
-        override fun hit(name: String, url: String, view: View) {
-            super.hit(name, url, view)
+        override fun hit(name: String, url: String, vararg view: View) {
+            super.hit(name, url, *view)
             val intented = Intent(this@ShowListActivity, EpisodeActivity::class.java)
             intented.putExtra(ConstantValues.URL_INTENT, url)
             intented.putExtra(ConstantValues.NAME_INTENT, name)
-            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this@ShowListActivity, view, "show_name_trans")
-            startActivity(intented, options.toBundle())
+            val titleView = Pair(view[0], "show_name_trans")
+            val likeView = if (view.size > 1) Pair(view[1], "like_trans") else null
+            val viewsToUse = arrayListOf<Pair<View, String>>()
+            viewsToUse.add(titleView)
+            if (likeView != null) {
+                viewsToUse.add(likeView)
+                intented.putExtra("is_favorited", (view[1] as LikeButton).isLiked)
+            }
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this@ShowListActivity, *viewsToUse.toTypedArray())
+            startActivityForResult(intented, 111, options.toBundle())
         }
 
         override fun longhit(info: ShowInfo, vararg views: View) {
@@ -112,6 +122,16 @@ class ShowListActivity : AppCompatActivity() {
 
             peekAndPop.isEnabled = true
 
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == 111 && data != null) {
+            val urlString = data.getStringExtra("url_string")
+            val isFavorite = data.getBooleanExtra("is_favorited", false)
+            Loged.wtf("$urlString is now $isFavorite")
+            (show_info.adapter as AListAdapter).notifyItemChanged(listOfNameAndLink.indexOfFirst { it.url == urlString }, isFavorite)
         }
     }
 
@@ -265,7 +285,7 @@ class ShowListActivity : AppCompatActivity() {
     class NameAndLink(val name: String, val url: String)
 
     interface LinkAction {
-        fun hit(name: String, url: String, view: View) {
+        fun hit(name: String, url: String, vararg view: View) {
             Loged.wtf("$name: $url")
         }
 

@@ -286,12 +286,12 @@ class SolitaireActivity : AppCompatActivity() {
 
                 val lastMove = this@SolitaireActivity.defaultSharedPreferences.getInt("solitaire_moves", Int.MAX_VALUE)
 
-                if (lastMove > moveCount)
+                if (lastMove > moveCount && moveCount != 0)
                     this@SolitaireActivity.defaultSharedPreferences.edit().putInt("solitaire_moves", moveCount).apply()
 
                 val lastTime = this@SolitaireActivity.defaultSharedPreferences.getLong("solitaire_time", Long.MAX_VALUE)
 
-                if (lastTime > time.time)
+                if (lastTime > time.time && time.time != 0L)
                     this@SolitaireActivity.defaultSharedPreferences.edit().putLong("solitaire_time", time.time).apply()
 
                 win = true
@@ -429,6 +429,34 @@ class SolitaireActivity : AppCompatActivity() {
             }
         }
 
+        high_score_view.setOnClickListener {
+            val lastScore = this@SolitaireActivity.defaultSharedPreferences.getInt("solitaire_score", 0)
+            val lastMove = this@SolitaireActivity.defaultSharedPreferences.getInt("solitaire_moves", 0)
+            val lastTime = this@SolitaireActivity.defaultSharedPreferences.getLong("solitaire_time", 0)
+            time.cancel()
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Your Current High Score")
+            builder.setMessage("Highest Score: ${if (lastScore == 0) "N/A" else lastScore.toString()}\n" +
+                    "Lowest Move Count: ${if (lastMove == 0) "N/A" else lastMove.toString()}\n" +
+                    "Fastest Time: ${if (lastTime == 0L) "N/A" else getTime(lastTime)}")
+            // Add the buttons
+            builder.setPositiveButton("Cool!") { _, _ ->
+                if (!win)
+                    time.startTimer(solitaire_timer)
+            }
+            builder.setOnDismissListener {
+                if (!win)
+                    time.startTimer(solitaire_timer)
+            }
+            val dialog = builder.create()
+            dialog.show()
+        }
+    }
+
+    private fun getTime(length: Long): String {
+        val m = TimeUnit.MILLISECONDS.toMinutes(length)
+        val s = TimeUnit.MILLISECONDS.toSeconds(length - m * 60 * 1000)
+        return String.format("%02d:%02d", m, s)
     }
 
     private fun winDialog() {
@@ -436,12 +464,6 @@ class SolitaireActivity : AppCompatActivity() {
         val lastScore = this@SolitaireActivity.defaultSharedPreferences.getInt("solitaire_score", 0)
         val lastMove = this@SolitaireActivity.defaultSharedPreferences.getInt("solitaire_moves", 0)
         val lastTime = this@SolitaireActivity.defaultSharedPreferences.getLong("solitaire_time", 0)
-
-        fun getTime(length: Long): String {
-            val m = TimeUnit.MILLISECONDS.toMinutes(length)
-            val s = TimeUnit.MILLISECONDS.toSeconds(length - m * 60 * 1000)
-            return String.format("%02d:%02d", m, s)
-        }
 
         deck_of_cards.setOnClickListener(null)
         val builder = AlertDialog.Builder(this)

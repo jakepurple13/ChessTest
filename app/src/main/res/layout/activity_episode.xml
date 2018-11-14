@@ -99,6 +99,7 @@
         android:layout_toStartOf="@id/share_button"
         android:layout_below="@id/progressBar2"
         android:layout_above="@id/episode_refresh"
+        android:transitionName="like_trans"
         app:icon_type="star" />
 
     <Button

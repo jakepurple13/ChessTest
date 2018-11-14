@@ -123,8 +123,10 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                     val length = sharedPreferences!!.getString(key, "1f")!!.toFloat()
 
                     defaultSharedPreferences.edit().putFloat(ConstantValues.UPDATE_CHECK, length).apply()
-                    FunApplication.cancelChecker(this@GeneralPreferenceFragment.context)
-                    FunApplication.checkUpdater(this@GeneralPreferenceFragment.context, length)
+                    //FunApplication.cancelChecker(this@GeneralPreferenceFragment.context)
+                    //FunApplication.checkUpdater(this@GeneralPreferenceFragment.context, length)
+                    FunApplication.cancelAlarm(this@GeneralPreferenceFragment.context)
+                    FunApplication.scheduleAlarm(this@GeneralPreferenceFragment.context, length)
 
                     findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * length.toDouble()).toLong(), false)
                 }

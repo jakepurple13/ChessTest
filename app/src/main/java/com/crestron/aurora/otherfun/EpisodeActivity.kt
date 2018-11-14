@@ -86,12 +86,12 @@ class EpisodeActivity : AppCompatActivity() {
 
         download_info.linksClickable = true
         download_info.text = nameUrl()
-
         runOnUiThread {
             GlobalScope.launch {
-                if (show.showDao().isUrlInDatabase(url) > 0) {
-                    //fav_episode.isChecked = true
-                    fav_episode.isLiked = true
+                if (intent.hasExtra("is_favorited")) {
+                    fav_episode.isLiked = intent.getBooleanExtra("is_favorited", false)
+                } else {
+                    fav_episode.isLiked = show.showDao().isUrlInDatabase(url) > 0
                 }
             }
         }
@@ -426,18 +426,7 @@ class EpisodeActivity : AppCompatActivity() {
             fun liked(like: Boolean) {
                 GlobalScope.launch {
                     if (like) {
-                        show.showDao().insert(Show(url, name))
-
-                        launch {
-                            val s = show.showDao().getShow(name)
-                            val showList = listOfEpisodes.size
-                            if (s.showNum < showList) {
-                                s.showNum = showList
-                                show.showDao().updateShow(s)
-                            }
-                            Loged.wtf("${s.name} and size is $showList")
-                        }
-
+                        show.showDao().insert(Show(url, name, listOfEpisodes.size))
                     } else {
                         show.showDao().deleteShow(name)
                     }
@@ -481,15 +470,18 @@ class EpisodeActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (backChoice)
-        //super.onBackPressed()
+        if (backChoice) {
+            intent.putExtra("url_string", url)
+            intent.putExtra("is_favorited", fav_episode.isLiked)
+            setResult(111, intent)
+            super.onBackPressed()
             supportFinishAfterTransition()
-        else {
+        } else {
             val intent = Intent(this@EpisodeActivity, ChoiceActivity::class.java)
             startActivity(intent)
-            finish()
+            //finish()
             Bungee.slideRight(this@EpisodeActivity)
-            //supportFinishAfterTransition()
+            supportFinishAfterTransition()
         }
     }
 

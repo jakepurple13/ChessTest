@@ -1,7 +1,9 @@
 package com.crestron.aurora;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.Application;
+import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
@@ -24,12 +26,14 @@ import android.support.v7.graphics.Palette;
 import com.crashlytics.android.Crashlytics;
 import com.crestron.aurora.otherfun.DownloadViewerActivity;
 import com.crestron.aurora.otherfun.FetchingUtils;
+import com.crestron.aurora.otherfun.ShowCheckReceiver;
 import com.crestron.aurora.otherfun.ShowCheckService;
 import com.crestron.aurora.otherfun.ShowListActivity;
 import com.crestron.aurora.otherfun.UpdateCheckService;
 import com.crestron.aurora.otherfun.ViewVideosActivity;
 import com.crestron.aurora.showapi.Source;
 import com.crestron.aurora.utilities.CustomFetchNotiManager;
+import com.crestron.aurora.utilities.KUtility;
 import com.evernote.android.job.JobManager;
 import com.facebook.stetho.Stetho;
 import com.google.firebase.FirebaseApp;
@@ -258,7 +262,7 @@ public class FunApplication extends Application {
         }
     }
 
-    public static void checkUpdater(Context context, Number time) {
+    public static void checkUpdater1(Context context, Number time) {
         cancelChecker(context);
         JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (jobScheduler != null) {
@@ -271,11 +275,65 @@ public class FunApplication extends Application {
         }
     }
 
+    public static void checkUpdater(Context context, Number time) {
+        checkUpdater1(context, time);
+        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        if (jobScheduler != null) {
+            for (JobInfo j : jobScheduler.getAllPendingJobs()) {
+                Loged.INSTANCE.d("Id: " + j.getId(), "TAG", true);
+            }
+            /*JobInfo check = jobScheduler.getPendingJob(1);
+            assert check != null;
+            Loged.INSTANCE.d("Time: " + time.longValue() + "\nLatency: " + check.getMinLatencyMillis(), Loged.INSTANCE.getTAG(), true);
+            if (check.getMinLatencyMillis() != time.longValue()) {
+                cancelChecker(context);
+                jobScheduler.schedule(new JobInfo.Builder(1,
+                        new ComponentName(context, ShowCheckService.class))
+                        .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                        .setMinimumLatency((long) (1000 * 60 * 60 * time.doubleValue()))
+                        .build());
+                Loged.INSTANCE.wtf(FetchingUtils.Fetched.getETAString((long) (1000 * 60 * 60 * time.doubleValue()), false), "TAG", true);
+            } else {
+                Loged.INSTANCE.wtf("No change here", Loged.INSTANCE.getTAG(), true);
+            }*/
+        }
+    }
+
     public static void cancelChecker(Context context) {
         JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (jobScheduler != null) {
             jobScheduler.cancel(1);
         }
+    }
+
+    // Setup a recurring alarm every half hour
+    public static void scheduleAlarm(Context context, Number time) {
+        Loged.INSTANCE.wtf(FetchingUtils.Fetched.getETAString((long) (1000 * 60 * 60 * time.doubleValue()), false), "TAG", true);
+        // Construct an intent that will execute the AlarmReceiver
+        Intent intent = new Intent(context, ShowCheckReceiver.class);
+
+        // Create a PendingIntent to be triggered when the alarm goes off
+        final PendingIntent pIntent = PendingIntent.getBroadcast(context, 1,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        long firstMillis = System.currentTimeMillis(); // alarm is set right away
+        long wantedTime = (long) (1000 * 60 * 60 * time.doubleValue());
+
+        AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
+        // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
+                wantedTime, pIntent);
+
+        KUtility.Util.setCurrentUpdateTime(time.floatValue());
+    }
+
+    public static void cancelAlarm(Context context) {
+        Intent intent = new Intent(context, ShowCheckReceiver.class);
+        final PendingIntent pIntent = PendingIntent.getBroadcast(context, 1,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarm.cancel(pIntent);
     }
 
     public static Fetch getDefault() {

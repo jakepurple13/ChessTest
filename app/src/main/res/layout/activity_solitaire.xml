@@ -237,5 +237,18 @@
         android:backgroundTint="@color/emeraldGreen"
         android:text="Auto Move" />
 
+    <Button
+        android:id="@+id/high_score_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="5dp"
+        android:background="@drawable/dialog_bg"
+        android:backgroundTint="@color/emeraldGreen"
+        android:layout_alignTop="@+id/auto_move"
+        android:layout_alignParentStart="true"
+        android:text="View High Scores" />
+
 
 </RelativeLayout>

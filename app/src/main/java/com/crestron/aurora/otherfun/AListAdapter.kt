@@ -84,6 +84,16 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
         return ViewHolder(LayoutInflater.from(context).inflate(R.layout.text_layout, parent, false))
     }
 
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        //super.onBindViewHolder(holder, position, payloads)
+        try {
+            holder.favorite.isLiked = payloads[0] as Boolean
+        } catch (e: IndexOutOfBoundsException) {
+
+        }
+        onBindViewHolder(holder, position)
+    }
+
     // Binds each animal in the ArrayList to a view
     @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
@@ -91,13 +101,13 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
             holder.linkType.text = items!![position]
             holder.linkType.setOnClickListener {
                 Loged.wtf("I was pressed")
-                action.hit(items!![position], links[position], it)
+                action.hit(items!![position], links[position], it, holder.favorite)
             }
         } else {
             holder.linkType.text = stuff[position].name
             holder.linkType.setOnClickListener {
                 Loged.wtf("I was pressed")
-                action.hit(stuff[position].name, stuff[position].url, it)
+                action.hit(stuff[position].name, stuff[position].url, it, holder.favorite)
             }
 
             holder.layout.setOnClickListener {
@@ -126,9 +136,7 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
                         fun liked(like: Boolean) {
                             launch {
                                 if (like) {
-
                                     show.showDao().insert(Show(stuff[position].url, stuff[position].name))
-
                                     launch {
                                         val s = show.showDao().getShow(stuff[position].name)
                                         val showList = getEpisodeList(stuff[position]).await()

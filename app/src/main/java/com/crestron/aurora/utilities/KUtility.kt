@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
+import com.crestron.aurora.FunApplication
 import com.crestron.aurora.Loged
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.IOException
@@ -16,6 +17,15 @@ import java.util.*
 class KUtility {
 
     companion object Util {
+
+        var currentUpdateTime: Float = 1f
+            set(value) {
+                FunApplication.getAppContext().defaultSharedPreferences.edit().putFloat("currentUpdateTime", value).apply()
+                field = value
+            }
+            get() {
+                return FunApplication.getAppContext().defaultSharedPreferences.getFloat("currentUpdateTime", 9f)
+            }
 
         fun getSharedPref(context: Context): SharedPreferences {
             return context.defaultSharedPreferences
@@ -62,7 +72,8 @@ class KUtility {
         for (i in 1 until a.size) {
             val d = a[i] - a[i - 1]
             when (d) {
-                0 -> {/*ignore duplicates*/}
+                0 -> {/*ignore duplicates*/
+                }
                 1 -> sequence += 1
                 else -> if (sequence > longest) {
                     longest = sequence

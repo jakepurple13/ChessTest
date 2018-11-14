@@ -5,7 +5,10 @@ import android.content.Context
 /**
  * The Class Card.
  */
-class Card(val suit: Suit, val value: Int) : Comparable<Card> {
+open class Card(val suit: Suit, val value: Int) : Comparable<Card> {
+
+    protected var maxValue = 16
+    protected var minValue = 1
 
     operator fun plus(c: Card) = value + c.value
     operator fun minus(c: Card) = value - c.value
@@ -17,7 +20,7 @@ class Card(val suit: Suit, val value: Int) : Comparable<Card> {
     }
 
     init {
-        if(value>16 || value<1) {
+        if (value > maxValue || value < minValue) {
             throw CardNotFoundException("The value isn't a card")
         }
     }

@@ -34,9 +34,9 @@ import com.crestron.aurora.cardgames.videopoker.VideoPokerActivity
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.*
 import com.crestron.aurora.showapi.EpisodeApi
-import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
+import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.views.DownloadsWidget
 import com.crestron.aurora.viewtesting.ViewTesting
@@ -150,7 +150,11 @@ class ChoiceActivity : AppCompatActivity() {
         //UpdateJob.cancelJob(UpdateJob.scheduleJob())
 
         val length = defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)
-        FunApplication.checkUpdater(this, length)
+        //FunApplication.checkUpdater(this, length)
+        Loged.d("length: $length and currentTime: ${KUtility.currentUpdateTime}")
+        FunApplication.cancelChecker(this)
+        if (KUtility.currentUpdateTime != length)
+            FunApplication.scheduleAlarm(this, length)
 
         KonamiCode.Installer(this)
                 .on(this)
@@ -891,7 +895,7 @@ class ChoiceActivity : AppCompatActivity() {
             //mNotificationManager.activeNotifications.filter { it.id == 1 }[0].notification.
             val showDatabase = ShowDatabase.getDatabase(this@ChoiceActivity)
             GlobalScope.launch {
-                var count = 0
+                /*var count = 0
                 val showApi = ShowApi(Source.RECENT_ANIME).showInfoList
                 showApi.addAll(ShowApi(Source.RECENT_CARTOON).showInfoList)
                 val filteredList = showApi.distinctBy { it.url }
@@ -910,23 +914,25 @@ class ChoiceActivity : AppCompatActivity() {
                             show.showNum = showList
                             showDatabase.showDao().updateShow(show)
                             count++
-                            /*checkForUpdateItem.withSubItems(SecondaryDrawerItem()
+                            *//*checkForUpdateItem.withSubItems(SecondaryDrawerItem()
                                     .withLevel(2)
                                     .withName(i.name)
                                     .withSelectable(false)
-                                    .withIcon(GoogleMaterial.Icon.gmd_adb))*/
+                                    .withIcon(GoogleMaterial.Icon.gmd_adb))*//*
                         } catch (e: SocketTimeoutException) {
                             continue
                         }
                     }
-                }
-                if (count > 0) {
+                }*/
+                val showCheck = Intent(this@ChoiceActivity, ShowCheckIntentService::class.java)
+                startService(showCheck)
+                /*if (count > 0) {
                     runOnUiThread {
                         checkForUpdateItem.withBadge("$count")
                         checkForUpdateItem.withBadgeStyle(BadgeStyle(Color.RED, Color.RED))
                         result.updateItem(checkForUpdateItem)
                     }
-                }
+                }*/
             }
             true
         }
