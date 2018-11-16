@@ -375,7 +375,7 @@ class SolitaireActivity : AppCompatActivity() {
                 intent.putExtra(ConstantValues.DRAW_AMOUNT, drawAmount)
                 finish()
                 startActivity(intent)
-                Bungee.windmill(this@SolitaireActivity)
+                Bungee.swipeLeft(this@SolitaireActivity)
             }
             builder.setNegativeButton("Nope") { _, _ ->
                 time.startTimer(solitaire_timer)
@@ -395,7 +395,7 @@ class SolitaireActivity : AppCompatActivity() {
             // Add the buttons
             builder.setPositiveButton("Yes, I want to stop") { _, _ ->
                 finish()
-                Bungee.windmill(this@SolitaireActivity)
+                Bungee.shrink(this@SolitaireActivity)
             }
             builder.setNegativeButton("No, I do not want to stop") { _, _ ->
                 if (!win)
@@ -485,7 +485,7 @@ class SolitaireActivity : AppCompatActivity() {
         }
         builder.setNegativeButton("Nope") { _, _ ->
             finish()
-            Bungee.windmill(this@SolitaireActivity)
+            Bungee.swipeLeft(this@SolitaireActivity)
         }
         val dialog = builder.create()
         dialog.show()

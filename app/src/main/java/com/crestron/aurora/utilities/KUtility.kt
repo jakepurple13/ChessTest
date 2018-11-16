@@ -18,13 +18,22 @@ class KUtility {
 
     companion object Util {
 
-        var currentUpdateTime: Float = 1f
+        var currentUpdateTime: Float = 9f
             set(value) {
                 FunApplication.getAppContext().defaultSharedPreferences.edit().putFloat("currentUpdateTime", value).apply()
                 field = value
             }
             get() {
                 return FunApplication.getAppContext().defaultSharedPreferences.getFloat("currentUpdateTime", 9f)
+            }
+
+        var nextCheckTime: Long = 0L
+            set(value) {
+                FunApplication.getAppContext().defaultSharedPreferences.edit().putLong("nextUpdateCheckTime", value).apply()
+                field = value
+            }
+            get() {
+                return FunApplication.getAppContext().defaultSharedPreferences.getLong("nextUpdateCheckTime", 0L)
             }
 
         fun getSharedPref(context: Context): SharedPreferences {

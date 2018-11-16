@@ -16,6 +16,7 @@ import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.Source
+import com.crestron.aurora.utilities.KUtility
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
@@ -149,6 +150,8 @@ class ShowCheckReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         val i = Intent(context, ShowCheckIntentService::class.java)
         context!!.startService(i)
+        val nextTime = (System.currentTimeMillis() + (1000 * 60 * 60 * KUtility.currentUpdateTime).toLong())
+        KUtility.nextCheckTime = nextTime
     }
 }
 

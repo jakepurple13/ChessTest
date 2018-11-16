@@ -45,6 +45,7 @@ import com.tonyodev.fetch2.HttpUrlConnectionDownloader;
 import com.tonyodev.fetch2.NetworkType;
 import com.tonyodev.fetch2core.Downloader;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -306,6 +307,15 @@ public class FunApplication extends Application {
         }
     }
 
+    public static void seeNextAlarm(Context context) {
+        AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        try {
+            Loged.INSTANCE.wtf(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(alarm.getNextAlarmClock().getTriggerTime()), "TAG", true);
+        } catch (NullPointerException e) {
+
+        }
+    }
+
     // Setup a recurring alarm every half hour
     public static void scheduleAlarm(Context context, Number time) {
         Loged.INSTANCE.wtf(FetchingUtils.Fetched.getETAString((long) (1000 * 60 * 60 * time.doubleValue()), false), "TAG", true);
@@ -316,14 +326,16 @@ public class FunApplication extends Application {
         final PendingIntent pIntent = PendingIntent.getBroadcast(context, 1,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        long firstMillis = System.currentTimeMillis(); // alarm is set right away
         long wantedTime = (long) (1000 * 60 * 60 * time.doubleValue());
+        long firstMillis = System.currentTimeMillis() + wantedTime; // alarm is set right away
 
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
         // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
+        alarm.setRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
                 wantedTime, pIntent);
+
+        //Loged.INSTANCE.wtf(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(alarm.getNextAlarmClock().getTriggerTime()), "TAG", true);
 
         KUtility.Util.setCurrentUpdateTime(time.floatValue());
     }

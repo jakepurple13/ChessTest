@@ -47,6 +47,11 @@
             android:summary="Time between update checks"
             android:title="Time between Checks (By Hour; So .5 = 30 minutes)" />
 
+        <Preference
+            android:key="next_update_check"
+            android:title="Next Update Check"
+            android:summary="Time" />
+
         <SwitchPreference
             android:key="slider_or_button"
             android:title="Use a Slider or a Button to download videos"

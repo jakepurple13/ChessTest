@@ -1,7 +1,9 @@
 package com.crestron.aurora
 
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
+import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -28,6 +30,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.text.SimpleDateFormat
 
 
 /**
@@ -145,6 +148,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
             }
         }
 
+        @SuppressLint("SimpleDateFormat")
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             //addPreferencesFromResource(R.xml.pref_general)
@@ -159,6 +163,17 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
             //bindPreferenceSummaryToValue(findPreference("wifiOnly"))
 
             findPreference(ConstantValues.FOLDER_LOCATION).summary = FetchingUtils.folderLocation
+
+            val alarm = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            findPreference("next_update_check").summary = try {
+                SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(alarm.nextAlarmClock.triggerTime)
+            } catch (e: IllegalStateException) {
+                "N/A"
+            } catch (e: NullPointerException) {
+                "N/A"
+            }
+
+            //findPreference("next_update_check").summary = SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(KUtility.nextCheckTime)
 
             findPreference(ConstantValues.FOLDER_LOCATION).setOnPreferenceClickListener {
                 chooseFolderLocation()

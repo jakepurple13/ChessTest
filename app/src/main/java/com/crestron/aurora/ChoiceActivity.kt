@@ -153,8 +153,17 @@ class ChoiceActivity : AppCompatActivity() {
         //FunApplication.checkUpdater(this, length)
         Loged.d("length: $length and currentTime: ${KUtility.currentUpdateTime}")
         FunApplication.cancelChecker(this)
-        if (KUtility.currentUpdateTime != length)
+        val alarmUp = PendingIntent.getBroadcast(this, 1,
+                Intent(this@ChoiceActivity, ShowCheckReceiver::class.java), PendingIntent.FLAG_NO_CREATE) != null
+
+        if (!alarmUp || KUtility.currentUpdateTime != length) {
             FunApplication.scheduleAlarm(this, length)
+        }
+        //FunApplication.scheduleAlarm(this, length)
+        /*if (KUtility.currentUpdateTime != length )
+            FunApplication.scheduleAlarm(this, length)
+        else
+            FunApplication.seeNextAlarm(this)*/
 
         KonamiCode.Installer(this)
                 .on(this)
