@@ -152,6 +152,7 @@
                 <action android:name="fun.com.crestron.UPDATE_APP" />
             </intent-filter>
         </receiver>
+
         <service
             android:name=".otherfun.UpdateCheckService"
             android:exported="true"
@@ -306,6 +307,9 @@
             android:process=":remote" />
         <service
             android:name=".otherfun.ShowCheckIntentService"
+            android:exported="false" />
+        <receiver
+            android:name=".otherfun.ShowCheckIntentService$NotificationDismissedReceiver"
             android:exported="false" />
     </application>
 

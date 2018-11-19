@@ -5,6 +5,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
+import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import com.crestron.aurora.FunApplication
@@ -12,7 +14,11 @@ import com.crestron.aurora.Loged
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.IOException
 import java.io.OutputStreamWriter
+import java.time.Duration
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
+
 
 class KUtility {
 
@@ -29,7 +35,11 @@ class KUtility {
 
         var nextCheckTime: Long = 0L
             set(value) {
-                FunApplication.getAppContext().defaultSharedPreferences.edit().putLong("nextUpdateCheckTime", value).apply()
+                val cal = Calendar.getInstance()
+                cal.timeInMillis = value
+                cal.set(Calendar.SECOND, 0)
+                //Loged.wtf("$value")
+                FunApplication.getAppContext().defaultSharedPreferences.edit().putLong("nextUpdateCheckTime", cal.timeInMillis).apply()
                 field = value
             }
             get() {
@@ -38,6 +48,31 @@ class KUtility {
 
         fun getSharedPref(context: Context): SharedPreferences {
             return context.defaultSharedPreferences
+        }
+
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun timeToNextHour(): Long {
+            val start = ZonedDateTime.now()
+            // Hour + 1, set Minute and Second to 00
+            val end = start.plusHours(1).truncatedTo(ChronoUnit.HOURS)
+
+            // Get Duration
+            val duration = Duration.between(start, end)
+            return duration.toMillis()
+        }
+
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun timeToNextHourOrHalf(): Long {
+            val start = ZonedDateTime.now()
+            // Hour + 1, set Minute and Second to 00
+            val hour = start.plusHours(1).truncatedTo(ChronoUnit.HOURS)
+            val minute = start.plusHours(0).truncatedTo(ChronoUnit.HOURS)
+                    .plusMinutes(30).truncatedTo(ChronoUnit.MINUTES).plusSeconds(1)
+
+            // Get Duration
+            val durationHour = Duration.between(start, hour).toMillis()
+            val durationMinute = Duration.between(start, minute).toMillis()
+            return if (durationHour <= durationMinute) durationHour else durationMinute
         }
 
         private fun sendNotification(context: Context, smallIconId: Int, title: String, message: String, channel_id: String, gotoActivity: Class<*>, notification_id: Int) {

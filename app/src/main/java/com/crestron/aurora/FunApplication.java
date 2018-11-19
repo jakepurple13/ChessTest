@@ -45,6 +45,7 @@ import com.tonyodev.fetch2core.Downloader;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
@@ -68,6 +69,7 @@ public class FunApplication extends Application {
         context = this;
 
         Loged.INSTANCE.wtf("We are connected: " + Utility.isNetwork(this), Loged.INSTANCE.getTAG(), true);
+        Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(KUtility.Util.getNextCheckTime()), "TAG", true);
 
         SharedPreferences sharedPreferences = getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE);
         FetchingUtils.Fetched.setFolderLocation(sharedPreferences.getString(ConstantValues.FOLDER_LOCATION, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/Fun/"));
@@ -234,30 +236,12 @@ public class FunApplication extends Application {
         return Color.argb(alpha, red, green, blue);
     }
 
-    /*public static void setUpdateAlarm(Context context) {
-        Calendar cur_cal = new GregorianCalendar();
-        cur_cal.setTimeInMillis(System.currentTimeMillis());//set the current time and date for this calendar
-
-        Calendar cal = new GregorianCalendar();
-        cal.add(Calendar.DAY_OF_YEAR, cur_cal.get(Calendar.DAY_OF_YEAR));
-        cal.set(Calendar.HOUR_OF_DAY, 18);
-        cal.set(Calendar.MINUTE, 32);
-        cal.set(Calendar.SECOND, cur_cal.get(Calendar.SECOND));
-        cal.set(Calendar.MILLISECOND, cur_cal.get(Calendar.MILLISECOND));
-        cal.set(Calendar.DATE, cur_cal.get(Calendar.DATE));
-        cal.set(Calendar.MONTH, cur_cal.get(Calendar.MONTH));
-        Intent intent = new Intent(context, UpdateCheckService.class);
-        PendingIntent pintent = PendingIntent.getService(ProfileList.this, 0, intent, 0);
-        AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-        alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 30*1000, pintent);
-    }*/
-
     public static void seeNextAlarm(Context context) {
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         try {
-            Loged.INSTANCE.wtf(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(alarm.getNextAlarmClock().getTriggerTime()), "TAG", true);
+            Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(alarm.getNextAlarmClock().getTriggerTime()), "TAG", true);
         } catch (NullPointerException e) {
-
+            Loged.INSTANCE.wtf(e.getMessage(), "TAG", true);
         }
     }
 
@@ -273,20 +257,15 @@ public class FunApplication extends Application {
 
         long wantedTime = (long) (1000 * 60 * 60 * time.doubleValue());
 
-        long millis = System.currentTimeMillis() + wantedTime;
-        /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        //long millis = System.currentTimeMillis() + wantedTime;
 
-            LocalDateTime start = LocalDateTime.now();
-            // Hour + 1, set Minute and Second to 00
-            LocalDateTime end = start.plusHours(1).truncatedTo(ChronoUnit.HOURS);
-
-            // Get Duration
-            Duration duration = Duration.between(start, end);
-            millis = System.currentTimeMillis() + duration.toMillis();
-
-            Loged.INSTANCE.wtf(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(millis), "TAG", true);
-        }*/
-        long firstMillis = millis; // alarm is set right away
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        long timeToSet = 5000L;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            timeToSet = KUtility.Util.timeToNextHourOrHalf();
+        }
+        long firstMillis = calendar.getTimeInMillis() + timeToSet; // alarm is set right away
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
         // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
@@ -294,6 +273,7 @@ public class FunApplication extends Application {
                 wantedTime, pIntent);
 
         KUtility.Util.setCurrentUpdateTime(time.floatValue());
+        KUtility.Util.setNextCheckTime(firstMillis);
     }
 
     public static void cancelAlarm(Context context) {

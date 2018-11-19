@@ -24,6 +24,14 @@ class AnimationUtility {
 
     companion object Animation {
 
+        fun translate(viewToMove: View, target: View) {
+            viewToMove.animate()
+                    .x(target.x)
+                    .y(target.y)
+                    .setDuration(1000)
+                    .start()
+        }
+
         fun circleAnimation(view: View) {
             val startRadius = 0
             val endRadius = Math.hypot(view.width.toDouble(), view.height.toDouble()).toInt()

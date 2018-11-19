@@ -36,6 +36,7 @@ import com.crestron.aurora.otherfun.*
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
+import com.crestron.aurora.utilities.AlarmUtils
 import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.utilities.ViewUtil
@@ -149,11 +150,15 @@ class ChoiceActivity : AppCompatActivity() {
         val length = defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)
         //FunApplication.checkUpdater(this, length)
         Loged.d("length: $length and currentTime: ${KUtility.currentUpdateTime}")
-        val alarmUp = PendingIntent.getBroadcast(this, 1,
-                Intent(this@ChoiceActivity, ShowCheckReceiver::class.java), PendingIntent.FLAG_NO_CREATE) != null
-
+        //PendingIntent.getBroadcast(this, 1, Intent(this@ChoiceActivity, ShowCheckReceiver::class.java), PendingIntent.FLAG_NO_CREATE) != null
+        val alarmUp = AlarmUtils.hasAlarm(this@ChoiceActivity, Intent(this@ChoiceActivity, ShowCheckReceiver::class.java), 1)
         if (!alarmUp || KUtility.currentUpdateTime != length) {
+            Loged.i("Setting")
             FunApplication.scheduleAlarm(this, length)
+            //FunApplication.seeNextAlarm(this@ChoiceActivity)
+        } else {
+            Loged.i("Nope, already set")
+            //FunApplication.seeNextAlarm(this@ChoiceActivity)
         }
         //FunApplication.scheduleAlarm(this, length)
         /*if (KUtility.currentUpdateTime != length )
@@ -592,7 +597,8 @@ class ChoiceActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         try {
-            unregisterReceiver(BroadcastReceiverDownload())
+            if (br != null)
+                unregisterReceiver(br)
         } catch (e: IllegalArgumentException) {
 
         }

@@ -20,6 +20,7 @@ import com.codekidlabs.storagechooser.StorageChooser
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.FetchingUtils
+import com.crestron.aurora.utilities.KUtility
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.GlobalScope
@@ -29,6 +30,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.text.SimpleDateFormat
 
 
 /**
@@ -129,6 +131,15 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                     FunApplication.cancelAlarm(this@GeneralPreferenceFragment.context)
                     FunApplication.scheduleAlarm(this@GeneralPreferenceFragment.context, length)
 
+                    findPreference("next_update_check").summary = try {
+                        "≈ ${SimpleDateFormat("MM/dd/yyyy E hh:mm a").format(KUtility.nextCheckTime)}"
+                        //SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(alarm.nextAlarmClock.triggerTime)
+                    } catch (e: IllegalStateException) {
+                        "N/A"
+                    } catch (e: NullPointerException) {
+                        "N/A"
+                    }
+
                     findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * length.toDouble()).toLong(), false)
                 }
                 ConstantValues.NUMBER_OF_RANDOM -> {
@@ -162,14 +173,15 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
 
             findPreference(ConstantValues.FOLDER_LOCATION).summary = FetchingUtils.folderLocation
 
-            /*val alarm = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            //val alarm = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             findPreference("next_update_check").summary = try {
-                SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(alarm.nextAlarmClock.triggerTime)
+                "≈ ${SimpleDateFormat("MM/dd/yyyy E hh:mm a").format(KUtility.nextCheckTime)}"
+                //SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(alarm.nextAlarmClock.triggerTime)
             } catch (e: IllegalStateException) {
                 "N/A"
             } catch (e: NullPointerException) {
                 "N/A"
-            }*/
+            }
 
             //findPreference("next_update_check").summary = SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(KUtility.nextCheckTime)
 

@@ -5,6 +5,7 @@ import com.crestron.aurora.boardgames.yahtzee.YahtzeeScores
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.Source
+import com.crestron.aurora.utilities.KUtility
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
 import crestron.com.deckofcards.Suit
@@ -133,6 +134,13 @@ class ExampleUnitTest {
         val logged = "$msg\t.$methodName\t($fileName:$lineNumber)"
 
         System.out.println(logged)
+    }
+
+    @Test
+    fun funTimeTesting() {
+        val time = SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(System.currentTimeMillis() + KUtility.timeToNextHourOrHalf())
+        log("${KUtility.timeToNextHour()}")
+        log(time)
     }
 
     @Test
@@ -344,7 +352,6 @@ class ExampleUnitTest {
     }
 
     fun personC(block: PersonBuilderB.() -> Unit): PersonC = PersonBuilderB().apply(block).build()
-
 
     @Test
     fun dslTest() {

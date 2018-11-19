@@ -2,13 +2,11 @@ package com.crestron.aurora
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
-import kotlinx.html.stream.appendHTML
-
+import com.crestron.aurora.utilities.KUtility
+import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import org.junit.Assert.*
-import org.junit.Before
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.ServerSocketChannel
@@ -27,6 +25,13 @@ class ExampleInstrumentedTest {
         val appContext = InstrumentationRegistry.getTargetContext()
         assertEquals("com.crestron.aurora", appContext.packageName)
     }
+
+    @Test
+    fun funTesting() {
+        Loged.wtf("${KUtility.timeToNextHour()}")
+        Loged.wtf("${KUtility.timeToNextHourOrHalf()}")
+    }
+
     @Before
     fun setUp() {
         Loged.FILTER_BY_CLASS_NAME = "crestron"
