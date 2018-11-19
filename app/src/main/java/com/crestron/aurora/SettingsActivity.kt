@@ -7,13 +7,15 @@ import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Toast
-import com.tonyodev.fetch2.*
-import com.tonyodev.fetch2core.Downloader
-import kotlinx.android.synthetic.main.activity_settings.*
-import java.lang.NumberFormatException
 import com.codekidlabs.storagechooser.StorageChooser
 import com.crestron.aurora.otherfun.DownloadViewerActivity
 import com.crestron.aurora.otherfun.FetchingUtils
+import com.tonyodev.fetch2.Fetch
+import com.tonyodev.fetch2.FetchConfiguration
+import com.tonyodev.fetch2.HttpUrlConnectionDownloader
+import com.tonyodev.fetch2.NetworkType
+import com.tonyodev.fetch2core.Downloader
+import kotlinx.android.synthetic.main.activity_settings.*
 import org.jetbrains.anko.defaultSharedPreferences
 
 
@@ -121,8 +123,8 @@ class SettingsActivity : AppCompatActivity() {
             val length = if (!update_check_number.text.toString().isEmpty()) update_check_number.text.toString().toFloat() else 1.0f
 
             getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, Context.MODE_PRIVATE).edit().putFloat(ConstantValues.UPDATE_CHECK, length).apply()
-            FunApplication.cancelChecker(this@SettingsActivity)
-            FunApplication.checkUpdater(this@SettingsActivity, length)
+            //FunApplication.cancelChecker(this@SettingsActivity)
+            //FunApplication.checkUpdater(this@SettingsActivity, length)
 
             check_time.text = FetchingUtils.getETAString((1000 * 60 * 60 * length.toDouble()).toLong(), false)
 

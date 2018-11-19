@@ -5,6 +5,7 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.Toast;
 
 import com.crestron.aurora.Loged;
 
@@ -26,8 +27,19 @@ public class Utility {
     public static boolean isConnectedNetwork(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
-
     }
+
+    public static boolean isNetworkToast(Context context) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        boolean connected = activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        if (!connected) {
+            Toast.makeText(context, "Not Connected to Internet", Toast.LENGTH_SHORT).show();
+        }
+        return connected;
+    }
+
 
     public static String runAsRoot(String command) {
 

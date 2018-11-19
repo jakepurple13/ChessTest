@@ -28,6 +28,7 @@ import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
+import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.utilities.ViewUtil
 import com.like.LikeButton
 import com.peekandpop.shalskar.peekandpop.PeekAndPop
@@ -36,6 +37,7 @@ import kotlinx.android.synthetic.main.activity_show_list.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.textColor
 import uk.co.deanwild.flowtextview.FlowTextView
 import java.net.SocketTimeoutException
@@ -46,6 +48,7 @@ class ShowListActivity : AppCompatActivity() {
 
     private val listOfLinks = arrayListOf<String>()
     private val listOfNames = arrayListOf<String>()
+    private var listOfNameAndLinkToShow = arrayListOf<ShowInfo>()
     private val listOfNameAndLink = arrayListOf<ShowInfo>()
     private val actionHit = object : LinkAction {
         override fun hit(name: String, url: String, vararg view: View) {
@@ -131,7 +134,7 @@ class ShowListActivity : AppCompatActivity() {
             val urlString = data.getStringExtra("url_string")
             val isFavorite = data.getBooleanExtra("is_favorited", false)
             Loged.wtf("$urlString is now $isFavorite")
-            (show_info.adapter as AListAdapter).notifyItemChanged(listOfNameAndLink.indexOfFirst { it.url == urlString }, isFavorite)
+            (show_info.adapter as AListAdapter).notifyItemChanged((show_info.adapter as AListAdapter).stuff.indexOfFirst { it.url == urlString }, isFavorite)
         }
     }
 
@@ -173,6 +176,8 @@ class ShowListActivity : AppCompatActivity() {
 
                 if (!recentChoice)
                     listOfNameAndLink.sortBy { it.name }
+                else
+                    defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT, 0).apply()
 
                 runOnUiThread {
                     show_info.adapter = AListAdapter(listOfNameAndLink, this@ShowListActivity, showDatabase, actionHit)
@@ -193,7 +198,20 @@ class ShowListActivity : AppCompatActivity() {
             getListOfAnime(url)
         }
 
-        getStuff()
+        if (Utility.isNetwork(this))
+            getStuff()
+        else {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("No Internet")
+            builder.setMessage("Please get connected to internet to use this section")
+            // Add the buttons
+            builder.setPositiveButton("Okay") { _, _ ->
+                finish()
+            }
+            builder.setCancelable(false)
+            val dialog = builder.create()
+            dialog.show()
+        }
 
         refresh_list.setOnRefreshListener {
             listOfNameAndLink.clear()
@@ -264,7 +282,7 @@ class ShowListActivity : AppCompatActivity() {
 
     }
 
-    fun errorHasOccurred(message: String) {
+    private fun errorHasOccurred(message: String) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("An error has occurred")
         builder.setMessage("Please send feedback and explain what you were doing when you found this error. I am sorry for your inconvenience.")

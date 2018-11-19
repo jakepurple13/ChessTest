@@ -3,11 +3,10 @@ package com.crestron.aurora;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.WallpaperManager;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,13 +26,12 @@ import com.crashlytics.android.Crashlytics;
 import com.crestron.aurora.otherfun.DownloadViewerActivity;
 import com.crestron.aurora.otherfun.FetchingUtils;
 import com.crestron.aurora.otherfun.ShowCheckReceiver;
-import com.crestron.aurora.otherfun.ShowCheckService;
 import com.crestron.aurora.otherfun.ShowListActivity;
-import com.crestron.aurora.otherfun.UpdateCheckService;
 import com.crestron.aurora.otherfun.ViewVideosActivity;
 import com.crestron.aurora.showapi.Source;
 import com.crestron.aurora.utilities.CustomFetchNotiManager;
 import com.crestron.aurora.utilities.KUtility;
+import com.crestron.aurora.utilities.Utility;
 import com.evernote.android.job.JobManager;
 import com.facebook.stetho.Stetho;
 import com.google.firebase.FirebaseApp;
@@ -69,6 +67,8 @@ public class FunApplication extends Application {
 
         context = this;
 
+        Loged.INSTANCE.wtf("We are connected: " + Utility.isNetwork(this), Loged.INSTANCE.getTAG(), true);
+
         SharedPreferences sharedPreferences = getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE);
         FetchingUtils.Fetched.setFolderLocation(sharedPreferences.getString(ConstantValues.FOLDER_LOCATION, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/Fun/"));
         boolean wifiOnly = sharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false);
@@ -91,6 +91,19 @@ public class FunApplication extends Application {
             UtilNotification.createNotificationGroup(this,
                     "episode_group_id",
                     "episode_group");
+            //show check update running
+            /*UtilNotification.createNotificationChannel(this, "updateCheckRun",
+                    "episode check update",
+                    "updateCheckRun");
+            UtilNotification.createNotificationGroup(this,
+                    "show_check_update",
+                    "update_check");*/
+            NotificationChannel channel = new NotificationChannel("updateCheckRun", "updateCheckRun", NotificationManager.IMPORTANCE_MIN);
+            channel.setShowBadge(false);
+            NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (mNotificationManager != null) {
+                mNotificationManager.createNotificationChannel(channel);
+            }
             //app update
             UtilNotification.createNotificationChannel(this, "update_notification",
                     "update_notification",
@@ -99,14 +112,11 @@ public class FunApplication extends Application {
                     "update_notification_group",
                     "update_notification_group");
         }
-        float length = getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE).getFloat("updateCheck", 1f);
-
+        //float length = getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE).getFloat("updateCheck", 1f);
         //JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
         //if (jobScheduler != null && jobScheduler.getPendingJob(1) == null)
         //checkUpdater(this, length);
-
-        Loged.INSTANCE.wtf(FetchingUtils.Fetched.getETAString((long) (1000 * 60 * 60 * 0.0169), false), "TAG", true);
-
+        //Loged.INSTANCE.wtf(FetchingUtils.Fetched.getETAString((long) (1000 * 60 * 60 * 0.0169), false), "TAG", true);
         //startUpdate(this);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1) {
@@ -207,7 +217,6 @@ public class FunApplication extends Application {
 
             shortcutManager.setDynamicShortcuts(scl);
         }
-
     }
 
     public static int getComplimentColor(int color) {
@@ -243,70 +252,6 @@ public class FunApplication extends Application {
         alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 30*1000, pintent);
     }*/
 
-    public static void startUpdate(Context context) {
-        cancelUpdate(context);
-        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (jobScheduler != null) {
-            jobScheduler.schedule(new JobInfo.Builder(2,
-                    new ComponentName(context, UpdateCheckService.class))
-                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                    .setMinimumLatency((long) (1000 * 60 * 60 * 0.0169))
-                    .build());
-            Loged.INSTANCE.wtf(FetchingUtils.Fetched.getETAString((long) (1000 * 60 * 60 * 0.0169), false), "TAG", true);
-        }
-    }
-
-    public static void cancelUpdate(Context context) {
-        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (jobScheduler != null) {
-            jobScheduler.cancel(2);
-        }
-    }
-
-    public static void checkUpdater1(Context context, Number time) {
-        cancelChecker(context);
-        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (jobScheduler != null) {
-            jobScheduler.schedule(new JobInfo.Builder(1,
-                    new ComponentName(context, ShowCheckService.class))
-                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                    .setMinimumLatency((long) (1000 * 60 * 60 * time.doubleValue()))
-                    .build());
-            Loged.INSTANCE.wtf(FetchingUtils.Fetched.getETAString((long) (1000 * 60 * 60 * time.doubleValue()), false), "TAG", true);
-        }
-    }
-
-    public static void checkUpdater(Context context, Number time) {
-        checkUpdater1(context, time);
-        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (jobScheduler != null) {
-            for (JobInfo j : jobScheduler.getAllPendingJobs()) {
-                Loged.INSTANCE.d("Id: " + j.getId(), "TAG", true);
-            }
-            /*JobInfo check = jobScheduler.getPendingJob(1);
-            assert check != null;
-            Loged.INSTANCE.d("Time: " + time.longValue() + "\nLatency: " + check.getMinLatencyMillis(), Loged.INSTANCE.getTAG(), true);
-            if (check.getMinLatencyMillis() != time.longValue()) {
-                cancelChecker(context);
-                jobScheduler.schedule(new JobInfo.Builder(1,
-                        new ComponentName(context, ShowCheckService.class))
-                        .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                        .setMinimumLatency((long) (1000 * 60 * 60 * time.doubleValue()))
-                        .build());
-                Loged.INSTANCE.wtf(FetchingUtils.Fetched.getETAString((long) (1000 * 60 * 60 * time.doubleValue()), false), "TAG", true);
-            } else {
-                Loged.INSTANCE.wtf("No change here", Loged.INSTANCE.getTAG(), true);
-            }*/
-        }
-    }
-
-    public static void cancelChecker(Context context) {
-        JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (jobScheduler != null) {
-            jobScheduler.cancel(1);
-        }
-    }
-
     public static void seeNextAlarm(Context context) {
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         try {
@@ -327,15 +272,26 @@ public class FunApplication extends Application {
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         long wantedTime = (long) (1000 * 60 * 60 * time.doubleValue());
-        long firstMillis = System.currentTimeMillis() + wantedTime; // alarm is set right away
 
+        long millis = System.currentTimeMillis() + wantedTime;
+        /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+
+            LocalDateTime start = LocalDateTime.now();
+            // Hour + 1, set Minute and Second to 00
+            LocalDateTime end = start.plusHours(1).truncatedTo(ChronoUnit.HOURS);
+
+            // Get Duration
+            Duration duration = Duration.between(start, end);
+            millis = System.currentTimeMillis() + duration.toMillis();
+
+            Loged.INSTANCE.wtf(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(millis), "TAG", true);
+        }*/
+        long firstMillis = millis; // alarm is set right away
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
         // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
         alarm.setRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
                 wantedTime, pIntent);
-
-        //Loged.INSTANCE.wtf(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(alarm.getNextAlarmClock().getTriggerTime()), "TAG", true);
 
         KUtility.Util.setCurrentUpdateTime(time.floatValue());
     }

@@ -4,14 +4,10 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.graphics.Palette
 import android.util.Log
 import android.view.Gravity
-import android.view.View
 import android.widget.Toast
 import antonkozyriatskyi.devdrawer.DevDrawer
 import com.crashlytics.android.Crashlytics
@@ -32,8 +28,6 @@ import com.nabinbhandari.android.permissions.Permissions
 import io.kimo.konamicode.KonamiCode
 import kotlinx.android.synthetic.main.activity_choose.*
 import org.jetbrains.anko.defaultSharedPreferences
-import java.io.IOException
-import java.io.OutputStreamWriter
 import java.util.*
 
 
@@ -88,7 +82,7 @@ class ChooseActivity : AppCompatActivity() {
         downloadChoice.background.setTint(getColor(R.color.peter_river))
 
         val length = defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)
-        FunApplication.checkUpdater(this, length)
+        //FunApplication.checkUpdater(this, length)
 
         /*Permissions.check(this@ChooseActivity, arrayOf(Manifest.permission.READ_CONTACTS),
                 "Need this for my mom",

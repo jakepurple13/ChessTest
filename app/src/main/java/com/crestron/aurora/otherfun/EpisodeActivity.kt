@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -27,6 +28,7 @@ import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
+import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.views.DownloadsWidget
 import com.like.LikeButton
 import com.like.OnLikeListener
@@ -293,7 +295,20 @@ class EpisodeActivity : AppCompatActivity() {
             }
         }
 
-        getList()
+        if (Utility.isNetwork(this))
+            getList()
+        else {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("No Internet")
+            builder.setMessage("Please get connected to internet to use this section")
+            // Add the buttons
+            builder.setPositiveButton("Okay") { _, _ ->
+                finish()
+            }
+            builder.setCancelable(false)
+            val dialog = builder.create()
+            dialog.show()
+        }
 
         episode_refresh.setOnRefreshListener {
             listOfUrls.clear()

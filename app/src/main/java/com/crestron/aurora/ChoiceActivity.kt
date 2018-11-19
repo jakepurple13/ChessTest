@@ -37,6 +37,7 @@ import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.KUtility
+import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.views.DownloadsWidget
 import com.crestron.aurora.viewtesting.ViewTesting
@@ -118,7 +119,7 @@ class ChoiceActivity : AppCompatActivity() {
     }
 
     lateinit var result: Drawer
-    lateinit var br: BroadcastReceiverDownload
+    var br: BroadcastReceiverDownload? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -129,30 +130,25 @@ class ChoiceActivity : AppCompatActivity() {
         setUpDrawer(savedInstanceState)
 
         //Loged.d(FirebaseInstanceId.getInstance().token!!)
+        if (Utility.isNetwork(this))
+            if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false)) {
+                GlobalScope.launch {
+                    val url = URL(ConstantValues.VERSION_URL).readText()
+                    val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                    val pInfo = packageManager.getPackageInfo(packageName, 0)
+                    val version = pInfo.versionName
 
-        if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false)) {
-            GlobalScope.launch {
-                val url = URL(ConstantValues.VERSION_URL).readText()
-                val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-                val pInfo = packageManager.getPackageInfo(packageName, 0)
-                val version = pInfo.versionName
+                    Loged.i("version is ${version.toDouble()} and info is ${info.version}")
 
-                Loged.i("version is ${version.toDouble()} and info is ${info.version}")
-
-                if (version.toDouble() < info.version) {
-                    getAppPermissions(info)
+                    if (version.toDouble() < info.version) {
+                        getAppPermissions(info)
+                    }
                 }
             }
-        }
-
-        //FunApplication.startUpdate(this)
-        //UpdateJob.scheduleJob()
-        //UpdateJob.cancelJob(UpdateJob.scheduleJob())
 
         val length = defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)
         //FunApplication.checkUpdater(this, length)
         Loged.d("length: $length and currentTime: ${KUtility.currentUpdateTime}")
-        FunApplication.cancelChecker(this)
         val alarmUp = PendingIntent.getBroadcast(this, 1,
                 Intent(this@ChoiceActivity, ShowCheckReceiver::class.java), PendingIntent.FLAG_NO_CREATE) != null
 
@@ -268,7 +264,6 @@ class ChoiceActivity : AppCompatActivity() {
                             permissionCheck(ShowListActivity::class.java, url = Source.CARTOON_MOVIES.link, view = view)
                         }
                         ChoiceButton.RECENT_ANIME -> {
-                            defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT, 0).apply()
                             permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_ANIME.link, view = view)
                         }
                         ChoiceButton.RECENT_CARTOON -> {
@@ -276,33 +271,34 @@ class ChoiceActivity : AppCompatActivity() {
                             permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_CARTOON.link, view = view)
                         }
                         ChoiceButton.UPDATE_APP -> {
-                            GlobalScope.launch {
-                                val url = URL(ConstantValues.VERSION_URL).readText()
+                            if (Utility.isNetwork(this@ChoiceActivity))
+                                GlobalScope.launch {
+                                    val url = URL(ConstantValues.VERSION_URL).readText()
 
-                                val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                                    val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
 
-                                Loged.wtf("$info")
+                                    Loged.wtf("$info")
 
-                                try {
-                                    val pInfo = packageManager.getPackageInfo(packageName, 0)
-                                    val version = pInfo.versionName
+                                    try {
+                                        val pInfo = packageManager.getPackageInfo(packageName, 0)
+                                        val version = pInfo.versionName
 
-                                    Loged.i("version is ${version.toDouble()} and info is ${info.version}")
+                                        Loged.i("version is ${version.toDouble()} and info is ${info.version}")
 
-                                    if (version.toDouble() < info.version) {
-                                        getAppPermissions(info)
-                                    } else {
-                                        Loged.e("Nope")
-                                        runOnUiThread {
-                                            Toast.makeText(this@ChoiceActivity, "You are up to date!", Toast.LENGTH_LONG).show()
+                                        if (version.toDouble() < info.version) {
+                                            getAppPermissions(info)
+                                        } else {
+                                            Loged.e("Nope")
+                                            runOnUiThread {
+                                                Toast.makeText(this@ChoiceActivity, "You are up to date!", Toast.LENGTH_LONG).show()
+                                            }
                                         }
+
+                                    } catch (e: PackageManager.NameNotFoundException) {
+                                        e.printStackTrace()
                                     }
 
-                                } catch (e: PackageManager.NameNotFoundException) {
-                                    e.printStackTrace()
                                 }
-
-                            }
                         }
                         ChoiceButton.VIEW_DOWNLOADS -> {
                             val intent = Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
@@ -315,97 +311,99 @@ class ChoiceActivity : AppCompatActivity() {
                             ViewUtil.presentActivity(view, this@ChoiceActivity, intent)
                         }
                         ChoiceButton.UPDATE_NOTES -> {
-                            GlobalScope.launch {
-                                val url = URL(ConstantValues.VERSION_URL).readText()
-                                Loged.i(url)
-                                val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-                                Loged.w("$info")
+                            if (Utility.isNetwork(this@ChoiceActivity))
+                                GlobalScope.launch {
+                                    val url = URL(ConstantValues.VERSION_URL).readText()
+                                    Loged.i(url)
+                                    val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                                    Loged.w("$info")
 
-                                val pInfo = packageManager.getPackageInfo(packageName, 0)
-                                val version = pInfo.versionName
+                                    val pInfo = packageManager.getPackageInfo(packageName, 0)
+                                    val version = pInfo.versionName
 
-                                runOnUiThread {
-                                    val builder = AlertDialog.Builder(this@ChoiceActivity)
-                                    builder.setTitle("Notes for version ${info.version}")
-                                    builder.setMessage("Your version: $version\n${info.devNotes}")
-                                    builder.setNeutralButton("Cool!") { _, _ ->
-                                        //FunApplication.cancelUpdate(this@ChoiceActivity)
+                                    runOnUiThread {
+                                        val builder = AlertDialog.Builder(this@ChoiceActivity)
+                                        builder.setTitle("Notes for version ${info.version}")
+                                        builder.setMessage("Your version: $version\n${info.devNotes}")
+                                        builder.setNeutralButton("Cool!") { _, _ ->
+                                            //FunApplication.cancelUpdate(this@ChoiceActivity)
+                                        }
+                                        val dialog = builder.create()
+                                        dialog.show()
                                     }
-                                    val dialog = builder.create()
-                                    dialog.show()
                                 }
-                            }
                         }
                         ChoiceButton.DOWNLOAD_APK -> {
+                            if (Utility.isNetwork(this@ChoiceActivity))
+                                GlobalScope.launch {
 
-                            GlobalScope.launch {
+                                    val url = URL(ConstantValues.VERSION_URL).readText()
 
-                                val url = URL(ConstantValues.VERSION_URL).readText()
+                                    val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
 
-                                val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                                    val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + getNameFromUrl(info.link)!!.replace(".png", ".apk")
+                                    val request = Request(info.link, filePath)
 
-                                val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + getNameFromUrl(info.link)!!.replace(".png", ".apk")
-                                val request = Request(info.link, filePath)
+                                    val fetchConfiguration = FetchConfiguration.Builder(this@ChoiceActivity)
+                                            .enableAutoStart(true)
+                                            .enableRetryOnNetworkGain(true)
+                                            .setProgressReportingInterval(1000L)
+                                            .setHttpDownloader(HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
+                                            .setDownloadConcurrentLimit(1)
+                                            .build()
 
-                                val fetchConfiguration = FetchConfiguration.Builder(this@ChoiceActivity)
-                                        .enableAutoStart(true)
-                                        .enableRetryOnNetworkGain(true)
-                                        .setProgressReportingInterval(1000L)
-                                        .setHttpDownloader(HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
-                                        .setDownloadConcurrentLimit(1)
-                                        .build()
+                                    val fetch = fetchConfiguration.getNewFetchInstanceFromConfiguration()
 
-                                val fetch = fetchConfiguration.getNewFetchInstanceFromConfiguration()
+                                    fetch.addListener(object : FetchingUtils.FetchAction {
+                                        override fun onProgress(download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
+                                            super.onProgress(download, etaInMilliSeconds, downloadedBytesPerSecond)
+                                            val progress = "%.2f".format(FetchingUtils.getProgress(download.downloaded, download.total))
+                                            val info1 = "$progress% " +
+                                                    "at ${FetchingUtils.getDownloadSpeedString(downloadedBytesPerSecond)} " +
+                                                    "with ${FetchingUtils.getETAString(etaInMilliSeconds)}"
 
-                                fetch.addListener(object : FetchingUtils.FetchAction {
-                                    override fun onProgress(download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
-                                        super.onProgress(download, etaInMilliSeconds, downloadedBytesPerSecond)
-                                        val progress = "%.2f".format(FetchingUtils.getProgress(download.downloaded, download.total))
-                                        val info1 = "$progress% " +
-                                                "at ${FetchingUtils.getDownloadSpeedString(downloadedBytesPerSecond)} " +
-                                                "with ${FetchingUtils.getETAString(etaInMilliSeconds)}"
+                                            sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
+                                                    info1,
+                                                    download.progress,
+                                                    this@ChoiceActivity,
+                                                    DownloadViewerActivity::class.java,
+                                                    download.id)
+                                        }
 
-                                        sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
-                                                info1,
-                                                download.progress,
-                                                this@ChoiceActivity,
-                                                DownloadViewerActivity::class.java,
-                                                download.id)
-                                    }
+                                        override fun onCompleted(download: Download) {
+                                            super.onCompleted(download)
 
-                                    override fun onCompleted(download: Download) {
-                                        super.onCompleted(download)
+                                            val mNotificationManager: NotificationManager = this@ChoiceActivity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                                            mNotificationManager.cancel(download.id)
+                                        }
+                                    })
 
-                                        val mNotificationManager: NotificationManager = this@ChoiceActivity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                                        mNotificationManager.cancel(download.id)
-                                    }
-                                })
+                                    fetch.enqueue(request, Func {
 
-                                fetch.enqueue(request, Func {
+                                    }, Func {
 
-                                }, Func {
-
-                                })
-                            }
+                                    })
+                                }
 
                         }
                         ChoiceButton.DELETE_OLD_FILE -> {
-                            GlobalScope.launch {
-                                val url = URL(ConstantValues.VERSION_URL).readText()
-                                val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-                                val strApkToInstall = getNameFromUrl(info.link)!!.replace(".png", ".apk")
-                                val path1 = File(File(Environment.getExternalStorageDirectory(), "Download"), strApkToInstall)
-                                if (path1.exists()) {
-                                    runOnUiThread {
-                                        Toast.makeText(this@ChoiceActivity, "Deleted", Toast.LENGTH_SHORT).show()
-                                    }
-                                    path1.delete()
-                                } else {
-                                    runOnUiThread {
-                                        Toast.makeText(this@ChoiceActivity, "It's not there", Toast.LENGTH_SHORT).show()
+                            if (Utility.isNetwork(this@ChoiceActivity))
+                                GlobalScope.launch {
+                                    val url = URL(ConstantValues.VERSION_URL).readText()
+                                    val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                                    val strApkToInstall = getNameFromUrl(info.link)!!.replace(".png", ".apk")
+                                    val path1 = File(File(Environment.getExternalStorageDirectory(), "Download"), strApkToInstall)
+                                    if (path1.exists()) {
+                                        runOnUiThread {
+                                            Toast.makeText(this@ChoiceActivity, "Deleted", Toast.LENGTH_SHORT).show()
+                                        }
+                                        path1.delete()
+                                    } else {
+                                        runOnUiThread {
+                                            Toast.makeText(this@ChoiceActivity, "It's not there", Toast.LENGTH_SHORT).show()
+                                        }
                                     }
                                 }
-                            }
                         }
                         ChoiceButton.QUICK_CHOICE -> {
                             Loged.wtf(bookTitle!!)
@@ -505,16 +503,23 @@ class ChoiceActivity : AppCompatActivity() {
 
             for (i in showList1.list) {
                 try {
-                    val link = async {
-                        val episodeApi = EpisodeApi(ShowInfo(i.name, i.url))
-                        //val doc1 = Jsoup.connect(i.url).get()
-                        //doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
-                        episodeApi.image
-                    }
-                    val s1 = link.await()
-                    models.add(BookModel.urlBookModel(s1, i.url, i.name))
-                    runOnUiThread {
-                        shelfView.loadData(models)
+                    if (Utility.isNetwork(this@ChoiceActivity)) {
+                        val link = async {
+                            val episodeApi = EpisodeApi(ShowInfo(i.name, i.url))
+                            //val doc1 = Jsoup.connect(i.url).get()
+                            //doc1.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
+                            episodeApi.image
+                        }
+                        val s1 = link.await()
+                        models.add(BookModel.urlBookModel(s1, i.url, i.name))
+                        runOnUiThread {
+                            shelfView.loadData(models)
+                        }
+                    } else {
+                        models.add(BookModel.drawableBookModel(R.drawable.apk, i.url, i.name))
+                        runOnUiThread {
+                            shelfView.loadData(models)
+                        }
                     }
                 } catch (e: SocketTimeoutException) {
 
@@ -527,36 +532,44 @@ class ChoiceActivity : AppCompatActivity() {
                 for (i in 0 until if (randomShowsToDisplay.size > numberOfShowsToDisplay) numberOfShowsToDisplay else randomShowsToDisplay.size) {
                     val s = randomShowsToDisplay[i]
                     Loged.e(s.name)
-                    val link = async {
-                        val epApi = EpisodeApi(ShowInfo(s.name, s.link))
-                        epApi.image
-                    }
-                    val s1 = link.await()
-                    models.add(BookModel.urlBookModel(s1, s.link, s.name))
-                    runOnUiThread {
-                        shelfView.loadData(models)
+                    if (Utility.isNetwork(this@ChoiceActivity)) {
+                        val link = async {
+                            val epApi = EpisodeApi(ShowInfo(s.name, s.link))
+                            epApi.image
+                        }
+                        val s1 = link.await()
+                        models.add(BookModel.urlBookModel(s1, s.link, s.name))
+                        runOnUiThread {
+                            shelfView.loadData(models)
+                        }
+                    } else {
+                        models.add(BookModel.drawableBookModel(R.drawable.apk, s.link, s.name))
+                        runOnUiThread {
+                            shelfView.loadData(models)
+                        }
                     }
                 }
             }
         }
 
         if (defaultSharedPreferences.getBoolean("delete_file", false)) {
-            GlobalScope.launch {
-                val url = URL(ConstantValues.VERSION_URL).readText()
-                val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-                val strApkToInstall = getNameFromUrl(info.link)!!.replace(".png", ".apk")
-                val path1 = File(File(Environment.getExternalStorageDirectory(), "Download"), strApkToInstall)
-                if (path1.exists()) {
-                    runOnUiThread {
-                        Toast.makeText(this@ChoiceActivity, "Deleted Old File", Toast.LENGTH_SHORT).show()
+            if (Utility.isNetwork(this@ChoiceActivity))
+                GlobalScope.launch {
+                    val url = URL(ConstantValues.VERSION_URL).readText()
+                    val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                    val strApkToInstall = getNameFromUrl(info.link)!!.replace(".png", ".apk")
+                    val path1 = File(File(Environment.getExternalStorageDirectory(), "Download"), strApkToInstall)
+                    if (path1.exists()) {
+                        runOnUiThread {
+                            Toast.makeText(this@ChoiceActivity, "Deleted Old File", Toast.LENGTH_SHORT).show()
+                        }
+                        path1.delete()
+                    } else {
+                        /*runOnUiThread {
+                            Toast.makeText(this@ChoiceActivity, "It's not there", Toast.LENGTH_SHORT).show()
+                        }*/
                     }
-                    path1.delete()
-                } else {
-                    /*runOnUiThread {
-                        Toast.makeText(this@ChoiceActivity, "It's not there", Toast.LENGTH_SHORT).show()
-                    }*/
                 }
-            }
         }
         runOnUiThread {
             //Toast.makeText(this, "New task created", Toast.LENGTH_LONG).show()
@@ -571,7 +584,8 @@ class ChoiceActivity : AppCompatActivity() {
         if (result.isDrawerOpen) {
             result.closeDrawer()
         } else {
-            unregisterReceiver(br)
+            if (br != null)
+                unregisterReceiver(br)
             super.onBackPressed()
         }
     }
@@ -849,25 +863,26 @@ class ChoiceActivity : AppCompatActivity() {
                 .withIdentifier(3)
                 .withName("Update App")
                 .withOnDrawerItemClickListener { _, _, _ ->
-                    GlobalScope.launch {
-                        val url = URL(ConstantValues.VERSION_URL).readText()
-                        val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-                        Loged.wtf("$info")
-                        try {
-                            Loged.i("version is ${version.toDouble()} and info is ${info.version}")
-                            if (version.toDouble() < info.version) {
-                                result.closeDrawer()
-                                getAppPermissions(info)
-                            } else {
-                                Loged.e("Nope")
-                                runOnUiThread {
-                                    Toast.makeText(this@ChoiceActivity, "You are up to date!", Toast.LENGTH_LONG).show()
+                    if (Utility.isNetworkToast(this@ChoiceActivity))
+                        GlobalScope.launch {
+                            val url = URL(ConstantValues.VERSION_URL).readText()
+                            val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                            Loged.wtf("$info")
+                            try {
+                                Loged.i("version is ${version.toDouble()} and info is ${info.version}")
+                                if (version.toDouble() < info.version) {
+                                    result.closeDrawer()
+                                    getAppPermissions(info)
+                                } else {
+                                    Loged.e("Nope")
+                                    runOnUiThread {
+                                        Toast.makeText(this@ChoiceActivity, "You are up to date!", Toast.LENGTH_LONG).show()
+                                    }
                                 }
+                            } catch (e: PackageManager.NameNotFoundException) {
+                                e.printStackTrace()
                             }
-                        } catch (e: PackageManager.NameNotFoundException) {
-                            e.printStackTrace()
                         }
-                    }
                     true
                 }
         val updateNotesItem = PrimaryDrawerItem()
@@ -876,22 +891,23 @@ class ChoiceActivity : AppCompatActivity() {
                 .withName("Update Notes")
                 .withOnDrawerItemClickListener { _, _, _ ->
                     result.closeDrawer()
-                    GlobalScope.launch {
-                        val url = URL(ConstantValues.VERSION_URL).readText()
-                        Loged.i(url)
-                        val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-                        Loged.w("$info")
-                        runOnUiThread {
-                            val builder = AlertDialog.Builder(this@ChoiceActivity)
-                            builder.setTitle("Notes for version ${info.version}")
-                            builder.setMessage("Your version: $version\n${info.devNotes}")
-                            builder.setNeutralButton("Cool!") { _, _ ->
+                    if (Utility.isNetworkToast(this@ChoiceActivity))
+                        GlobalScope.launch {
+                            val url = URL(ConstantValues.VERSION_URL).readText()
+                            Loged.i(url)
+                            val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                            Loged.w("$info")
+                            runOnUiThread {
+                                val builder = AlertDialog.Builder(this@ChoiceActivity)
+                                builder.setTitle("Notes for version ${info.version}")
+                                builder.setMessage("Your version: $version\n${info.devNotes}")
+                                builder.setNeutralButton("Cool!") { _, _ ->
 
+                                }
+                                val dialog = builder.create()
+                                dialog.show()
                             }
-                            val dialog = builder.create()
-                            dialog.show()
                         }
-                    }
                     true
                 }
         val checkForUpdateItem = PrimaryDrawerItem()
@@ -899,50 +915,11 @@ class ChoiceActivity : AppCompatActivity() {
                 .withSelectable(false).withIdentifier(9)
                 .withName("Check For Show Updates")
         checkForUpdateItem.withOnDrawerItemClickListener { _, _, _ ->
-            //result.closeDrawer()
-            //val mNotificationManager = this@ShowCheckService.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            //mNotificationManager.activeNotifications.filter { it.id == 1 }[0].notification.
-            val showDatabase = ShowDatabase.getDatabase(this@ChoiceActivity)
-            GlobalScope.launch {
-                /*var count = 0
-                val showApi = ShowApi(Source.RECENT_ANIME).showInfoList
-                showApi.addAll(ShowApi(Source.RECENT_CARTOON).showInfoList)
-                val filteredList = showApi.distinctBy { it.url }
-                val shows = showDatabase.showDao().allShows
-
-                val aColIds = shows.asSequence().map { it.link }.toSet()
-                val bColIds = filteredList.filter { it.url in aColIds }
-
-                for (i in bColIds) {
-                    Loged.i(i.name)
-                    val showList = EpisodeApi(i).episodeList.size
-                    if (showDatabase.showDao().getShow(i.name).showNum < showList) {
-                        try {
-                            Loged.i(i.name)
-                            val show = showDatabase.showDao().getShow(i.name)
-                            show.showNum = showList
-                            showDatabase.showDao().updateShow(show)
-                            count++
-                            *//*checkForUpdateItem.withSubItems(SecondaryDrawerItem()
-                                    .withLevel(2)
-                                    .withName(i.name)
-                                    .withSelectable(false)
-                                    .withIcon(GoogleMaterial.Icon.gmd_adb))*//*
-                        } catch (e: SocketTimeoutException) {
-                            continue
-                        }
-                    }
-                }*/
-                val showCheck = Intent(this@ChoiceActivity, ShowCheckIntentService::class.java)
-                startService(showCheck)
-                /*if (count > 0) {
-                    runOnUiThread {
-                        checkForUpdateItem.withBadge("$count")
-                        checkForUpdateItem.withBadgeStyle(BadgeStyle(Color.RED, Color.RED))
-                        result.updateItem(checkForUpdateItem)
-                    }
-                }*/
-            }
+            if (Utility.isNetworkToast(this@ChoiceActivity))
+                GlobalScope.launch {
+                    val showCheck = Intent(this@ChoiceActivity, ShowCheckIntentService::class.java)
+                    startService(showCheck)
+                }
             true
         }
 
@@ -1011,71 +988,72 @@ class ChoiceActivity : AppCompatActivity() {
             }
         }
 
-        GlobalScope.launch {
-            val url = URL(ConstantValues.PAST_VERSION_URL).readText()
-            val info = Gson().fromJson(url, PastAppInfo::class.java)
-            for (appVersion in info.versions) {
-                versionItem.withSubItems(SecondaryDrawerItem()
-                        .withName("Version ${appVersion.version} Notes")
-                        .withSelectable(false)
-                        .withLevel(2)
-                        .withIcon(GoogleMaterial.Icon.gmd_android)
-                        .withOnDrawerItemClickListener { _, _, _ ->
-                            Loged.w("$info")
-                            runOnUiThread {
-                                val builder = AlertDialog.Builder(this@ChoiceActivity)
-                                builder.setTitle("Notes for version ${appVersion.version}")
-                                builder.setMessage(appVersion.devNotes)
-                                builder.setNeutralButton("Cool!") { _, _ ->
-                                    //FunApplication.cancelUpdate(this@ChoiceActivity)
-                                }
-                                val dialog = builder.create()
-                                dialog.show()
-                                runOnUiThread {
-                                    result.updateItem(versionItem)
-                                }
-                            }
-                            true
-                        })
-            }
-            runOnUiThread {
-                result.updateItem(versionItem)
-            }
-
-            br = BroadcastReceiverDownload(object : DownloadBroadcast {
-                override fun onCall(intent: Intent) {
-                    val viewDownloadsItemUpdate = PrimaryDrawerItem()
-                            .withIcon(GoogleMaterial.Icon.gmd_file_download)
+        if (Utility.isNetwork(this@ChoiceActivity))
+            GlobalScope.launch {
+                val url = URL(ConstantValues.PAST_VERSION_URL).readText()
+                val info = Gson().fromJson(url, PastAppInfo::class.java)
+                for (appVersion in info.versions) {
+                    versionItem.withSubItems(SecondaryDrawerItem()
+                            .withName("Version ${appVersion.version} Notes")
                             .withSelectable(false)
-                            .withIdentifier(0)
-                            .withName("View Downloads")
+                            .withLevel(2)
+                            .withIcon(GoogleMaterial.Icon.gmd_android)
                             .withOnDrawerItemClickListener { _, _, _ ->
-                                result.closeDrawer()
-                                val intent1 = Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
-                                intent1.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
-                                ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intent1)
+                                Loged.w("$info")
+                                runOnUiThread {
+                                    val builder = AlertDialog.Builder(this@ChoiceActivity)
+                                    builder.setTitle("Notes for version ${appVersion.version}")
+                                    builder.setMessage(appVersion.devNotes)
+                                    builder.setNeutralButton("Cool!") { _, _ ->
+                                        //FunApplication.cancelUpdate(this@ChoiceActivity)
+                                    }
+                                    val dialog = builder.create()
+                                    dialog.show()
+                                    runOnUiThread {
+                                        result.updateItem(versionItem)
+                                    }
+                                }
                                 true
-                            }
-
-                    try {
-                        val downloaded = intent.getStringExtra("view_download_item_count").toInt()
-                        if (downloaded > 0) {
-                            viewDownloadsItemUpdate.withBadge("$downloaded")
-                                    .withBadgeStyle(BadgeStyle(Color.RED, Color.RED))
-                        }
-                    } catch (e: Exception) {
-
-                    }
-                    runOnUiThread {
-                        result.updateItem(viewDownloadsItemUpdate)
-                    }
+                            })
                 }
-            })
-            val filter = IntentFilter().apply {
-                addAction(ConstantValues.BROADCAST_DOWNLOAD)
+                runOnUiThread {
+                    result.updateItem(versionItem)
+                }
+
+                br = BroadcastReceiverDownload(object : DownloadBroadcast {
+                    override fun onCall(intent: Intent) {
+                        val viewDownloadsItemUpdate = PrimaryDrawerItem()
+                                .withIcon(GoogleMaterial.Icon.gmd_file_download)
+                                .withSelectable(false)
+                                .withIdentifier(0)
+                                .withName("View Downloads")
+                                .withOnDrawerItemClickListener { _, _, _ ->
+                                    result.closeDrawer()
+                                    val intent1 = Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
+                                    intent1.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
+                                    ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intent1)
+                                    true
+                                }
+
+                        try {
+                            val downloaded = intent.getStringExtra("view_download_item_count").toInt()
+                            if (downloaded > 0) {
+                                viewDownloadsItemUpdate.withBadge("$downloaded")
+                                        .withBadgeStyle(BadgeStyle(Color.RED, Color.RED))
+                            }
+                        } catch (e: Exception) {
+
+                        }
+                        runOnUiThread {
+                            result.updateItem(viewDownloadsItemUpdate)
+                        }
+                    }
+                })
+                val filter = IntentFilter().apply {
+                    addAction(ConstantValues.BROADCAST_DOWNLOAD)
+                }
+                registerReceiver(br, filter)
             }
-            registerReceiver(br, filter)
-        }
 
     }
 

@@ -152,11 +152,6 @@
                 <action android:name="fun.com.crestron.UPDATE_APP" />
             </intent-filter>
         </receiver>
-
-        <service
-            android:name=".otherfun.ShowCheckService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
             android:name=".otherfun.UpdateCheckService"
             android:exported="true"
