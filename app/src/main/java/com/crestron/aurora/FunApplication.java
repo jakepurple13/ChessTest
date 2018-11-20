@@ -241,7 +241,8 @@ public class FunApplication extends Application {
         try {
             Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(alarm.getNextAlarmClock().getTriggerTime()), "TAG", true);
         } catch (NullPointerException e) {
-            Loged.INSTANCE.wtf(e.getMessage(), "TAG", true);
+            //Loged.INSTANCE.wtf(e.getMessage(), "TAG", true);
+            e.printStackTrace();
         }
     }
 

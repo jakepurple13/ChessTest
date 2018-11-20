@@ -160,6 +160,7 @@ class ChoiceActivity : AppCompatActivity() {
             Loged.i("Nope, already set")
             //FunApplication.seeNextAlarm(this@ChoiceActivity)
         }
+        FunApplication.seeNextAlarm(this@ChoiceActivity)
         //FunApplication.scheduleAlarm(this, length)
         /*if (KUtility.currentUpdateTime != length )
             FunApplication.scheduleAlarm(this, length)

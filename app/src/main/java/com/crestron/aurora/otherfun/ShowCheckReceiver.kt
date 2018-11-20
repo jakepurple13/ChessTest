@@ -43,7 +43,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         if (Utility.isNetwork(this)) {
             sendRunningNotification(this@ShowCheckIntentService,
                     android.R.mipmap.sym_def_app_icon,
-                    "updateCheckRun", 1)
+                    "updateCheckRun", 2)
             //if(wifiOnly()) {
             //val mNotificationManager = this@ShowCheckService.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             //mNotificationManager.activeNotifications.filter { it.id == 1 }[0].notification.
@@ -90,11 +90,10 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                             "episodeUpdate",
                             ShowListActivity::class.java,
                             1)
-                } else {
-                    sendFinishedCheckingNotification(this@ShowCheckIntentService,
-                            android.R.mipmap.sym_def_app_icon,
-                            "updateCheckRun", 1)
                 }
+                sendFinishedCheckingNotification(this@ShowCheckIntentService,
+                        android.R.mipmap.sym_def_app_icon,
+                        "updateCheckRun", 2)
             }
         }
     }

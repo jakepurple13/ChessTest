@@ -180,12 +180,12 @@ class ShowListActivity : AppCompatActivity() {
                     defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT, 0).apply()
 
                 runOnUiThread {
-                    show_info.adapter = AListAdapter(listOfNameAndLink, this@ShowListActivity, showDatabase, actionHit)
+                    show_info.adapter = AListAdapter(listOfNameAndLink, this@ShowListActivity, showDatabase, actionHit, recentChoice)
                     favorite_show.isEnabled = true//!recentChoice
                     search_info.isEnabled = true
+                    Loged.d("${(show_info.adapter!! as AListAdapter).itemCount}")
                 }
-
-                Loged.d("${(show_info.adapter!! as AListAdapter).itemCount}")
+                
                 refresh_list.isRefreshing = false
 
             } catch (e: SocketTimeoutException) {

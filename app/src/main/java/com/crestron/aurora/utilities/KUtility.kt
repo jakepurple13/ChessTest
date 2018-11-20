@@ -38,7 +38,7 @@ class KUtility {
                 val cal = Calendar.getInstance()
                 cal.timeInMillis = value
                 cal.set(Calendar.SECOND, 0)
-                //Loged.wtf("$value")
+                Loged.wtf("$value")
                 FunApplication.getAppContext().defaultSharedPreferences.edit().putLong("nextUpdateCheckTime", cal.timeInMillis).apply()
                 field = value
             }

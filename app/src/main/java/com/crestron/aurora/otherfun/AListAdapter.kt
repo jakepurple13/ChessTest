@@ -55,12 +55,21 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
     var action: ShowListActivity.LinkAction
     lateinit var stuff: List<ShowInfo>
     lateinit var show: ShowDatabase
+    var isRecent = false
 
     constructor(stuff: List<ShowInfo>, context: Context, showDatabase: ShowDatabase, action: ShowListActivity.LinkAction = object : ShowListActivity.LinkAction {}) {
         this.stuff = stuff
         this.context = context
         this.action = action
         this.show = showDatabase
+    }
+
+    constructor(stuff: List<ShowInfo>, context: Context, showDatabase: ShowDatabase, action: ShowListActivity.LinkAction = object : ShowListActivity.LinkAction {}, isRecent: Boolean) {
+        this.stuff = stuff
+        this.context = context
+        this.action = action
+        this.show = showDatabase
+        this.isRecent = isRecent
     }
 
     constructor(items: ArrayList<String>, links: ArrayList<String>, context: Context, action: ShowListActivity.LinkAction = object : ShowListActivity.LinkAction {}) {
@@ -118,7 +127,14 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
 
             Picasso.get().setIndicatorsEnabled(true)
             holder.imageView.visibility = View.GONE
-
+            /*if(!isRecent) {
+                //http://www.animeplus.tv/images/series/big/1.jpg
+                holder.imageView.visibility = View.VISIBLE
+                Picasso.get()
+                        .load("http://www.animeplus.tv/images/series/big/${position+1}.jpg")
+                        .resize((600 * .6).toInt(), (800 * .6).toInt())
+                        .into(holder.imageView)
+            }*/
             GlobalScope.launch {
 
                 holder.favorite.apply {
