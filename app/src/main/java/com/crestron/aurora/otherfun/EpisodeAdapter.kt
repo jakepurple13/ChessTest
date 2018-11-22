@@ -72,6 +72,26 @@ class EpisodeAdapter(private val items: ArrayList<ShowInfo>, private val name: S
                         .replace(".", "\\.")} (.*) ${it.episodeNumber + 1}".toRegex().matches(items[position].name) || "$name (.*) ${it.episodeNumber + 1} (.*)".toRegex().matches(items[position].name)
             }
 
+            holder.watched.setOnCheckedChangeListener { _, b ->
+                GlobalScope.async {
+                    try {
+                        if (b) {
+                            Loged.e("Inserted ${items[position]}")
+                            show.insertEpisode(Episode(position, name))
+                        } else {
+                            Loged.e("Deleted")
+                            show.deleteEpisode(position)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        this@EpisodeAdapter.context.runOnUiThread {
+                            Toast.makeText(this@EpisodeAdapter.context, "Please Favorite Show if you plan on Checking the Episodes", Toast.LENGTH_LONG).show()
+                        }
+                        holder.watched.isChecked = false
+                    }
+                }
+            }
+
             /*for (i in episodes) {
 
                 val check = if (reverse)
@@ -89,26 +109,6 @@ class EpisodeAdapter(private val items: ArrayList<ShowInfo>, private val name: S
                 //holder.watched.isChecked = "$name (.*) ${i.episodeNumber}".toRegex().matches(items[position])
                 //}
             }*/
-        }
-
-        holder.watched.setOnCheckedChangeListener { _, b ->
-            GlobalScope.async {
-                try {
-                    if (b) {
-                        Loged.e("Inserted ${items[position]}")
-                        show.insertEpisode(Episode(position, name))
-                    } else {
-                        Loged.e("Deleted")
-                        show.deleteEpisode(position)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    this@EpisodeAdapter.context.runOnUiThread {
-                        Toast.makeText(this@EpisodeAdapter.context, "Please Favorite Show if you plan on Checking the Episodes", Toast.LENGTH_LONG).show()
-                    }
-                    holder.watched.isChecked = false
-                }
-            }
         }
     }
 }

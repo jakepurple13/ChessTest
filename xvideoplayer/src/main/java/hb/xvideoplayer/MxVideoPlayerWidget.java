@@ -2,10 +2,8 @@ package hb.xvideoplayer;
 
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
@@ -544,7 +542,7 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
     }
 
     private void showWifiDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        /*AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setMessage(getResources().getString(R.string.tips_not_wifi));
         builder.setPositiveButton(getResources().getString(R.string.tips_not_wifi_confirm),
                 new DialogInterface.OnClickListener() {
@@ -562,7 +560,7 @@ public class MxVideoPlayerWidget extends MxVideoPlayer {
                         dialog.dismiss();
                     }
                 });
-        builder.create().show();
+        builder.create().show();*/
     }
 
 

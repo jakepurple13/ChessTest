@@ -116,7 +116,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
     }
 
     override fun onBackPressed() {
-        if(backChoice)
+        if (backChoice)
             super.onBackPressed()
         else {
             val intent = Intent(this@DownloadViewerActivity, ChoiceActivity::class.java)
@@ -169,13 +169,14 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                     EpisodeActivity::class.java, download.id,
                     EpisodeActivity.KeyAndValue(ConstantValues.URL_INTENT, "${download.extras.map[ConstantValues.URL_INTENT]}"),
                     EpisodeActivity.KeyAndValue(ConstantValues.NAME_INTENT, "${download.extras.map[ConstantValues.NAME_INTENT]}"))*/
-            sendNotification(this@DownloadViewerActivity, android.R.mipmap.sym_def_app_icon,
-                    download.file.substring(download.file.lastIndexOf("/") + 1),
-                    "All Finished!",
-                    ConstantValues.CHANNEL_ID,
-                    StartVideoFromNotificationActivity::class.java, download.id,
-                    EpisodeActivity.KeyAndValue("video_path", download.file),
-                    EpisodeActivity.KeyAndValue("video_name", download.file))
+            if (defaultSharedPreferences.getBoolean("useNotifications", true))
+                sendNotification(this@DownloadViewerActivity, android.R.mipmap.sym_def_app_icon,
+                        download.file.substring(download.file.lastIndexOf("/") + 1),
+                        "All Finished!",
+                        ConstantValues.CHANNEL_ID,
+                        StartVideoFromNotificationActivity::class.java, download.id,
+                        EpisodeActivity.KeyAndValue("video_path", download.file),
+                        EpisodeActivity.KeyAndValue("video_name", download.file))
             DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
@@ -208,7 +209,6 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                     DownloadViewerActivity::class.java,
                     download.id)*/
             DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
-
             //DefaultFetchNotificationManager(this@DownloadViewerActivity).postNotificationUpdate(download, etaInMilliSeconds, downloadedBytesPerSecond)
         }
 
@@ -283,7 +283,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                 .setGroup("downloaded_group")
                 .setChannelId(channel_id)
                 .setAutoCancel(true)
-        
+
         // Creates an explicit intent for an Activity in your app
         val resultIntent = Intent(context, gotoActivity)
         resultIntent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, false)

@@ -219,6 +219,8 @@ public class FunApplication extends Application {
 
             shortcutManager.setDynamicShortcuts(scl);
         }
+
+        KUtility.Util.setAlarmUp(context);
     }
 
     public static int getComplimentColor(int color) {
@@ -238,8 +240,9 @@ public class FunApplication extends Application {
 
     public static void seeNextAlarm(Context context) {
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager.AlarmClockInfo al = alarm.getNextAlarmClock();
         try {
-            Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(alarm.getNextAlarmClock().getTriggerTime()), "TAG", true);
+            Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(al.getTriggerTime()), "TAG", true);
         } catch (NullPointerException e) {
             //Loged.INSTANCE.wtf(e.getMessage(), "TAG", true);
             e.printStackTrace();

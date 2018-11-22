@@ -183,6 +183,17 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                 "N/A"
             }
 
+            findPreference("next_update_check").setOnPreferenceClickListener {
+                findPreference("next_update_check").summary = try {
+                    "≈ ${SimpleDateFormat("MM/dd/yyyy E hh:mm a").format(KUtility.nextCheckTime)}"
+                } catch (e: IllegalStateException) {
+                    "N/A"
+                } catch (e: NullPointerException) {
+                    "N/A"
+                }
+                true
+            }
+
             //findPreference("next_update_check").summary = SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(KUtility.nextCheckTime)
 
             findPreference(ConstantValues.FOLDER_LOCATION).setOnPreferenceClickListener {

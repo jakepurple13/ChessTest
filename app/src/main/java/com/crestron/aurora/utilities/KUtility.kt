@@ -9,8 +9,10 @@ import android.os.Build
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
+import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.FunApplication
 import com.crestron.aurora.Loged
+import com.crestron.aurora.otherfun.ShowCheckReceiver
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.IOException
 import java.io.OutputStreamWriter
@@ -23,6 +25,23 @@ import java.util.*
 class KUtility {
 
     companion object Util {
+
+        fun setAlarmUp(context: Context) {
+            val length = context.defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)
+            //FunApplication.checkUpdater(this, length)
+            Loged.d("length: $length and currentTime: ${KUtility.currentUpdateTime}")
+            //PendingIntent.getBroadcast(this, 1, Intent(this@ChoiceActivity, ShowCheckReceiver::class.java), PendingIntent.FLAG_NO_CREATE) != null
+            val alarmUp = AlarmUtils.hasAlarm(context, Intent(context, ShowCheckReceiver::class.java), 1)
+            if (!alarmUp || KUtility.currentUpdateTime != length) {
+                Loged.i("Setting")
+                FunApplication.scheduleAlarm(context, length)
+                //FunApplication.seeNextAlarm(this@ChoiceActivity)
+            } else {
+                Loged.i("Nope, already set")
+                //FunApplication.seeNextAlarm(this@ChoiceActivity)
+            }
+            FunApplication.seeNextAlarm(context)
+        }
 
         var currentUpdateTime: Float = 9f
             set(value) {

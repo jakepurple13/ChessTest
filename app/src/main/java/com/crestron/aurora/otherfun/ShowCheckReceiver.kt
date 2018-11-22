@@ -47,8 +47,8 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
             //if(wifiOnly()) {
             //val mNotificationManager = this@ShowCheckService.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             //mNotificationManager.activeNotifications.filter { it.id == 1 }[0].notification.
-            val showDatabase = ShowDatabase.getDatabase(this)
             GlobalScope.launch {
+                val showDatabase = ShowDatabase.getDatabase(this@ShowCheckIntentService)
                 var count = 0
                 val showApi = ShowApi(Source.RECENT_ANIME).showInfoList
                 showApi.addAll(ShowApi(Source.RECENT_CARTOON).showInfoList)
@@ -75,7 +75,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                         continue
                     }
                 }
-
                 if (updateNotiMap.size > 0) {
                     defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT,
                             defaultSharedPreferences.getInt(ConstantValues.UPDATE_COUNT, 0) + count).apply()
@@ -83,13 +82,14 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                     for (i in updateNotiMap) {
                         nStyle.addLine(i)
                     }
-                    sendNotification(this@ShowCheckIntentService,
-                            android.R.mipmap.sym_def_app_icon,
-                            "${updateNotiMap.size} show${if (updateNotiMap.size == 1) "" else "s"} had updates!",
-                            nStyle,
-                            "episodeUpdate",
-                            ShowListActivity::class.java,
-                            1)
+                    if (defaultSharedPreferences.getBoolean("useNotifications", true))
+                        sendNotification(this@ShowCheckIntentService,
+                                android.R.mipmap.sym_def_app_icon,
+                                "${updateNotiMap.size} show${if (updateNotiMap.size == 1) "" else "s"} had updates!",
+                                nStyle,
+                                "episodeUpdate",
+                                ShowListActivity::class.java,
+                                1)
                 }
                 sendFinishedCheckingNotification(this@ShowCheckIntentService,
                         android.R.mipmap.sym_def_app_icon,
@@ -105,7 +105,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 .setContentTitle("Checking for Show Updates")
                 .setChannelId(channel_id)
                 .setProgress(0, 100, true)
-                .setAutoCancel(true)
                 .setOngoing(true)
                 .setVibrate(longArrayOf(0L))
                 .setSubText("Checking for Show Updates")
@@ -125,7 +124,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 .setSmallIcon(smallIconId)
                 .setContentTitle("Finished Checking")
                 .setChannelId(channel_id)
-                .setAutoCancel(true)
                 .setVibrate(longArrayOf(0L))
                 .setSubText("Finished Checking")
                 .setOnlyAlertOnce(true)
@@ -166,7 +164,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 PendingIntent.FLAG_UPDATE_CURRENT
         )
         mBuilder.setContentIntent(resultPendingIntent)
-        mBuilder.setDeleteIntent(createOnDismissedIntent(context, notification_id))
+        //mBuilder.setDeleteIntent(createOnDismissedIntent(context, notification_id))
         val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // mNotificationId is a unique integer your app uses to identify the
@@ -188,6 +186,6 @@ class NotificationDismissedReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         //val notificationId = intent.extras!!.getInt("com.my.app.notificationId")
         /* Your code to handle the event here */
-        ShowCheckIntentService.updateNotiMap.clear()
+        //ShowCheckIntentService.updateNotiMap.clear()
     }
 }

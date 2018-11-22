@@ -15,6 +15,7 @@ import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.R
 import com.crestron.aurora.otherfun.*
 import com.tonyodev.fetch2.*
+import org.jetbrains.anko.defaultSharedPreferences
 
 open class CustomFetchNotiManager(context: Context) : FetchNotificationManager {
 
@@ -275,7 +276,8 @@ open class CustomFetchNotiManager(context: Context) : FetchNotificationManager {
             if (useGroupNotification) {
                 notificationIdList.add(groupId)
                 notificationOngoingList.add(ongoingNotification)
-                notificationManager.notify(groupId, groupSummaryNotificationBuilder.build())
+                if (context.defaultSharedPreferences.getBoolean("useNotifications", true))
+                    notificationManager.notify(groupId, groupSummaryNotificationBuilder.build())
             }
             for (index in 0 until notificationIdList.size) {
                 handleNotificationOngoingDismissal(notificationIdList[index], groupId, notificationOngoingList[index])

@@ -149,6 +149,9 @@ class ShowListActivity : AppCompatActivity() {
         val recentChoice = intent.getBooleanExtra(ConstantValues.RECENT_OR_NOT, false)
         val url = intent.getStringExtra(ConstantValues.SHOW_LINK)
 
+        if (recentChoice)
+            ShowCheckIntentService.updateNotiMap.clear()
+
         class ItemOffsetDecoration(private val mItemOffset: Int) : RecyclerView.ItemDecoration() {
 
             //constructor(@NonNull context: Context, itemOffsetId: Int) : this(context.resources.getDimensionPixelSize(itemOffsetId)) {}
@@ -185,7 +188,7 @@ class ShowListActivity : AppCompatActivity() {
                     search_info.isEnabled = true
                     Loged.d("${(show_info.adapter!! as AListAdapter).itemCount}")
                 }
-                
+
                 refresh_list.isRefreshing = false
 
             } catch (e: SocketTimeoutException) {

@@ -33,6 +33,12 @@
             android:summary="Automatically retry downloads"
             android:title="Auto Retry" />
 
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="useNotifications"
+            android:summary="Allow notifications to be shown for this app"
+            android:title="Allow Notifications" />
+
         <!--<com.crestron.aurora.views.FloatEditTextPreference
             android:inputType="numberDecimal"
             android:key="updateCheck"

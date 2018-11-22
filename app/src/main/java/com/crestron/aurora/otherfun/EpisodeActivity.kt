@@ -213,15 +213,16 @@ class EpisodeActivity : AppCompatActivity() {
                             download.id,
                             KeyAndValue(ConstantValues.URL_INTENT, url),
                             KeyAndValue(ConstantValues.NAME_INTENT, name))*/
-                    sendNotification(this@EpisodeActivity,
-                            android.R.mipmap.sym_def_app_icon,
-                            download.file.substring(download.file.lastIndexOf("/") + 1),
-                            "All Finished!",
-                            ConstantValues.CHANNEL_ID,
-                            StartVideoFromNotificationActivity::class.java,
-                            download.id,
-                            KeyAndValue("video_path", download.file),
-                            KeyAndValue("video_name", name))
+                    if (defaultSharedPreferences.getBoolean("useNotifications", true))
+                        sendNotification(this@EpisodeActivity,
+                                android.R.mipmap.sym_def_app_icon,
+                                download.file.substring(download.file.lastIndexOf("/") + 1),
+                                "All Finished!",
+                                ConstantValues.CHANNEL_ID,
+                                StartVideoFromNotificationActivity::class.java,
+                                download.id,
+                                KeyAndValue("video_path", download.file),
+                                KeyAndValue("video_name", name))
                 }
                 DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
