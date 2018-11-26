@@ -32,7 +32,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
-import java.text.SimpleDateFormat
 
 
 /**
@@ -49,24 +48,27 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
 
     var shouldReset = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    /*override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Display the fragment as the main content.
         fragmentManager.beginTransaction()
                 .replace(android.R.id.content, GeneralPreferenceFragment())
                 .commit()
         setupActionBar()
-    }
+    }*/
 
     override fun onBackPressed() {
         //val intent = Intent(this@SettingsActivity2, ChoiceActivity::class.java)
         //startActivity(intent)
         //finish()
-        val returnIntent = Intent()
-        returnIntent.putExtra("restart", shouldReset)
-        setResult(Activity.RESULT_OK, returnIntent)
-        finish()
-        //super.onBackPressed()
+        val f = fragmentManager.findFragmentById(android.R.id.content)
+        if (f is GeneralPreferenceFragment) {
+            val returnIntent = Intent()
+            returnIntent.putExtra("restart", shouldReset)
+            setResult(Activity.RESULT_OK, returnIntent)
+        }
+        //finish()
+        super.onBackPressed()
     }
 
     /**
@@ -88,7 +90,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     override fun onBuildHeaders(target: List<PreferenceActivity.Header>) {
-        //loadHeadersFromResource(R.xml.pref_headers, target)
+        loadHeadersFromResource(R.xml.pref_headers, target)
     }
 
     /**
@@ -98,6 +100,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
     override fun isValidFragment(fragmentName: String): Boolean {
         return PreferenceFragment::class.java.name == fragmentName
                 || GeneralPreferenceFragment::class.java.name == fragmentName
+                || WifiOnlyPreferenceFragment::class.java.name == fragmentName
     }
 
     /**
@@ -106,6 +109,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     class GeneralPreferenceFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+
         override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
 
             when (key) {
@@ -133,16 +137,23 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                     FunApplication.cancelAlarm(this@GeneralPreferenceFragment.context)
                     FunApplication.scheduleAlarm(this@GeneralPreferenceFragment.context, length)
 
-                    findPreference("next_update_check").summary = try {
+                    /*findPreference("next_update_check").summary = try {
                         "≈ ${SimpleDateFormat("MM/dd/yyyy E hh:mm a").format(KUtility.nextCheckTime)}"
                         //SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(alarm.nextAlarmClock.triggerTime)
                     } catch (e: IllegalStateException) {
                         "N/A"
                     } catch (e: NullPointerException) {
                         "N/A"
-                    }
+                    }*/
 
                     findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * length.toDouble()).toLong(), false)
+                }
+                "run_update_check" -> {
+                    if (sharedPreferences!!.getBoolean(key, false)) {
+                        FunApplication.cancelAlarm(this.context)
+                    } else {
+                        KUtility.setAlarmUp(this.context)
+                    }
                 }
                 ConstantValues.NUMBER_OF_RANDOM -> {
                     findPreference(key).summary = "The Number of Random Favorites to Display: ${PreferenceManager.getDefaultSharedPreferences(this@GeneralPreferenceFragment.context).getString(key, "1")!!.toInt()}"
@@ -176,7 +187,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
             findPreference(ConstantValues.FOLDER_LOCATION).summary = FetchingUtils.folderLocation
 
             //val alarm = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            findPreference("next_update_check").summary = try {
+            /*findPreference("next_update_check").summary = try {
                 "≈ ${SimpleDateFormat("MM/dd/yyyy E hh:mm a").format(KUtility.nextCheckTime)}"
                 //SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(alarm.nextAlarmClock.triggerTime)
             } catch (e: IllegalStateException) {
@@ -194,7 +205,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                     "N/A"
                 }
                 true
-            }
+            }*/
 
             //findPreference("next_update_check").summary = SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(KUtility.nextCheckTime)
 
@@ -476,6 +487,24 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                     PreferenceManager
                             .getDefaultSharedPreferences(preference.context)
                             .getString(preference.key, ""))
+        }
+    }
+
+    class WifiOnlyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            addPreferencesFromResource(R.xml.wifi_settings_list)
+            setHasOptionsMenu(true)
+        }
+
+        override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+            when (key) {
+                "downloading_wifi" -> FunApplication.fetchSetUp(this@WifiOnlyPreferenceFragment.context)
+                else -> {
+
+                }
+            }
         }
     }
 }

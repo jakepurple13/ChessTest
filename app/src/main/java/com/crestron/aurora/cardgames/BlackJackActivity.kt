@@ -1,20 +1,28 @@
 package com.crestron.aurora.cardgames
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
-import com.crestron.aurora.utilities.AnimationUtility
+import com.crestron.aurora.views.HintedImageView
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.CardNotFoundException
 import crestron.com.deckofcards.Deck
 import id.co.ionsoft.randomnumberanimationlibrary.RandomNumberAnimation
 import kotlinx.android.synthetic.main.activity_black_jack.*
+import kotlinx.android.synthetic.main.card_item.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.android.Main
@@ -170,6 +178,9 @@ Back = Rewind Button
             playerCardList = arrayListOf()
             dealerCardList = arrayListOf()
 
+            blackjack_player_cards.adapter = BlackJackAdapter(playerCardList, this)
+            blackjack_dealer_cards.adapter = BlackJackAdapter(dealerCardList, this)
+
             start().start()
 
         }
@@ -179,6 +190,28 @@ Back = Rewind Button
             Bungee.swipeRight(this@BlackJackActivity)
         }
 
+        val layoutManagerPlayer = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        blackjack_player_cards.setHasFixedSize(true)
+        val bitmap = BitmapFactory.decodeResource(resources, Card.BackCard.getImage(this))
+        blackjack_player_cards.addItemDecoration(OverlapDecoration((-bitmap.width / 1.5).toInt()))
+        blackjack_player_cards.layoutManager = layoutManagerPlayer
+
+        val layoutManagerDealer = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        blackjack_dealer_cards.setHasFixedSize(true)
+        blackjack_dealer_cards.addItemDecoration(OverlapDecoration((-bitmap.width / 1.5).toInt()))
+        blackjack_dealer_cards.layoutManager = layoutManagerDealer
+
+    }
+
+    inner class OverlapDecoration(private var horizontalOverlap: Int = -200) : RecyclerView.ItemDecoration() {
+
+        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+            val itemPosition = parent.getChildAdapterPosition(view)
+            if (itemPosition == 0) {
+                return
+            }
+            outRect.set(horizontalOverlap, 0, 0, 0)
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -220,11 +253,11 @@ Back = Rewind Button
             deckOfCards = Deck(true)
             deckOfCards.draw()
         }
-        AnimationUtility.animateCard(cardView, c, this@BlackJackActivity, end = object : AnimationUtility.AnimationEnd {
+        /*AnimationUtility.animateCard(cardView, c, this@BlackJackActivity, end = object : AnimationUtility.AnimationEnd {
             override fun onAnimationEnd() {
                 listCardsView.append("\n$c")
             }
-        })
+        })*/
         //backButtonJack.text = "Back\nCards Left: ${deckOfCards.deckCount()}"
         listCard.add(c)
         val sortedCards = arrayListOf<Card>()
@@ -253,6 +286,7 @@ Back = Rewind Button
     @SuppressLint("SetTextI18n")
     private fun playerMove() {
         playerVal = hit(cardList, playerCardList, playerCards)
+        blackjack_player_cards.adapter = BlackJackAdapter(playerCardList, this)
         total.text = "$playerVal"
         if (playerVal > 21) {
             playing = false
@@ -270,6 +304,7 @@ Back = Rewind Button
     @SuppressLint("SetTextI18n")
     private fun dealerMove() {
         dealerVal = hit(dealerCards, dealerCardList, dealer)
+        blackjack_dealer_cards.adapter = BlackJackAdapter(dealerCardList, this)
         dealerTotal.text = "$dealerVal"
         if (dealerVal > 21) {
             playing = false
@@ -283,6 +318,37 @@ Back = Rewind Button
     override fun onBackPressed() {
         //super.onBackPressed()
         backButtonJack.performClick()
+    }
+
+    class BlackJackAdapter(private var stuff: ArrayList<Card>,
+                           var context: Context) : RecyclerView.Adapter<ViewHolder>() {
+
+        // Gets the number of animals in the list
+        override fun getItemCount(): Int {
+            return stuff.size
+        }
+
+        // Inflates the item views
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            return ViewHolder(LayoutInflater.from(context).inflate(R.layout.card_item, parent, false))
+        }
+
+        // Binds each animal in the ArrayList to a view
+        @SuppressLint("SetTextI18n")
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.cardInfo.setImageResource(stuff[position].getImage(context))
+            holder.cardInfo.contentDescription = stuff[position].toString()
+        }
+
+    }
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        // Holds the TextView that will add each animal to
+        val cardInfo: HintedImageView = view.card_info_cards!!
+
+        init {
+            setIsRecyclable(true)
+        }
     }
 
 }

@@ -4,9 +4,11 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Handler
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.ActivityOptionsCompat
+import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewTreeObserver
@@ -80,6 +82,17 @@ class ViewUtil {
             circularReveal.start()
         }
 
+    }
+}
+
+class OverlapDecoration(private var left: Int = 0, private var top: Int = 0, private var right: Int = 0, private var bottom: Int = 0) : RecyclerView.ItemDecoration() {
+
+    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+        val itemPosition = parent.getChildAdapterPosition(view)
+        if (itemPosition == 0) {
+            return
+        }
+        outRect.set(left, top, right, bottom)
     }
 }
 

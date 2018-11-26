@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="wifi_only_settings"
+        android:title="WiFi Only Settings">
+
+        <CheckBoxPreference
+            android:key="downloading_wifi"
+            android:summaryOn="Download only on WiFi"
+            android:summaryOff="Download on Both WiFi and Mobile Data"
+            android:title="Downloading Videos" />
+
+        <CheckBoxPreference
+            android:key="show_update_check"
+            android:title="Show Update Check"
+            android:summaryOff="Check for Show updates on WiFi and Mobile Data"
+            android:summaryOn="Check for Show updates only on WiFi" />
+
+        <CheckBoxPreference
+            android:key="app_update_check"
+            android:title="App Update Check"
+            android:summaryOff="Check for App updates on WiFi and Mobile Data"
+            android:summaryOn="Check for App updates only on WiFi" />
+
+        <CheckBoxPreference
+            android:key="episode_covers"
+            android:title="Show Covers"
+            android:summaryOff="Show Covers on WiFi and Mobile Data"
+            android:summaryOn="Show Covers only on WiFi" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.ConnectivityManager
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
@@ -14,6 +15,8 @@ import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.FunApplication
 import com.crestron.aurora.Loged
 import com.crestron.aurora.otherfun.ShowCheckReceiver
+import com.crestron.aurora.otherfun.ShowInfosList
+import com.google.gson.Gson
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.IOException
 import java.io.OutputStreamWriter
@@ -22,12 +25,53 @@ import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
 
+enum class NetworkTypes(val type: String) {
+    WIFI("wifi"),
+    MOBILE("mobile"),
+    NONE("noNetwork")
+}
 
 class KUtility {
 
     companion object Util {
 
-        fun commitNotiList(list: MutableSet<String>) {
+        private fun wifiDataCheck(key: String, context: Context): Boolean {
+            return when (context.defaultSharedPreferences.getBoolean(key, false)) {
+                true -> checkNetworkStatus(context) == NetworkTypes.WIFI
+                false -> (checkNetworkStatus(context) == NetworkTypes.WIFI) || (checkNetworkStatus(context) == NetworkTypes.MOBILE)
+            } && Utility.isNetwork(context)
+        }
+
+        fun canDownload(context: Context): Boolean {
+            return wifiDataCheck("downloading_wifi", context)
+        }
+
+        fun canShowUpdateCheck(context: Context): Boolean {
+            return wifiDataCheck("show_update_check", context)
+        }
+
+        fun canAppUpdate(context: Context): Boolean {
+            return wifiDataCheck("app_update_check", context)
+        }
+
+        fun canShowCovers(context: Context): Boolean {
+            return wifiDataCheck("episode_covers", context)
+        }
+
+        private fun checkNetworkStatus(context: Context): NetworkTypes {
+            val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            //Check Wifi
+            val wifi = manager.activeNetworkInfo
+            //Check for mobile data
+            val mobile = manager.activeNetworkInfo
+            return when {
+                wifi.type == ConnectivityManager.TYPE_WIFI -> NetworkTypes.WIFI
+                mobile.type == ConnectivityManager.TYPE_MOBILE -> NetworkTypes.MOBILE
+                else -> NetworkTypes.NONE
+            }
+        }
+
+        /*fun commitNotiList(list: MutableSet<String>) {
             FunApplication.getAppContext().defaultSharedPreferences.edit().putStringSet("notiList", list).apply()
         }
 
@@ -39,6 +83,27 @@ class KUtility {
             val list = getNotifyList()
             list.clear()
             commitNotiList(list)
+        }*/
+
+        fun commitNotiJsonList(list: ShowInfosList) {
+            FunApplication.getAppContext().defaultSharedPreferences.edit().putString("notilists", Gson().toJson(list)).apply()
+        }
+
+        fun getNotiJsonList(): ShowInfosList {
+            val list = FunApplication.getAppContext().defaultSharedPreferences.getString("notilists", "{\"list\" : []}")
+            return Gson().fromJson<ShowInfosList>(list, ShowInfosList::class.java)
+        }
+
+        fun clearNotiJsonList() {
+            val list = getNotiJsonList()
+            list.list.clear()
+            commitNotiJsonList(list)
+        }
+
+        fun removeItemFromNotiJsonList(url: String) {
+            val list = getNotiJsonList()
+            list.list.removeIf { it.url == url }
+            commitNotiJsonList(list)
         }
 
         var shouldGetUpdate = false

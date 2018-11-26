@@ -57,25 +57,28 @@
         android:text="Stand" />
 
     <ScrollView
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="172dp"
         android:layout_alignTop="@+id/playerCards"
-        android:layout_marginTop="-28dp"
+        android:layout_marginStart="-191dp"
+        android:layout_marginTop="-271dp"
         android:layout_toEndOf="@+id/newCard">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/cardList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/playerCards"
-        android:layout_toEndOf="@+id/newCard"
-        android:text="List of cards" />
+            <TextView
+                android:id="@+id/cardList"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/playerCards"
+                android:layout_toEndOf="@+id/newCard"
+                android:text="List of cards" />
+        </LinearLayout>
+    </ScrollView>
 
     <ImageView
         android:id="@+id/dealer"
@@ -100,6 +103,7 @@
     <TextView
         android:id="@+id/dealerCards"
         android:layout_width="wrap_content"
+        android:visibility="gone"
         android:layout_height="wrap_content"
         android:layout_below="@+id/backButtonJack"
         android:layout_toEndOf="@+id/playerCards"
@@ -146,5 +150,25 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/backButtonJack"
         android:text="TextView" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/blackjack_player_cards"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_alignStart="@id/playerCards"
+        android:layout_above="@+id/newCard"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/total" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/blackjack_dealer_cards"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_alignStart="@id/dealer"
+        android:layout_alignTop="@id/dealer"
+        android:layout_above="@+id/dealerTotal"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

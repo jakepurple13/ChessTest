@@ -152,7 +152,8 @@ class ShowListActivity : AppCompatActivity() {
 
         if (recentChoice) {
             //ShowCheckIntentService.updateNotiMap.clear()
-            KUtility.clearNotiList()
+            //KUtility.clearNotiList()
+            KUtility.clearNotiJsonList()
         }
 
         class ItemOffsetDecoration(private val mItemOffset: Int) : RecyclerView.ItemDecoration() {

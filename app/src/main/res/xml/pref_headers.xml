@@ -7,6 +7,11 @@
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_header_general" />
 
+    <header
+        android:fragment="com.crestron.aurora.SettingsActivity2$WifiOnlyPreferenceFragment"
+        android:icon="@drawable/ic_mr_button_connected_22_light"
+        android:title="WiFi Settings" />
+
     <!--<header
         android:fragment="com.crestron.aurora.SettingsActivity2$NotificationPreferenceFragment"
         android:icon="@drawable/ic_notifications_black_24dp"

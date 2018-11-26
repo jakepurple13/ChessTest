@@ -16,31 +16,49 @@ import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.KUtility
-import com.crestron.aurora.utilities.Utility
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
+import java.util.*
 
 class ShowCheckReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         val nextTime = (System.currentTimeMillis() + (1000 * 60 * 60 * KUtility.currentUpdateTime).toLong())
         KUtility.nextCheckTime = nextTime
         val i = Intent(context, ShowCheckIntentService::class.java)
+        i.putExtra("received", true)
         context!!.startService(i)
     }
 }
+
+open class ShowInfos(val name: String, val size: Int, val time: String, val url: String) {
+    override fun toString(): String {
+        return "$time - $name Updated: Episode $size"
+    }
+}
+
+open class ShowInfosList(var list: ArrayList<ShowInfos>)
+
+open class NameWithUrl(val name: String, val url: String)
 
 class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
 
     companion object {
         val updateNotiMap = arrayListOf<String>()
+        val updateNotiList = arrayListOf<ShowInfos>()
     }
 
     @SuppressLint("SimpleDateFormat")
     override fun onHandleIntent(intent: Intent?) {
-        if (Utility.isNetwork(this)) {
+
+        val rec = intent!!.getBooleanExtra("received", false)
+        val check = if (rec)
+            KUtility.canShowUpdateCheck(this)
+        else
+            true
+        if (check) {
             sendRunningNotification(this@ShowCheckIntentService,
                     android.R.mipmap.sym_def_app_icon,
                     "updateCheckRun", 2)
@@ -64,8 +82,9 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                         if (showDatabase.showDao().getShow(i.name).showNum < showList) {
                             val timeOfUpdate = SimpleDateFormat("hh:mm a").format(System.currentTimeMillis())
                             //nStyle.addLine("$timeOfUpdate - ${i.name} Updated: Episode $showList")
-                            val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
-                            updateNotiMap.add(infoToShow)
+                            //val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
+                            //updateNotiMap.add(infoToShow)
+                            updateNotiList.add(ShowInfos(i.name, showList, timeOfUpdate, i.url))
                             val show = showDatabase.showDao().getShow(i.name)
                             show.showNum = showList
                             showDatabase.showDao().updateShow(show)
@@ -76,26 +95,42 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                         continue
                     }
                 }
-                updateNotiMap.addAll(KUtility.getNotifyList())
-                val list = updateNotiMap.distinctBy { it }
-                if (list.size > 0) {
+                //updateNotiMap.addAll(KUtility.getNotifyList())
+                updateNotiList.addAll(KUtility.getNotiJsonList().list)
+                //val list = updateNotiMap.distinctBy { it }
+                val list = updateNotiList.distinctBy { it.url }
+                if (list.isNotEmpty()) {
                     defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT,
                             defaultSharedPreferences.getInt(ConstantValues.UPDATE_COUNT, 0) + count).apply()
                     val nStyle = NotificationCompat.InboxStyle()
                     for (i in list) {
-                        nStyle.addLine(i)
+                        nStyle.addLine(i.name)
                     }
-                    updateNotiMap.clear()
-                    updateNotiMap.addAll(list)
-                    KUtility.commitNotiList(updateNotiMap.toMutableSet())
-                    if (defaultSharedPreferences.getBoolean("useNotifications", true))
-                        sendNotification(this@ShowCheckIntentService,
+                    //updateNotiMap.clear()
+                    //updateNotiMap.addAll(list)
+                    updateNotiList.clear()
+                    updateNotiList.addAll(list)
+                    //KUtility.commitNotiList(updateNotiMap.toMutableSet())
+                    KUtility.commitNotiJsonList(ShowInfosList(updateNotiList))
+                    if (defaultSharedPreferences.getBoolean("useNotifications", true)) {
+                        for ((j, i) in list.withIndex()) {
+                            sendNotification(this@ShowCheckIntentService,
+                                    android.R.mipmap.sym_def_app_icon,
+                                    i.name,
+                                    i.toString(),
+                                    "episodeUpdate",
+                                    EpisodeActivity::class.java,
+                                    j + 3,
+                                    NameWithUrl(i.name, i.url))
+                        }
+                        sendGroupNotification(this@ShowCheckIntentService,
                                 android.R.mipmap.sym_def_app_icon,
                                 "${list.size} show${if (list.size == 1) "" else "s"} had updates!",
                                 nStyle,
                                 "episodeUpdate",
-                                ShowListActivity::class.java,
-                                1)
+                                ShowListActivity::class.java)
+
+                    }
                 }
                 sendFinishedCheckingNotification(this@ShowCheckIntentService,
                         android.R.mipmap.sym_def_app_icon,
@@ -143,13 +178,54 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         mNotificationManager.notify(notification_id, mBuilder.build())
     }
 
-    private fun sendNotification(context: Context, smallIconId: Int, title: String, messages: NotificationCompat.Style = NotificationCompat.InboxStyle(), channel_id: String, gotoActivity: Class<*>, notification_id: Int) {
+    private fun sendNotification(context: Context, smallIconId: Int, title: String, text: String, channel_id: String, gotoActivity: Class<*>, notification_id: Int, nameUrl: NameWithUrl) {
+        // The id of the channel.
+        val mBuilder = NotificationCompat.Builder(context, "episodeUpdate")
+                .setSmallIcon(smallIconId)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setOnlyAlertOnce(true)
+                .setChannelId(channel_id)
+                .setGroup("episode_group")
+                .setAutoCancel(true)
+        // Creates an explicit intent for an Activity in your app
+        val resultIntent = Intent(context, gotoActivity)
+        resultIntent.putExtra(ConstantValues.URL_INTENT, nameUrl.url)
+        resultIntent.putExtra(ConstantValues.NAME_INTENT, nameUrl.name)
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your app to the Home screen.
+        val stackBuilder = TaskStackBuilder.create(context)
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(gotoActivity)
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent)
+        val resultPendingIntent = stackBuilder.getPendingIntent(
+                0,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        mBuilder.setContentIntent(resultPendingIntent)
+        //mBuilder.setDeleteIntent(createOnDismissedIntent(context, notification_id))
+        val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        // mNotificationId is a unique integer your app uses to identify the
+        // notification. For example, to cancel the notification, you can pass its ID
+        // number to NotificationManager.cancel().
+        mNotificationManager.notify(notification_id, mBuilder.build())
+    }
+
+    private fun sendGroupNotification(context: Context, smallIconId: Int, title: String, messages: NotificationCompat.Style = NotificationCompat.InboxStyle(), channel_id: String, gotoActivity: Class<*>) {
+
         // The id of the channel.
         val mBuilder = NotificationCompat.Builder(context, "episodeUpdate")
                 .setSmallIcon(smallIconId)
                 .setContentTitle(title)
                 .setStyle(messages)
                 .setChannelId(channel_id)
+                .setOnlyAlertOnce(true)
+                .setGroupSummary(true)
+                .setGroup("episode_group")
                 .setAutoCancel(true)
         // Creates an explicit intent for an Activity in your app
         val resultIntent = Intent(context, gotoActivity)
@@ -175,7 +251,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         // mNotificationId is a unique integer your app uses to identify the
         // notification. For example, to cancel the notification, you can pass its ID
         // number to NotificationManager.cancel().
-        mNotificationManager.notify(notification_id, mBuilder.build())
+        mNotificationManager.notify(0, mBuilder.build())
     }
 
     private fun createOnDismissedIntent(context: Context, notificationId: Int): PendingIntent {

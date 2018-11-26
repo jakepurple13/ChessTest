@@ -28,6 +28,7 @@ import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
+import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.views.DownloadsWidget
 import com.like.LikeButton
@@ -530,8 +531,8 @@ class EpisodeActivity : AppCompatActivity() {
             backChoice = true
             url = intent.getStringExtra(ConstantValues.URL_INTENT)
             name = intent.getStringExtra(ConstantValues.NAME_INTENT)
-
         }
+        KUtility.removeItemFromNotiJsonList(url)
     }
 
     fun sendNotification(context: Context, smallIconId: Int, title: String, message: String, channel_id: String, gotoActivity: Class<*>, notification_id: Int, vararg dataToPass: KeyAndValue) {

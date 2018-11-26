@@ -6,38 +6,25 @@
 
         <Preference
             android:key="user_version"
-            android:title="App Version"
-            android:summary="Version: " />
+            android:summary="Version: "
+            android:title="App Version" />
 
         <Preference
             android:key="folder_location"
             android:summary="Location"
             android:title="Folder Location" />
 
-        <CheckBoxPreference
-            android:defaultValue="false"
+        <!--<Preference
             android:key="wifiOnly"
             android:summary="Check for updates and downloads only on Wifi"
-            android:title="Wifi Only" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="videoPlayer"
-            android:summaryOff="Use app's built in video player"
-            android:summaryOn="Use your own video player"
-            android:title="Video Player" />
+            android:fragment="com.crestron.aurora.SettingsActivity2$WifiOnlyPreferenceFragment"
+            android:title="Wifi Only" />-->
 
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="autoRetry"
             android:summary="Automatically retry downloads"
             android:title="Auto Retry" />
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="useNotifications"
-            android:summary="Allow notifications to be shown for this app"
-            android:title="Allow Notifications" />
 
         <!--<com.crestron.aurora.views.FloatEditTextPreference
             android:inputType="numberDecimal"
@@ -46,6 +33,13 @@
             android:summary="Time between update checks"
             android:title="Time between Checks" />-->
 
+        <CheckBoxPreference
+            android:key="run_update_check"
+            android:title="Show Updates"
+            android:summaryOn="Check for Show Updates"
+            android:summaryOff="Do not check for Show Updates"
+            android:defaultValue="true" />
+
         <EditTextPreference
             android:inputType="numberDecimal"
             android:key="updateChecks"
@@ -53,17 +47,28 @@
             android:summary="Time between update checks"
             android:title="Time between Checks (By Hour; So .5 = 30 minutes)" />
 
-        <Preference
+        <!--<Preference
             android:key="next_update_check"
             android:title="Next Update Check"
-            android:summary="Time" />
+            android:summary="Time" />-->
 
-        <SwitchPreference
-            android:key="slider_or_button"
-            android:title="Use a Slider or a Button to download videos"
-            android:summaryOn="Using Slider"
-            android:summaryOff="Using Button"
-            android:defaultValue="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="notification_settings"
+        android:title="Notifications">
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="useNotifications"
+            android:summary="Allow notifications to be shown for this app"
+            android:title="Allow Notifications" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="customization"
+        android:title="Custom Settings">
 
         <Preference
             android:key="show_show"
@@ -71,17 +76,37 @@
             android:title="Favorites" />
 
         <SwitchPreference
+            android:defaultValue="true"
             android:key="random_show"
             android:summary="Display Random Show"
-            android:defaultValue="true"
             android:title="Random Show" />
 
         <EditTextPreference
-            android:key="number_of_random"
+            android:defaultValue="1"
             android:inputType="number"
+            android:key="number_of_random"
             android:summary="The Number of Random Favorites to Display"
-            android:title="Number of Random Favorites"
-            android:defaultValue="1" />
+            android:title="Number of Random Favorites" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="videoPlayer"
+            android:summaryOff="Use app's built in video player"
+            android:summaryOn="Use your own video player"
+            android:title="Video Player" />
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="slider_or_button"
+            android:summaryOff="Using Button"
+            android:summaryOn="Using Slider"
+            android:title="Use a Slider or a Button to download videos" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="Extra"
+        android:title="Misc Settings">
 
         <Preference
             android:key="export_favorites"
@@ -96,4 +121,5 @@
             android:title="Send Feedback" />
 
     </PreferenceCategory>
+
 </PreferenceScreen>

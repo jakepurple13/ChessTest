@@ -36,6 +36,7 @@ import com.crestron.aurora.otherfun.*
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
+import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.views.DownloadsWidget
@@ -129,8 +130,8 @@ class ChoiceActivity : AppCompatActivity() {
         setUpDrawer(savedInstanceState)
 
         //Loged.d(FirebaseInstanceId.getInstance().token!!)
-        if (Utility.isNetwork(this)/* && KUtility.shouldGetUpdate*/)
-            if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false)) {
+        if (KUtility.canAppUpdate(this) && KUtility.shouldGetUpdate)
+        //if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false)) {
                 GlobalScope.launch {
                     val url = URL(ConstantValues.VERSION_URL).readText()
                     val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
@@ -143,7 +144,7 @@ class ChoiceActivity : AppCompatActivity() {
                         getAppPermissions(info)
                     }
                 }
-            }
+        //}
         //FunApplication.scheduleAlarm(this, length)
         /*if (KUtility.currentUpdateTime != length )
             FunApplication.scheduleAlarm(this, length)
@@ -492,7 +493,7 @@ class ChoiceActivity : AppCompatActivity() {
 
             for (i in showList1.list) {
                 try {
-                    if (Utility.isNetwork(this@ChoiceActivity)) {
+                    if (KUtility.canShowCovers(this@ChoiceActivity)) {
                         val link = async {
                             val episodeApi = EpisodeApi(ShowInfo(i.name, i.url))
                             //val doc1 = Jsoup.connect(i.url).get()
@@ -521,7 +522,7 @@ class ChoiceActivity : AppCompatActivity() {
                 for (i in 0 until if (randomShowsToDisplay.size > numberOfShowsToDisplay) numberOfShowsToDisplay else randomShowsToDisplay.size) {
                     val s = randomShowsToDisplay[i]
                     Loged.e(s.name)
-                    if (Utility.isNetwork(this@ChoiceActivity)) {
+                    if (KUtility.canShowCovers(this@ChoiceActivity)) {
                         val link = async {
                             val epApi = EpisodeApi(ShowInfo(s.name, s.link))
                             epApi.image

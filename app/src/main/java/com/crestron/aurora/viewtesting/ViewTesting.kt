@@ -1,6 +1,9 @@
 package com.crestron.aurora.viewtesting
 
+import android.app.NotificationManager
+import android.content.Context
 import android.os.Bundle
+import android.support.v4.app.NotificationCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
 import android.view.animation.AnimationUtils
@@ -14,6 +17,21 @@ import kotlinx.android.synthetic.main.activity_view_testing.*
 class ViewTesting : AppCompatActivity() {
 
     var num = 0
+
+    fun notiTest() {
+        val mBuilder = NotificationCompat.Builder(this, "episodeUpdate")
+                .setSmallIcon(R.drawable.apk)
+                .setContentTitle(title)
+                //.setStyle(messages)
+                .setChannelId("episodeUpdate")
+                .setGroup("episode_group")
+                .setAutoCancel(true)
+        val mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        // mNotificationId is a unique integer your app uses to identify the
+        // notification. For example, to cancel the notification, you can pass its ID
+        // number to NotificationManager.cancel().
+        mNotificationManager.notify(7, mBuilder.build())
+    }
 
     private val mFactory = ViewSwitcher.ViewFactory {
         // Create a new TextView

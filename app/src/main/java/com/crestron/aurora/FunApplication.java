@@ -73,7 +73,7 @@ public class FunApplication extends Application {
 
         SharedPreferences sharedPreferences = getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE);
         FetchingUtils.Fetched.setFolderLocation(sharedPreferences.getString(ConstantValues.FOLDER_LOCATION, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/Fun/"));
-        boolean wifiOnly = sharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false);
+        boolean wifiOnly = KUtility.Util.canDownload(this);
         FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this)
                 .enableAutoStart(true)
                 .enableRetryOnNetworkGain(true)
@@ -219,9 +219,25 @@ public class FunApplication extends Application {
 
             shortcutManager.setDynamicShortcuts(scl);
         }
-
-        KUtility.Util.setAlarmUp(context);
+        if (KUtility.Util.getSharedPref(this).getBoolean("run_update_check", true))
+            KUtility.Util.setAlarmUp(context);
         KUtility.Util.setUpdateCheckAlarm(context);
+    }
+
+    public static void fetchSetUp(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE);
+        FetchingUtils.Fetched.setFolderLocation(sharedPreferences.getString(ConstantValues.FOLDER_LOCATION, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/Fun/"));
+        boolean wifiOnly = KUtility.Util.canDownload(context);
+        FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(context)
+                .enableAutoStart(true)
+                .enableRetryOnNetworkGain(true)
+                .setProgressReportingInterval(1000L)
+                .setGlobalNetworkType(wifiOnly ? NetworkType.WIFI_ONLY : NetworkType.ALL)
+                .setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
+                .setDownloadConcurrentLimit(sharedPreferences.getInt("downloadNumber", 1))
+                .setNotificationManager(new CustomFetchNotiManager(context))
+                .build();
+        Fetch.Impl.setDefaultInstanceConfiguration(fetchConfiguration);
     }
 
     public static int getComplimentColor(int color) {
