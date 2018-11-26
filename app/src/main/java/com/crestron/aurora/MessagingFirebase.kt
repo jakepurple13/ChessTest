@@ -9,6 +9,7 @@ import android.support.v4.app.TaskStackBuilder
 import android.util.Log
 import com.crestron.aurora.otherfun.AppInfo
 import com.crestron.aurora.otherfun.DownloadUpdateReceiver
+import com.crestron.aurora.utilities.KUtility
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
@@ -46,7 +47,7 @@ class MessagingFirebase : FirebaseMessagingService() {
             Log.d(TAG, "Message data payload: " + remoteMessage.data)
             if(remoteMessage.data.containsKey("update")) {
                 if(remoteMessage.data["update"]=="true") {
-
+                    KUtility.shouldGetUpdate = true
                     sendDownloadUpdateNotification("For Us Nerds has an Update!", remoteMessage.notification!!.body!!,
                             this@MessagingFirebase, ChoiceActivity::class.java, 50)
                 }

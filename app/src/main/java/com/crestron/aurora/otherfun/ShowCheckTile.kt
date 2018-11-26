@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class ShowCheckTile : TileService() {
 
-    fun updateCheck() {
+    private fun updateCheck() {
         if (Utility.isNetworkToast(this@ShowCheckTile))
             GlobalScope.launch {
                 qsTile.state = Tile.STATE_ACTIVE
@@ -46,10 +46,14 @@ class ShowCheckTile : TileService() {
 
     override fun onStartListening() {
         super.onStartListening()
+        //only enable when there is internet access
         // Called when the Tile becomes visible
-        //val tile = qsTile // this is getQsTile() method form java, used in Kotlin as a property
-        //tile.state = Tile.STATE_ACTIVE
-        //tile.updateTile() // you need to call this method to apply changes
+        val tile = qsTile // this is getQsTile() method form java, used in Kotlin as a property
+        tile.state = if (Utility.isNetwork(this))
+            Tile.STATE_INACTIVE
+        else
+            Tile.STATE_UNAVAILABLE
+        tile.updateTile() // you need to call this method to apply changes
         Loged.wtf("Start Listening")
     }
 

@@ -311,18 +311,22 @@
         <receiver
             android:name=".otherfun.NotificationDismissedReceiver"
             android:exported="false" />
+
         <service
             android:name=".otherfun.ShowCheckTile"
+            android:enabled="true"
+            android:exported="true"
             android:icon="@drawable/apk"
             android:label="Update Shows"
-            android:process=":remote"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
-            android:exported="true"
-            android:enabled="true">
+            android:process=":remote">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
+        <receiver
+            android:name=".utilities.AppUpdateCheckReceiver"
+            android:exported="false" />
     </application>
 
 </manifest>

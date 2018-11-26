@@ -129,7 +129,7 @@ class ChoiceActivity : AppCompatActivity() {
         setUpDrawer(savedInstanceState)
 
         //Loged.d(FirebaseInstanceId.getInstance().token!!)
-        if (Utility.isNetwork(this))
+        if (Utility.isNetwork(this)/* && KUtility.shouldGetUpdate*/)
             if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false)) {
                 GlobalScope.launch {
                     val url = URL(ConstantValues.VERSION_URL).readText()

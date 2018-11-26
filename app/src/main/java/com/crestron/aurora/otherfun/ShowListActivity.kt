@@ -28,6 +28,7 @@ import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
+import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.utilities.ViewUtil
 import com.like.LikeButton
@@ -149,8 +150,10 @@ class ShowListActivity : AppCompatActivity() {
         val recentChoice = intent.getBooleanExtra(ConstantValues.RECENT_OR_NOT, false)
         val url = intent.getStringExtra(ConstantValues.SHOW_LINK)
 
-        if (recentChoice)
-            ShowCheckIntentService.updateNotiMap.clear()
+        if (recentChoice) {
+            //ShowCheckIntentService.updateNotiMap.clear()
+            KUtility.clearNotiList()
+        }
 
         class ItemOffsetDecoration(private val mItemOffset: Int) : RecyclerView.ItemDecoration() {
 

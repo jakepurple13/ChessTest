@@ -221,6 +221,7 @@ public class FunApplication extends Application {
         }
 
         KUtility.Util.setAlarmUp(context);
+        KUtility.Util.setUpdateCheckAlarm(context);
     }
 
     public static int getComplimentColor(int color) {
@@ -245,7 +246,7 @@ public class FunApplication extends Application {
             Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(al.getTriggerTime()), "TAG", true);
         } catch (NullPointerException e) {
             //Loged.INSTANCE.wtf(e.getMessage(), "TAG", true);
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 

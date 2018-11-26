@@ -1,5 +1,6 @@
 package com.crestron.aurora.utilities
 
+import android.app.AlarmManager
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -26,6 +27,29 @@ class KUtility {
 
     companion object Util {
 
+        fun commitNotiList(list: MutableSet<String>) {
+            FunApplication.getAppContext().defaultSharedPreferences.edit().putStringSet("notiList", list).apply()
+        }
+
+        fun getNotifyList(): MutableSet<String> {
+            return FunApplication.getAppContext().defaultSharedPreferences.getStringSet("notiList", mutableSetOf<String>())
+        }
+
+        fun clearNotiList() {
+            val list = getNotifyList()
+            list.clear()
+            commitNotiList(list)
+        }
+
+        var shouldGetUpdate = false
+            set(value) {
+                FunApplication.getAppContext().defaultSharedPreferences.edit().putBoolean("shouldGetUpdate", value).apply()
+                field = value
+            }
+            get() {
+                return FunApplication.getAppContext().defaultSharedPreferences.getBoolean("shouldGetUpdate", false)
+            }
+
         fun setAlarmUp(context: Context) {
             val length = context.defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)
             //FunApplication.checkUpdater(this, length)
@@ -40,7 +64,32 @@ class KUtility {
                 Loged.i("Nope, already set")
                 //FunApplication.seeNextAlarm(this@ChoiceActivity)
             }
-            FunApplication.seeNextAlarm(context)
+            //FunApplication.seeNextAlarm(context)
+        }
+
+        fun setUpdateCheckAlarm(context: Context) {
+            val alarmUp = AlarmUtils.hasAlarm(context, Intent(context, AppUpdateCheckReceiver::class.java), 5)
+            if (!alarmUp) {
+                val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                val alarmIntent = Intent(context, AppUpdateCheckReceiver::class.java).let { intent ->
+                    PendingIntent.getBroadcast(context, 5, intent, 0)
+                }
+
+                // Set the alarm to start at approximately 12:00 p.m.
+                val calendar: Calendar = Calendar.getInstance().apply {
+                    timeInMillis = System.currentTimeMillis()
+                    set(Calendar.HOUR_OF_DAY, 12)
+                }
+
+                // With setInexactRepeating(), you have to use one of the AlarmManager interval
+                // constants--in this case, AlarmManager.INTERVAL_DAY.
+                alarmMgr.setInexactRepeating(
+                        AlarmManager.RTC_WAKEUP,
+                        calendar.timeInMillis,
+                        AlarmManager.INTERVAL_DAY,
+                        alarmIntent
+                )
+            }
         }
 
         var currentUpdateTime: Float = 9f

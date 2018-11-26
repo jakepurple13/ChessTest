@@ -64,7 +64,8 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                         if (showDatabase.showDao().getShow(i.name).showNum < showList) {
                             val timeOfUpdate = SimpleDateFormat("hh:mm a").format(System.currentTimeMillis())
                             //nStyle.addLine("$timeOfUpdate - ${i.name} Updated: Episode $showList")
-                            updateNotiMap.add("$timeOfUpdate - ${i.name} Updated: Episode $showList")
+                            val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
+                            updateNotiMap.add(infoToShow)
                             val show = showDatabase.showDao().getShow(i.name)
                             show.showNum = showList
                             showDatabase.showDao().updateShow(show)
@@ -75,17 +76,22 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                         continue
                     }
                 }
-                if (updateNotiMap.size > 0) {
+                updateNotiMap.addAll(KUtility.getNotifyList())
+                val list = updateNotiMap.distinctBy { it }
+                if (list.size > 0) {
                     defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT,
                             defaultSharedPreferences.getInt(ConstantValues.UPDATE_COUNT, 0) + count).apply()
                     val nStyle = NotificationCompat.InboxStyle()
-                    for (i in updateNotiMap) {
+                    for (i in list) {
                         nStyle.addLine(i)
                     }
+                    updateNotiMap.clear()
+                    updateNotiMap.addAll(list)
+                    KUtility.commitNotiList(updateNotiMap.toMutableSet())
                     if (defaultSharedPreferences.getBoolean("useNotifications", true))
                         sendNotification(this@ShowCheckIntentService,
                                 android.R.mipmap.sym_def_app_icon,
-                                "${updateNotiMap.size} show${if (updateNotiMap.size == 1) "" else "s"} had updates!",
+                                "${list.size} show${if (list.size == 1) "" else "s"} had updates!",
                                 nStyle,
                                 "episodeUpdate",
                                 ShowListActivity::class.java,
@@ -166,7 +172,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         mBuilder.setContentIntent(resultPendingIntent)
         //mBuilder.setDeleteIntent(createOnDismissedIntent(context, notification_id))
         val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
         // mNotificationId is a unique integer your app uses to identify the
         // notification. For example, to cancel the notification, you can pass its ID
         // number to NotificationManager.cancel().

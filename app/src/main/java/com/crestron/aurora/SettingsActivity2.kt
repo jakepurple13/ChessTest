@@ -23,7 +23,9 @@ import com.crestron.aurora.otherfun.FetchingUtils
 import com.crestron.aurora.utilities.KUtility
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.android.Main
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.File
@@ -257,7 +259,9 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                         stream.use { streams ->
                             streams.write(string.toByteArray())
                         }
-                        Toast.makeText(this@GeneralPreferenceFragment.context, "Finished Exporting", Toast.LENGTH_SHORT).show()
+                        GlobalScope.launch(Dispatchers.Main) {
+                            Toast.makeText(this@GeneralPreferenceFragment.context, "Finished Exporting", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
 
@@ -299,7 +303,9 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                             }
                         }
                     }
-                    Toast.makeText(this@GeneralPreferenceFragment.context, "Finished Importing", Toast.LENGTH_SHORT).show()
+                    GlobalScope.launch(Dispatchers.Main) {
+                        Toast.makeText(this@GeneralPreferenceFragment.context, "Finished Importing", Toast.LENGTH_SHORT).show()
+                    }
                 }
                 true
             }
