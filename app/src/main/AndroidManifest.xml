@@ -296,7 +296,6 @@
         <service
             android:name=".views.MyWidgetRemoteViewsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
-
         <service
             android:name=".views.PlayPauseWidgetService"
             android:enabled="true"
@@ -305,9 +304,11 @@
         <receiver
             android:name=".otherfun.ShowCheckReceiver"
             android:process=":remote" />
+
         <service
             android:name=".otherfun.ShowCheckIntentService"
             android:exported="false" />
+
         <receiver
             android:name=".otherfun.NotificationDismissedReceiver"
             android:exported="false" />
@@ -323,13 +324,20 @@
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
+
             <meta-data
                 android:name="android.service.quicksettings.ACTIVE_TILE"
                 android:value="true" />
         </service>
+
         <receiver
             android:name=".utilities.AppUpdateCheckReceiver"
             android:exported="false" />
+
+        <activity
+            android:name=".boardgames.pong.PongActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.Design.NoActionBar" />
     </application>
 
 </manifest>

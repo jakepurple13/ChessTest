@@ -24,6 +24,7 @@ import android.widget.Toast
 import com.box.shelfview.BookModel
 import com.box.shelfview.ShelfView
 import com.crestron.aurora.boardgames.chess.MainActivity
+import com.crestron.aurora.boardgames.pong.PongActivity
 import com.crestron.aurora.boardgames.yahtzee.YahtzeeActivity
 import com.crestron.aurora.cardgames.BlackJackActivity
 import com.crestron.aurora.cardgames.calculation.CalculationActivity
@@ -83,6 +84,7 @@ class ChoiceActivity : AppCompatActivity() {
         HILO("hilo", "HiLo"),
         CHESS("chess", "Chess"),
         YAHTZEE("yahtzee", "Yahtzee"),
+        PONG("pong", "Pong"),
         SETTINGS("settings", "Settings"),
         ANIME("anime", "Anime"),
         CARTOON("cartoon", "Cartoon"),
@@ -425,6 +427,10 @@ class ChoiceActivity : AppCompatActivity() {
                             val intented = Intent(this@ChoiceActivity, ViewTesting::class.java)
                             startActivity(intented)
                         }
+                        ChoiceButton.PONG -> {
+                            val intented = Intent(this@ChoiceActivity, PongActivity::class.java)
+                            startActivity(intented)
+                        }
                     }
                 } catch (e: IllegalArgumentException) {
                     val intented = Intent(this@ChoiceActivity, EpisodeActivity::class.java)
@@ -451,6 +457,7 @@ class ChoiceActivity : AppCompatActivity() {
         models.add(drawableModel(R.drawable.hilologo, ChoiceButton.HILO))
         models.add(drawableModel(R.drawable.yahtzeelogo, ChoiceButton.YAHTZEE))
         models.add(drawableModel(R.drawable.black_chess_knight, ChoiceButton.CHESS))
+        models.add(drawableModel(R.drawable.apk, ChoiceButton.PONG))
         models.add(drawableModel(R.drawable.matchinglogo, ChoiceButton.MATCHING))
 
         models.add(drawableModel(android.R.drawable.ic_menu_today, ChoiceButton.RSS_FEED))
