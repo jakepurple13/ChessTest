@@ -33,7 +33,7 @@ class ShowCheckReceiver : BroadcastReceiver() {
     }
 }
 
-open class ShowInfos(val name: String, val size: Int, val time: String, val url: String) {
+open class ShowInfos(val name: String, val size: Int, val time: String, val url: String, var dismissed: Boolean = false) {
     override fun toString(): String {
         return "$time - $name Updated: Episode $size"
     }
@@ -97,15 +97,14 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 }
                 //updateNotiMap.addAll(KUtility.getNotifyList())
                 updateNotiList.addAll(KUtility.getNotiJsonList().list)
+                //updateNotiList.add(ShowInfos("This is the name", 4, "01:30 AM", "http://www.animeplus.tv/kitsune-no-koe-online"))
+                //updateNotiList.add(ShowInfos("Soccer One", 4, "02:30 AM", "http://www.animeplus.tv/captain-tsubasa-2018-online"))
+                //updateNotiList.add(ShowInfos("Cute One With a really really long name", 4, "03:30 AM", "http://www.animeplus.tv/jingai-san-no-yome-episode-9-online"))
                 //val list = updateNotiMap.distinctBy { it }
                 val list = updateNotiList.distinctBy { it.url }
                 if (list.isNotEmpty()) {
                     defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT,
                             defaultSharedPreferences.getInt(ConstantValues.UPDATE_COUNT, 0) + count).apply()
-                    val nStyle = NotificationCompat.InboxStyle()
-                    for (i in list) {
-                        nStyle.addLine(i.name)
-                    }
                     //updateNotiMap.clear()
                     //updateNotiMap.addAll(list)
                     updateNotiList.clear()
@@ -113,7 +112,10 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                     //KUtility.commitNotiList(updateNotiMap.toMutableSet())
                     KUtility.commitNotiJsonList(ShowInfosList(updateNotiList))
                     if (defaultSharedPreferences.getBoolean("useNotifications", true)) {
+                        dismissCurrentNotis(this@ShowCheckIntentService)
+                        val nStyle = NotificationCompat.InboxStyle()
                         for ((j, i) in list.withIndex()) {
+                            nStyle.addLine(i.name)
                             sendNotification(this@ShowCheckIntentService,
                                     android.R.mipmap.sym_def_app_icon,
                                     i.name,
@@ -129,7 +131,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                 nStyle,
                                 "episodeUpdate",
                                 ShowListActivity::class.java)
-
                     }
                 }
                 sendFinishedCheckingNotification(this@ShowCheckIntentService,
@@ -178,6 +179,14 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         mNotificationManager.notify(notification_id, mBuilder.build())
     }
 
+    private fun dismissCurrentNotis(context: Context) {
+        val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        // mNotificationId is a unique integer your app uses to identify the
+        // notification. For example, to cancel the notification, you can pass its ID
+        // number to NotificationManager.cancel().
+        mNotificationManager.cancel(0)
+    }
+
     private fun sendNotification(context: Context, smallIconId: Int, title: String, text: String, channel_id: String, gotoActivity: Class<*>, notification_id: Int, nameUrl: NameWithUrl) {
         // The id of the channel.
         val mBuilder = NotificationCompat.Builder(context, "episodeUpdate")
@@ -185,6 +194,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 .setContentTitle(title)
                 .setContentText(text)
                 .setOnlyAlertOnce(true)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(text).setBigContentTitle(title))
                 .setChannelId(channel_id)
                 .setGroup("episode_group")
                 .setAutoCancel(true)
@@ -203,11 +213,11 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent)
         val resultPendingIntent = stackBuilder.getPendingIntent(
-                0,
+                notification_id,
                 PendingIntent.FLAG_UPDATE_CURRENT
         )
         mBuilder.setContentIntent(resultPendingIntent)
-        //mBuilder.setDeleteIntent(createOnDismissedIntent(context, notification_id))
+        mBuilder.setDeleteIntent(createOnDismissedIntent(context, notification_id, nameUrl.url))
         val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         // mNotificationId is a unique integer your app uses to identify the
         // notification. For example, to cancel the notification, you can pass its ID
@@ -254,8 +264,9 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         mNotificationManager.notify(0, mBuilder.build())
     }
 
-    private fun createOnDismissedIntent(context: Context, notificationId: Int): PendingIntent {
+    private fun createOnDismissedIntent(context: Context, notificationId: Int, url: String): PendingIntent {
         val intent = Intent(context, NotificationDismissedReceiver::class.java)
+        intent.putExtra(ConstantValues.URL_INTENT, url)
         //intent.putExtra("com.my.app.notificationId", notificationId)
         return PendingIntent.getBroadcast(context.applicationContext,
                 notificationId, intent, 0)
@@ -268,5 +279,8 @@ class NotificationDismissedReceiver : BroadcastReceiver() {
         //val notificationId = intent.extras!!.getInt("com.my.app.notificationId")
         /* Your code to handle the event here */
         //ShowCheckIntentService.updateNotiMap.clear()
+        val url = intent.extras!!.getString(ConstantValues.URL_INTENT)
+        if (url != null)
+            KUtility.removeItemFromNotiJsonList(url)
     }
 }

@@ -102,7 +102,18 @@ class KUtility {
 
         fun removeItemFromNotiJsonList(url: String) {
             val list = getNotiJsonList()
+            Loged.i("Before: ${list.list}")
             list.list.removeIf { it.url == url }
+            Loged.i("After: ${list.list}")
+            commitNotiJsonList(list)
+        }
+
+        fun dismissedItemFromNotiJsonList(url: String) {
+            val list = getNotiJsonList()
+            for (i in list.list) {
+                if (i.url == url)
+                    i.dismissed = true
+            }
             commitNotiJsonList(list)
         }
 

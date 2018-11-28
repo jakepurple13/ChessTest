@@ -28,7 +28,6 @@ import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
-import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.utilities.ViewUtil
 import com.like.LikeButton
@@ -153,7 +152,7 @@ class ShowListActivity : AppCompatActivity() {
         if (recentChoice) {
             //ShowCheckIntentService.updateNotiMap.clear()
             //KUtility.clearNotiList()
-            KUtility.clearNotiJsonList()
+            //KUtility.clearNotiJsonList()
         }
 
         class ItemOffsetDecoration(private val mItemOffset: Int) : RecyclerView.ItemDecoration() {
