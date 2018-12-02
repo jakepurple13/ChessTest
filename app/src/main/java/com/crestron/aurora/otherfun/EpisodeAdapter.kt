@@ -61,15 +61,19 @@ class EpisodeAdapter(private val items: ArrayList<ShowInfo>, private val name: S
         val show = ShowDatabase.getDatabase(this@EpisodeAdapter.context).showDao()
 
         GlobalScope.launch {
-            val episodes = show.getEpisodeFromShow(name)
+            val episodes = show.getEpisodes(name)//show.getEpisodeFromShow(name)
             Loged.wtf("$episodes")
 
-            holder.watched.isChecked = episodes.any {
+            /*holder.watched.isChecked = episodes.any {
                 "${name
                         .replace("(", "\\(")
                         .replace(")", "\\)")
                         .replace("\"", "\\\"")
                         .replace(".", "\\.")} (.*) ${it.episodeNumber + 1}".toRegex().matches(items[position].name) || "$name (.*) ${it.episodeNumber + 1} (.*)".toRegex().matches(items[position].name)
+            }*/
+
+            holder.watched.isChecked = episodes.any {
+                it.episodeNumber == position
             }
 
             holder.watched.setOnCheckedChangeListener { _, b ->

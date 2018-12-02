@@ -82,7 +82,8 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                         if (showDatabase.showDao().getShow(i.name).showNum < showList) {
                             val timeOfUpdate = SimpleDateFormat("hh:mm a").format(System.currentTimeMillis())
                             //nStyle.addLine("$timeOfUpdate - ${i.name} Updated: Episode $showList")
-                            //val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
+                            val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
+                            Loged.wtf(infoToShow)
                             //updateNotiMap.add(infoToShow)
                             updateNotiList.add(ShowInfos(i.name, showList, timeOfUpdate, i.url))
                             val show = showDatabase.showDao().getShow(i.name)
@@ -256,7 +257,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 PendingIntent.FLAG_UPDATE_CURRENT
         )
         mBuilder.setContentIntent(resultPendingIntent)
-        //mBuilder.setDeleteIntent(createOnDismissedIntent(context, notification_id))
+        mBuilder.setDeleteIntent(createOnGroupDismissedIntent(context, 0))
         val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         // mNotificationId is a unique integer your app uses to identify the
         // notification. For example, to cancel the notification, you can pass its ID
@@ -272,6 +273,13 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 notificationId, intent, 0)
     }
 
+    private fun createOnGroupDismissedIntent(context: Context, notificationId: Int): PendingIntent {
+        val intent = Intent(context, NotificationGroupDismissedReceiver::class.java)
+        //intent.putExtra("com.my.app.notificationId", notificationId)
+        return PendingIntent.getBroadcast(context.applicationContext,
+                notificationId, intent, 0)
+    }
+
 }
 
 class NotificationDismissedReceiver : BroadcastReceiver() {
@@ -282,5 +290,14 @@ class NotificationDismissedReceiver : BroadcastReceiver() {
         val url = intent.extras!!.getString(ConstantValues.URL_INTENT)
         if (url != null)
             KUtility.removeItemFromNotiJsonList(url)
+    }
+}
+
+class NotificationGroupDismissedReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        //val notificationId = intent.extras!!.getInt("com.my.app.notificationId")
+        /* Your code to handle the event here */
+        //ShowCheckIntentService.updateNotiMap.clear()
+        KUtility.clearNotiJsonList()
     }
 }

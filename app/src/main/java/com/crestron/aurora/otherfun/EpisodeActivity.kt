@@ -28,6 +28,7 @@ import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
+import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.views.DownloadsWidget
 import com.like.LikeButton
@@ -514,10 +515,8 @@ class EpisodeActivity : AppCompatActivity() {
         if (Intent.ACTION_VIEW == action && data != null) {
             backChoice = false
             val id = data.lastPathSegment
-
             //val sourceId = data.pathSegments[0]
             //val titleId = data.pathSegments[1]
-
             for (s in data.pathSegments) {
                 Loged.e(s)
             }
@@ -525,13 +524,12 @@ class EpisodeActivity : AppCompatActivity() {
             url = data.toString().replace("fun.", "www.")
             name = "fun.getting"//toTitleCase(id!!.replace("-", " ").removeSuffix("online"))
             Loged.d("action: " + action + " | data: " + data.toString() + " | id: " + id)
-
         } else {
             backChoice = true
             url = intent.getStringExtra(ConstantValues.URL_INTENT)
             name = intent.getStringExtra(ConstantValues.NAME_INTENT)
         }
-        //KUtility.removeItemFromNotiJsonList(url)
+        KUtility.removeItemFromNotiJsonList(url)
     }
 
     fun sendNotification(context: Context, smallIconId: Int, title: String, message: String, channel_id: String, gotoActivity: Class<*>, notification_id: Int, vararg dataToPass: KeyAndValue) {
