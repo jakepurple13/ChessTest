@@ -1,6 +1,8 @@
 package com.crestron.aurora.otherfun
 
+import android.content.ComponentName
 import android.content.Intent
+import android.os.IBinder
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.crestron.aurora.Loged
@@ -55,6 +57,12 @@ class ShowCheckTile : TileService() {
             Tile.STATE_UNAVAILABLE
         tile.updateTile() // you need to call this method to apply changes
         Loged.wtf("Start Listening")
+    }
+
+    override fun onBind(intent: Intent?): IBinder {
+        TileService.requestListeningState(this,
+                ComponentName(this, ShowCheckTile::class.java))
+        return super.onBind(intent)!!
     }
 
     override fun onStopListening() {

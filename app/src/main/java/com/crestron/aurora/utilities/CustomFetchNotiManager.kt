@@ -67,7 +67,8 @@ open class CustomFetchNotiManager(context: Context) : FetchNotificationManager {
                 .setStyle(style)
                 .setGroup(groupId.toString())
                 .setGroupSummary(true)
-        return false
+                .setOnlyAlertOnce(true)
+        return !downloadNotifications.isEmpty()
     }
 
     override fun updateNotification(notificationBuilder: NotificationCompat.Builder,
@@ -144,6 +145,8 @@ open class CustomFetchNotiManager(context: Context) : FetchNotificationManager {
                 .setGroup(downloadNotification.groupId.toString())
                 .setGroupSummary(false)
                 .setOnlyAlertOnce(true)
+        if (downloadNotification.isPaused)
+            notificationBuilder.setTimeoutAfter(5000)
         if (downloadNotification.isFailed) {
             notificationBuilder.setProgress(0, 0, false)
         } else {
@@ -278,6 +281,8 @@ open class CustomFetchNotiManager(context: Context) : FetchNotificationManager {
                 notificationOngoingList.add(ongoingNotification)
                 if (context.defaultSharedPreferences.getBoolean("useNotifications", true))
                     notificationManager.notify(groupId, groupSummaryNotificationBuilder.build())
+            } else {
+                notificationManager.cancel(groupId)
             }
             for (index in 0 until notificationIdList.size) {
                 handleNotificationOngoingDismissal(notificationIdList[index], groupId, notificationOngoingList[index])

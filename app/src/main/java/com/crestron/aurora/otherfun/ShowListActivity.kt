@@ -150,9 +150,7 @@ class ShowListActivity : AppCompatActivity() {
         val url = intent.getStringExtra(ConstantValues.SHOW_LINK)
 
         if (recentChoice) {
-            //ShowCheckIntentService.updateNotiMap.clear()
-            //KUtility.clearNotiList()
-            //KUtility.clearNotiJsonList()
+
         }
 
         class ItemOffsetDecoration(private val mItemOffset: Int) : RecyclerView.ItemDecoration() {

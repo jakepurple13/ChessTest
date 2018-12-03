@@ -202,6 +202,7 @@ class EpisodeActivity : AppCompatActivity() {
                 Toast.makeText(this@EpisodeActivity, "Finished Downloading", Toast.LENGTH_LONG).show()
                 progressBar2.progress = 0
                 ChoiceActivity.downloadCast(this@EpisodeActivity, ChoiceActivity.BroadCastInfo.KVObject("view_download_item_count", "1"))
+                ViewVideosActivity.videoCast(this@EpisodeActivity)
                 mNotificationManager.cancel(download.id)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     //UtilNotification.sendNotification(this@EpisodeActivity, android.R.mipmap.sym_def_app_icon, download.file.substring(download.file.lastIndexOf("/") + 1), "All Finished!", "showDownload", ChooseActivity::class.java, download.id)
@@ -214,7 +215,7 @@ class EpisodeActivity : AppCompatActivity() {
                             download.id,
                             KeyAndValue(ConstantValues.URL_INTENT, url),
                             KeyAndValue(ConstantValues.NAME_INTENT, name))*/
-                    if (defaultSharedPreferences.getBoolean("useNotifications", true))
+                    if (defaultSharedPreferences.getBoolean("useNotifications", true)) {
                         sendNotification(this@EpisodeActivity,
                                 android.R.mipmap.sym_def_app_icon,
                                 download.file.substring(download.file.lastIndexOf("/") + 1),
@@ -224,6 +225,12 @@ class EpisodeActivity : AppCompatActivity() {
                                 download.id,
                                 KeyAndValue("video_path", download.file),
                                 KeyAndValue("video_name", name))
+                        sendGroupNotification(this@EpisodeActivity,
+                                android.R.mipmap.sym_def_app_icon,
+                                "Finished Downloads",
+                                ConstantValues.CHANNEL_ID,
+                                ViewVideosActivity::class.java)
+                    }
                 }
                 DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
@@ -564,7 +571,7 @@ class EpisodeActivity : AppCompatActivity() {
         stackBuilder.addNextIntent(resultIntent)
         //stackBuilder.addNextIntent(Intent.createChooser(resultIntent, "Complete action using"))
         val resultPendingIntent = stackBuilder.getPendingIntent(
-                0,
+                notification_id * 2,
                 PendingIntent.FLAG_UPDATE_CURRENT
         )
         mBuilder.setContentIntent(resultPendingIntent)
@@ -574,6 +581,41 @@ class EpisodeActivity : AppCompatActivity() {
         // notification. For example, to cancel the notification, you can pass its ID
         // number to NotificationManager.cancel().
         mNotificationManager.notify(notification_id * 2, mBuilder.build())
+    }
+
+    private fun sendGroupNotification(context: Context, smallIconId: Int, title: String, channel_id: String, gotoActivity: Class<*>) {
+
+        // The id of the channel.
+        val mBuilder = NotificationCompat.Builder(context, channel_id)
+                .setSmallIcon(smallIconId)
+                .setContentTitle(title)
+                .setChannelId(channel_id)
+                .setOnlyAlertOnce(true)
+                .setGroupSummary(true)
+                .setGroup("downloaded_group")
+                .setAutoCancel(true)
+        // Creates an explicit intent for an Activity in your app
+        val resultIntent = Intent(context, gotoActivity)
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your app to the Home screen.
+        val stackBuilder = TaskStackBuilder.create(context)
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(gotoActivity)
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent)
+        val resultPendingIntent = stackBuilder.getPendingIntent(
+                0,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        mBuilder.setContentIntent(resultPendingIntent)
+        val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        // mNotificationId is a unique integer your app uses to identify the
+        // notification. For example, to cancel the notification, you can pass its ID
+        // number to NotificationManager.cancel().
+        mNotificationManager.notify(99, mBuilder.build())
     }
 
     data class KeyAndValue(val key: String, val value: String)

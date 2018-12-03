@@ -32,7 +32,7 @@ android {
         minSdkVersion 24
         targetSdkVersion 28
         versionCode 1
-        versionName "7.6"
+        versionName "7.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
@@ -97,7 +97,7 @@ dependencies {
     implementation 'com.nabinbhandari.android:permissions:3.6'
     implementation 'com.obsez.android.lib.filechooser:filechooser:1.1.10'
     implementation 'com.github.codekidX:storage-chooser:2.0.4.2'
-    implementation('com.crashlytics.sdk.android:crashlytics:2.9.4@aar') {
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.6@aar') {
         transitive = true
     }
     implementation 'com.squareup.picasso:picasso:2.71828'

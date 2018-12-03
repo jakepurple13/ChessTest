@@ -33,7 +33,7 @@ class ShowCheckReceiver : BroadcastReceiver() {
     }
 }
 
-open class ShowInfos(val name: String, val size: Int, val time: String, val url: String, var dismissed: Boolean = false) {
+open class ShowInfos(val name: String, val size: Int, val time: String, val url: String) {
     override fun toString(): String {
         return "$time - $name Updated: Episode $size"
     }
@@ -80,7 +80,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                     try {
                         val showList = EpisodeApi(i).episodeList.size
                         if (showDatabase.showDao().getShow(i.name).showNum < showList) {
-                            val timeOfUpdate = SimpleDateFormat("hh:mm a").format(System.currentTimeMillis())
+                            val timeOfUpdate = SimpleDateFormat("MM/dd hh:mm a").format(System.currentTimeMillis())
                             //nStyle.addLine("$timeOfUpdate - ${i.name} Updated: Episode $showList")
                             val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
                             Loged.wtf(infoToShow)

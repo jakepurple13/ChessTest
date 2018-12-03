@@ -108,15 +108,6 @@ class KUtility {
             commitNotiJsonList(list)
         }
 
-        fun dismissedItemFromNotiJsonList(url: String) {
-            val list = getNotiJsonList()
-            for (i in list.list) {
-                if (i.url == url)
-                    i.dismissed = true
-            }
-            commitNotiJsonList(list)
-        }
-
         var shouldGetUpdate = false
             set(value) {
                 FunApplication.getAppContext().defaultSharedPreferences.edit().putBoolean("shouldGetUpdate", value).apply()
