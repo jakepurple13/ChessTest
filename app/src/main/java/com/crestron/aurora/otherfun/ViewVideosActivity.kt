@@ -77,6 +77,10 @@ class ViewVideosActivity : AppCompatActivity() {
         view_videos_recyclerview.layoutManager = LinearLayoutManager(this@ViewVideosActivity)
         view_videos_recyclerview.addItemDecoration(DividerItemDecoration(view_videos_recyclerview.context, (view_videos_recyclerview.layoutManager as LinearLayoutManager).orientation))
         view_videos_recyclerview.addItemDecoration(ItemOffsetDecoration(20))
+        view_videos_recyclerview.setHasFixedSize(true)
+        val instance = Picasso.Builder(this@ViewVideosActivity)
+                .addRequestHandler(VideoRequestHandler())
+                .build()
 
         fun getStuff() {
             listOfFiles = getListFiles2(File(FetchingUtils.folderLocation))
@@ -95,25 +99,19 @@ class ViewVideosActivity : AppCompatActivity() {
                     defaultSharedPreferences.edit().remove(p).apply()
                 }
             }
-
-            val instance = Picasso.Builder(this@ViewVideosActivity)
-                    .addRequestHandler(VideoRequestHandler())
-                    .build()
-
             adapter = VideoAdapter(listOfFiles, this@ViewVideosActivity, object : DeleteVideoListener {
                 override fun videoDelete(position: Int) {
-                    defaultSharedPreferences.edit().remove(listOfFiles[position].path).apply()
                     listOfFiles.removeAt(position)
-                    adapter.notifyItemRemoved(position)
                 }
             }, instance)
-            view_videos_recyclerview.adapter = adapter
+            view_videos_recyclerview.swapAdapter(adapter, true)
             val callback = RVHItemTouchHelperCallback(adapter
                     , false
                     , true
                     , true)
             val helper = ItemTouchHelper(callback)
             helper.attachToRecyclerView(view_videos_recyclerview)
+
             runOnUiThread {
                 video_refresh.isRefreshing = false
             }
@@ -128,7 +126,7 @@ class ViewVideosActivity : AppCompatActivity() {
             getStuff()
         }
 
-        delete_multiple.setOnClickListener { _ ->
+        delete_multiple.setOnClickListener {
             val multiSelectDialog = MultiSelectDialog()
                     .title("Select the Videos to Delete") //setting title for dialog
                     .titleSize(25f)
@@ -165,9 +163,7 @@ class ViewVideosActivity : AppCompatActivity() {
                     })
 
             runOnUiThread {
-
                 multiSelectDialog.show(supportFragmentManager, "multiSelectDialog")
-
             }
         }
 
@@ -196,6 +192,11 @@ class ViewVideosActivity : AppCompatActivity() {
             }
         }
         return inFiles
+    }
+
+    override fun onResume() {
+        super.onResume()
+        adapter.notifyDataSetChanged()
     }
 
     override fun onDestroy() {
@@ -255,39 +256,42 @@ class ViewVideosActivity : AppCompatActivity() {
 
     class VideoAdapter(private var stuff: ArrayList<File>,
                        var context: Context,
-                       val videoListener: DeleteVideoListener,
+                       private val videoListener: DeleteVideoListener,
                        val picasso: Picasso) : RecyclerView.Adapter<ViewHolder>(), RVHAdapter {
 
         override fun onItemDismiss(position: Int, direction: Int) {
-            Loged.e("$direction")
-            context.runOnUiThread {
-                val listener = object : DeleteDialog.DeleteDialogListener {
-                    override fun onDelete() {
-                        stuff[position].delete()
-                        stuff.removeAt(position)
-                        notifyItemRemoved(position)
-                    }
-
-                    override fun onCancel() {
-                        notifyDataSetChanged()
-                    }
-                }
-                //DeleteDialog(context, stuff[position].name, file = stuff[position], listener = listener).show()
-                DeleteDialog.deleteDialog(context, file = stuff[position]) {
-                    title = stuff[position].name
-                    this.listener = listener
-                }.show()
-                /*DeleteDialog.DialogBuilder().deleteDialog {
-                    title = stuff[position].name
-                    this.file = stuff[position]
-                    this.dialogListener = listener
-                    this.context = context
-                }.show()*/
-            }
+            if (stuff.isNotEmpty())
+                DeleteDialog(context, stuff[position].name, listener = listener(position)).show()
+            else
+                notifyDataSetChanged()
         }
 
         override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
             return false
+        }
+
+        fun listener(position: Int) = object : DeleteDialog.DeleteDialogListener {
+            override fun onDelete() {
+                /*context.defaultSharedPreferences.edit().remove(stuff[position].path).apply()
+                //videoListener.videoDelete(position)
+                stuff[position].delete()
+                stuff.removeAt(position)
+                notifyItemRemoved(position)*/
+                remove(position)
+            }
+
+            override fun onCancel() {
+                notifyDataSetChanged()
+            }
+        }
+
+        private fun remove(position: Int) {
+            context.defaultSharedPreferences.edit().remove(stuff[position].path).apply()
+            val f = stuff.removeAt(position)
+            if (f.exists())
+                f.delete()
+            notifyItemRemoved(position)
+            //videoListener.videoDelete(position)
         }
 
         // Gets the number of animals in the list
@@ -314,9 +318,6 @@ class ViewVideosActivity : AppCompatActivity() {
                 val runTimeString = String.format("%02d:%02d",
                         TimeUnit.MILLISECONDS.toMinutes(duration),
                         TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration)))
-                /*val formatter = SimpleDateFormat("mm:ss")
-                formatter.timeZone = TimeZone.getTimeZone("UTC")
-                val dateFormatted = formatter.format(Date(duration))*/
                 holder.videoRuntime.text = runTimeString
                 context.runOnUiThread {
                     //Thumbnail image
@@ -337,12 +338,8 @@ class ViewVideosActivity : AppCompatActivity() {
                     }
                 }
                 holder.videoLayout.setOnLongClickListener {
-                    val listener = object : DeleteDialog.DeleteDialogListener {
-                        override fun onDelete() {
-                            videoListener.videoDelete(holder.adapterPosition)
-                        }
-                    }
-                    DeleteDialog(context, stuff[position].name, file = stuff[position], listener = listener).show()
+                    if (position != RecyclerView.NO_POSITION)
+                        DeleteDialog(context, stuff[position].name, file = stuff[position], listener = listener(holder.adapterPosition)).show()
                     true
                 }
             } catch (e: IllegalStateException) {

@@ -19,6 +19,7 @@ class DeleteDialog(context: Context?, var title: String = "", val download: Down
 
     companion object {
         fun deleteDialog(context: Context?, download: Download? = null, file: File? = null, block: DeleteDialog.() -> Unit): DeleteDialog = DeleteDialog(context, file = file, download = download).apply(block)
+        fun deleteDialog(context: Context?, title: String, block: DeleteDialog.() -> Unit): DeleteDialog = DeleteDialog(context, title = title).apply(block)
     }
 
     class DialogBuilder {

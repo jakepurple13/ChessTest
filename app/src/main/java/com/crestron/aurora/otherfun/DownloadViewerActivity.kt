@@ -177,7 +177,6 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                         StartVideoFromNotificationActivity::class.java, download.id,
                         EpisodeActivity.KeyAndValue("video_path", download.file),
                         EpisodeActivity.KeyAndValue("video_name", download.file))
-
                 sendGroupNotification(this@DownloadViewerActivity,
                         android.R.mipmap.sym_def_app_icon,
                         "Finished Downloads",
@@ -330,7 +329,6 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                 .setSmallIcon(smallIconId)
                 .setContentTitle(title)
                 .setChannelId(channel_id)
-                .setOnlyAlertOnce(true)
                 .setGroupSummary(true)
                 .setGroup("downloaded_group")
                 .setAutoCancel(true)

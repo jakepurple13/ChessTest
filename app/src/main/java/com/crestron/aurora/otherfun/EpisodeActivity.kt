@@ -590,7 +590,6 @@ class EpisodeActivity : AppCompatActivity() {
                 .setSmallIcon(smallIconId)
                 .setContentTitle(title)
                 .setChannelId(channel_id)
-                .setOnlyAlertOnce(true)
                 .setGroupSummary(true)
                 .setGroup("downloaded_group")
                 .setAutoCancel(true)
