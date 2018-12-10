@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/cod_gray"
-    tools:context=".SettingsShowActivity">
+    tools:context=".otherfun.FavoriteShowsActivity">
 
     <in.myinnos.alphabetsindexfastscrollrecycler.IndexFastScrollRecyclerView
         android:id="@+id/list_to_choose"

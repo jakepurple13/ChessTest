@@ -1,4 +1,4 @@
-package com.crestron.aurora
+package com.crestron.aurora.otherfun
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -6,13 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SectionIndexer
-import com.crestron.aurora.otherfun.ShowListActivity
-import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.settings_show_layout.view.*
+import com.crestron.aurora.R
+import kotlinx.android.synthetic.main.favorites_show_layout.view.*
 
-class SettingsShowAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
-                          var context: Context,
-                          var action: SettingsShowActivity.ShowHit = object : SettingsShowActivity.ShowHit {}) : RecyclerView.Adapter<ViewHolder>(), SectionIndexer {
+class FavoriteShowsAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
+                           var context: Context,
+                           var toBeChecked: List<FavoriteShowsActivity.NameUrl>,
+                           var action: FavoriteShowsActivity.ShowHit = object : FavoriteShowsActivity.ShowHit {}) : RecyclerView.Adapter<ViewHolder>(), SectionIndexer {
 
     private var mSectionPositions: ArrayList<Int>? = null
 
@@ -57,7 +57,7 @@ class SettingsShowAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
 
     // Inflates the item views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(context).inflate(R.layout.settings_show_layout, parent, false))
+        return ViewHolder(LayoutInflater.from(context).inflate(R.layout.favorites_show_layout, parent, false))
     }
 
     // Binds each animal in the ArrayList to a view
@@ -68,22 +68,17 @@ class SettingsShowAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
             action.click(stuff[position].name, stuff[position].url, it)
         }
 
-        //holder.favorite.text = ""//stuff[position].name
         action.longhit(stuff[position], holder.layout, holder.linkType)
 
-        Picasso.get().setIndicatorsEnabled(true)
+        //Picasso.get().setIndicatorsEnabled(true)
         holder.imageView.visibility = View.GONE
 
         holder.layout.setOnClickListener {
             holder.linkType.performClick()
         }
 
-        holder.favorite.isChecked = action.isChecked(stuff[position].name)
-
-        /*holder.favorite.setOnCheckedChangeListener { _, b ->
-            action.longClick(stuff[position].name, stuff[position].url, b)
-        }*/
-
+        holder.favorite.setOnCheckedChangeListener(null)
+        holder.favorite.isChecked = toBeChecked.any { it.url == stuff[position].url }
         holder.favorite.setOnCheckedChangeListener { _, isChecked ->
             action.longClick(stuff[position].name, stuff[position].url, isChecked)
         }

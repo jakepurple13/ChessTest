@@ -55,7 +55,7 @@ class ViewVideosActivity : AppCompatActivity() {
         fun videoDelete(position: Int)
     }
 
-    lateinit var listOfFiles: ArrayList<File>
+    var listOfFiles: ArrayList<File> = arrayListOf()
 
     lateinit var adapter: VideoAdapter
 
@@ -83,7 +83,7 @@ class ViewVideosActivity : AppCompatActivity() {
                 .build()
 
         fun getStuff() {
-            listOfFiles = getListFiles2(File(FetchingUtils.folderLocation))
+            listOfFiles.addAll(getListFiles2(File(FetchingUtils.folderLocation)))
             listOfFiles.sortBy { it.name }
             for (i in listOfFiles) {
                 Loged.i(i.name)
@@ -121,9 +121,9 @@ class ViewVideosActivity : AppCompatActivity() {
         getStuff()
 
         video_refresh.setOnRefreshListener {
-            listOfFiles.clear()
-            video_refresh.isRefreshing = true
-            getStuff()
+            //listOfFiles.clear()
+            video_refresh.isRefreshing = false
+            //getStuff()
         }
 
         delete_multiple.setOnClickListener {
@@ -291,6 +291,7 @@ class ViewVideosActivity : AppCompatActivity() {
             if (f.exists())
                 f.delete()
             notifyItemRemoved(position)
+            //notifyDataSetChanged()
             //videoListener.videoDelete(position)
         }
 

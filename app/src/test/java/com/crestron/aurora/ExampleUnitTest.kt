@@ -76,6 +76,40 @@ class ExampleUnitTest {
     }
 
     @Test
+    fun cipherTest() {
+        //BTFHGVEHNWGBGX
+        val text = "BTFHGVEHNWGBGX"
+
+        fun freq(texts: String) {
+            val letterMap = texts.filter { it in 'a'..'z' }.groupBy { it }.toSortedMap()
+            for (letter in letterMap)
+                println("${letter.key} = ${letter.value.size}")
+            val sum = letterMap.values.sumBy { it.size }
+            println("\nTotal letters = $sum")
+        }
+
+        freq(text.toLowerCase())
+
+        fun num(i: Int): Double {
+            return 0.2143 * (9 - i) +
+                    0.1429 * (1 - i) +
+                    0.1429 * (7 - i) +
+                    0.714 * (19 - i) +
+                    0.714 * (4 - i) +
+                    0.714 * (5 - i) +
+                    0.714 * (21 - i) +
+                    0.714 * (13 - i) +
+                    0.714 * (22 - i) +
+                    0.714 * (23 - i)
+
+            //#N : 10    Σ = 14.000    Σ = 99.990
+        }
+        for (i in 0..25) {
+            System.out.println("${(i + 65).toChar()} = ${num(i)}")
+        }
+    }
+
+    @Test
     fun socketting() {
         /*val ssc = ServerSocketChannel.open()
         val s = InetSocketAddress("127.0.0.1", 80)

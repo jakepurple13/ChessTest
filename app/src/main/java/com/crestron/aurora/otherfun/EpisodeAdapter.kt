@@ -72,6 +72,8 @@ class EpisodeAdapter(private val items: ArrayList<ShowInfo>, private val name: S
                         .replace(".", "\\.")} (.*) ${it.episodeNumber + 1}".toRegex().matches(items[position].name) || "$name (.*) ${it.episodeNumber + 1} (.*)".toRegex().matches(items[position].name)
             }*/
 
+            holder.watched.setOnCheckedChangeListener(null)
+
             holder.watched.isChecked = episodes.any {
                 it.episodeNumber == position
             }

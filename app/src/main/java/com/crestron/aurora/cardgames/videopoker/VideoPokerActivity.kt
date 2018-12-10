@@ -19,6 +19,7 @@ import com.wx.wheelview.widget.WheelView
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
 import crestron.com.deckofcards.Hand
+import hari.floatingtoast.FloatingToast
 import io.kimo.konamicode.KonamiCode
 import kotlinx.android.synthetic.main.activity_video_poker.*
 import kotlinx.coroutines.Dispatchers
@@ -133,6 +134,10 @@ class VideoPokerActivity : AppCompatActivity() {
 
         })
 
+        jack_or_better.setOnCheckedChangeListener { _, isChecked ->
+            scores.jacksOrBetter = isChecked
+        }
+
         deckOfCards.deckListener = object : Deck.DeckListener {
 
             @SuppressLint("SetTextI18n")
@@ -236,7 +241,9 @@ class VideoPokerActivity : AppCompatActivity() {
 
             if (!discard_button.isEnabled && !newGame) {
                 try {
-                    winning += scores.winCheck(hand, betAmount)
+                    val money = scores.winCheck(hand, betAmount)
+                    winning += money
+                    FloatingToast.makeToast(this@VideoPokerActivity, "$$money ${if (money < 0) "lost" else "won"}", FloatingToast.LENGTH_SHORT).show()
                 } catch (e: IndexOutOfBoundsException) {
                 }
                 // winnings.text = "\$$winning"

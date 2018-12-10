@@ -21,7 +21,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
-class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
+class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
 
     private var mSectionPositions: ArrayList<Int>? = null
 
@@ -89,11 +89,11 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
     }
 
     // Inflates the item views
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(context).inflate(R.layout.text_layout, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderShow {
+        return ViewHolderShow(LayoutInflater.from(context).inflate(R.layout.text_layout, parent, false))
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(holder: ViewHolderShow, position: Int, payloads: MutableList<Any>) {
         //super.onBindViewHolder(holder, position, payloads)
         try {
             holder.favorite.isLiked = payloads[0] as Boolean
@@ -105,7 +105,7 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
 
     // Binds each animal in the ArrayList to a view
     @SuppressLint("ClickableViewAccessibility")
-    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
+    override fun onBindViewHolder(holder: ViewHolderShow, @SuppressLint("RecyclerView") position: Int) {
         if (items != null) {
             holder.linkType.text = items!![position]
             holder.linkType.setOnClickListener {
@@ -138,8 +138,9 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
             GlobalScope.launch {
 
                 holder.favorite.apply {
-                    isLiked = show.showDao().isUrlInDatabase(stuff[position].url) > 0
 
+                    setOnLikeListener(null)
+                    isLiked = show.showDao().isUrlInDatabase(stuff[position].url) > 0
                     setOnLikeListener(object : OnLikeListener {
                         override fun liked(p0: LikeButton?) {
                             liked(p0!!.isLiked)
@@ -217,7 +218,7 @@ class AListAdapter : RecyclerView.Adapter<ViewHolder>, SectionIndexer {
 
 }
 
-class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+class ViewHolderShow(view: View) : RecyclerView.ViewHolder(view) {
     // Holds the TextView that will add each animal to
     val linkType = view.link_list!!
     val favorite = view.checkBox!!

@@ -249,13 +249,16 @@ class Scores {
         return stringToShow
     }
 
+    var jacksOrBetter = false
+
     private fun pair(hand: Hand): Boolean {
         val h = hand.hand.sortedBy { it.value }//h.sortHandByValue()
         var acceptable = false
         var count = 0
         for (i in 1 until h.size) {
             //if (h.getCard(i).compareTo(h.getCard(i - 1)) == 0) {
-            if (h.getCard(i).compareTo(h.getCard(i - 1)) == 0 && h.getCard(i).value>11 || h.getCard(i).value==1) {
+            val valueMin = if (jacksOrBetter) 11 else 1
+            if (h.getCard(i).compareTo(h.getCard(i - 1)) == 0 && h.getCard(i).value > valueMin || h.getCard(i).value == 1) {
                 count++
             }
 

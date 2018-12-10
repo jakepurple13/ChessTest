@@ -1,4 +1,4 @@
-package com.crestron.aurora
+package com.crestron.aurora.otherfun
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -16,24 +16,24 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import com.crestron.aurora.ConstantValues
+import com.crestron.aurora.Loged
+import com.crestron.aurora.R
 import com.crestron.aurora.db.ShowDatabase
-import com.crestron.aurora.otherfun.EpisodeActivity
-import com.crestron.aurora.otherfun.ShowListActivity
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.google.gson.Gson
 import com.peekandpop.shalskar.peekandpop.PeekAndPop
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.activity_settings_show.*
+import kotlinx.android.synthetic.main.activity_favorites_show.*
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.textColor
 import uk.co.deanwild.flowtextview.FlowTextView
 import java.util.*
 
-class SettingsShowActivity : AppCompatActivity() {
+class FavoriteShowsActivity : AppCompatActivity() {
 
     interface ShowHit {
         fun longClick(name: String, url: String, checked: Boolean) {
@@ -44,7 +44,7 @@ class SettingsShowActivity : AppCompatActivity() {
 
         }
 
-        fun isChecked(name: String): Boolean {
+        fun isChecked(url: String): Boolean {
             return false
         }
 
@@ -58,7 +58,7 @@ class SettingsShowActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings_show)
+        setContentView(R.layout.activity_favorites_show)
 
         homeScreen = intent.getBooleanExtra("homeScreen", false)
 
@@ -80,7 +80,7 @@ class SettingsShowActivity : AppCompatActivity() {
         val stuff = arrayListOf<ShowListActivity.NameAndLink>()
 
         GlobalScope.launch {
-            val s = ShowDatabase.getDatabase(this@SettingsShowActivity).showDao()
+            val s = ShowDatabase.getDatabase(this@FavoriteShowsActivity).showDao()
             val showList = s.allShows
 
             showList.sortBy { it.name }
@@ -89,37 +89,41 @@ class SettingsShowActivity : AppCompatActivity() {
                 stuff.add(ShowListActivity.NameAndLink(s1.name, s1.link))
 
             runOnUiThread {
+                val listScreen = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")
+                val showListsForScreen = Gson().fromJson<NameList>(listScreen, NameList::class.java)
                 favorite_text.append("\nFavorite Count: ${showList.size}")
-                list_to_choose.adapter = SettingsShowAdapter(stuff, this@SettingsShowActivity, object : ShowHit {
+                list_to_choose.adapter = FavoriteShowsAdapter(stuff, this@FavoriteShowsActivity, showListsForScreen.list, object : ShowHit {
                     override fun longClick(name: String, url: String, checked: Boolean) {
                         super.longClick(name, url, checked)
                         shouldReset = true
                         addOrRemoveToHomescreen(name, url, checked)
                     }
 
-                    override fun isChecked(name: String): Boolean {
+                    override fun isChecked(url: String): Boolean {
                         val list = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")
                         val showLists = Gson().fromJson<NameList>(list, NameList::class.java)
-                        return showLists.list.any { it.name == name }
+                        return showLists.list.any { it.url == url }
                     }
 
                     override fun click(name: String, url: String, view: View) {
                         super.click(name, url, view)
-                        val intented = Intent(this@SettingsShowActivity, EpisodeActivity::class.java)
+                        val intented = Intent(this@FavoriteShowsActivity, EpisodeActivity::class.java)
                         intented.putExtra(ConstantValues.URL_INTENT, url)
                         intented.putExtra(ConstantValues.NAME_INTENT, name)
-                        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this@SettingsShowActivity, view, "show_name_trans")
+                        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this@FavoriteShowsActivity, view, "show_name_trans")
                         startActivity(intented, options.toBundle())
                     }
 
                     override fun longhit(info: ShowListActivity.NameAndLink, vararg view: View) {
-                        val peekAndPop = PeekAndPop.Builder(this@SettingsShowActivity)
+                        val peekAndPop = PeekAndPop.Builder(this@FavoriteShowsActivity)
                                 .peekLayout(R.layout.image_dialog_layout)
-                                .apply {
+                                /*.apply {
                                     for (v in view) {
                                         longClickViews(v)
                                     }
-                                }
+                                }*/
+                                .flingTypes(true, true)
+                                .longClickViews(*view)
                                 .build()
 
                         peekAndPop.setOnGeneralActionListener(object : PeekAndPop.OnGeneralActionListener {
@@ -143,7 +147,7 @@ class SettingsShowActivity : AppCompatActivity() {
                                 description.textColor = Color.WHITE
                                 description.setTextSize(episodeNumber.textSize)
 
-                                async {
+                                GlobalScope.launch {
                                     try {
                                         val epiApi = EpisodeApi(ShowInfo(info.name, info.url))
                                         runOnUiThread {
@@ -153,10 +157,11 @@ class SettingsShowActivity : AppCompatActivity() {
                                             } catch (e: java.lang.IllegalArgumentException) {
                                                 Picasso.get().load(android.R.drawable.stat_notify_error).resize((600 * .6).toInt(), (800 * .6).toInt()).into(image)
                                             }
+                                            title.text = info.name
                                             description.text = epiApi.description
                                         }
                                     } catch (e: IllegalArgumentException) {
-
+                                        Loged.e(e.toString())
                                     }
                                 }
                             }
@@ -197,7 +202,7 @@ class SettingsShowActivity : AppCompatActivity() {
         else {
             showList.list.removeIf { it.name == name }
         }
-
+        showList.list = showList.list.distinctBy { it.url } as ArrayList<NameUrl>
         defaultSharedPreferences.edit().putString("homeScreenAdding", Gson().toJson(showList)).apply()
 
         Loged.d(Gson().toJson(showList))

@@ -237,7 +237,7 @@
         -->
 
         <activity
-            android:name=".SettingsShowActivity"
+            android:name=".otherfun.FavoriteShowsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent" />
         <activity

@@ -19,6 +19,7 @@ import android.widget.Toast
 import com.codekidlabs.storagechooser.StorageChooser
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.otherfun.FavoriteShowsActivity
 import com.crestron.aurora.otherfun.FetchingUtils
 import com.crestron.aurora.utilities.KUtility
 import com.google.gson.Gson
@@ -216,7 +217,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
 
             findPreference("show_show").setOnPreferenceClickListener {
                 //(this@GeneralPreferenceFragment.activity as SettingsActivity2).shouldReset = true
-                val intent = Intent(this@GeneralPreferenceFragment.context, SettingsShowActivity::class.java)
+                val intent = Intent(this@GeneralPreferenceFragment.context, FavoriteShowsActivity::class.java)
                 intent.putExtra("displayText", "Choose What Shows To Display on the Home screen")
                 intent.putExtra("homeScreen", true)
                 startActivityForResult(intent, 3)

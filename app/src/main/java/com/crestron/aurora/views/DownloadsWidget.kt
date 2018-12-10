@@ -142,8 +142,10 @@ class MyWidgetRemoteViewsFactory(private val mContext: Context, intent: Intent) 
         rv.setTextViewText(R.id.widgetItemTaskNameLabel, name)
         rv.setTextViewText(R.id.info_speed, if (prog < 0) downloadList[position].status.name else "$progress%")
         rv.setProgressBar(R.id.download_progress, 100, prog.toInt(), false)
-        rv.setImageViewResource(R.id.play_pause_button, if (downloadList[position].status == Status.DOWNLOADING) R.drawable.mr_media_pause_dark else R.drawable.mr_media_play_dark)
-
+        try {
+            rv.setImageViewResource(R.id.play_pause_button, if (downloadList[position].status == Status.DOWNLOADING) R.drawable.mr_media_pause_dark else R.drawable.mr_media_play_dark)
+        } catch (e: java.lang.IndexOutOfBoundsException) {
+        }
         val fillInIntent = Intent()
         fillInIntent.putExtra("show_to_pause_or_play", downloadList[position].id)
         rv.setOnClickFillInIntent(R.id.play_pause_button, fillInIntent)

@@ -10,6 +10,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.support.v4.app.NotificationCompat
@@ -131,21 +132,33 @@ class ChoiceActivity : AppCompatActivity() {
 
         setUpDrawer(savedInstanceState)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (!packageManager.canRequestPackageInstalls()) {
+                val builder = AlertDialog.Builder(this@ChoiceActivity)
+                builder.setTitle("Some Permissions Needed")
+                builder.setMessage("Please Allow Install from Unknown Sources so you can stay up to date!")
+                builder.setPositiveButton("Take me there!") { _, _ ->
+                    startActivity(Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:com.crestron.aurora")))
+                }
+                Toast.makeText(this, "Please Allow Install from Unknown Sources so you can stay up to date!", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         //Loged.d(FirebaseInstanceId.getInstance().token!!)
         if (KUtility.canAppUpdate(this) && KUtility.shouldGetUpdate)
         //if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false)) {
-                GlobalScope.launch {
-                    val url = URL(ConstantValues.VERSION_URL).readText()
-                    val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-                    val pInfo = packageManager.getPackageInfo(packageName, 0)
-                    val version = pInfo.versionName
+            GlobalScope.launch {
+                val url = URL(ConstantValues.VERSION_URL).readText()
+                val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                val pInfo = packageManager.getPackageInfo(packageName, 0)
+                val version = pInfo.versionName
 
-                    Loged.i("version is ${version.toDouble()} and info is ${info.version}")
+                Loged.i("version is ${version.toDouble()} and info is ${info.version}")
 
-                    if (version.toDouble() < info.version) {
-                        getAppPermissions(info)
-                    }
+                if (version.toDouble() < info.version) {
+                    getAppPermissions(info)
                 }
+            }
         //}
         //FunApplication.scheduleAlarm(this, length)
         /*if (KUtility.currentUpdateTime != length )
@@ -405,7 +418,7 @@ class ChoiceActivity : AppCompatActivity() {
                             startActivity(intented)
                         }
                         ChoiceButton.VIEW_FAVORITES -> {
-                            val intented = Intent(this@ChoiceActivity, SettingsShowActivity::class.java)
+                            val intented = Intent(this@ChoiceActivity, FavoriteShowsActivity::class.java)
                             intented.putExtra("displayText", "Your Favorites")
                             startForResult(intented) {
                                 val shouldReset = it.data?.extras?.getBoolean("restart") ?: false
@@ -494,7 +507,7 @@ class ChoiceActivity : AppCompatActivity() {
 
             Loged.i(list!!)
 
-            val showList1 = Gson().fromJson<SettingsShowActivity.NameList>(list, SettingsShowActivity.NameList::class.java)
+            val showList1 = Gson().fromJson<FavoriteShowsActivity.NameList>(list, FavoriteShowsActivity.NameList::class.java)
 
             showList1.list.sortBy { it.name }
 
@@ -773,7 +786,7 @@ class ChoiceActivity : AppCompatActivity() {
                 .withName("View Favorites")
                 .withOnDrawerItemClickListener { _, _, _ ->
                     result.closeDrawer()
-                    val intented = Intent(this@ChoiceActivity, SettingsShowActivity::class.java)
+                    val intented = Intent(this@ChoiceActivity, FavoriteShowsActivity::class.java)
                     intented.putExtra("displayText", "Your Favorites")
                     startForResult(intented) {
                         val shouldReset = it.data?.extras?.getBoolean("restart") ?: false

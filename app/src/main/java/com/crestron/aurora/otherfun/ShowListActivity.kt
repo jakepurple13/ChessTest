@@ -71,13 +71,13 @@ class ShowListActivity : AppCompatActivity() {
         override fun longhit(info: ShowInfo, vararg views: View) {
             val peekAndPop = PeekAndPop.Builder(this@ShowListActivity)
                     .peekLayout(R.layout.image_dialog_layout)
-                    .apply {
+                    /*.apply {
                         for (v in views) {
                             longClickViews(v)
                         }
-                    }
+                    }*/
                     .flingTypes(true, true)
-                    //.longClickViews(views)
+                    .longClickViews(*views)
                     .build()
 
             peekAndPop.setOnGeneralActionListener(object : PeekAndPop.OnGeneralActionListener {

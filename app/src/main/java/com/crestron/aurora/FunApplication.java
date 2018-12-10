@@ -102,6 +102,8 @@ public class FunApplication extends Application {
                     "update_check");*/
             NotificationChannel channel = new NotificationChannel("updateCheckRun", "updateCheckRun", NotificationManager.IMPORTANCE_MIN);
             channel.setShowBadge(false);
+            channel.enableVibration(false);
+            channel.enableLights(false);
             NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             if (mNotificationManager != null) {
                 mNotificationManager.createNotificationChannel(channel);

@@ -20,6 +20,7 @@ import com.crestron.aurora.views.HintedImageView
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.CardNotFoundException
 import crestron.com.deckofcards.Deck
+import hari.floatingtoast.FloatingToast
 import id.co.ionsoft.randomnumberanimationlibrary.RandomNumberAnimation
 import kotlinx.android.synthetic.main.activity_black_jack.*
 import kotlinx.android.synthetic.main.card_item.view.*
@@ -138,6 +139,7 @@ Back = Rewind Button
                     }
                     else -> ""
                 }
+                FloatingToast.makeToast(this@BlackJackActivity, "${winner.text}", FloatingToast.LENGTH_SHORT).show()
             }
             resetGame.isEnabled = true
             playing = false
