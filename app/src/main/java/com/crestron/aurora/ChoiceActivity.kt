@@ -140,7 +140,11 @@ class ChoiceActivity : AppCompatActivity() {
                 builder.setPositiveButton("Take me there!") { _, _ ->
                     startActivity(Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:com.crestron.aurora")))
                 }
+                builder.setNegativeButton("Nah") { _, _ ->
+
+                }
                 Toast.makeText(this, "Please Allow Install from Unknown Sources so you can stay up to date!", Toast.LENGTH_SHORT).show()
+                builder.show()
             }
         }
 
