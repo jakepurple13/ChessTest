@@ -15,6 +15,7 @@ import com.crestron.aurora.R
 import com.crestron.aurora.utilities.AnimationUtility
 import com.crestron.aurora.utilities.ViewUtil
 import com.plattysoft.leonids.ParticleSystem
+import hari.floatingtoast.FloatingToast
 import kotlinx.android.synthetic.main.activity_yahtzee.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -198,6 +199,7 @@ class YahtzeeActivity : AppCompatActivity() {
                 }
             })
             largeScore = scores.largeTotal
+            FloatingToast.makeToast(this@YahtzeeActivity, "+${scores.total - totalScore}", FloatingToast.LENGTH_SHORT).show()
             AnimationUtility.startCountAnimation(totalScore, scores.total, interpolator = OvershootInterpolator(), view = total_score, countListener = object : AnimationUtility.CountListener {
                 override fun numberUpdate(change: Number) {
                     total_score.text = "Total Score: $change"
