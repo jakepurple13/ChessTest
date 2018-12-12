@@ -51,6 +51,8 @@ class ShowCheckTile : TileService() {
         //only enable when there is internet access
         // Called when the Tile becomes visible
         val tile = qsTile // this is getQsTile() method form java, used in Kotlin as a property
+        tile.state = Tile.STATE_INACTIVE
+        tile.updateTile()
         tile.state = if (Utility.isNetwork(this))
             Tile.STATE_INACTIVE
         else

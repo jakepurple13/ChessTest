@@ -31,6 +31,7 @@ import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.views.DownloadsWidget
+import com.kaopiz.kprogresshud.KProgressHUD
 import com.like.LikeButton
 import com.like.OnLikeListener
 import com.squareup.picasso.Picasso
@@ -78,6 +79,14 @@ class EpisodeActivity : AppCompatActivity() {
 
         val show = ShowDatabase.getDatabase(this@EpisodeActivity)
 
+        val hud = KProgressHUD.create(this@EpisodeActivity)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setLabel("Loading")
+                .setDetailsLabel("Loading Episodes")
+                .setAnimationSpeed(2)
+                .setDimAmount(0.5f)
+                .setCancellable(false)
+
         mNotificationManager = this@EpisodeActivity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -105,7 +114,14 @@ class EpisodeActivity : AppCompatActivity() {
                 super.onStarted(download, downloadBlocks, totalBlocks)
                 //mNotificationManager.cancelAll()
                 progressBar2.max = 100
-                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+            }
+
+            override fun onQueued(download: Download, waitingOnNetwork: Boolean) {
+                super.onQueued(download, waitingOnNetwork)
+                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onProgress(download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
@@ -127,7 +143,8 @@ class EpisodeActivity : AppCompatActivity() {
                             DownloadViewerActivity::class.java,
                             download.id)*/
                 }
-                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onCancelled(download: Download) {
@@ -142,7 +159,8 @@ class EpisodeActivity : AppCompatActivity() {
                 }
                 progressBar2.progress = 0
                 //download_info.text = nameUrl("0% at 0 b/s with 0 secs left")
-                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onPaused(download: Download) {
@@ -154,7 +172,8 @@ class EpisodeActivity : AppCompatActivity() {
                         this@EpisodeActivity,
                         DownloadViewerActivity::class.java,
                         download.id)*/
-                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onResumed(download: Download) {
@@ -166,7 +185,8 @@ class EpisodeActivity : AppCompatActivity() {
                         this@EpisodeActivity,
                         DownloadViewerActivity::class.java,
                         download.id)*/
-                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onDeleted(download: Download) {
@@ -179,7 +199,8 @@ class EpisodeActivity : AppCompatActivity() {
                 } catch (e: java.lang.NullPointerException) {
                     e.printStackTrace()
                 }
-                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onError(download: Download, error: Error, throwable: Throwable?) {
@@ -194,7 +215,8 @@ class EpisodeActivity : AppCompatActivity() {
                             this@EpisodeActivity,
                             DownloadViewerActivity::class.java,
                             download.id)*/
-                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
 
             override fun onCompleted(download: Download) {
@@ -203,6 +225,9 @@ class EpisodeActivity : AppCompatActivity() {
                 progressBar2.progress = 0
                 ChoiceActivity.downloadCast(this@EpisodeActivity, ChoiceActivity.BroadCastInfo.KVObject("view_download_item_count", "1"))
                 ViewVideosActivity.videoCast(this@EpisodeActivity)
+                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+                FetchingUtils.retryAll()
                 mNotificationManager.cancel(download.id)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     //UtilNotification.sendNotification(this@EpisodeActivity, android.R.mipmap.sym_def_app_icon, download.file.substring(download.file.lastIndexOf("/") + 1), "All Finished!", "showDownload", ChooseActivity::class.java, download.id)
@@ -232,9 +257,7 @@ class EpisodeActivity : AppCompatActivity() {
                                 ViewVideosActivity::class.java)
                     }
                 }
-                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
-
         })
 
         episode_list.layoutManager = LinearLayoutManager(this)
@@ -252,7 +275,9 @@ class EpisodeActivity : AppCompatActivity() {
         episode_list.addItemDecoration(ItemOffsetDecoration(20))
 
         fun getList() = GlobalScope.launch {
-
+            runOnUiThread {
+                hud.show()
+            }
             val epApi = try {
                 EpisodeApi(ShowInfo(name, url))
             } catch (e: SocketTimeoutException) {
@@ -301,6 +326,7 @@ class EpisodeActivity : AppCompatActivity() {
             }
             runOnUiThread {
                 episode_refresh.isRefreshing = false
+                hud.dismiss()
             }
         }
 

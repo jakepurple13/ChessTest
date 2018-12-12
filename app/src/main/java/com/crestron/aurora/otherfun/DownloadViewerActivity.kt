@@ -150,7 +150,8 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
         override fun onQueued(@NotNull download: Download, waitingOnNetwork: Boolean) {
             fileAdapter!!.addDownload(download)
             fileAdapter!!.update(download, UNKNOWN_REMAINING_TIME, UNKNOWN_DOWNLOADED_BYTES_PER_SECOND)
-            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
+            if (DownloadsWidget.isWidgetActive(this@DownloadViewerActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onCompleted(@NotNull download: Download) {
@@ -161,6 +162,9 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             FetchingUtils.remove(download)
             ChoiceActivity.downloadCast(this@DownloadViewerActivity, ChoiceActivity.BroadCastInfo.KVObject("view_download_item_count", "1"))
             ViewVideosActivity.videoCast(this@DownloadViewerActivity)
+            if (DownloadsWidget.isWidgetActive(this@DownloadViewerActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
+            FetchingUtils.retryAll()
             //FetchingUtils.downloadCount+=1
             /*sendNotification(this@DownloadViewerActivity, android.R.mipmap.sym_def_app_icon,
                     download.file.substring(download.file.lastIndexOf("/") + 1),
@@ -183,7 +187,6 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                         ConstantValues.CHANNEL_ID,
                         ViewVideosActivity::class.java)
             }
-            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onError(download: Download, error: Error, throwable: Throwable?) {
@@ -199,7 +202,8 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                         this@DownloadViewerActivity,
                         DownloadViewerActivity::class.java,
                         download.id)*/
-            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
+            if (DownloadsWidget.isWidgetActive(this@DownloadViewerActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onProgress(@NotNull download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
@@ -214,7 +218,8 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                     this@DownloadViewerActivity,
                     DownloadViewerActivity::class.java,
                     download.id)*/
-            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
+            if (DownloadsWidget.isWidgetActive(this@DownloadViewerActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
             //DefaultFetchNotificationManager(this@DownloadViewerActivity).postNotificationUpdate(download, etaInMilliSeconds, downloadedBytesPerSecond)
         }
 
@@ -229,7 +234,8 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                     this@DownloadViewerActivity,
                     DownloadViewerActivity::class.java,
                     download.id)*/
-            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
+            if (DownloadsWidget.isWidgetActive(this@DownloadViewerActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onResumed(@NotNull download: Download) {
@@ -241,7 +247,8 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                     this@DownloadViewerActivity,
                     DownloadViewerActivity::class.java,
                     download.id)*/
-            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
+            if (DownloadsWidget.isWidgetActive(this@DownloadViewerActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onCancelled(@NotNull download: Download) {
@@ -255,14 +262,16 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             } catch (e: java.lang.NullPointerException) {
                 e.printStackTrace()
             }
-            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
+            if (DownloadsWidget.isWidgetActive(this@DownloadViewerActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onRemoved(@NotNull download: Download) {
             fileAdapter!!.update(download, UNKNOWN_REMAINING_TIME, UNKNOWN_DOWNLOADED_BYTES_PER_SECOND)
             //val mNotificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             //mNotificationManager.cancel(download.id)
-            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
+            if (DownloadsWidget.isWidgetActive(this@DownloadViewerActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
 
         override fun onDeleted(@NotNull download: Download) {
@@ -276,7 +285,8 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             } catch (e: java.lang.NullPointerException) {
                 e.printStackTrace()
             }
-            DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
+            if (DownloadsWidget.isWidgetActive(this@DownloadViewerActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
         }
     }
 

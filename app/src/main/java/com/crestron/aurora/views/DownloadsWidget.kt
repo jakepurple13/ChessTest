@@ -6,8 +6,10 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.preference.PreferenceManager
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import com.crestron.aurora.FunApplication
 import com.crestron.aurora.R
 import com.crestron.aurora.otherfun.DownloadViewerActivity
 import com.crestron.aurora.otherfun.FetchingUtils
@@ -38,7 +40,6 @@ class DownloadsWidget : AppWidgetProvider() {
         /*for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }*/
-
         for (appWidgetId in appWidgetIds) {
             val views = RemoteViews(
                     context.packageName,
@@ -71,15 +72,28 @@ class DownloadsWidget : AppWidgetProvider() {
 
     override fun onEnabled(context: Context) {
         // Enter relevant functionality for when the first widget is created
+        super.onEnabled(context)
+        setWidgetActive(true)
     }
 
     override fun onDisabled(context: Context) {
         // Enter relevant functionality for when the last widget is disabled
+        setWidgetActive(false)
+        super.onDisabled(context)
+    }
+
+    private fun setWidgetActive(active: Boolean) {
+        val appContext = FunApplication.getAppContext()
+        val prefs = PreferenceManager.getDefaultSharedPreferences(appContext)
+        val edit = prefs.edit()
+        edit.putBoolean("widgetActive", active)
+        edit.apply()
     }
 
     companion object {
 
         fun sendRefreshBroadcast(context: Context) {
+
             val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
             intent.component = ComponentName(context, DownloadsWidget::class.java)
             context.sendBroadcast(intent)
@@ -95,6 +109,11 @@ class DownloadsWidget : AppWidgetProvider() {
 
             // Instruct the widget manager to update the widget
             appWidgetManager.updateAppWidget(appWidgetId, views)
+        }
+
+        fun isWidgetActive(context: Context): Boolean {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+            return prefs.getBoolean("widgetActive", false)
         }
     }
 }

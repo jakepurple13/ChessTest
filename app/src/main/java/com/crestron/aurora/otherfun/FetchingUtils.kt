@@ -284,6 +284,14 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
             Fetch.getDefaultInstance().retry(download)
         }
 
+        fun retryAll() {
+            Fetch.getDefaultInstance().getDownloadsWithStatus(Status.DOWNLOADING, Func {
+                for (i in it) {
+                    retry(i)
+                }
+            })
+        }
+
         fun pause(download: Download) {
             Fetch.getDefaultInstance().pause(download.id)
         }

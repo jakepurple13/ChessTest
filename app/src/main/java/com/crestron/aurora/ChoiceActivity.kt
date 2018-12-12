@@ -39,6 +39,7 @@ import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.KUtility
+import com.crestron.aurora.utilities.SharedPrefVariables
 import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.views.DownloadsWidget
@@ -147,6 +148,34 @@ class ChoiceActivity : AppCompatActivity() {
                 builder.show()
             }
         }
+
+        if (Utility.isNetworkToast(this@ChoiceActivity))
+            GlobalScope.launch {
+                val pInfo = packageManager.getPackageInfo(packageName, 0)
+                val version = pInfo.versionName
+                runOnUiThread {
+                    if (!SharedPrefVariables.hasShownForLatest) {
+                        SharedPrefVariables.latestVersion = version.toFloat()
+                        if (SharedPrefVariables.hasShownForLatest) {
+                            val url = URL(ConstantValues.VERSION_URL).readText()
+                            Loged.i(url)
+                            val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                            Loged.w("$info")
+                            val builder = AlertDialog.Builder(this@ChoiceActivity)
+                            builder.setTitle("New Version Notes!")
+                            builder.setMessage("Version: ${info.version}\n${info.devNotes}")
+                            builder.setNeutralButton("Cool!") { _, _ ->
+
+                            }
+                            builder.setOnDismissListener {
+                                SharedPrefVariables.hasShownForLatest = true
+                            }
+                            val dialog = builder.create()
+                            dialog.show()
+                        }
+                    }
+                }
+            }
 
         //Loged.d(FirebaseInstanceId.getInstance().token!!)
         if (KUtility.canAppUpdate(this) && KUtility.shouldGetUpdate)
@@ -589,7 +618,8 @@ class ChoiceActivity : AppCompatActivity() {
             //Toast.makeText(this, "New task created", Toast.LENGTH_LONG).show()
             //getTodoList()
             //this will send the broadcast to update the appwidget
-            DownloadsWidget.sendRefreshBroadcast(this@ChoiceActivity)
+            if (DownloadsWidget.isWidgetActive(this@ChoiceActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@ChoiceActivity)
         }
     }
 

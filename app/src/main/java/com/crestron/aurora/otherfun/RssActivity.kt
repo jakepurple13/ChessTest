@@ -14,6 +14,7 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.views.StickHeaderItemDecoration
+import com.kaopiz.kprogresshud.KProgressHUD
 import com.prof.rssparser.Article
 import com.prof.rssparser.Parser
 import kotlinx.android.synthetic.main.activity_rss.*
@@ -50,11 +51,21 @@ class RssActivity : AppCompatActivity() {
 
         ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
+        val hud = KProgressHUD.create(this@RssActivity)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setLabel("Loading")
+                .setDetailsLabel("Loading Shows")
+                .setAnimationSpeed(2)
+                .setDimAmount(0.5f)
+                .setCancellable(false)
+
         textView5.append("\nCurrent Date is ${SimpleDateFormat("MM/dd/yyyy E hh:mm a").format(System.currentTimeMillis())}")
         spinner.isEnabled = false
 
         fun getStuff() = GlobalScope.async {
-
+            runOnUiThread {
+                hud.show()
+            }
             fun livechartRss() = async {
 
                 val urlString = "https://www.livechart.me/feeds/episodes"
@@ -158,6 +169,7 @@ class RssActivity : AppCompatActivity() {
                 feed_list.addItemDecoration(StickHeaderItemDecoration(adapter))
                 feed_list.addItemDecoration(ItemOffsetDecoration(20, list))
                 //refresh_feed.isRefreshing = false
+                hud.dismiss()
             }
         }
 

@@ -135,8 +135,9 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                     defaultSharedPreferences.edit().putFloat(ConstantValues.UPDATE_CHECK, length).apply()
                     //FunApplication.cancelChecker(this@GeneralPreferenceFragment.context)
                     //FunApplication.checkUpdater(this@GeneralPreferenceFragment.context, length)
-                    FunApplication.cancelAlarm(this@GeneralPreferenceFragment.context)
-                    FunApplication.scheduleAlarm(this@GeneralPreferenceFragment.context, length)
+                    KUtility.currentUpdateTime = length
+                    KUtility.cancelAlarm(this@GeneralPreferenceFragment.context)
+                    KUtility.scheduleAlarm(this@GeneralPreferenceFragment.context, length)
 
                     /*findPreference("next_update_check").summary = try {
                         "≈ ${SimpleDateFormat("MM/dd/yyyy E hh:mm a").format(KUtility.nextCheckTime)}"
@@ -151,7 +152,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                 }
                 "run_update_check" -> {
                     if (sharedPreferences!!.getBoolean(key, false)) {
-                        FunApplication.cancelAlarm(this.context)
+                        KUtility.cancelAlarm(this.context)
                     } else {
                         KUtility.setAlarmUp(this.context)
                     }
@@ -229,7 +230,8 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
             //findPreference("show_show").isEnabled = false
 
             //val updateCheck = (findPreference(ConstantValues.UPDATE_CHECK) as EditTextPreference)
-            findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)).toLong(), false)
+            //findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)).toLong(), false)
+            findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * KUtility.currentUpdateTime).toLong(), false)
 
             findPreference("export_favorites").setOnPreferenceClickListener {
 

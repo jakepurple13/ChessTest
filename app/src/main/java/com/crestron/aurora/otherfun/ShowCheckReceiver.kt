@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import com.crestron.aurora.ConstantValues
@@ -23,13 +24,34 @@ import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 class ShowCheckReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         val nextTime = (System.currentTimeMillis() + (1000 * 60 * 60 * KUtility.currentUpdateTime).toLong())
         KUtility.nextCheckTime = nextTime
+        Loged.d(SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(KUtility.nextCheckTime))
         val i = Intent(context, ShowCheckIntentService::class.java)
         i.putExtra("received", true)
-        context!!.startService(i)
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context!!.startForegroundService(i)
+            } else {
+                context!!.startService(i)
+            }
+        } catch (e: IllegalStateException) {
+
+        }
+    }
+}
+
+class BootUpReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context?, intent: Intent?) {
+        if (intent!!.action == "android.intent.action.BOOT_COMPLETED") {
+            Loged.i("Setting from boot")
+            // Set the alarm here.
+            if (KUtility.getSharedPref(context!!).getBoolean("run_update_check", true))
+                KUtility.setAlarmUp(context)
+        }
     }
 }
 
@@ -52,7 +74,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
 
     @SuppressLint("SimpleDateFormat")
     override fun onHandleIntent(intent: Intent?) {
-
         val rec = intent!!.getBooleanExtra("received", false)
         val check = if (rec)
             KUtility.canShowUpdateCheck(this)

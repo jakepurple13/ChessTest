@@ -14,12 +14,14 @@ import android.support.v4.app.TaskStackBuilder
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.FunApplication
 import com.crestron.aurora.Loged
+import com.crestron.aurora.otherfun.FetchingUtils
 import com.crestron.aurora.otherfun.ShowCheckReceiver
 import com.crestron.aurora.otherfun.ShowInfosList
 import com.google.gson.Gson
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.IOException
 import java.io.OutputStreamWriter
+import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
@@ -122,10 +124,11 @@ class KUtility {
             //FunApplication.checkUpdater(this, length)
             Loged.d("length: $length and currentTime: ${KUtility.currentUpdateTime}")
             //PendingIntent.getBroadcast(this, 1, Intent(this@ChoiceActivity, ShowCheckReceiver::class.java), PendingIntent.FLAG_NO_CREATE) != null
-            val alarmUp = AlarmUtils.hasAlarm(context, Intent(context, ShowCheckReceiver::class.java), 1)
+            val alarmUp = AlarmUtils.hasAlarm(context, Intent(context, ShowCheckReceiver::class.java), 90)
+            Loged.i("Alarm up: $alarmUp")
             if (!alarmUp || KUtility.currentUpdateTime != length) {
                 Loged.i("Setting")
-                FunApplication.scheduleAlarm(context, length)
+                scheduleAlarm(context, length)
                 //FunApplication.seeNextAlarm(this@ChoiceActivity)
             } else {
                 Loged.i("Nope, already set")
@@ -134,8 +137,50 @@ class KUtility {
             //FunApplication.seeNextAlarm(context)
         }
 
+        // Setup a recurring alarm every half hour
+        fun scheduleAlarm(context: Context, time: Number) {
+            Loged.wtf(FetchingUtils.getETAString((1000.0 * 60.0 * 60.0 * time.toDouble()).toLong(), false), "TAG", true)
+            // Construct an intent that will execute the AlarmReceiver
+            val intent = Intent(context, ShowCheckReceiver::class.java)
+
+            // Create a PendingIntent to be triggered when the alarm goes off
+            val pIntent = PendingIntent.getBroadcast(context, 90,
+                    intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+            val wantedTime = (1000.0 * 60.0 * 60.0 * time.toDouble()).toLong()
+
+            //long millis = System.currentTimeMillis() + wantedTime;
+
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = System.currentTimeMillis()
+            var timeToSet = 5000L
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                timeToSet = KUtility.timeToNextHourOrHalf()
+            }
+            val firstMillis = calendar.timeInMillis + timeToSet // alarm is set right away
+            val alarm = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            // First parameter is the type: ELAPSED_REALTIME, ELAPSED_REALTIME_WAKEUP, RTC_WAKEUP
+            // Interval can be INTERVAL_FIFTEEN_MINUTES, INTERVAL_HALF_HOUR, INTERVAL_HOUR, INTERVAL_DAY
+            alarm.setRepeating(AlarmManager.RTC_WAKEUP, firstMillis,
+                    wantedTime, pIntent)
+
+            KUtility.currentUpdateTime = time.toFloat()
+            KUtility.nextCheckTime = firstMillis
+            Loged.d(SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(KUtility.nextCheckTime))
+
+        }
+
+        fun cancelAlarm(context: Context) {
+            val intent = Intent(context, ShowCheckReceiver::class.java)
+            val pIntent = PendingIntent.getBroadcast(context, 90,
+                    intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val alarm = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarm.cancel(pIntent)
+        }
+
         fun setUpdateCheckAlarm(context: Context) {
             val alarmUp = AlarmUtils.hasAlarm(context, Intent(context, AppUpdateCheckReceiver::class.java), 5)
+            Loged.wtf("Alarm is up? $alarmUp")
             if (!alarmUp) {
                 val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                 val alarmIntent = Intent(context, AppUpdateCheckReceiver::class.java).let { intent ->

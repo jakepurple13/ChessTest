@@ -57,7 +57,7 @@ class ViewVideosActivity : AppCompatActivity() {
 
     var listOfFiles: ArrayList<File> = arrayListOf()
 
-    lateinit var adapter: VideoAdapter
+    var adapter: VideoAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,11 +99,17 @@ class ViewVideosActivity : AppCompatActivity() {
                     defaultSharedPreferences.edit().remove(p).apply()
                 }
             }
-            adapter = VideoAdapter(listOfFiles, this@ViewVideosActivity, object : DeleteVideoListener {
-                override fun videoDelete(position: Int) {
-                    listOfFiles.removeAt(position)
-                }
-            }, instance)
+            if (adapter == null)
+                adapter = VideoAdapter(listOfFiles, this@ViewVideosActivity, object : DeleteVideoListener {
+                    override fun videoDelete(position: Int) {
+                        listOfFiles.removeAt(position)
+                    }
+                }, instance)
+            else {
+                val list = listOfFiles
+                list.addAll(adapter!!.stuff)
+                adapter!!.add(list.distinctBy { it })
+            }
             view_videos_recyclerview.swapAdapter(adapter, true)
             val callback = RVHItemTouchHelperCallback(adapter
                     , false
@@ -121,9 +127,9 @@ class ViewVideosActivity : AppCompatActivity() {
         getStuff()
 
         video_refresh.setOnRefreshListener {
-            //listOfFiles.clear()
-            video_refresh.isRefreshing = false
-            //getStuff()
+            listOfFiles.clear()
+            video_refresh.isRefreshing = true
+            getStuff()
         }
 
         delete_multiple.setOnClickListener {
@@ -149,7 +155,7 @@ class ViewVideosActivity : AppCompatActivity() {
                                         runOnUiThread {
                                             val index = listOfFiles.indexOf(f)
                                             listOfFiles.remove(f)
-                                            adapter.notifyItemRemoved(index)
+                                            adapter!!.notifyItemRemoved(index)
                                         }
                                     }
                                 }
@@ -169,7 +175,7 @@ class ViewVideosActivity : AppCompatActivity() {
 
         val br = BroadcastReceiverVideoView(object : VideoBroadcast {
             override fun onCall(intent: Intent) {
-                adapter.notifyDataSetChanged()
+                adapter!!.notifyDataSetChanged()
             }
         })
         val filter = IntentFilter().apply {
@@ -196,7 +202,7 @@ class ViewVideosActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        adapter.notifyDataSetChanged()
+        adapter!!.notifyDataSetChanged()
     }
 
     override fun onDestroy() {
@@ -254,7 +260,7 @@ class ViewVideosActivity : AppCompatActivity() {
         }
     }
 
-    class VideoAdapter(private var stuff: ArrayList<File>,
+    class VideoAdapter(var stuff: ArrayList<File>,
                        var context: Context,
                        private val videoListener: DeleteVideoListener,
                        val picasso: Picasso) : RecyclerView.Adapter<ViewHolder>(), RVHAdapter {
@@ -268,6 +274,12 @@ class ViewVideosActivity : AppCompatActivity() {
 
         override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
             return false
+        }
+
+        fun add(list: Collection<File>) {
+            stuff.addAll(list)
+            stuff = stuff.distinctBy { it } as ArrayList<File>
+            notifyDataSetChanged()
         }
 
         fun listener(position: Int) = object : DeleteDialog.DeleteDialogListener {

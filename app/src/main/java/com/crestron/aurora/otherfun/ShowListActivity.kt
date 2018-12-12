@@ -30,6 +30,7 @@ import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.utilities.ViewUtil
+import com.kaopiz.kprogresshud.KProgressHUD
 import com.like.LikeButton
 import com.peekandpop.shalskar.peekandpop.PeekAndPop
 import com.squareup.picasso.Picasso
@@ -144,6 +145,14 @@ class ShowListActivity : AppCompatActivity() {
 
         ViewUtil.revealing(findViewById(android.R.id.content), intent)
 
+        val hud = KProgressHUD.create(this@ShowListActivity)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setLabel("Loading")
+                .setDetailsLabel("Loading Shows")
+                .setAnimationSpeed(2)
+                .setDimAmount(0.5f)
+                .setCancellable(false)
+
         val showDatabase = ShowDatabase.getDatabase(this@ShowListActivity)
 
         val recentChoice = intent.getBooleanExtra(ConstantValues.RECENT_OR_NOT, false)
@@ -188,9 +197,9 @@ class ShowListActivity : AppCompatActivity() {
                     favorite_show.isEnabled = true//!recentChoice
                     search_info.isEnabled = true
                     Loged.d("${(show_info.adapter!! as AListAdapter).itemCount}")
+                    hud.dismiss()
+                    refresh_list.isRefreshing = false
                 }
-
-                refresh_list.isRefreshing = false
 
             } catch (e: SocketTimeoutException) {
                 errorHasOccurred(e.message!!)
@@ -199,6 +208,9 @@ class ShowListActivity : AppCompatActivity() {
 
         fun getStuff() = GlobalScope.async {
             Loged.i(url)
+            runOnUiThread {
+                hud.show()
+            }
             getListOfAnime(url)
         }
 
