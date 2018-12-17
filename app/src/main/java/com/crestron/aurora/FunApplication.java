@@ -53,6 +53,7 @@ public class FunApplication extends Application {
     @SuppressLint("StaticFieldLeak")
     private static Context context;
 
+    @SuppressLint("SimpleDateFormat")
     @Override
     public void onCreate() {
         super.onCreate();
@@ -217,8 +218,8 @@ public class FunApplication extends Application {
 
             shortcutManager.setDynamicShortcuts(scl);
         }
-        if (KUtility.Util.getSharedPref(this).getBoolean("run_update_check", true))
-            KUtility.Util.setAlarmUp(context);
+        //if (KUtility.Util.getSharedPref(this).getBoolean("run_update_check", true))
+        KUtility.Util.setAlarmUp(context);
         KUtility.Util.setUpdateCheckAlarm(context);
     }
 

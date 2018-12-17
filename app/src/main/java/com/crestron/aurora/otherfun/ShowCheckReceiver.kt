@@ -26,6 +26,7 @@ import java.util.*
 
 
 class ShowCheckReceiver : BroadcastReceiver() {
+    @SuppressLint("SimpleDateFormat")
     override fun onReceive(context: Context?, intent: Intent?) {
         val nextTime = (System.currentTimeMillis() + (1000 * 60 * 60 * KUtility.currentUpdateTime).toLong())
         KUtility.nextCheckTime = nextTime
@@ -33,11 +34,7 @@ class ShowCheckReceiver : BroadcastReceiver() {
         val i = Intent(context, ShowCheckIntentService::class.java)
         i.putExtra("received", true)
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context!!.startForegroundService(i)
-            } else {
-                context!!.startService(i)
-            }
+            context!!.startService(i)
         } catch (e: IllegalStateException) {
 
         }
@@ -49,8 +46,8 @@ class BootUpReceiver : BroadcastReceiver() {
         if (intent!!.action == "android.intent.action.BOOT_COMPLETED") {
             Loged.i("Setting from boot")
             // Set the alarm here.
-            if (KUtility.getSharedPref(context!!).getBoolean("run_update_check", true))
-                KUtility.setAlarmUp(context)
+            //if (KUtility.getSharedPref(context!!).getBoolean("run_update_check", true))
+            KUtility.setAlarmUp(context!!)
         }
     }
 }
@@ -68,7 +65,6 @@ open class NameWithUrl(val name: String, val url: String)
 class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
 
     companion object {
-        val updateNotiMap = arrayListOf<String>()
         val updateNotiList = arrayListOf<ShowInfos>()
     }
 
@@ -80,6 +76,9 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         else
             true
         if (check) {
+            /*sendRunningNotification(this@ShowCheckIntentService,
+                    android.R.mipmap.sym_def_app_icon,
+                    "updateCheckRun", 2)*/
             sendRunningNotification(this@ShowCheckIntentService,
                     android.R.mipmap.sym_def_app_icon,
                     "updateCheckRun", 2)
@@ -97,7 +96,10 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 val aColIds = shows.asSequence().map { it.link }.toSet()
                 val bColIds = filteredList.filter { it.url in aColIds }
 
-                for (i in bColIds) {
+                for ((prog, i) in bColIds.withIndex()) {
+                    sendRunningNotification(this@ShowCheckIntentService,
+                            android.R.mipmap.sym_def_app_icon,
+                            "updateCheckRun", 2, prog + 1, bColIds.size)
                     try {
                         val showList = EpisodeApi(i).episodeList.size
                         if (showDatabase.showDao().getShow(i.name).showNum < showList) {
@@ -162,13 +164,13 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         }
     }
 
-    private fun sendRunningNotification(context: Context, smallIconId: Int, channel_id: String, notification_id: Int) {
+    private fun sendRunningNotification(context: Context, smallIconId: Int, channel_id: String, notification_id: Int, prog: Int = 0, max: Int = 100) {
         // The id of the channel.
         val mBuilder = NotificationCompat.Builder(context, "updateCheckRun")
                 .setSmallIcon(smallIconId)
-                .setContentTitle("Checking for Show Updates")
+                .setContentTitle("Checking for Show Updates${if (prog != 0) ": $prog/$max" else ""}")
                 .setChannelId(channel_id)
-                .setProgress(0, 100, true)
+                .setProgress(max, prog, prog == 0)
                 .setOngoing(true)
                 .setVibrate(longArrayOf(0L))
                 .setSubText("Checking for Show Updates")
@@ -192,7 +194,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 .setSubText("Finished Checking")
                 .setOnlyAlertOnce(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setTimeoutAfter(500)
+                .setTimeoutAfter(750)
 
         val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         // mNotificationId is a unique integer your app uses to identify the
