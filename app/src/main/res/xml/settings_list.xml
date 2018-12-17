@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory
         android:key="pref_key_storage_settings"
         android:title="Settings">
@@ -26,26 +27,26 @@
             android:summary="Automatically retry downloads"
             android:title="Auto Retry" />
 
-        <!--<com.crestron.aurora.views.FloatEditTextPreference
-            android:inputType="numberDecimal"
-            android:key="updateCheck"
-            android:numeric="decimal"
-            android:summary="Time between update checks"
-            android:title="Time between Checks" />-->
-
         <CheckBoxPreference
+            android:defaultValue="true"
             android:key="run_update_check"
-            android:title="Show Updates"
-            android:summaryOn="Check for Show Updates"
             android:summaryOff="Do not check for Show Updates"
-            android:defaultValue="true" />
+            android:summaryOn="Check for Show Updates"
+            android:title="Show Updates" />
 
-        <EditTextPreference
+        <!--<EditTextPreference
             android:inputType="numberDecimal"
             android:key="updateChecks"
             android:numeric="decimal"
             android:summary="Time between update checks"
-            android:title="Time between Checks (By Hour; So .5 = 30 minutes)" />
+            android:title="Time between Checks (By Hour; So .5 = 30 minutes)" />-->
+
+        <mobi.upod.timedurationpicker.TimeDurationPickerPreference
+            android:defaultValue="3600000"
+            android:key="pref_duration"
+            android:summary="Check every ${h:mm:ss} hour(s). (Default is 1 hour)"
+            android:title="Time between Checks"
+            app:timeUnits="hhmm" />
 
         <!--<Preference
             android:key="next_update_check"

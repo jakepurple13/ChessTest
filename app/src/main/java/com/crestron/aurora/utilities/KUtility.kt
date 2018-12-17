@@ -38,9 +38,10 @@ class KUtility {
     companion object Util {
 
         private fun wifiDataCheck(key: String, context: Context): Boolean {
+            val type = checkNetworkStatus(context)
             return when (context.defaultSharedPreferences.getBoolean(key, false)) {
-                true -> checkNetworkStatus(context) == NetworkTypes.WIFI
-                false -> (checkNetworkStatus(context) == NetworkTypes.WIFI) || (checkNetworkStatus(context) == NetworkTypes.MOBILE)
+                true -> type == NetworkTypes.WIFI
+                false -> (type == NetworkTypes.WIFI) || (type == NetworkTypes.MOBILE)
             } && Utility.isNetwork(context)
         }
 
@@ -67,8 +68,8 @@ class KUtility {
             //Check for mobile data
             val mobile = manager.activeNetworkInfo
             return when {
-                wifi.type == ConnectivityManager.TYPE_WIFI -> NetworkTypes.WIFI
-                mobile.type == ConnectivityManager.TYPE_MOBILE -> NetworkTypes.MOBILE
+                wifi != null && wifi.type == ConnectivityManager.TYPE_WIFI -> NetworkTypes.WIFI
+                mobile != null && mobile.type == ConnectivityManager.TYPE_MOBILE -> NetworkTypes.MOBILE
                 else -> NetworkTypes.NONE
             }
         }
@@ -120,13 +121,14 @@ class KUtility {
             }
 
         fun setAlarmUp(context: Context) {
-            val length = context.defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)
+            //val length = context.defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)
+            val length = context.defaultSharedPreferences.getLong("pref_duration", 3_600_000)
             //FunApplication.checkUpdater(this, length)
-            Loged.d("length: $length and currentTime: ${KUtility.currentUpdateTime}")
+            Loged.d("length: $length and currentTime: ${KUtility.currentDurationTime}")
             //PendingIntent.getBroadcast(this, 1, Intent(this@ChoiceActivity, ShowCheckReceiver::class.java), PendingIntent.FLAG_NO_CREATE) != null
             val alarmUp = AlarmUtils.hasAlarm(context, Intent(context, ShowCheckReceiver::class.java), 90)
             Loged.i("Alarm up: $alarmUp")
-            if (!alarmUp || KUtility.currentUpdateTime != length) {
+            if (!alarmUp || KUtility.currentDurationTime != length) {
                 Loged.i("Setting")
                 scheduleAlarm(context, length)
                 //FunApplication.seeNextAlarm(this@ChoiceActivity)
@@ -139,7 +141,8 @@ class KUtility {
 
         // Setup a recurring alarm every half hour
         fun scheduleAlarm(context: Context, time: Number) {
-            Loged.wtf(FetchingUtils.getETAString((1000.0 * 60.0 * 60.0 * time.toDouble()).toLong(), false), "TAG", true)
+            //Loged.wtf(FetchingUtils.getETAString((1000.0 * 60.0 * 60.0 * time.toDouble()).toLong(), false), "TAG", true)
+            Loged.wtf(FetchingUtils.getETAString(time.toLong(), false), "TAG", true)
             // Construct an intent that will execute the AlarmReceiver
             val intent = Intent(context, ShowCheckReceiver::class.java)
 
@@ -147,7 +150,7 @@ class KUtility {
             val pIntent = PendingIntent.getBroadcast(context, 90,
                     intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-            val wantedTime = (1000.0 * 60.0 * 60.0 * time.toDouble()).toLong()
+            val wantedTime = time.toLong()//(1000.0 * 60.0 * 60.0 * time.toDouble()).toLong()
 
             //long millis = System.currentTimeMillis() + wantedTime;
 
@@ -165,6 +168,7 @@ class KUtility {
                     wantedTime, pIntent)
 
             KUtility.currentUpdateTime = time.toFloat()
+            KUtility.currentDurationTime = time.toLong()
             KUtility.nextCheckTime = firstMillis
             Loged.d(SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(KUtility.nextCheckTime))
 
@@ -203,6 +207,15 @@ class KUtility {
                 )
             }
         }
+
+        var currentDurationTime: Long = 3_600_000
+            set(value) {
+                FunApplication.getAppContext().defaultSharedPreferences.edit().putLong("currentDurationTime", value).apply()
+                field = value
+            }
+            get() {
+                return FunApplication.getAppContext().defaultSharedPreferences.getLong("currentDurationTime", 3_600_000)
+            }
 
         var currentUpdateTime: Float = 9f
             set(value) {

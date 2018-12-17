@@ -135,6 +135,7 @@ dependencies {
     implementation 'com.github.Binary-Finery:Bungee:master-SNAPSHOT'
     implementation 'hari.floatingtoast:floatingtoast:0.1.0'
     implementation 'com.kaopiz:kprogresshud:1.2.0'
+    implementation 'mobi.upod:time-duration-picker:1.1.3'
 
 }
 kotlin {

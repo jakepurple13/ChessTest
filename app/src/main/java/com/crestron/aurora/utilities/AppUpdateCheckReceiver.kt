@@ -10,6 +10,7 @@ import com.crestron.aurora.otherfun.AppInfo
 import com.google.gson.Gson
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.net.ConnectException
 import java.net.URL
 
 class AppUpdateCheckReceiver : BroadcastReceiver() {
@@ -17,13 +18,17 @@ class AppUpdateCheckReceiver : BroadcastReceiver() {
         val notificationId = intent?.getIntExtra(ConstantValues.NOTIFICATION_ID, 0) ?: 0
         Log.d("", "NotificationBroadcastReceiver: notificationId = $notificationId")
         GlobalScope.launch {
-            val url = URL(ConstantValues.VERSION_URL).readText()
-            val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-            val pInfo = context!!.packageManager.getPackageInfo(context.packageName, 0)
-            val version = pInfo.versionName
-            Loged.i("version is ${version.toDouble()} and info is ${info.version}")
-            if (version.toDouble() < info.version) {
-                KUtility.shouldGetUpdate = true
+            try {
+                val url = URL(ConstantValues.VERSION_URL).readText()
+                val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                val pInfo = context!!.packageManager.getPackageInfo(context.packageName, 0)
+                val version = pInfo.versionName
+                Loged.i("version is ${version.toDouble()} and info is ${info.version}")
+                if (version.toDouble() < info.version) {
+                    KUtility.shouldGetUpdate = true
+                }
+            } catch(e: ConnectException) {
+                Loged.e(e.toString())
             }
         }
     }

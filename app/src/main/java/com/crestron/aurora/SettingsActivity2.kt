@@ -28,6 +28,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.android.Main
 import kotlinx.coroutines.launch
+import mobi.upod.timedurationpicker.TimeDurationPicker
+import mobi.upod.timedurationpicker.TimeDurationPickerPreference
+import mobi.upod.timedurationpicker.TimeDurationUtil
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.File
 import java.io.FileInputStream
@@ -122,13 +125,13 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
 
                     folder.summary = sharedPreferences!!.getString(key, FetchingUtils.folderLocation)
                 }
-                ConstantValues.UPDATE_CHECK + "s" -> {
+                /*ConstantValues.UPDATE_CHECK + "s" -> {
                     val updateCheck = (findPreference(ConstantValues.UPDATE_CHECK + "s") as EditTextPreference)
-                    /*val length = try {
+                    *//*val length = try {
                         updateCheck.text.toString().toFloat()
                     } catch (e: NumberFormatException) {
                         1.0f
-                    }*/
+                    }*//*
 
                     val length = sharedPreferences!!.getString(key, "1f")!!.toFloat()
 
@@ -139,23 +142,24 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                     KUtility.cancelAlarm(this@GeneralPreferenceFragment.context)
                     KUtility.scheduleAlarm(this@GeneralPreferenceFragment.context, length)
 
-                    /*findPreference("next_update_check").summary = try {
+                    *//*findPreference("next_update_check").summary = try {
                         "≈ ${SimpleDateFormat("MM/dd/yyyy E hh:mm a").format(KUtility.nextCheckTime)}"
                         //SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(alarm.nextAlarmClock.triggerTime)
                     } catch (e: IllegalStateException) {
                         "N/A"
                     } catch (e: NullPointerException) {
                         "N/A"
-                    }*/
+                    }*//*
 
                     findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * length.toDouble()).toLong(), false)
-                }
+                }*/
                 "run_update_check" -> {
                     if (sharedPreferences!!.getBoolean(key, false)) {
                         KUtility.cancelAlarm(this.context)
                     } else {
                         KUtility.setAlarmUp(this.context)
                     }
+                    findPreference("pref_duration").isEnabled = sharedPreferences.getBoolean(key, true)
                 }
                 ConstantValues.NUMBER_OF_RANDOM -> {
                     findPreference(key).summary = "The Number of Random Favorites to Display: ${PreferenceManager.getDefaultSharedPreferences(this@GeneralPreferenceFragment.context).getString(key, "1")!!.toInt()}"
@@ -187,6 +191,25 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
             //bindPreferenceSummaryToValue(findPreference("wifiOnly"))
 
             findPreference(ConstantValues.FOLDER_LOCATION).summary = FetchingUtils.folderLocation
+
+            /*(findPreference("pref_duration") as TimeDurationPickerPreference)
+                    .timeDurationPicker
+                    .setTimeUnits(TimeDurationPicker.HH_MM)*/
+
+            (findPreference("pref_duration") as TimeDurationPickerPreference).setOnPreferenceChangeListener { preference, newValue ->
+                val text = TimeDurationUtil.formatHoursMinutesSeconds(newValue as Long)
+                val length = context.defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)
+                Loged.d("$text or $newValue and Current values is ${1000.0 * 60.0 * 60.0 * length}")
+                KUtility.currentDurationTime = newValue
+                KUtility.cancelAlarm(this@GeneralPreferenceFragment.context)
+                KUtility.scheduleAlarm(this@GeneralPreferenceFragment.context, newValue)
+                true
+            }
+
+            findPreference("pref_duration").isEnabled = defaultSharedPreferences.getBoolean("run_update_check", true)
+
+            //findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * KUtility.currentUpdateTime).toLong(), false)
+            //findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString(KUtility.currentDurationTime, false)
 
             //val alarm = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             /*findPreference("next_update_check").summary = try {
@@ -226,12 +249,6 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
             }
 
             findPreference(ConstantValues.NUMBER_OF_RANDOM).summary = "The Number of Random Favorites to Display: ${PreferenceManager.getDefaultSharedPreferences(this@GeneralPreferenceFragment.context).getString(ConstantValues.NUMBER_OF_RANDOM, "1")!!.toInt()}"
-
-            //findPreference("show_show").isEnabled = false
-
-            //val updateCheck = (findPreference(ConstantValues.UPDATE_CHECK) as EditTextPreference)
-            //findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)).toLong(), false)
-            findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * KUtility.currentUpdateTime).toLong(), false)
 
             findPreference("export_favorites").setOnPreferenceClickListener {
 

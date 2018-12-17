@@ -77,6 +77,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:id="@+id/episode_info_layout"
                 android:orientation="vertical">
 
                 <TextView
@@ -85,6 +87,7 @@
                     android:layout_height="wrap_content"
                     android:transitionName="show_name_trans"
                     android:autoLink="web"
+                    android:textIsSelectable="true"
                     android:gravity="center"
                     android:text="TextView" />
             </LinearLayout>

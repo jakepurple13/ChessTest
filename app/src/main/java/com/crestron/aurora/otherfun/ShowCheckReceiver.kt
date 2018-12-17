@@ -24,17 +24,20 @@ import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class ShowCheckReceiver : BroadcastReceiver() {
     @SuppressLint("SimpleDateFormat")
     override fun onReceive(context: Context?, intent: Intent?) {
-        val nextTime = (System.currentTimeMillis() + (1000 * 60 * 60 * KUtility.currentUpdateTime).toLong())
+        val nextTime = (System.currentTimeMillis() + KUtility.currentDurationTime)
         KUtility.nextCheckTime = nextTime
         Loged.d(SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(KUtility.nextCheckTime))
         val i = Intent(context, ShowCheckIntentService::class.java)
         i.putExtra("received", true)
         try {
-            context!!.startService(i)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context!!.startForegroundService(i)
+            } else {
+                context!!.startService(i)
+            }
         } catch (e: IllegalStateException) {
 
         }
@@ -68,6 +71,14 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         val updateNotiList = arrayListOf<ShowInfos>()
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notification = NotificationCompat.Builder(this, "updateCheckRun").build()
+            startForeground(2, notification)
+        }
+    }
+
     @SuppressLint("SimpleDateFormat")
     override fun onHandleIntent(intent: Intent?) {
         val rec = intent!!.getBooleanExtra("received", false)
@@ -76,9 +87,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         else
             true
         if (check) {
-            /*sendRunningNotification(this@ShowCheckIntentService,
-                    android.R.mipmap.sym_def_app_icon,
-                    "updateCheckRun", 2)*/
             sendRunningNotification(this@ShowCheckIntentService,
                     android.R.mipmap.sym_def_app_icon,
                     "updateCheckRun", 2)
@@ -101,6 +109,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                             android.R.mipmap.sym_def_app_icon,
                             "updateCheckRun", 2, prog + 1, bColIds.size)
                     try {
+                        Loged.i("Checking ${i.name}")
                         val showList = EpisodeApi(i).episodeList.size
                         if (showDatabase.showDao().getShow(i.name).showNum < showList) {
                             val timeOfUpdate = SimpleDateFormat("MM/dd hh:mm a").format(System.currentTimeMillis())
