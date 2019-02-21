@@ -98,9 +98,11 @@ class KUtility {
         }
 
         fun clearNotiJsonList() {
-            val list = getNotiJsonList()
-            list.list.clear()
-            commitNotiJsonList(list)
+            //val list = getNotiJsonList()
+            //list.list.clear()
+            //commitNotiJsonList(list)
+            commitNotiJsonList(ShowInfosList(arrayListOf()))
+            //FunApplication.getAppContext().defaultSharedPreferences.edit().remove("notilists").apply()
         }
 
         fun removeItemFromNotiJsonList(url: String) {

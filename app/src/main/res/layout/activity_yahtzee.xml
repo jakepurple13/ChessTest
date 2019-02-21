@@ -72,6 +72,7 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/small_score_layout"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:orientation="vertical">
@@ -266,5 +267,17 @@
         android:layout_centerHorizontal="true"
         android:visibility="gone"
         android:text="Button" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/small_score_layout"
+        android:background="@drawable/dialog_bg"
+        android:backgroundTint="@android:color/tertiary_text_dark"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:onClick="playAgain"
+        android:text="Reset" />
 
 </RelativeLayout>

@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.agik.swipe_button.Controller.OnSwipeCompleteListener
-import com.agik.swipe_button.View.Swipe_Button_View
+import com.agik.AGIKSwipeButton.Controller.OnSwipeCompleteListener
+import com.agik.AGIKSwipeButton.View.Swipe_Button_View
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Episode

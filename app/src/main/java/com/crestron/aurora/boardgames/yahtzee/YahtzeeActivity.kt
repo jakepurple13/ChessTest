@@ -5,6 +5,8 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.app.AppCompatDelegate
+import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.OvershootInterpolator
@@ -482,6 +484,40 @@ class YahtzeeActivity : AppCompatActivity() {
         }
         builder.setNegativeButton("Nope") { _, _ ->
             finish()
+        }
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    override fun onBackPressed() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Are you sure you want to quit?")
+        builder.setMessage("You currently have a score of $totalScore")
+        // Add the buttons
+        builder.setPositiveButton("Quit") { _, _ ->
+            super.onBackPressed()
+        }
+        builder.setNegativeButton("Nope") { _, _ ->
+
+        }
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    fun playAgain(v: View) {
+        val pref = defaultSharedPreferences
+        val oldScore = pref.getInt("yahtzee_high_score", 0)
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Are you sure you want to restart?")
+        builder.setMessage("You currently have a score of $totalScore" +
+                "\nYour current high score is $oldScore")
+        // Add the buttons
+        builder.setPositiveButton("Play Again") { _, _ ->
+            finish()
+            startActivity(intent)
+        }
+        builder.setNegativeButton("Nope") { _, _ ->
+
         }
         val dialog = builder.create()
         dialog.show()

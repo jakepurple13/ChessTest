@@ -19,6 +19,7 @@ import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.graphics.Palette;
 
 import com.crashlytics.android.Crashlytics;
@@ -220,7 +221,9 @@ public class FunApplication extends Application {
         }
         //if (KUtility.Util.getSharedPref(this).getBoolean("run_update_check", true))
         KUtility.Util.setAlarmUp(context);
-        KUtility.Util.setUpdateCheckAlarm(context);
+        //KUtility.Util.setUpdateCheckAlarm(context);
+        //keeps things dark because of current styling, but makes app in not night mode
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
     }
 
     public static void fetchSetUp(Context context) {

@@ -206,6 +206,11 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                 true
             }
 
+            (findPreference("pref_duration") as TimeDurationPickerPreference).setOnPreferenceClickListener {
+                (it as TimeDurationPickerPreference).timeDurationPicker.setTimeUnits(TimeDurationPicker.HH_MM)
+                true
+            }
+
             findPreference("pref_duration").isEnabled = defaultSharedPreferences.getBoolean("run_update_check", true)
 
             //findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * KUtility.currentUpdateTime).toLong(), false)

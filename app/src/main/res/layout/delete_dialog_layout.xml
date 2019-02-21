@@ -8,7 +8,7 @@
     tools:ignore="HardcodedText"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.agik.swipe_button.View.Swipe_Button_View
+    <com.agik.AGIKSwipeButton.View.Swipe_Button_View
         android:id="@+id/slide_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
         app:sb_swipe_animate_text="true"
         app:sb_swipe_text="Delete">
 
-    </com.agik.swipe_button.View.Swipe_Button_View>
+    </com.agik.AGIKSwipeButton.View.Swipe_Button_View>
 
     <TextView
         android:id="@+id/textView6"

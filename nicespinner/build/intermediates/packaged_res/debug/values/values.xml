@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="light_gray">#fff5f5f5</color>
+    <dimen name="one_and_a_half_grid_unit">12dp</dimen>
+    <dimen name="three_grid_unit">24dp</dimen>
     <declare-styleable name="NiceSpinner">
         <attr format="color" name="arrowTint"/>
         <attr format="boolean" name="hideArrow"/>
@@ -11,6 +13,4 @@
         <attr format="color" name="mainTextTint"/>
         <attr format="color" name="backgroundColor"/>
     </declare-styleable>
-    <dimen name="one_and_a_half_grid_unit">12dp</dimen>
-    <dimen name="three_grid_unit">24dp</dimen>
 </resources>
