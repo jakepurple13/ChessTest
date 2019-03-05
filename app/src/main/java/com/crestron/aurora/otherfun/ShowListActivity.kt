@@ -105,7 +105,7 @@ class ShowListActivity : AppCompatActivity() {
 
                     GlobalScope.launch {
                         try {
-                            val episode = EpisodeApi(info)
+                            val episode = EpisodeApi(info, 5000)
                             runOnUiThread {
                                 try {
                                     Picasso.get().load(episode.image)
@@ -117,6 +117,8 @@ class ShowListActivity : AppCompatActivity() {
                                 description.text = episode.description
                             }
                         } catch (e: IllegalArgumentException) {
+
+                        } catch (e: SocketTimeoutException) {
 
                         }
                     }

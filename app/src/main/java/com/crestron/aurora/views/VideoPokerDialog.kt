@@ -72,9 +72,9 @@ class VideoPokerDialog(context: Context?, val currentCard: Card, val hand: Hand,
                 viewHolder = ViewHolderWheel()
                 convertView = LayoutInflater.from(mContext).inflate(R.layout.single_image_view_item, null)
                 viewHolder.textView = convertView!!.findViewById(R.id.imageView)
-                convertView!!.tag = viewHolder
+                convertView.tag = viewHolder
             } else {
-                viewHolder = convertView!!.tag as ViewHolderWheel
+                viewHolder = convertView.tag as ViewHolderWheel
             }
             //viewHolder.textView!!.text = mList[position]
             viewHolder.textView!!.setImageResource(mList[position].getImage(mContext))

@@ -37,6 +37,9 @@ public interface ShowDao {
     @Query("select * from show_table where show_name=:name")
     Show getShow(String name);
 
+    @Query("select * from show_table where show_link=:link")
+    Show getShowByURL(String link);
+
     @Query("select * from episode_watched where showName=:name")
     List<Episode> getEpisodes(String name);
 

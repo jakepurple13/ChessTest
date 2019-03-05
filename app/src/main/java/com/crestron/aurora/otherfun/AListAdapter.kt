@@ -154,7 +154,7 @@ class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
                             launch {
                                 if (like) {
                                     show.showDao().insert(Show(stuff[position].url, stuff[position].name))
-                                    launch {
+                                    /*launch {
                                         val s = show.showDao().getShow(stuff[position].name)
                                         val showList = getEpisodeList(stuff[position]).await()
                                         if (s.showNum < showList) {
@@ -162,7 +162,7 @@ class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
                                             show.showDao().updateShow(s)
                                         }
                                         Loged.wtf("${s.name} and size is $showList")
-                                    }
+                                    }*/
 
                                 } else {
                                     show.showDao().deleteShow(stuff[position].name)

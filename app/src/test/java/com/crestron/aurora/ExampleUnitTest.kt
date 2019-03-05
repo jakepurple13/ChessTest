@@ -9,15 +9,19 @@ import com.crestron.aurora.utilities.KUtility
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
 import crestron.com.deckofcards.Suit
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.html.*
 import kotlinx.html.stream.appendHTML
 import kotlinx.html.stream.createHTML
+import org.jsoup.Jsoup
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -253,6 +257,63 @@ class ExampleUnitTest {
         }
         result
         log("Hello")
+    }
+
+    @Test
+    fun videoLinkTest() {
+        log("Here")
+        log("Hello")
+        /*
+        val result = runBlocking {
+            //work from webpage   http://st5.anime1.com/[HorribleSubs]%20Tate%20no%20Yuusha%20no%20Nariagari%20-%2007%20[720p]_af.mp4?st=4z3NqVs6tOHbs84kwibNyw&e=1551392688
+            //work from here      http://st8.anime1.com/[HorribleSubs] Tate no Yuusha no Nariagari - 07 [720p]_af.mp4?st=3VnviVU26QuVFQPUGv25fg&e=1551394918
+            //not work from phone http://st3.anime1.com/[HorribleSubs] Tate no Yuusha no Nariagari - 07 [720p]_af.mp4?st=lkB7Cofu_L4ZEr4Zb-DRrw&e=1551395194
+            //not work from phone http://st8.anime1.com/[HorribleSubs] Tate no Yuusha no Nariagari - 07 [720p]_af.mp4?st=gcZaYE5NzbD8KEwL4wqpiQ&e=1551395397
+            val urlToUse = "https://www.gogoanime1.com/watch/tate-no-yuusha-no-nariagari/episode/episode-7"
+            log(urlToUse)
+            val doc = Jsoup.connect(urlToUse).get()
+            //val vid = doc.select("div.vmn-video").select("script")
+            val htmld = doc.html()//getHtml(urlToUse)
+            //Loged.w(vid[1].data())
+            //val js = vid[1].data()
+            val m = "file: \\\"([^\\\"]+)\\\"," //"(file:(\\s*))+(\"(.*?)\")"
+                    .toRegex().toPattern().matcher(htmld)
+            while (m.find()) {
+                val s = m.group(1)
+                log(s)
+                //Loged.d(URLEncoder.encode(s, "UTF-8").replace("\\+", "%20"))
+            }
+        }*/
+        //result
+        log("Yup")
+        val res = runBlocking {
+            log("I is here")
+            val listOfShows = arrayListOf<String>()
+            val url = "https://www.gogoanime1.com/watch/watashi-ni-tenshi-ga-maiorita"
+            val doc = Jsoup.connect(url).get()
+            val name = doc.select("div.anime-title").text()
+            val stuffList = doc.select("ul.check-list").select("li")
+            for (i in stuffList) {
+                //if(!i.select("a[href^=http]").text().contains(doc.select("div.anime-title").text()))
+                val episodeName = i.select("a").text()
+                val epName = if(episodeName.contains(name)) {
+                    episodeName.substring(name.length)
+                } else {
+                    episodeName
+                }.trim()
+                log(epName)
+                listOfShows.add(epName)
+                //listOfShows.add(ShowInfo(i.select("a[href^=http]").text(), i.select("a[href^=http]").attr("abs:href")))
+            }
+            log("$listOfShows")
+            val c = listOfShows.distinct()
+            log("$c")
+            //val downloadLink = doc.select("a[download^=http]").attr("abs:download")
+            //log(downloadLink)
+            log("here too")
+        }
+        res
+        log("Here")
     }
 
     open class Person(open var name: String? = null,

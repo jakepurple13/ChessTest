@@ -44,7 +44,9 @@ import com.tonyodev.fetch2core.DownloadBlock
 import kotlinx.android.synthetic.main.activity_episode.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.anko.defaultSharedPreferences
+import org.jsoup.Jsoup
 import programmer.box.utilityhelper.UtilNotification
 import spencerstudios.com.bungeelib.Bungee
 import java.net.SocketTimeoutException
@@ -289,9 +291,10 @@ class EpisodeActivity : AppCompatActivity() {
             if (epApi != null)
                 listOfEpisodes.addAll(epApi.episodeList)
 
-            if (name == "fun.getting") {
+            /*if (name == "fun.getting") {
                 name = epApi?.name ?: name
-            }
+            }*/
+            name = epApi?.name ?: name
 
             runOnUiThread {
 
@@ -465,7 +468,6 @@ class EpisodeActivity : AppCompatActivity() {
                 }
             }
         }*/
-
         fav_episode.setOnLikeListener(object : OnLikeListener {
             override fun liked(p0: LikeButton?) {
                 liked(p0!!.isLiked)

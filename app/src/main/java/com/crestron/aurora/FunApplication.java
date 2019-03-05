@@ -42,6 +42,8 @@ import com.tonyodev.fetch2.HttpUrlConnectionDownloader;
 import com.tonyodev.fetch2.NetworkType;
 import com.tonyodev.fetch2core.Downloader;
 
+import org.jsoup.Jsoup;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +78,7 @@ public class FunApplication extends Application {
         FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this)
                 .enableAutoStart(true)
                 .enableRetryOnNetworkGain(true)
+                .enableLogging(true)
                 .setProgressReportingInterval(1000L)
                 .setGlobalNetworkType(wifiOnly ? NetworkType.WIFI_ONLY : NetworkType.ALL)
                 .setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))

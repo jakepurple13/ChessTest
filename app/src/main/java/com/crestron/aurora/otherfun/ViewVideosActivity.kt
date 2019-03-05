@@ -37,6 +37,7 @@ import com.tonyodev.fetch2.Fetch
 import github.nisrulz.recyclerviewhelper.RVHAdapter
 import github.nisrulz.recyclerviewhelper.RVHItemTouchHelperCallback
 import hb.xvideoplayer.MxUtils
+import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.activity_view_videos.*
 import kotlinx.android.synthetic.main.video_layout.view.*
 import kotlinx.android.synthetic.main.video_with_text.view.*
@@ -334,7 +335,9 @@ class ViewVideosActivity : AppCompatActivity() {
                 holder.videoRuntime.text = runTimeString
                 context.runOnUiThread {
                     //Thumbnail image
-                    picasso.load(VideoRequestHandler.SCHEME_VIDEO + ":" + stuff[position].path)?.into(holder.videoThumbnail)
+                    picasso.load(VideoRequestHandler.SCHEME_VIDEO + ":" + stuff[position].path)?.
+                            transform(RoundedCornersTransformation(5, 5))?.
+                            into(holder.videoThumbnail)
                 }
                 //to play video
                 holder.videoLayout.setOnClickListener {

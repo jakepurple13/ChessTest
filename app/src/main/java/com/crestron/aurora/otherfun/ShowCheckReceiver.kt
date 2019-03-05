@@ -7,7 +7,6 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
 import com.crestron.aurora.ConstantValues
@@ -17,7 +16,8 @@ import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.KUtility
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
@@ -81,92 +81,85 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
             //val mNotificationManager = this@ShowCheckService.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             //mNotificationManager.activeNotifications.filter { it.id == 1 }[0].notification.
             GlobalScope.launch {
-                try {
-                    withTimeout(300000) {
-                        val showDatabase = ShowDatabase.getDatabase(this@ShowCheckIntentService)
-                        var count = 0
-                        //gets the list from the source
-                        val showApi = ShowApi(Source.RECENT_ANIME).showInfoList
-                        showApi.addAll(ShowApi(Source.RECENT_CARTOON).showInfoList)
-                        //this part filters the two lists with the list in the database
-                        val filteredList = showApi.distinctBy { it.url }
-                        val shows = showDatabase.showDao().allShows
-                        //in order to only search for the shows that are in the database
-                        val aColIds = shows.asSequence().map { it.link }.toSet()
-                        val bColIds = filteredList.filter { it.url in aColIds }
+                val showDatabase = ShowDatabase.getDatabase(this@ShowCheckIntentService)
+                var count = 0
+                //gets the list from the source
+                val showApi = ShowApi(Source.RECENT_ANIME).showInfoList
+                showApi.addAll(ShowApi(Source.RECENT_CARTOON).showInfoList)
+                //this part filters the two lists with the list in the database
+                val filteredList = showApi.distinctBy { it.url }
+                val shows = showDatabase.showDao().allShows
+                //in order to only search for the shows that are in the database
+                val aColIds = shows.asSequence().map { it.link }.toSet()
+                val bColIds = filteredList.filter { it.url in aColIds }
 
-                        for ((prog, i) in bColIds.withIndex()) {
-                            sendRunningNotification(this@ShowCheckIntentService,
-                                    android.R.mipmap.sym_def_app_icon,
-                                    "updateCheckRun", 2, prog + 1, bColIds.size)
-                            try {
-                                Loged.i("Checking ${i.name}")
-                                val showList = EpisodeApi(i).episodeList.size
-                                if (showDatabase.showDao().getShow(i.name).showNum < showList) {
-                                    val timeOfUpdate = SimpleDateFormat("MM/dd hh:mm a").format(System.currentTimeMillis())
-                                    //nStyle.addLine("$timeOfUpdate - ${i.name} Updated: Episode $showList")
-                                    val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
-                                    Loged.wtf(infoToShow)
-                                    //updateNotiMap.add(infoToShow)
-                                    updateNotiList.add(ShowInfos(i.name, showList, timeOfUpdate, i.url))
-                                    val show = showDatabase.showDao().getShow(i.name)
-                                    show.showNum = showList
-                                    showDatabase.showDao().updateShow(show)
-                                    count++
-                                }
-                                Loged.wtf("${i.name} and size is $showList")
-                            } catch (e: SocketTimeoutException) {
-                                continue
-                            }
-                        }
-                        //updateNotiMap.addAll(KUtility.getNotifyList())
-                        updateNotiList.addAll(KUtility.getNotiJsonList().list)
-                        //updateNotiList.add(ShowInfos("This is the name", 4, "01:30 AM", "http://www.animeplus.tv/kitsune-no-koe-online"))
-                        //updateNotiList.add(ShowInfos("Soccer One", 4, "02:30 AM", "http://www.animeplus.tv/captain-tsubasa-2018-online"))
-                        //updateNotiList.add(ShowInfos("Cute One With a really really long name", 4, "03:30 AM", "http://www.animeplus.tv/jingai-san-no-yome-episode-9-online"))
-                        //val list = updateNotiMap.distinctBy { it }
-                        val list = updateNotiList.distinctBy { it.url }
-                        if (list.isNotEmpty()) {
-                            defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT,
-                                    defaultSharedPreferences.getInt(ConstantValues.UPDATE_COUNT, 0) + count).apply()
-                            //updateNotiMap.clear()
-                            //updateNotiMap.addAll(list)
-                            updateNotiList.clear()
-                            updateNotiList.addAll(list)
-                            //KUtility.commitNotiList(updateNotiMap.toMutableSet())
-                            KUtility.commitNotiJsonList(ShowInfosList(updateNotiList))
-                            if (defaultSharedPreferences.getBoolean("useNotifications", true)) {
-                                dismissCurrentNotis(this@ShowCheckIntentService)
-                                val nStyle = NotificationCompat.InboxStyle()
-                                for ((j, i) in list.withIndex()) {
-                                    nStyle.addLine(i.name)
-                                    sendNotification(this@ShowCheckIntentService,
-                                            android.R.mipmap.sym_def_app_icon,
-                                            i.name,
-                                            i.toString(),
-                                            "episodeUpdate",
-                                            EpisodeActivity::class.java,
-                                            j + 3 + (Math.random() * 50).toInt(),
-                                            NameWithUrl(i.name, i.url))
-                                }
-                                sendGroupNotification(this@ShowCheckIntentService,
-                                        android.R.mipmap.sym_def_app_icon,
-                                        "${list.size} show${if (list.size == 1) "" else "s"} had updates!",
-                                        nStyle,
-                                        "episodeUpdate",
-                                        ShowListActivity::class.java)
-                            }
-                        }
-                        sendFinishedCheckingNotification(this@ShowCheckIntentService,
-                                android.R.mipmap.sym_def_app_icon,
-                                "updateCheckRun", 2)
-                    }
-                } catch (e: TimeoutCancellationException) {
-                    sendFinishedCheckingNotification(this@ShowCheckIntentService,
+                for ((prog, i) in bColIds.withIndex()) {
+                    sendRunningNotification(this@ShowCheckIntentService,
                             android.R.mipmap.sym_def_app_icon,
-                            "updateCheckRun", 2, "Stopped", "Stopped due to timeout")
-                    stopSelf()
+                            "updateCheckRun", 2, prog + 1, bColIds.size)
+                    try {
+                        Loged.i("Checking ${i.name}")
+                        val showList = EpisodeApi(i).episodeList.size
+                        //if (showDatabase.showDao().getShow(i.name).showNum < showList) {
+                        if (showDatabase.showDao().getShowByURL(i.url).showNum < showList) {
+                            val timeOfUpdate = SimpleDateFormat("MM/dd hh:mm a").format(System.currentTimeMillis())
+                            //nStyle.addLine("$timeOfUpdate - ${i.name} Updated: Episode $showList")
+                            val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
+                            Loged.wtf(infoToShow)
+                            //updateNotiMap.add(infoToShow)
+                            updateNotiList.add(ShowInfos(i.name, showList, timeOfUpdate, i.url))
+                            val show = showDatabase.showDao().getShow(i.name)
+                            show.showNum = showList
+                            showDatabase.showDao().updateShow(show)
+                            count++
+                        }
+                        Loged.wtf("${i.name} and size is $showList")
+                    } catch (e: SocketTimeoutException) {
+                        Loged.i("${i.name} Took too long")
+                        continue
+                    }
                 }
+                //updateNotiMap.addAll(KUtility.getNotifyList())
+                updateNotiList.addAll(KUtility.getNotiJsonList().list)
+                //updateNotiList.add(ShowInfos("This is the name", 4, "01:30 AM", "http://www.animeplus.tv/kitsune-no-koe-online"))
+                //updateNotiList.add(ShowInfos("Soccer One", 4, "02:30 AM", "http://www.animeplus.tv/captain-tsubasa-2018-online"))
+                //updateNotiList.add(ShowInfos("Cute One With a really really long name", 4, "03:30 AM", "http://www.animeplus.tv/jingai-san-no-yome-episode-9-online"))
+                //val list = updateNotiMap.distinctBy { it }
+                val list = updateNotiList.distinctBy { it.url }
+                if (list.isNotEmpty()) {
+                    defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT,
+                            defaultSharedPreferences.getInt(ConstantValues.UPDATE_COUNT, 0) + count).apply()
+                    //updateNotiMap.clear()
+                    //updateNotiMap.addAll(list)
+                    updateNotiList.clear()
+                    updateNotiList.addAll(list)
+                    //KUtility.commitNotiList(updateNotiMap.toMutableSet())
+                    KUtility.commitNotiJsonList(ShowInfosList(updateNotiList))
+                    if (defaultSharedPreferences.getBoolean("useNotifications", true)) {
+                        dismissCurrentNotis(this@ShowCheckIntentService)
+                        val nStyle = NotificationCompat.InboxStyle()
+                        for ((j, i) in list.withIndex()) {
+                            nStyle.addLine(i.name)
+                            sendNotification(this@ShowCheckIntentService,
+                                    android.R.mipmap.sym_def_app_icon,
+                                    i.name,
+                                    i.toString(),
+                                    "episodeUpdate",
+                                    EpisodeActivity::class.java,
+                                    j + 3 + (Math.random() * 50).toInt(),
+                                    NameWithUrl(i.name, i.url))
+                        }
+                        sendGroupNotification(this@ShowCheckIntentService,
+                                android.R.mipmap.sym_def_app_icon,
+                                "${list.size} show${if (list.size == 1) "" else "s"} had updates!",
+                                nStyle,
+                                "episodeUpdate",
+                                ShowListActivity::class.java)
+                    }
+                }
+                sendFinishedCheckingNotification(this@ShowCheckIntentService,
+                        android.R.mipmap.sym_def_app_icon,
+                        "updateCheckRun", 2)
             }
         }
     }

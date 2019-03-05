@@ -509,7 +509,7 @@ class ChoiceActivity : AppCompatActivity() {
         models.add(drawableModel(android.R.drawable.ic_menu_today, ChoiceButton.RSS_FEED))
         models.add(drawableModel(R.drawable.recents, ChoiceButton.RECENT_ANIME, defaultSharedPreferences.getInt(ConstantValues.UPDATE_COUNT, 0)))
         models.add(drawableModel(R.drawable.ten2, ChoiceButton.ANIME))
-        models.add(drawableModel(R.drawable.mov, ChoiceButton.ANIME_MOVIES))
+        //models.add(drawableModel(R.drawable.mov, ChoiceButton.ANIME_MOVIES))
         models.add(drawableModel(R.drawable.ten4, ChoiceButton.DUBBED))
         models.add(drawableModel(R.drawable.cartoon_recent_cover, ChoiceButton.RECENT_CARTOON))
         models.add(drawableModel(R.drawable.cartoon_cover, ChoiceButton.CARTOON))
