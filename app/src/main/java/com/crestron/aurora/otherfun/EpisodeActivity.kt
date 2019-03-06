@@ -360,6 +360,8 @@ class EpisodeActivity : AppCompatActivity() {
             getList()
         }
 
+        episode_refresh.isEnabled = false
+
         reverse_order.setOnCheckedChangeListener { _, b ->
             if (b) {
                 //Toast.makeText(this@EpisodeActivity, "Will only download on Wifi", Toast.LENGTH_LONG).show()

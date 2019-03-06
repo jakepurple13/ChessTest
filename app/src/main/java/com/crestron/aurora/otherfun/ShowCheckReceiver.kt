@@ -96,7 +96,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 for ((prog, i) in bColIds.withIndex()) {
                     sendRunningNotification(this@ShowCheckIntentService,
                             android.R.mipmap.sym_def_app_icon,
-                            "updateCheckRun", 2, prog + 1, bColIds.size)
+                            "updateCheckRun", 2, prog + 1, bColIds.size, i.name)
                     try {
                         Loged.i("Checking ${i.name}")
                         val showList = EpisodeApi(i).episodeList.size
@@ -108,7 +108,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                             Loged.wtf(infoToShow)
                             //updateNotiMap.add(infoToShow)
                             updateNotiList.add(ShowInfos(i.name, showList, timeOfUpdate, i.url))
-                            val show = showDatabase.showDao().getShow(i.name)
+                            val show = showDatabase.showDao().getShowByURL(i.url)
                             show.showNum = showList
                             showDatabase.showDao().updateShow(show)
                             count++
@@ -164,7 +164,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         }
     }
 
-    private fun sendRunningNotification(context: Context, smallIconId: Int, channel_id: String, notification_id: Int, prog: Int = 0, max: Int = 100) {
+    private fun sendRunningNotification(context: Context, smallIconId: Int, channel_id: String, notification_id: Int, prog: Int = 0, max: Int = 100, showCheckName: String = "") {
         // The id of the channel.
         val mBuilder = NotificationCompat.Builder(context, "updateCheckRun")
                 .setSmallIcon(smallIconId)
@@ -173,6 +173,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 .setProgress(max, prog, prog == 0)
                 .setOngoing(true)
                 .setVibrate(longArrayOf(0L))
+                .setContentText(showCheckName)
                 .setSubText("Checking for Show Updates")
                 .setOnlyAlertOnce(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)

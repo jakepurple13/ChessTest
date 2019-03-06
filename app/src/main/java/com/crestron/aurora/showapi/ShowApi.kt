@@ -148,10 +148,11 @@ class EpisodeApi(private val source: ShowInfo, timeOut: Int = 10000) {
 
     val episodeList: ArrayList<ShowInfo>
         get() {
-            val listOfShows = arrayListOf<ShowInfo>()
+            var listOfShows = arrayListOf<ShowInfo>()
             if (source.url.contains("gogoanime")) {
                 //val doc = Jsoup.connect(source.url).get()
                 val stuffList = doc.select("ul.check-list").select("li")
+                val showList = arrayListOf<ShowInfo>()
                 for(i in stuffList) {
                     val urlInfo = i.select("a[href^=http]")
                     //val episodeName = i.select("a").text()
@@ -160,8 +161,9 @@ class EpisodeApi(private val source: ShowInfo, timeOut: Int = 10000) {
                     } else {
                         urlInfo.text()
                     }.trim()
-                    listOfShows.add(ShowInfo(epName, urlInfo.attr("abs:href")))
+                    showList.add(ShowInfo(epName, urlInfo.attr("abs:href")))
                 }
+                listOfShows = showList.distinctBy { it.name } as ArrayList<ShowInfo>
             } else {
                 fun getStuff(url: String) {
                     val doc1 = Jsoup.connect(url).get()

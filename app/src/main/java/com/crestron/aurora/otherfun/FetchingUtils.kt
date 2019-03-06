@@ -251,40 +251,57 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         val urlList = arrayListOf<String>()
 
         for (i in urlToUse) {
+            Loged.i(i)
+            if (i.contains("gogoanime")) {
+                val doc = Jsoup.connect(i).get()
+                //val vid = doc.select("div.vmn-video").select("script")
+                val downloadLink = doc.select("a[download^=http]").attr("abs:download")
+                /*val htmld = doc.html()//getHtml(urlToUse)
+                //Loged.w(vid[1].data())
+                //val js = vid[1].data()
+                val m = "file: \\\"([^\\\"]+)\\\"," //"(file:(\\s*))+(\"(.*?)\")"
+                        .toRegex().toPattern().matcher(htmld)
+                while (m.find()) {
+                    val s = m.group(1)
+                    Loged.d(s)
+                }*/
+                //fetchIt(downloadLink, true, networkType, keyAndValue)
+                urlList.add(downloadLink)
+            } else {
+                val htmld = getHtml(i)
+                val m = "<iframe src=\"([^\"]+)\"[^<]+<\\/iframe>".toRegex().toPattern().matcher(htmld)
+                var s = ""
+                val list = arrayListOf<String>()
+                while (m.find()) {
+                    val g = m.group(1)
+                    s += g + "\n"
+                    list.add(g)
+                }
 
-            val htmld = getHtml(i)
-            val m = "<iframe src=\"([^\"]+)\"[^<]+<\\/iframe>".toRegex().toPattern().matcher(htmld)
-            var s = ""
-            val list = arrayListOf<String>()
-            while (m.find()) {
-                val g = m.group(1)
-                s += g + "\n"
-                list.add(g)
-            }
+                Loged.wtf(s)
 
-            Loged.wtf(s)
+                val htmlc = getHtml(list[0])
 
-            val htmlc = getHtml(list[0])
+                Loged.i("Starting video part")
 
-            Loged.i("Starting video part")
+                val reg = "var video_links = (\\{.*?\\});".toRegex().toPattern().matcher(htmlc)
+                Loged.wtf("Here")
+                while (reg.find()) {
+                    val d = reg.group(1)
+                    Loged.wtf(d)
+                    Loged.e("We in here")
+                    val g = Gson()
+                    val d1 = g.fromJson<NormalLink>(d, NormalLink::class.java)
 
-            val reg = "var video_links = (\\{.*?\\});".toRegex().toPattern().matcher(htmlc)
-            Loged.wtf("Here")
-            while (reg.find()) {
-                val d = reg.group(1)
-                Loged.wtf(d)
-                Loged.e("We in here")
-                val g = Gson()
-                val d1 = g.fromJson<NormalLink>(d, NormalLink::class.java)
+                    Loged.wtf(d1.toString())
 
-                Loged.wtf(d1.toString())
-
-                /*if (d1.normal.storage[0].link.isNullOrBlank())
+                    /*if (d1.normal.storage[0].link.isNullOrBlank())
                 continue
             else*/
-                urlList.add(d1.normal.storage[0].link)
-                break
+                    urlList.add(d1.normal.storage[0].link)
+                    break
 
+                }
             }
 
         }
