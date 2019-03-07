@@ -329,9 +329,16 @@ class ViewVideosActivity : AppCompatActivity() {
                 val duration = mp.duration.toLong()
                 mp.release()
                 /*convert millis to appropriate time*/
-                val runTimeString = String.format("%02d:%02d",
-                        TimeUnit.MILLISECONDS.toMinutes(duration),
-                        TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration)))
+                val runTimeString = if(duration>TimeUnit.HOURS.toMillis(1)) {
+                    String.format("%02d:%02d:%02d",
+                            TimeUnit.MILLISECONDS.toHours(duration),
+                            TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration)),
+                            TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration)))
+                } else {
+                    String.format("%02d:%02d",
+                            TimeUnit.MILLISECONDS.toMinutes(duration),
+                            TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration)))
+                }
                 holder.videoRuntime.text = runTimeString
                 context.runOnUiThread {
                     //Thumbnail image

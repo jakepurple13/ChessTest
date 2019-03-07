@@ -118,6 +118,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
+        android:layout_above="@id/auto_move"
         android:layout_below="@+id/deck_info"
         android:orientation="horizontal">
 
@@ -228,7 +229,7 @@
         android:id="@+id/auto_move"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="2dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
         android:layout_above="@+id/back_button_solitaire"
@@ -241,12 +242,12 @@
         android:id="@+id/high_score_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="2dp"
         android:layout_marginTop="5dp"
         android:layout_marginStart="5dp"
         android:background="@drawable/dialog_bg"
         android:backgroundTint="@color/emeraldGreen"
-        android:layout_alignTop="@+id/auto_move"
+        android:layout_above="@id/back_button_solitaire"
         android:layout_alignParentStart="true"
         android:text="View High Scores" />
 

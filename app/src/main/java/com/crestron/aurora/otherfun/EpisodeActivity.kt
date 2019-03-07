@@ -562,7 +562,7 @@ class EpisodeActivity : AppCompatActivity() {
             Loged.i("$data")
             url = data.toString().replace("fun.", "www.")
             name = "fun.getting"//toTitleCase(id!!.replace("-", " ").removeSuffix("online"))
-            Loged.d("action: " + action + " | data: " + data.toString() + " | id: " + id)
+            Loged.d("action: $action | data: $data | id: $id")
         } else {
             backChoice = true
             url = intent.getStringExtra(ConstantValues.URL_INTENT)

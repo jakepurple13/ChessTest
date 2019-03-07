@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/choiceActivity">
+
+    <activity
+        android:id="@+id/choiceActivity"
+        android:name="com.crestron.aurora.ChoiceActivity"
+        android:label="activity_choice"
+        tools:layout="@layout/activity_choice" />
+    <activity
+        android:id="@+id/showListActivity"
+        android:name="com.crestron.aurora.otherfun.ShowListActivity"
+        android:label="activity_show_list"
+        tools:layout="@layout/activity_show_list" />
+    <activity
+        android:id="@+id/episodeActivity"
+        android:name="com.crestron.aurora.otherfun.EpisodeActivity"
+        android:label="activity_episode"
+        tools:layout="@layout/activity_episode" />
+</navigation>
