@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.activity_black_jack.*
 import kotlinx.android.synthetic.main.card_item.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.android.Main
+
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import spencerstudios.com.bungeelib.Bungee

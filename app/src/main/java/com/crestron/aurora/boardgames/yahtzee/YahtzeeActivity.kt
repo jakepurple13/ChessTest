@@ -21,7 +21,7 @@ import hari.floatingtoast.FloatingToast
 import kotlinx.android.synthetic.main.activity_yahtzee.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.android.Main
+
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences

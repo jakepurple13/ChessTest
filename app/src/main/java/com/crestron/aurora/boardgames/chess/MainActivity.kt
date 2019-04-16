@@ -13,7 +13,7 @@ import com.crestron.aurora.utilities.ViewUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.android.Main
+
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 

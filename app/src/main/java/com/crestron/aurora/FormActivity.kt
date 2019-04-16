@@ -12,7 +12,7 @@ import com.thejuki.kformmaster.model.FormSliderElement
 import kotlinx.android.synthetic.main.activity_form.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.android.Main
+
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import okhttp3.FormBody
@@ -122,7 +122,7 @@ class FormActivity : AppCompatActivity() {
         }
     }
 
-    private fun submit(feedback: String, rating: String, name: String?) = async {
+    private fun submit(feedback: String, rating: String, name: String?) = GlobalScope.async {
         val url = "https://docs.google.com/forms/d/e/1FAIpQLSc27pWo2vM1MSXR3KrykkM6V0LLti4I4jJjfMxOZAEuSRol9g/formResponse"
         val feedbackID = "entry.49490076"
         val levelID = "entry.23666763"

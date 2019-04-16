@@ -3,7 +3,6 @@ package com.crestron.aurora.utilities
 import android.widget.TextView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.android.Main
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit

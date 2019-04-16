@@ -6,7 +6,8 @@ import android.view.View
 import android.widget.Button
 import com.crestron.aurora.R
 import kotlinx.android.synthetic.main.activity_ttt.*
-import kotlinx.coroutines.android.UI
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -35,7 +36,7 @@ class TTTActivity : AppCompatActivity() {
                 it.isEnabled = false
                 try {
                     if (TTTBoard.move(x, y)) {
-                        launch(UI) {
+                        GlobalScope.launch(Dispatchers.Main) {
                             delay(1500)
                             AI.run(TTTBoard.turn, TTTBoard, 2.0)
                         }

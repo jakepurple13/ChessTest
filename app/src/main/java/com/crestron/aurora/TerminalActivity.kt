@@ -10,7 +10,7 @@ import com.crestron.aurora.utilities.Utility
 import kotlinx.android.synthetic.main.activity_terminal.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.android.Main
+
 import kotlinx.coroutines.async
 
 class TerminalActivity : AppCompatActivity() {
