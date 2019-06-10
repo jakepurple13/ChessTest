@@ -7,16 +7,61 @@ import android.content.Context
  */
 open class Card(val suit: Suit, val value: Int) : Comparable<Card> {
 
-    protected var maxValue = 16
-    protected var minValue = 1
+    private var maxValue = 16
+    private var minValue = 1
 
     operator fun plus(c: Card) = value + c.value
     operator fun minus(c: Card) = value - c.value
     override fun equals(other: Any?) = suit.equals((other as Card).suit) && value == other.value
 
     companion object DefaultCard {
+        /**
+         * A Clear Card, [value] = 15, [suit] = SPADES
+         * Used as a placeholder for ImageViews when wanting to have a spot for a card but do not want anything to show
+         */
         val ClearCard = Card(Suit.SPADES, 15)
+
+        /**
+         * The Back of a Card, [value] = 16, [suit] = SPADES
+         * Used as a placeholder for ImageViews when wanting to have a spot for a card
+         * but want to show the back of a card
+         */
         val BackCard = Card(Suit.SPADES, 16)
+
+        /**
+         * A card of both random suit and number
+         */
+        val RandomCard: Card
+            get() {
+                return Card(Suit.randomSuit(), CardUtil.randomNumber(1, 13))
+            }
+
+        /**
+         * A card of random value but chosen suit
+         */
+        fun randomCardBySuit(suit: Suit) = Card(suit, CardUtil.randomNumber(1, 13))
+
+        /**
+         * A card of random suit but chosen value
+         */
+        fun randomCardByValue(value: Int) = Card(Suit.randomSuit(), value)
+
+        /**
+         * A card of random color and value
+         */
+        fun randomCardByColor(color: Color) = Card(Color.randomColor(color), CardUtil.randomNumber(1, 13))
+
+        /**
+         * Sets how the printout of the cards are.
+         * e.g.
+         *
+         * [CardDescriptor.WRITTEN_OUT] = Ace of Spades
+         *
+         * [CardDescriptor.SYMBOL] = AS
+         *
+         * [CardDescriptor.UNICODE_SYMBOL] = A♠
+         */
+        var cardDescriptor = CardDescriptor.randomDescriptor()
     }
 
     init {
@@ -64,13 +109,41 @@ open class Card(val suit: Suit, val value: Int) : Comparable<Card> {
     val color = suit.getColor()
 
     override fun toString(): String {
-        return when (value) {
-            1 -> "Ace of $suit"
-            11 -> "Jack of $suit"
-            12 -> "Queen of $suit"
-            13 -> "King of $suit"
-            else -> "$value of $suit"
+        return when (cardDescriptor) {
+            CardDescriptor.UNICODE_SYMBOL -> toPrettyString()
+            CardDescriptor.SYMBOL -> toSymbolString()
+            CardDescriptor.WRITTEN_OUT -> toNormalString()
         }
+    }
+
+    internal fun toNormalString(): String {
+        return when (value) {
+            1 -> "Ace"
+            11 -> "Jack"
+            12 -> "Queen"
+            13 -> "King"
+            else -> "$value"
+        } + " of $suit"
+    }
+
+    internal fun toSymbolString(): String {
+        return when (value) {
+            1 -> "A"
+            11 -> "J"
+            12 -> "Q"
+            13 -> "K"
+            else -> "$value"
+        } + suit.symbol
+    }
+
+    internal fun toPrettyString(): String {
+        return when (value) {
+            1 -> "A"
+            11 -> "J"
+            12 -> "Q"
+            13 -> "K"
+            else -> "$value"
+        } + suit.unicodeSymbol
     }
 
     /**
@@ -85,18 +158,10 @@ open class Card(val suit: Suit, val value: Int) : Comparable<Card> {
         return suit.equals(c.suit) && value == c.value
     }
 
-    fun ace(): Int {
-        return if (value == 1) {
-            14
-        } else {
-            value
-        }
-    }
-
     /**
      * Gives the card image.
      */
-    fun getImage(context: Context): Int {
+    open fun getImage(context: Context): Int {
 
         val num = when (suit) {
             Suit.CLUBS -> 1
@@ -150,3 +215,4 @@ open class Card(val suit: Suit, val value: Int) : Comparable<Card> {
     }
 
 }
+

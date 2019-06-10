@@ -21,7 +21,7 @@ public class ExampleUnitTest {
 
     @Test
     public void deckTest() throws CardNotFoundException {
-        Deck d = new Deck();
+        Deck d = new Deck(true);
 
         System.out.println(d.removeColor(Color.BLACK));
 
@@ -31,7 +31,7 @@ public class ExampleUnitTest {
 
         System.out.println(d);
 
-        d = new Deck();
+        d = new Deck(true);
 
         log(d.getRandomCard().toString());
         log(d.getCard(4).toString());

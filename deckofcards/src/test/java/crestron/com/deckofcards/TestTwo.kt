@@ -1,6 +1,6 @@
 package crestron.com.deckofcards
 
-import junit.framework.Assert.assertEquals
+import junit.framework.TestCase.assertEquals
 import org.junit.Test
 import kotlin.properties.Delegates
 
@@ -16,8 +16,119 @@ class TestTwo {
 
     @Test
     fun test2345() {
-        val f = 1..9
-        System.out.println(5.5 in f)
+        //val f = 1..9
+        //System.out.println(5.5 in f)
+    }
+
+    @Test
+    fun dTest() {
+        val d = Deck()
+
+        //d-=Card(Suit.SPADES, 5)
+
+        val c = d.getCardLocation(Card(Suit.SPADES, 5))
+        log("${Card(Suit.SPADES, 5)} is in the $c place of the deck")
+
+        val dq = Deck.deck {
+            addNormalDeck()
+            card(Card.RandomCard)
+            build()
+        }
+    }
+
+    @Test
+    fun kotlinFunTest() {
+        val numbers = listOf("one", "two", "three", "four")
+        val numbersSequence = numbers.asSequence()
+        log("$numbersSequence")
+    }
+
+    @Test
+    @Throws(CardNotFoundException::class)
+    fun randomTest() {
+
+        log("${Card.RandomCard}")
+
+        var d = Deck()
+
+        log(d.toString())
+        log(d.toNormalString())
+        log(d.toSymbolString())
+        log(d.toPrettyString())
+        log(d.toArrayString())
+        log(d.toArrayNormalString())
+        log(d.toArraySymbolString())
+        log(d.toArrayPrettyString())
+
+        Card.cardDescriptor = CardDescriptor.UNICODE_SYMBOL
+
+        d.deckListener = object : Deck.DeckListener {
+            override fun draw(c: Card, size: Int) {
+                log("$c and $size")
+            }
+        }
+
+        log("Random card is ${d.randomCard}")
+        log("Random card is ${d.randomCard}")
+        log("Random card is ${d.randomCard}")
+        log("Random card is ${d.randomCard}")
+        log("Random card is ${d.getCard(6)}")
+        d += Card.RandomCard
+        d += arrayListOf<Card>().apply {
+            add(Card.RandomCard)
+            add(Card.RandomCard)
+            add(Card.RandomCard)
+            add(Card.randomCardByColor(Color.BLACK))
+            add(Card.randomCardBySuit(Suit.SPADES))
+            add(Card.randomCardByValue(5))
+        }
+        d += Deck()
+        Card.ClearCard
+        d += Deck.deck {
+            card {
+                suit = Suit.randomSuit()
+                value = CardUtil.randomNumber(1, 13)
+            }
+            addNormalDeck()
+            card(Card.RandomCard)
+        }
+
+        d.randomCard.compareSuit(Card.RandomCard)
+
+        d.clear()
+
+        d = Deck()
+
+        d.deckListener = object : Deck.DeckListener {
+            override fun draw(c: Card, size: Int) {
+                log("$c and $size")
+            }
+        }
+
+        CardDescriptor.setRandomDescriptor()
+
+        log(d.toArrayString())
+        d.trueRandomShuffle()
+        log(d.toArrayString())
+        d.sortToReset()
+        log(d.toArrayString())
+        d.trueRandomShuffle(3)
+        log(d.toArrayString())
+        d.sortToReset()
+        d.trueRandomShuffle(3)
+        log(d.toArrayString())
+
+        /*
+        var total = 0
+        for(c in d) {
+            total+=c.value
+        }
+        log("$total") //total == 364
+        */
+
+        val x = Card.RandomCard + Card.RandomCard
+        log("$x")
+
     }
 
     @Test
@@ -52,8 +163,11 @@ class TestTwo {
 
         d = Deck()
 
-        log("${d.randomCard}")
-        log("${d.getCard(6)}")
+        log("Random card is ${d.randomCard}")
+        log("Random card is ${d.randomCard}")
+        log("Random card is ${d.randomCard}")
+        log("Random card is ${d.randomCard}")
+        log("Random card is ${d.getCard(6)}")
 
         d = Deck()
 
@@ -118,7 +232,7 @@ class TestTwo {
         log("Color only ${d[Color.BLACK]}")
 
         log("Color only ${d[Color.BACK]}")
-        
+
         d.sortByColor()
         log("Sort color ${d.toArrayString()}")
         d.shuffle()
@@ -167,7 +281,7 @@ class TestTwo {
                 print((i * 100) + j)
                 print(" ")
             }
-            println(i.toString() + " loop ends")
+            println("$i loop ends")
         }
 
         println("We are done")
@@ -178,7 +292,7 @@ class TestTwo {
                 print((i * 100) + j)
                 print(" ")
             }
-            println(i.toString() + " loop ends")
+            println("$i loop ends")
         }
 
         println("We are done")
@@ -241,6 +355,8 @@ class TestTwo {
         user.name = "first"
         user.name = "second"
         log(user.name)
+        log(user.name1)
+        log("${user.age}")
 
         val items = listOf(1, 2, 3, 4, 5)
         // Lambdas are code blocks enclosed in curly braces.
@@ -258,21 +374,39 @@ class TestTwo {
         println("joinedToString = $joinedToString")
         println("product = $product")
 
-        fun suitOnly(vararg suit: Suit) {
-
-            when (suit) {
-                Suit.HEARTS -> println("HEARTS")
-                Suit.DIAMONDS -> println("DIAMONDS")
-                Suit.CLUBS -> println("CLUBS")
-                Suit.SPADES -> println("SPADES")
-            }
-        }
-
-        suitOnly(Suit.SPADES, Suit.CLUBS)
-
-        val decked = Deck.suitOnly(Suit.SPADES, Suit.HEARTS)
+        var decked = Deck.suitOnly(Suit.SPADES, Suit.HEARTS)
 
         println("${decked.getDeck()}")
+
+        decked = Deck.numberOnly(2, 3, 4)
+
+        log(decked.toArrayString())
+
+        decked = Deck.colorOnly(Color.BLACK)
+
+        log(decked.toArrayString())
+
+        decked = Deck(Deck())
+
+        log(decked.toArrayString())
+
+        decked = Deck(arrayListOf<Card>().apply {
+            add(Card.RandomCard)
+        })
+
+        log(decked.toArrayString())
+
+        decked = Deck(Deck())
+
+        log(decked.toArrayString())
+
+        decked = Deck(2)
+
+        log(decked.toArrayString())
+
+        decked = Deck(2, true)
+
+        log(decked.toArrayString())
 
     }
 

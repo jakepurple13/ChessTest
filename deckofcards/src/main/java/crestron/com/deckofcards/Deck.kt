@@ -14,6 +14,7 @@ class Deck {
     var deckListener: DeckListener? = null
     private val emptyDeck = CardNotFoundException("Deck is Empty")
 
+    //builders
     class DeckBuilder {
 
         private val cards = mutableListOf<Card>()
@@ -32,30 +33,17 @@ class Deck {
         }
 
         /**
-         * add a card with #suit and a value
+         * add a card with #suit and a #value
          */
         fun card(suit: Suit, value: Int) {
             cards.add(Card(suit, value))
         }
 
         /**
-         * add a random card into the deck
+         * add a card
          */
-        fun randomCard() {
-            fun randomNumber(low: Int, high: Int): Int {
-                return low + (Math.random() * ((high - low) + 1)).toInt()
-            }
-
-            val suit: Suit? = when (randomNumber(1, 4)) {
-                1 -> Suit.SPADES
-                2 -> Suit.CLUBS
-                3 -> Suit.DIAMONDS
-                4 -> Suit.HEARTS
-                else -> {
-                    null
-                }
-            }
-            cards.add(Card(suit!!, randomNumber(1, 13)))
+        fun card(c: Card) {
+            cards.add(c)
         }
 
     }
@@ -72,22 +60,29 @@ class Deck {
 
     }
 
-    private constructor(cards: Collection<Card>) {
-        deckOfCards.addAll(cards)
-    }
-
     companion object Builder {
 
+        /**
+         * Create a deck via DSL
+         */
         fun deck(block: DeckBuilder.() -> Unit): Deck = DeckBuilder().apply(block).build()
 
+        /**
+         * Builds a deck of only [suit]
+         * @return a Deck of [suit]
+         */
         fun suitOnly(vararg suit: Suit): Deck {
-            val d = Deck(null)
+            val d = Deck()
             d.initialize(Suit.SPADES in suit, Suit.CLUBS in suit, Suit.DIAMONDS in suit, Suit.HEARTS in suit)
             return d
         }
 
+        /**
+         * Builds a deck of only [num]s
+         * @return a Deck of [num]s
+         */
         fun numberOnly(vararg num: Int): Deck {
-            val d = Deck(null)
+            val d = Deck()
             for (i in num) {
                 d += Card(Suit.SPADES, i)
                 d += Card(Suit.CLUBS, i)
@@ -97,17 +92,23 @@ class Deck {
             return d
         }
 
+        /**
+         * Builds a deck of only [color]
+         * @return a Deck of [color]
+         */
         fun colorOnly(color: Color): Deck {
-            val d = Deck(null)
+            val d = Deck()
             when (color) {
-                Color.BLACK -> d.initialize(true, true, false, false)
-                Color.RED -> d.initialize(false, false, true, true)
+                Color.BLACK -> d.initialize(spades = true, clubs = true, diamonds = false, hearts = false)
+                Color.RED -> d.initialize(spades = false, clubs = false, diamonds = true, hearts = true)
                 Color.BACK -> throw CardNotFoundException("Cannot Find Back Card")
             }
             return d
         }
+
     }
 
+    //Constructors
     /**
      * A Deck of Cards
      *
@@ -116,7 +117,12 @@ class Deck {
      * @param seed the seed to use if shuffled
      * @param deckListener the listener for shuffling and drawing
      */
-    constructor(shuffler: Boolean = false, numberOfDecks: Int = 1, seed: Long? = null, deckListener: DeckListener? = null) {
+    constructor(
+            shuffler: Boolean = false,
+            numberOfDecks: Int = 1,
+            seed: Long? = null,
+            deckListener: DeckListener? = null
+    ) {
         for (i in 0 until numberOfDecks) {
             initialize()
         }
@@ -128,11 +134,11 @@ class Deck {
     /**
      * A Deck of Cards, unshuffled.
      */
-    constructor() {
-        initialize()
-    }
+    private constructor()
 
-    private constructor(b: Boolean?)
+    private constructor(cards: Collection<Card>) {
+        deckOfCards.addAll(cards)
+    }
 
     constructor(deck: Collection<Card>, deckListener: DeckListener? = null) {
         deckOfCards.addAll(deck)
@@ -227,10 +233,10 @@ class Deck {
      */
     operator fun plusAssign(suit: Suit) {
         when (suit) {
-            Suit.HEARTS -> initialize(false, false, false, true)
-            Suit.DIAMONDS -> initialize(false, false, true, false)
-            Suit.CLUBS -> initialize(false, true, false, false)
-            Suit.SPADES -> initialize(true, false, false, false)
+            Suit.HEARTS -> initialize(spades = false, clubs = false, diamonds = false, hearts = true)
+            Suit.DIAMONDS -> initialize(spades = false, clubs = false, diamonds = true, hearts = false)
+            Suit.CLUBS -> initialize(spades = false, clubs = true, diamonds = false, hearts = false)
+            Suit.SPADES -> initialize(spades = true, clubs = false, diamonds = false, hearts = false)
         }
     }
 
@@ -240,16 +246,18 @@ class Deck {
      */
     operator fun plusAssign(color: Color) {
         when (color) {
-            Color.BLACK -> initialize(true, true, false, false)
-            Color.RED -> initialize(false, false, true, true)
+            Color.BLACK -> initialize(spades = true, clubs = true, diamonds = false, hearts = false)
+            Color.RED -> initialize(spades = false, clubs = false, diamonds = true, hearts = true)
             Color.BACK -> throw CardNotFoundException("Cannot Find Back Card")
         }
     }
 
     /**
-     * removes the card from this deck
+     * removes a card from the deck
      */
-    operator fun minus(c: Card): Card = getCard(c)
+    operator fun minusAssign(c: Card) {
+        getCard(c)
+    }
 
     /**
      * removes num number of cards from this deck
@@ -276,6 +284,10 @@ class Deck {
      */
     operator fun get(start: Int, end: Int): Collection<Card> = deckOfCards.subList(start, end)
 
+    /**
+     * gets all of the cards in [range]
+     * @return a [Collection] of cards that are in the [range]
+     */
     operator fun get(range: IntRange): Collection<Card> = deckOfCards.slice(range)
 
     /**
@@ -283,8 +295,16 @@ class Deck {
      */
     operator fun get(num: Int): Card = deckOfCards[num]
 
+    /**
+     * gets all of the colors of [color]
+     * @return a [Collection] of cards that are [color]s
+     */
     operator fun get(vararg color: Color): Collection<Card> = deckOfCards.filter { color.contains(it.color) }
 
+    /**
+     * gets all of the suits of [suit]
+     * @return a [Collection] of cards that are [suit]s
+     */
     operator fun get(vararg suit: Suit): Collection<Card> = deckOfCards.filter { suit.contains(it.suit) }
 
     operator fun compareTo(num: Int): Int = when {
@@ -321,7 +341,15 @@ class Deck {
         }
     }
 
+    /**
+     * allows iteration
+     */
     operator fun iterator() = deckOfCards.iterator()
+
+    /**
+     * Shorthand to draw from the deck
+     */
+    operator fun unaryMinus() = draw()
 
     /**
      * adds deck to this deck
@@ -339,9 +367,18 @@ class Deck {
      */
     infix fun removeDecks(num: Int) = divAssign(num)
 
+    /**
+     * draws [num] cards from the deck
+     * @return a [Collection] of cards
+     */
     infix fun drawCards(num: Int): Collection<Card> = getCards(num)
 
-    private fun initialize(spades: Boolean = true, clubs: Boolean = true, diamonds: Boolean = true, hearts: Boolean = true) {
+    private fun initialize(
+            spades: Boolean = true,
+            clubs: Boolean = true,
+            diamonds: Boolean = true,
+            hearts: Boolean = true
+    ) {
         for (i in 1..13) {
             if (spades)
                 deckOfCards.add(Card(Suit.SPADES, i))
@@ -428,9 +465,8 @@ class Deck {
     val randomCard: Card
         @Throws(CardNotFoundException::class)
         get() {
-            val gen = Random()
             try {
-                val num = gen.nextInt(deckCount() - 1)
+                val num = CardUtil.randomNumber(1, deckCount() - 1)
                 val c = deckOfCards.removeAt(num)
                 deckListener?.draw(c, deckCount())
                 return c
@@ -438,6 +474,28 @@ class Deck {
                 throw emptyDeck
             }
         }
+
+    /**
+     * Adds a card to the deck.
+     *
+     * @param c Card
+     */
+    fun addCard(c: Card) {
+        deckOfCards.add(c)
+        deckListener?.cardAdded(c)
+    }
+
+    /**
+     * Adds cards to the deck.
+     *
+     * @param c Card
+     */
+    fun addCards(c: Collection<Card>) {
+        deckOfCards.addAll(c)
+        if (deckListener != null)
+            for (i in c)
+                deckListener?.cardAdded(i)
+    }
 
     /**
      * Draws a random card from the deck.
@@ -456,30 +514,17 @@ class Deck {
         }
     }
 
+    /**
+     * Gets a [Collection] of cards from the top of the deck
+     * @param num the number of cards to [draw]
+     * @return a [Collection] of cards
+     */
     fun getCards(num: Int): Collection<Card> {
         val cards = arrayListOf<Card>()
         for (i in 0 until num) {
             cards += draw()
         }
         return cards
-    }
-
-    /**
-     * Adds a card to the deck.
-     *
-     * @param c Card
-     */
-    fun addCard(c: Card) {
-        deckOfCards.add(c)
-    }
-
-    /**
-     * Adds cards to the deck.
-     *
-     * @param c Card
-     */
-    fun addCards(c: Collection<Card>) {
-        deckOfCards.addAll(c)
     }
 
     /**
@@ -502,6 +547,11 @@ class Deck {
         throw CardNotFoundException("Could not find card $check")
     }
 
+    /**
+     * Gets a card out of the deck
+     * @param c the wanted card
+     * @return the card
+     */
     @Throws(CardNotFoundException::class)
     fun getCard(c: Card): Card {
         for (i in deckOfCards.indices) {
@@ -514,13 +564,16 @@ class Deck {
         throw CardNotFoundException("Could not find card $c")
     }
 
+    /**
+     * Get the location of a card
+     * @param c the wanted card
+     * @return the location of [c]
+     */
     @Throws(CardNotFoundException::class)
     fun getCardLocation(c: Card): Int {
-        for (i in deckOfCards.indices) {
-            if (deckOfCards[i].equals(c)) {
-                return i
-            }
-        }
+        val loc = deckOfCards.indexOf(c)
+        if (loc != -1)
+            return loc
         throw CardNotFoundException("Could not find card $c")
     }
 
@@ -633,19 +686,52 @@ class Deck {
         throw CardNotFoundException("Could not find card for the color $color")
     }
 
+    /**
+     * Sorts the deck by color
+     * (Black, Red)
+     */
     fun sortByColor() {
         deckOfCards.sortWith(compareBy { it.color })
     }
 
+    /**
+     * Sorts the deck by card value
+     */
     fun sortByValue() {
         deckOfCards.sortWith(compareBy { it.value })
     }
 
+    /**
+     * Sorts the deck by suit
+     * (Spades, Clubs, Diamonds, Hearts)
+     */
     fun sortBySuit() {
         deckOfCards.sortWith(compareBy { it.suit })
     }
 
-    private fun shuffle(seed: Long?) {
+    /**
+     * Sorts the deck to a brand new deck. Values are Ascending and Suit order (Spades, Clubs, Diamonds, Hearts)
+     */
+    fun sortToReset() {
+        val spadesList = this[Suit.SPADES]//get(Suit.SPADES)
+        val clubsList = this[Suit.CLUBS]
+        val diamondsList = get(Suit.DIAMONDS)
+        val heartsList = get(Suit.HEARTS)
+        clear()
+        deckOfCards.apply {
+            addAll(spadesList.sortedWith(compareBy { it.value }))
+            addAll(clubsList.sortedWith(compareBy { it.value }))
+            addAll(diamondsList.sortedWith(compareBy { it.value }))
+            addAll(heartsList.sortedWith(compareBy { it.value }))
+        }
+    }
+
+    /**
+     * Shuffles the deck.
+     *
+     * @param seed for generation
+     */
+    fun shuffle(seed: Long? = null) {
         val gen: Random = if (seed == null) {
             Random()
         } else {
@@ -660,19 +746,15 @@ class Deck {
     }
 
     /**
-     * Shuffles the deck.
-     */
-    fun shuffle() {
-        shuffle(null)
-    }
-
-    /**
-     * Shuffles the deck.
+     * People say that you need to shuffle a deck 7 times before it is truly shuffled and randomized.
+     * That is what this does.
      *
-     * @param seed for generation
+     * @param seed for generation (Yes, you can seed a true random shuffle if you wish)
      */
-    fun shuffle(seed: Long) {
-        shuffle(seed)
+    fun trueRandomShuffle(seed: Long? = null) {
+        for (i in 1..7) {
+            shuffle(seed)
+        }
     }
 
     /**
@@ -689,8 +771,82 @@ class Deck {
         return temp
     }
 
+    /**
+     * The Deck.
+     *
+     * @return The remaining contents of the deck
+     */
+    fun toNormalString(): String {
+        var temp = ""
+        for (i in deckOfCards.indices) {
+            temp += "${deckOfCards[i].toNormalString()}\n"
+        }
+
+        return temp
+    }
+
+    /**
+     * The Deck.
+     *
+     * @return The remaining contents of the deck
+     */
+    fun toSymbolString(): String {
+        var temp = ""
+        for (i in deckOfCards.indices) {
+            temp += "${deckOfCards[i].toSymbolString()}\n"
+        }
+
+        return temp
+    }
+
+    /**
+     * The Deck.
+     *
+     * @return The remaining contents of the deck
+     */
+    fun toPrettyString(): String {
+        var temp = ""
+        for (i in deckOfCards.indices) {
+            temp += "${deckOfCards[i].toPrettyString()}\n"
+        }
+
+        return temp
+    }
+
+    /**
+     * The Deck in Array String Format
+     *
+     * @return The remaining contents of the deck
+     */
     fun toArrayString(): String {
         return "$deckOfCards"
+    }
+
+    /**
+     * The Deck in Array String Format
+     *
+     * @return The remaining contents of the deck
+     */
+    fun toArrayNormalString(): String {
+        return "[${deckOfCards.joinToString(separator = ", ") { it.toNormalString() }}]"
+    }
+
+    /**
+     * The Deck in Array String Format
+     *
+     * @return The remaining contents of the deck
+     */
+    fun toArraySymbolString(): String {
+        return "[${deckOfCards.joinToString(separator = ", ") { it.toSymbolString() }}]"
+    }
+
+    /**
+     * The Deck in Array String Format
+     *
+     * @return The remaining contents of the deck
+     */
+    fun toArrayPrettyString(): String {
+        return "[${deckOfCards.joinToString(separator = ", ") { it.toPrettyString() }}]"
     }
 
     /**
@@ -739,5 +895,13 @@ class Deck {
          * @param size the size of the deck
          */
         fun draw(c: Card, size: Int)
+
+        /**
+         * when a card is added to the deck
+         * @param c the card that was added
+         */
+        fun cardAdded(vararg c: Card) {
+            println("$c")
+        }
     }
 }
