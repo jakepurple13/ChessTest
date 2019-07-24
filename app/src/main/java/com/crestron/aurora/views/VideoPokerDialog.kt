@@ -28,7 +28,7 @@ class VideoPokerDialog(context: Context?, val currentCard: Card, val hand: Hand,
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.video_poker_dialog)
 
-        window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val wheelView = wheelviews as WheelView<Card>
         wheelView.setWheelAdapter(MyWheelAdapter(context))

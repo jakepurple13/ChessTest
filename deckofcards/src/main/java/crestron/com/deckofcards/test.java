@@ -1,7 +1,5 @@
 package crestron.com.deckofcards;
 
-import org.jetbrains.annotations.NotNull;
-
 public class test {
 
 	public static void main(String[] args) throws CardNotFoundException {
@@ -13,8 +11,8 @@ public class test {
 			System.out.println(d.draw() + "\t" + q.draw());
 		}
 		
-		Deck j = new Deck();
-		j.shuffle(1);
+		Deck j = new Deck(true);
+		j.shuffle(1L);
 		for(int i=0;i<d.deckCount();i++) {
 			//System.out.println(j.draw());
 		}

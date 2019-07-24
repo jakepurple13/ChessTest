@@ -6,12 +6,12 @@
     android:background="@drawable/drkgreen"
     tools:context=".ChoiceActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/choice_app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -24,9 +24,9 @@
                 android:src="@drawable/ic_hamburger"
                 android:tint="@android:color/white" />-->
 
-        </android.support.v7.widget.Toolbar>
+        </androidx.appcompat.widget.Toolbar>
 
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <com.box.shelfview.ShelfView
         android:id="@+id/shelfView"

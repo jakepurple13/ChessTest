@@ -14,9 +14,9 @@ import android.graphics.drawable.Icon
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
-import android.support.annotation.DrawableRes
-import android.support.annotation.RequiresApi
-import android.support.v7.app.AppCompatActivity
+import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Rational
 import android.view.View
 import android.view.WindowManager
@@ -162,13 +162,13 @@ class VideoPlayerActivity : AppCompatActivity() {
             }
 
             override fun onStarted() {
-                updatePictureInPictureActions(R.drawable.ic_media_pause_dark, labelPause,
+                updatePictureInPictureActions(android.R.drawable.ic_media_pause, labelPause,
                         CONTROL_TYPE_PAUSE, REQUEST_PAUSE)
             }
 
             override fun onStopped() {
                 currentPos = mpw_video_player.currentPositionInVideo
-                updatePictureInPictureActions(R.drawable.ic_media_play_dark, labelPlay,
+                updatePictureInPictureActions(android.R.drawable.ic_media_play, labelPlay,
                         CONTROL_TYPE_PLAY, REQUEST_PLAY)
             }
 

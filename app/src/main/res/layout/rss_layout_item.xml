@@ -28,7 +28,7 @@
         tools:ignore="PxUsage"
         android:contentDescription="image" />
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/progressBar4"
@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:text="TextView" />
         </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <TextView
         android:id="@+id/time_info"

@@ -7,13 +7,13 @@ import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.support.v4.app.ActivityOptionsCompat
-import android.support.v4.util.Pair
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.util.Pair
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.Editable
 import android.text.Html
 import android.text.TextWatcher
@@ -30,8 +30,7 @@ import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
-import com.crestron.aurora.utilities.Utility
-import com.crestron.aurora.utilities.ViewUtil
+import com.crestron.aurora.utilities.*
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.like.LikeButton
 import com.peekandpop.shalskar.peekandpop.PeekAndPop
@@ -41,7 +40,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
-import org.jetbrains.anko.textColor
 import uk.co.deanwild.flowtextview.FlowTextView
 import java.net.SocketTimeoutException
 import java.util.*
@@ -99,7 +97,7 @@ class ShowListActivity : AppCompatActivity() {
 
                     button.visibility = View.GONE
                     title.text = Html.fromHtml("<b>${info.name}<b>", Html.FROM_HTML_MODE_COMPACT)
-                    title.textColor = Color.WHITE
+                    title.setTextColor(Color.WHITE)
                     //description_dialog.text = description
                     episodeNumber.text = ""
                     description.textColor = Color.WHITE
@@ -265,8 +263,13 @@ class ShowListActivity : AppCompatActivity() {
         val gen = Random()
 
         random_button.setOnClickListener {
-            val nameAndLink = listOfNameAndLink[gen.nextInt(listOfNameAndLink.size)]
-            actionHit.hit(nameAndLink.name, nameAndLink.url, it)
+            val num = gen.nextInt(listOfNameAndLink.size)
+            show_info.smoothScrollAction(num) {
+                val l = show_info.findViewHolderForAdapterPosition(num) as? ViewHolder
+                l?.layout?.flashScreen(duration = 250)
+            }
+            //val nameAndLink = listOfNameAndLink[gen.nextInt(listOfNameAndLink.size)]
+            //actionHit.hit(nameAndLink.name, nameAndLink.url, it)
         }
 
         search_info.isEnabled = false

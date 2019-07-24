@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.os.Build
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.view.DragEvent
 import android.view.View
 import android.widget.ImageView

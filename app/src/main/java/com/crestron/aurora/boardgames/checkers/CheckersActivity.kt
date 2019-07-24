@@ -3,7 +3,7 @@ package com.crestron.aurora.boardgames.checkers
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.util.DisplayMetrics
 import android.widget.Button
 import android.widget.GridLayout

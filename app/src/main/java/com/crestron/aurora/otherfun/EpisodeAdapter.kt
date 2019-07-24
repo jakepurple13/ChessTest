@@ -1,7 +1,7 @@
 package com.crestron.aurora.otherfun
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +12,7 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.showapi.EpisodeInfo
 import com.crestron.aurora.showapi.ShowInfo
 import kotlinx.android.synthetic.main.episode_info.view.*
 import kotlinx.coroutines.GlobalScope
@@ -21,7 +22,7 @@ import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
 //class EpisodeAdapter(private val items: ArrayList<String>, private val links: ArrayList<String>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
-class EpisodeAdapter(private val items: ArrayList<ShowInfo>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
+class EpisodeAdapter(private val items: ArrayList<EpisodeInfo>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
 
     // Gets the number of animals in the list
     override fun getItemCount(): Int {
@@ -44,13 +45,15 @@ class EpisodeAdapter(private val items: ArrayList<ShowInfo>, private val name: S
 
         holder.watched.text = items[position].name
         holder.episodeDownload.setOnClickListener {
-            action.hit(items[position].name, items[position].url)
+            //action.hit(items[position].name, items[position].url)
+            action.hit(items[position])
         }
 
         holder.slideToDownload.setOnSwipeCompleteListener_forward_reverse(object : OnSwipeCompleteListener {
             override fun onSwipe_Forward(p0: Swipe_Button_View?) {
                 //action.hit(items[position], links[position])
-                action.hit(items[position].name, items[position].url)
+                //action.hit(items[position].name, items[position].url)
+                action.hit(items[position])
             }
 
             override fun onSwipe_Reverse(p0: Swipe_Button_View?) {

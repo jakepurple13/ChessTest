@@ -8,9 +8,9 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.os.Build
-import android.support.annotation.RequiresApi
-import android.support.v4.app.NotificationCompat
-import android.support.v4.app.TaskStackBuilder
+import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import androidx.core.app.TaskStackBuilder
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.FunApplication
 import com.crestron.aurora.Loged

@@ -1,6 +1,6 @@
 package com.crestron.aurora.cardgames.canfield
 
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.crestron.aurora.R
 import crestron.com.deckofcards.Card
@@ -24,9 +24,9 @@ class CanfieldActivity : AppCompatActivity() {
 
     private fun setUp() {
         val c = deck.getFirstCardByValue(Random().nextInt(13) + 1)
-        val c1 = deck - Card(Suit.CLUBS, c.value)
-        val c2 = deck - Card(Suit.DIAMONDS, c.value)
-        val c3 = deck - Card(Suit.HEARTS, c.value)
+        deck -= Card(Suit.CLUBS, c.value)
+        deck -= Card(Suit.DIAMONDS, c.value)
+        deck -= Card(Suit.HEARTS, c.value)
 
 
 

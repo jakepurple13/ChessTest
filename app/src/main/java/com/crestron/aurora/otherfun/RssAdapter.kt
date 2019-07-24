@@ -3,7 +3,7 @@ package com.crestron.aurora.otherfun
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +15,6 @@ import com.crestron.aurora.views.StickHeaderItemDecoration
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.rss_layout_item.view.*
 import org.jetbrains.anko.runOnUiThread
-import org.jetbrains.anko.textColor
 
 
 class RssAdapter(var stuff: List<RssActivity.MainInfo>, var context: Context, val adapterListener: RssActivity.RssAdapterListener? = null) : RecyclerView.Adapter<RssAdapter.BaseHolder>(), StickHeaderItemDecoration.StickyHeaderInterface {
@@ -89,7 +88,7 @@ class RssAdapter(var stuff: List<RssActivity.MainInfo>, var context: Context, va
             val information = stuff[position] as RssActivity.MALInfo
 
             holder.info.text = Html.fromHtml("<b>${information.title}<b>", Html.FROM_HTML_MODE_COMPACT)
-            holder.info.textColor = Color.WHITE
+            holder.info.setTextColor(Color.WHITE)
             holder.des.text = information.description
             //holder.timeInfo.text = information.time
             holder.timeInfo.text = information.episodeNumber

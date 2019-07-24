@@ -8,7 +8,7 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.ViewUtil
 
-class TypeWriter : android.support.v7.widget.AppCompatTextView {
+class TypeWriter : androidx.appcompat.widget.AppCompatTextView {
 
     private var mText: CharSequence? = null
     private var mIndex = 0

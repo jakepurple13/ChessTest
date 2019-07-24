@@ -11,11 +11,11 @@ import android.media.ThumbnailUtils
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +34,7 @@ import com.squareup.picasso.Picasso
 import com.squareup.picasso.Request
 import com.squareup.picasso.RequestHandler
 import com.tonyodev.fetch2.Fetch
+import com.tonyodev.fetch2core.Func
 import github.nisrulz.recyclerviewhelper.RVHAdapter
 import github.nisrulz.recyclerviewhelper.RVHItemTouchHelperCallback
 import hb.xvideoplayer.MxUtils
@@ -182,8 +183,10 @@ class ViewVideosActivity : AppCompatActivity() {
         val filter = IntentFilter().apply {
             addAction(ConstantValues.BROADCAST_VIDEO)
         }
-        if (Fetch.getDefaultInstance().hasActiveDownloads)
-            registerReceiver(br, filter)
+        Fetch.getDefaultInstance().hasActiveDownloads(true, Func {
+            if (it)
+                registerReceiver(br, filter)
+        })
     }
 
     private fun getListFiles2(parentDir: File): ArrayList<File> {
@@ -329,7 +332,7 @@ class ViewVideosActivity : AppCompatActivity() {
                 val duration = mp.duration.toLong()
                 mp.release()
                 /*convert millis to appropriate time*/
-                val runTimeString = if(duration>TimeUnit.HOURS.toMillis(1)) {
+                val runTimeString = if (duration > TimeUnit.HOURS.toMillis(1)) {
                     String.format("%02d:%02d:%02d",
                             TimeUnit.MILLISECONDS.toHours(duration),
                             TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration)),
@@ -342,9 +345,7 @@ class ViewVideosActivity : AppCompatActivity() {
                 holder.videoRuntime.text = runTimeString
                 context.runOnUiThread {
                     //Thumbnail image
-                    picasso.load(VideoRequestHandler.SCHEME_VIDEO + ":" + stuff[position].path)?.
-                            transform(RoundedCornersTransformation(5, 5))?.
-                            into(holder.videoThumbnail)
+                    picasso.load(VideoRequestHandler.SCHEME_VIDEO + ":" + stuff[position].path)?.transform(RoundedCornersTransformation(5, 5))?.into(holder.videoThumbnail)
                 }
                 //to play video
                 holder.videoLayout.setOnClickListener {

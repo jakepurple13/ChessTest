@@ -3,8 +3,8 @@ package com.crestron.aurora;
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.FirebaseInstanceIdService;
 
+/*
 public class FirebaseMessage extends FirebaseInstanceIdService {
 
     @Override
@@ -20,3 +20,4 @@ public class FirebaseMessage extends FirebaseInstanceIdService {
     }
 
 }
+*/

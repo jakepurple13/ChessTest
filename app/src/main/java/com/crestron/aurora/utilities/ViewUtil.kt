@@ -6,9 +6,9 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Handler
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.ActivityOptionsCompat
-import android.support.v7.widget.RecyclerView
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewTreeObserver

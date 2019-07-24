@@ -1,7 +1,7 @@
 package com.crestron.aurora.cardgames.hilo
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.AnimationUtility
@@ -54,9 +54,9 @@ class HiLoActivity : AppCompatActivity() {
 
                         //chosen_cards.setImageResource(mysteryCard!!.getImage(this@HiLoActivity))
                         val winned = when {
-                            playerCard!!.ace() == mysteryCard!!.ace() -> null
-                            condition -> playerCard!!.ace() < mysteryCard!!.ace()
-                            else -> playerCard!!.ace() > mysteryCard!!.ace()
+                            playerCard!!.value == mysteryCard!!.value -> null
+                            condition -> playerCard!!.value < mysteryCard!!.value
+                            else -> playerCard!!.value > mysteryCard!!.value
                         }
 
                         win_choose.text = when {

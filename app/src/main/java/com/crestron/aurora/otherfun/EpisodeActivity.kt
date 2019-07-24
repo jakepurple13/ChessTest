@@ -9,13 +9,13 @@ import android.content.Intent
 import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.app.NotificationCompat
-import android.support.v4.app.TaskStackBuilder
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.core.app.NotificationCompat
+import androidx.core.app.TaskStackBuilder
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -29,6 +29,7 @@ import com.crestron.aurora.R
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeApi
+import com.crestron.aurora.showapi.EpisodeInfo
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.Utility
@@ -57,7 +58,7 @@ class EpisodeActivity : AppCompatActivity() {
 
     private val listOfUrls = arrayListOf<String>()
     private val listOfNames = arrayListOf<String>()
-    private val listOfEpisodes = arrayListOf<ShowInfo>()
+    private val listOfEpisodes = arrayListOf<EpisodeInfo>()
 
     lateinit var mNotificationManager: NotificationManager
     lateinit var url: String
@@ -321,7 +322,18 @@ class EpisodeActivity : AppCompatActivity() {
                         FetchingUtils.downloadCount++
                         Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
                         GlobalScope.launch {
-                            fetching.getVideo(url, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
+                            fetching.getVideo(EpisodeInfo(name, url), if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
+                                    KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
+                                    KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
+                        }
+                    }
+
+                    override fun hit(info: EpisodeInfo) {
+                        super.hit(name, url)
+                        FetchingUtils.downloadCount++
+                        Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
+                        GlobalScope.launch {
+                            fetching.getVideo(info, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
                                     KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
                                     KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
                         }
@@ -381,7 +393,18 @@ class EpisodeActivity : AppCompatActivity() {
                         FetchingUtils.downloadCount++
                         Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
                         GlobalScope.launch {
-                            fetching.getVideo(url, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
+                            fetching.getVideo(EpisodeInfo(name, url), if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
+                                    KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
+                                    KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
+                        }
+                    }
+
+                    override fun hit(info: EpisodeInfo) {
+                        super.hit(name, url)
+                        FetchingUtils.downloadCount++
+                        Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
+                        GlobalScope.launch {
+                            fetching.getVideo(info, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
                                     KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
                                     KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
                         }
@@ -410,9 +433,9 @@ class EpisodeActivity : AppCompatActivity() {
                         }
                     }) // the multi select model list with ids and name
                     .onSubmit(object : MultiSelectDialog.SubmitCallbackListener {
-                        override fun onSelected(selectedIds: java.util.ArrayList<Int>?, selectedNames: java.util.ArrayList<String>?, dataString: String?) {
+                        override fun onSelected(selectedIds: ArrayList<Int>?, selectedNames: ArrayList<String>?, dataString: String?) {
 
-                            val urlList = arrayListOf<String>().apply {
+                            val urlList = arrayListOf<EpisodeInfo>().apply {
                                 for (i in 0 until selectedIds!!.size) {
                                     /*Toast.makeText(this@EpisodeActivity, "Selected Ids : " + selectedIds[i] + "\n" +
                                             "Selected Names : " + selectedNames!![i] + "\n" +
@@ -420,7 +443,7 @@ class EpisodeActivity : AppCompatActivity() {
                                     Loged.e("Selected Ids : " + selectedIds[i] + "\n" +
                                             "Selected Names : " + selectedNames!![i] + "\n" +
                                             "DataString : " + dataString)
-                                    add(listOfEpisodes[selectedIds[i]].url)
+                                    add(listOfEpisodes[selectedIds[i]])
                                 }
                             }
 
@@ -654,6 +677,9 @@ class EpisodeActivity : AppCompatActivity() {
     interface EpisodeAction {
         fun hit(name: String, url: String) {
             Loged.wtf("$name: $url")
+        }
+        fun hit(info: EpisodeInfo) {
+            Loged.wtf("$info")
         }
     }
 

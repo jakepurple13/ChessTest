@@ -26,14 +26,14 @@ def packageName = 'com.crestron.aurora'
 def libraryVersion = '1.0.0'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.crestron.aurora"
         minSdkVersion 24
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
-        versionName "8.1"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        versionName "9.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -62,19 +62,19 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.github.jakepurple13:HelperUtils2:v1.74'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation 'com.android.support:preference-v7:+'
-    implementation 'com.android.support:preference-v14:+'
-    implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.google.firebase:firebase-core:16.0.3'
-    implementation 'com.google.firebase:firebase-messaging:17.3.2'
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.core:core-ktx:1.0.2'
+    implementation 'androidx.collection:collection-ktx:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'com.google.firebase:firebase-core:17.0.1'
+    implementation 'com.google.firebase:firebase-messaging:19.0.1'
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.1'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation project(':deckofcards')
     implementation project(':library')
@@ -83,32 +83,30 @@ dependencies {
     implementation project(':wheelview')
     implementation project(':xvideoplayer')
     implementation 'com.github.jinatonic.confetti:confetti:1.1.1'
-    implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.plattysoft.leonids:LeonidsLib:1.3.2'
     implementation 'com.github.IONsoft-Indonesia:RandomNumberAnimation:1.3.1'
     //implementation 'androidx.core:core-ktx:1.0.0-alpha1'
-    implementation "androidx.core:core-ktx:$rootProject.ktxVersion"
     implementation 'org.jetbrains.kotlinx:kotlinx-html-jvm:+'
     // include for client-side
     implementation 'org.jetbrains.kotlinx:kotlinx-html-js:+'
     implementation 'org.jetbrains.anko:anko-commons:+'
     //implementation "org.jetbrains.anko:anko:+"
-    implementation "com.tonyodev.fetch2:fetch2:2.3.6"
-    implementation 'com.tonyodev.fetch2okhttp:fetch2okhttp:2.3.6'
-    implementation 'com.tonyodev.fetch2fileserver:fetch2fileserver:2.3.6'
-    implementation 'org.jsoup:jsoup:1.11.3'
+    implementation "androidx.tonyodev.fetch2:xfetch2:3.1.4"
+    implementation "androidx.tonyodev.fetch2okhttp:xfetch2okhttp:3.1.4"
+    implementation "androidx.tonyodev.fetch2fileserver:xfetch2fileserver:3.1.4"
+    implementation 'org.jsoup:jsoup:1.12.1'
     // Room components
-    implementation "android.arch.persistence.room:runtime:$rootProject.roomVersion"
-    annotationProcessor "android.arch.persistence.room:compiler:$rootProject.roomVersion"
-    androidTestImplementation "android.arch.persistence.room:testing:$rootProject.roomVersion"
+    implementation 'androidx.room:room-runtime:2.1.0'
+    annotationProcessor 'androidx.room:room-compiler:2.1.0'
+    androidTestImplementation 'androidx.room:room-testing:2.1.0'
     // Lifecycle components
-    implementation "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
-    annotationProcessor "android.arch.lifecycle:compiler:$rootProject.archLifecycleVersion"
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.0.0'
     implementation 'com.facebook.stetho:stetho:1.5.0'
-    implementation 'com.nabinbhandari.android:permissions:3.6'
+    implementation 'com.nabinbhandari.android:permissions:3.8'
     implementation 'com.obsez.android.lib.filechooser:filechooser:1.1.10'
     implementation 'com.github.codekidX:storage-chooser:2.0.4.2'
-    implementation('com.crashlytics.sdk.android:crashlytics:2.9.6@aar') {
+    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
         transitive = true
     }
     implementation 'com.squareup.picasso:picasso:2.71828'
@@ -117,7 +115,7 @@ dependencies {
     implementation 'com.github.antonKozyriatskyi:DevDrawer:1.0'
     implementation 'com.github.kittinunf.fuel:fuel-android:1.15.0'
     implementation 'com.evernote:android-job:1.2.6'
-    implementation 'com.github.myinnos:AlphabetIndex-Fast-Scroll-RecyclerView:1.0.92'
+    implementation 'com.github.myinnos:AlphabetIndex-Fast-Scroll-RecyclerView:+'
     implementation 'com.github.abumoallim:Android-Multi-Select-Dialog:v1.9'
     implementation 'com.prof.rssparser:rssparser:1.4.4'
     implementation 'com.github.jd-alexander:LikeButton:0.2.3'
@@ -133,7 +131,6 @@ dependencies {
     //implementation 'com.wx.wheelview:wheelview:1.3.3'
     implementation 'com.github.shalskar:PeekAndPop:1.1.0'
     implementation "com.github.skydoves:powermenu:2.0.5"
-    implementation "com.android.support:cardview-v7:+"
     implementation("com.mikepenz:materialdrawer:6.0.8@aar") {
         transitive = true
     }
@@ -142,13 +139,13 @@ dependencies {
     implementation 'com.mikepenz:fontawesome-typeface:5.3.1.1@aar' //FontAwesome
     //implementation 'co.zsmb:materialdrawer-kt:1.3.7'
     implementation "com.github.nisrulz:recyclerviewhelper:+"
-    implementation 'com.android.support:palette-v7:28.0.0'
     implementation 'com.github.Binary-Finery:Bungee:master-SNAPSHOT'
     implementation 'hari.floatingtoast:floatingtoast:0.1.0'
     implementation 'com.kaopiz:kprogresshud:1.2.0'
     implementation 'mobi.upod:time-duration-picker:1.1.3'
     implementation 'jp.wasabeef:picasso-transformations:2.2.1'
-    implementation 'android.arch.navigation:navigation-fragment:1.0.0-rc02'
+    implementation 'androidx.navigation:navigation-fragment:2.1.0-beta02'
+    implementation 'androidx.palette:palette:1.0.0'
     // If you want to use the GPU Filters
     //implementation 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
 

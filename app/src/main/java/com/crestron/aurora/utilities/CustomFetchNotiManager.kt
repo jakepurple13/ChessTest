@@ -1,3 +1,4 @@
+/*
 package com.crestron.aurora.utilities
 
 import android.app.AlarmManager
@@ -9,8 +10,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
-import android.support.v4.app.NotificationCompat
-import android.support.v4.app.TaskStackBuilder
+import androidx.core.app.NotificationCompat
+import androidx.core.app.TaskStackBuilder
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.R
 import com.crestron.aurora.otherfun.*
@@ -159,7 +160,8 @@ open class CustomFetchNotiManager(context: Context) : FetchNotificationManager {
         val actions = getPauseOrResumeAction(downloadNotification)
         if (actions != null)
             notificationBuilder.addAction(actions)
-        /*when {
+        */
+/*when {
             downloadNotification.isDownloading -> {
                 notificationBuilder.addAction(R.drawable.fetch_notification_pause,
                         context.getString(R.string.fetch_notification_download_pause),
@@ -176,7 +178,8 @@ open class CustomFetchNotiManager(context: Context) : FetchNotificationManager {
                                 context.getString(R.string.fetch_notification_download_cancel),
                                 getActionPendingIntent(downloadNotification, DownloadNotification.ActionType.CANCEL))
             }
-        }*/
+        }*//*
+
         val cancelIntent = Intent(context, NotificationBroadcastReceiver::class.java).apply {
             action = "fun.com.crestron.CANCEL_DOWNLOAD"
             putExtra(ConstantValues.NOTIFICATION_ID, downloadNotification.notificationId)
@@ -380,4 +383,4 @@ open class CustomFetchNotiManager(context: Context) : FetchNotificationManager {
         }
     }
 
-}
+}*/

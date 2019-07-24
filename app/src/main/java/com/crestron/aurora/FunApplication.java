@@ -19,8 +19,8 @@ import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.graphics.Palette;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.palette.graphics.Palette;
 
 import com.crashlytics.android.Crashlytics;
 import com.crestron.aurora.otherfun.DownloadViewerActivity;
@@ -28,7 +28,6 @@ import com.crestron.aurora.otherfun.FetchingUtils;
 import com.crestron.aurora.otherfun.ShowListActivity;
 import com.crestron.aurora.otherfun.ViewVideosActivity;
 import com.crestron.aurora.showapi.Source;
-import com.crestron.aurora.utilities.CustomFetchNotiManager;
 import com.crestron.aurora.utilities.KUtility;
 import com.crestron.aurora.utilities.Utility;
 import com.evernote.android.job.JobManager;
@@ -36,13 +35,14 @@ import com.facebook.stetho.Stetho;
 import com.google.firebase.FirebaseApp;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.tonyodev.fetch2.DefaultFetchNotificationManager;
 import com.tonyodev.fetch2.Fetch;
 import com.tonyodev.fetch2.FetchConfiguration;
 import com.tonyodev.fetch2.HttpUrlConnectionDownloader;
 import com.tonyodev.fetch2.NetworkType;
 import com.tonyodev.fetch2core.Downloader;
 
-import org.jsoup.Jsoup;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -83,7 +83,13 @@ public class FunApplication extends Application {
                 .setGlobalNetworkType(wifiOnly ? NetworkType.WIFI_ONLY : NetworkType.ALL)
                 .setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
                 .setDownloadConcurrentLimit(sharedPreferences.getInt("downloadNumber", 1))
-                .setNotificationManager(new CustomFetchNotiManager(this))
+                .setNotificationManager(new DefaultFetchNotificationManager(this) {
+                    @NotNull
+                    @Override
+                    public Fetch getFetchInstanceForNamespace(@NotNull String s) {
+                        return Fetch.Impl.getDefaultInstance();
+                    }
+                })//CustomFetchNotiManager(this))
                 .build();
         Fetch.Impl.setDefaultInstanceConfiguration(fetchConfiguration);
 
@@ -240,7 +246,13 @@ public class FunApplication extends Application {
                 .setGlobalNetworkType(wifiOnly ? NetworkType.WIFI_ONLY : NetworkType.ALL)
                 .setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
                 .setDownloadConcurrentLimit(sharedPreferences.getInt("downloadNumber", 1))
-                .setNotificationManager(new CustomFetchNotiManager(context))
+                .setNotificationManager(new DefaultFetchNotificationManager(context) {
+                    @NotNull
+                    @Override
+                    public Fetch getFetchInstanceForNamespace(@NotNull String s) {
+                        return Fetch.Impl.getDefaultInstance();
+                    }
+                })//CustomFetchNotiManager(context))
                 .build();
         Fetch.Impl.setDefaultInstanceConfiguration(fetchConfiguration);
     }

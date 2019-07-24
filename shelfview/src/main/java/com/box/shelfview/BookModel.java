@@ -1,7 +1,7 @@
 package com.box.shelfview;
 
-import android.support.annotation.DrawableRes;
-import android.support.annotation.RawRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.RawRes;
 
 public class BookModel {
     private String bookCoverSource;

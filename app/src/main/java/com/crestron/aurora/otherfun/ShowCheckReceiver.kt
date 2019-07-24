@@ -7,21 +7,24 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.support.v4.app.NotificationCompat
-import android.support.v4.app.TaskStackBuilder
+import androidx.core.app.NotificationCompat
+import androidx.core.app.TaskStackBuilder
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
+import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.KUtility
+import com.crestron.aurora.utilities.intersect
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class ShowCheckReceiver : BroadcastReceiver() {
     @SuppressLint("SimpleDateFormat")
@@ -84,7 +87,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 val showDatabase = ShowDatabase.getDatabase(this@ShowCheckIntentService)
                 var count = 0
                 //gets the list from the source
-                val showApi = ShowApi(Source.RECENT_ANIME).showInfoList
+                val showApi = ShowApi(Source.RECENT_ANIME).showInfoList as ArrayList<ShowInfo>
                 showApi.addAll(ShowApi(Source.RECENT_CARTOON).showInfoList)
                 //this part filters the two lists with the list in the database
                 val filteredList = showApi.distinctBy { it.url }
@@ -93,10 +96,14 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 val aColIds = shows.asSequence().map { it.link }.toSet()
                 val bColIds = filteredList.filter { it.url in aColIds }
 
-                for ((prog, i) in bColIds.withIndex()) {
+                val filtered = filteredList.intersect(shows) { one, two ->
+                    one.url == two.link
+                }
+                for ((prog, i) in filtered.withIndex()) {
+                //for ((prog, i) in bColIds.withIndex()) {
                     sendRunningNotification(this@ShowCheckIntentService,
                             android.R.mipmap.sym_def_app_icon,
-                            "updateCheckRun", 2, prog + 1, bColIds.size, i.name)
+                            "updateCheckRun", 2, prog + 1, filtered.size, i.name)
                     try {
                         Loged.i("Checking ${i.name}")
                         val showList = EpisodeApi(i).episodeList.size

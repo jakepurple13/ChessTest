@@ -6,11 +6,11 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
-import android.support.v4.app.ActivityOptionsCompat
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.core.app.ActivityOptionsCompat
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.Html
 import android.view.View
 import android.widget.Button
@@ -29,7 +29,6 @@ import kotlinx.android.synthetic.main.activity_favorites_show.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
-import org.jetbrains.anko.textColor
 import uk.co.deanwild.flowtextview.FlowTextView
 import java.util.*
 
@@ -142,7 +141,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
 
                                 button.visibility = View.GONE
                                 title.text = Html.fromHtml("<b>${info.name}<b>", Html.FROM_HTML_MODE_COMPACT)
-                                title.textColor = Color.WHITE
+                                title.setTextColor(Color.WHITE)
                                 episodeNumber.text = ""
                                 description.textColor = Color.WHITE
                                 description.setTextSize(episodeNumber.textSize)

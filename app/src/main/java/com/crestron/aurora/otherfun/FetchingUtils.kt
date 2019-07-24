@@ -8,6 +8,7 @@ import android.webkit.MimeTypeMap
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.FunApplication
 import com.crestron.aurora.Loged
+import com.crestron.aurora.showapi.EpisodeInfo
 import com.google.gson.Gson
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
@@ -141,169 +142,16 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         return file
     }
 
-    fun getVideo(urlToUse: String, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.async {
-        if (urlToUse.contains("gogoanime")) {
-            Loged.i(urlToUse)
-            val doc = Jsoup.connect(urlToUse).get()
-            //val vid = doc.select("div.vmn-video").select("script")
-            val downloadLink = doc.select("a[download^=http]").attr("abs:download")
-            /*val htmld = doc.html()//getHtml(urlToUse)
-            //Loged.w(vid[1].data())
-            //val js = vid[1].data()
-            val m = "file: \\\"([^\\\"]+)\\\"," //"(file:(\\s*))+(\"(.*?)\")"
-                    .toRegex().toPattern().matcher(htmld)
-            while (m.find()) {
-                val s = m.group(1)
-                Loged.d(s)
-            }*/
-            fetchIt(downloadLink, true, networkType, keyAndValue)
-        } else {
-            //Loged.d("${fetching.canReachSite(urlToUse).await()}")
-
-            //ex "http://www.animeplus.tv/satsuriku-no-tenshi-episode-5-online"
-
-            //http://videowing.gogoanime.to/embed?w=600&h=438&video=ongoing/satsuriku_no_tenshi_-_05.mp4
-            val htmld = getHtml(urlToUse)
-            val m = "<iframe src=\"([^\"]+)\"[^<]+<\\/iframe>".toRegex().toPattern().matcher(htmld)
-            var s = ""
-            val list = arrayListOf<String>()
-            while (m.find()) {
-                val g = m.group(1)
-                s += g + "\n"
-                list.add(g)
-            }
-
-            Loged.wtf(s)
-
-            val regex = "(http|https):\\/\\/([\\w+?\\.\\w+])+([a-zA-Z0-9\\~\\%\\&\\-\\_\\?\\.\\=\\/])+(part[0-9])+.(\\w*)"
-
-            //"[http\\:\\/\\/](\\w*)[part][0-9]"
-
-            val htmlc = if (regex.toRegex().toPattern().matcher(list[0]).find()) {
-                Loged.i("ArrayList")
-                list
-            } else {
-                Loged.i("String")
-                getHtml(list[0])
-            }
-
-            //val htmlc = getHtml(list[0])
-
-            Loged.i("Starting video part")
-
-            when (htmlc) {
-                is ArrayList<*> -> {
-                    val urlList = arrayListOf<String>()
-                    for (info in htmlc) {
-                        val reg = "var video_links = (\\{.*?\\});".toRegex().toPattern().matcher(getHtml(info.toString()))
-                        Loged.wtf("Here with $info")
-                        while (reg.find()) {
-                            val d = reg.group(1)
-                            Loged.wtf(d)
-                            Loged.e("We in here")
-                            val g = Gson()
-                            val d1 = g.fromJson<NormalLink>(d, NormalLink::class.java)
-
-                            Loged.wtf(d1.toString())
-
-                            /*if (d1.normal.storage[0].link.isNullOrBlank())
-                        continue
-                    else*/
-
-                            urlList.add(d1.normal.storage[0].link)
-
-                        }
-                    }
-                    fetchIt(urlList, true, networkType, keyAndValue)
-                }
-                is String -> {
-                    val reg = "var video_links = (\\{.*?\\});".toRegex().toPattern().matcher(htmlc)
-                    Loged.wtf("Here")
-                    while (reg.find()) {
-                        val d = reg.group(1)
-                        Loged.wtf(d)
-                        Loged.e("We in here")
-                        val g = Gson()
-                        val d1 = g.fromJson<NormalLink>(d, NormalLink::class.java)
-
-                        Loged.wtf(d1.toString())
-
-                        /*if (d1.normal.storage[0].link.isNullOrBlank())
-                    continue
-                else*/
-                        fetchIt(d1.normal.storage[0].link, true, networkType, keyAndValue)
-
-                    }
-
-                    Loged.d("DONE!")
-                }
-            }
-        }
+    fun getVideo(urlToUse: EpisodeInfo, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.async {
+        fetchIt(urlToUse.getVideoLinks(), true, networkType, keyAndValue)
     }
 
-    fun getVideo(urlToUse: Collection<String>, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.async {
-        //Loged.d("${fetching.canReachSite(urlToUse).await()}")
-
-        //ex "http://www.animeplus.tv/satsuriku-no-tenshi-episode-5-online"
-
-        //http://videowing.gogoanime.to/embed?w=600&h=438&video=ongoing/satsuriku_no_tenshi_-_05.mp4
+    fun getVideo(urlToUse: Collection<EpisodeInfo>, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.async {
 
         val urlList = arrayListOf<String>()
 
-        for (i in urlToUse) {
-            Loged.i(i)
-            if (i.contains("gogoanime")) {
-                val doc = Jsoup.connect(i).get()
-                //val vid = doc.select("div.vmn-video").select("script")
-                val downloadLink = doc.select("a[download^=http]").attr("abs:download")
-                /*val htmld = doc.html()//getHtml(urlToUse)
-                //Loged.w(vid[1].data())
-                //val js = vid[1].data()
-                val m = "file: \\\"([^\\\"]+)\\\"," //"(file:(\\s*))+(\"(.*?)\")"
-                        .toRegex().toPattern().matcher(htmld)
-                while (m.find()) {
-                    val s = m.group(1)
-                    Loged.d(s)
-                }*/
-                //fetchIt(downloadLink, true, networkType, keyAndValue)
-                urlList.add(downloadLink)
-            } else {
-                val htmld = getHtml(i)
-                val m = "<iframe src=\"([^\"]+)\"[^<]+<\\/iframe>".toRegex().toPattern().matcher(htmld)
-                var s = ""
-                val list = arrayListOf<String>()
-                while (m.find()) {
-                    val g = m.group(1)
-                    s += g + "\n"
-                    list.add(g)
-                }
-
-                Loged.wtf(s)
-
-                val htmlc = getHtml(list[0])
-
-                Loged.i("Starting video part")
-
-                val reg = "var video_links = (\\{.*?\\});".toRegex().toPattern().matcher(htmlc)
-                Loged.wtf("Here")
-                while (reg.find()) {
-                    val d = reg.group(1)
-                    Loged.wtf(d)
-                    Loged.e("We in here")
-                    val g = Gson()
-                    val d1 = g.fromJson<NormalLink>(d, NormalLink::class.java)
-
-                    Loged.wtf(d1.toString())
-
-                    /*if (d1.normal.storage[0].link.isNullOrBlank())
-                continue
-            else*/
-                    urlList.add(d1.normal.storage[0].link)
-                    break
-
-                }
-            }
-
+        for(i in urlToUse) {
+            urlList += i.getVideoLink()
         }
 
         fetchIt(urlList, true, networkType, keyAndValue)

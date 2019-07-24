@@ -14,7 +14,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.os.Handler;
-import android.support.v7.app.ActionBar;
+import androidx.appcompat.app.ActionBar;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -1013,6 +1013,7 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
         MxVideoPlayerManager.completeAll();
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     public void autoFullscreen(float x) {
         Log.i(TAG, "autoFullscreen: [" + this.hashCode() + "] ");

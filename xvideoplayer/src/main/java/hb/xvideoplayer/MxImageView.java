@@ -9,7 +9,7 @@ import android.util.Log;
  * NOTE! Can not fullscreen RelativeLayout, need to nest a LinearLayout
  * onMeasure与MxTextureView里的相同, 参考VideoView中的onMeasure
  */
-public class MxImageView extends android.support.v7.widget.AppCompatImageView {
+public class MxImageView extends androidx.appcompat.widget.AppCompatImageView {
     protected static final String TAG = "MxImageView";
     protected static final boolean DEBUG = false;
 

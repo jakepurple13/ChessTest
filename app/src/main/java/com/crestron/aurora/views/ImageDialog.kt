@@ -10,9 +10,8 @@ import com.crestron.aurora.R
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.image_dialog_layout.*
 import org.jetbrains.anko.runOnUiThread
-import org.jetbrains.anko.textColor
 
-class ImageDialog(context: Context?, val title: String, val description: String, private val episodeNumber: String, private val imageLink: String) : Dialog(context) {
+class ImageDialog(context: Context?, val title: String, val description: String, private val episodeNumber: String, private val imageLink: String) : Dialog(context!!) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,7 +20,7 @@ class ImageDialog(context: Context?, val title: String, val description: String,
 
         setTitle(title)
         title_dialog.text = Html.fromHtml("<b>$title<b>", Html.FROM_HTML_MODE_COMPACT)
-        title_dialog.textColor = Color.WHITE
+        title_dialog.setTextColor(Color.WHITE)
         //description_dialog.text = description
         episode_number_dialog.text = episodeNumber
         ftv.text = description

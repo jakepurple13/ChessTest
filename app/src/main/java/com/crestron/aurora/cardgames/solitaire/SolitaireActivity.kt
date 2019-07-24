@@ -5,10 +5,10 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -193,7 +193,7 @@ class SolitaireActivity : AppCompatActivity() {
         fun startingFound(c: Card, list: ArrayList<Card>) {
             try {
                 //list.add(deckOfCards.getCard(c))
-                list.add(deckOfCards - c)
+                list.add(deckOfCards.getCard(c))
                 /* when {
                      foundation1.isEmpty() -> foundation1
                      foundation2.isEmpty() -> foundation2
