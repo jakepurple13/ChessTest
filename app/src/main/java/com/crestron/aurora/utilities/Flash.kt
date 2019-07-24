@@ -13,8 +13,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import com.crestron.aurora.Loged
 import com.crestron.aurora.R
-import kotlinx.android.synthetic.main.download_item.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -80,6 +80,62 @@ fun <T : ViewGroup> T.flashScreen(
     rl.z = Float.MAX_VALUE
 
     addView(rl, params1)
+
+    rl.alpha = 1f
+    rl.animate()
+            .alpha(0f)
+            .setDuration(duration)
+            .setInterpolator(FastOutLinearInInterpolator())
+            .withEndAction {
+                rl.alpha = 0f
+                removeView(rl)
+                doOnEnd()
+            }
+            .start()
+}
+
+/**
+ * Flashes a ViewGroup
+ * @see flash
+ */
+fun <T : ViewGroup> T.flashScreen(
+        color: Int = Color.WHITE,
+        duration: Long = 500
+) = GlobalScope.launch(Dispatchers.Main) {
+    val params1 = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)
+    val rl = RelativeLayout(context)
+    rl.setBackgroundColor(color)
+    rl.z = Float.MAX_VALUE
+
+    addView(rl, params1)
+
+    rl.alpha = 1f
+    rl.animate()
+            .alpha(0f)
+            .setDuration(duration)
+            .setInterpolator(FastOutLinearInInterpolator())
+            .withEndAction {
+                rl.alpha = 0f
+                removeView(rl)
+            }
+            .start()
+}
+
+/**
+ * Flashes a ViewGroup
+ * @see flash
+ */
+fun <T : ViewGroup> T.flashScreen(
+        color: Int = Color.WHITE,
+        duration: Long = 500,
+        paramSetup: RelativeLayout.LayoutParams,
+        doOnEnd: () -> Unit = {}
+) = GlobalScope.launch(Dispatchers.Main) {
+    val rl = RelativeLayout(context)
+    rl.setBackgroundColor(color)
+    rl.z = Float.MAX_VALUE
+
+    addView(rl, paramSetup)
 
     rl.alpha = 1f
     rl.animate()

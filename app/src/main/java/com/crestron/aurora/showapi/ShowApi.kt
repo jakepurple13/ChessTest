@@ -103,12 +103,14 @@ class ShowApi(private val source: Source) {
     }
 
     private fun gogoAnimeMovies(): ArrayList<ShowInfo> {
-        return gogoAnimeAll().filter {
+        val list = gogoAnimeAll().filter {
             it.name.contains(
                     "movie",
                     ignoreCase = true
             )
         } as ArrayList<ShowInfo>
+        list.sortBy { it.name }
+        return list
     }
 
     private fun getRecentList(): ArrayList<ShowInfo> {

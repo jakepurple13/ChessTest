@@ -20,7 +20,9 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.FormActivity
 import com.crestron.aurora.Loged
@@ -38,6 +40,7 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_show_list.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import uk.co.deanwild.flowtextview.FlowTextView
@@ -175,7 +178,8 @@ class ShowListActivity : AppCompatActivity() {
             }
         }
 
-        show_info.layoutManager = LinearLayoutManager(this)
+        show_info.layoutManager = LinearLayoutManager(this).apply { this@apply.isSmoothScrollbarEnabled = true }
+        show_info.setHasFixedSize(true)
         val dividerItemDecoration = DividerItemDecoration(show_info.context, (show_info.layoutManager as LinearLayoutManager).orientation)
         show_info.addItemDecoration(dividerItemDecoration)
         show_info.addItemDecoration(ItemOffsetDecoration(20))
@@ -263,14 +267,30 @@ class ShowListActivity : AppCompatActivity() {
         val gen = Random()
 
         random_button.setOnClickListener {
-            val num = gen.nextInt(listOfNameAndLink.size)
+            /*val num = gen.nextInt(listOfNameAndLink.size)
             show_info.smoothScrollAction(num) {
-                val l = show_info.findViewHolderForAdapterPosition(num) as? ViewHolder
-                l?.layout?.flashScreen(duration = 250)
+                val l = show_info.findViewHolderForAdapterPosition(num) as? ViewHolderShow
+                val lay = l?.layout
+                lay?.flashScreen(duration = 250)
+            }*/
+            val nameAndLink = listOfNameAndLink[gen.nextInt(listOfNameAndLink.size)]
+            actionHit.hit(nameAndLink.name, nameAndLink.url, it)
+        }
+
+        /*random_button.setOnLongClickListener {
+            val num = 0//gen.nextInt(listOfNameAndLink.size)
+            show_info.smoothScrollAction(num) {
+                val l = show_info.findViewHolderForAdapterPosition(num) as? ViewHolderShow
+                val lay = l?.layout
+                lay?.flashScreen(duration = 500, color = Color.CYAN)
+                l?.linkType?.flash { i, textView ->
+                    textView.backgroundColor = i
+                }
             }
             //val nameAndLink = listOfNameAndLink[gen.nextInt(listOfNameAndLink.size)]
             //actionHit.hit(nameAndLink.name, nameAndLink.url, it)
-        }
+            true
+        }*/
 
         search_info.isEnabled = false
         favorite_show.isEnabled = false

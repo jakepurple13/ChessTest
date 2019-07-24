@@ -2,10 +2,12 @@ package com.crestron.aurora.otherfun
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import android.widget.SectionIndexer
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
@@ -13,6 +15,9 @@ import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
+import com.crestron.aurora.utilities.Flash
+import com.crestron.aurora.utilities.flash
+import com.crestron.aurora.utilities.flashScreen
 import com.like.LikeButton
 import com.like.OnLikeListener
 import com.squareup.picasso.Picasso
@@ -86,6 +91,10 @@ class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
         } else {
             stuff.size
         }
+    }
+
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
     }
 
     // Inflates the item views

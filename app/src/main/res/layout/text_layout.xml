@@ -3,9 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/show_layout"
-    android:clipChildren="false"
+    android:clipChildren="true"
+    android:background="?android:colorBackground"
     android:animateLayoutChanges="true"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
     <com.like.LikeButton
@@ -19,12 +20,11 @@
     <TextView
         android:id="@+id/link_list"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
+        android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toEndOf="@+id/checkBox"
-        android:layout_toStartOf="@+id/show_img"
         android:gravity="start|center_vertical"
+        android:layout_toEndOf="@+id/checkBox"
+        android:layout_alignParentEnd="true"
         android:transitionName="show_name_trans"
         android:text="TextView"
         tools:ignore="HardcodedText" />
@@ -33,6 +33,7 @@
         android:id="@+id/show_img"
         android:layout_width="360px"
         android:layout_height="480px"
+        android:visibility="gone"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:layout_gravity="end"
