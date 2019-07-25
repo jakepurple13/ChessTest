@@ -24,8 +24,13 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        tools:ignore="LockedOrientationActivity"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="LockedOrientationActivity">
+        <activity android:name=".otherfun.NotificationBubbleActivity"
+            android:label="Download Show"
+            android:allowEmbedded="true"
+            android:documentLaunchMode="always"
+            android:resizeableActivity="true" />
         <activity
             android:name=".boardgames.chess.MainActivity"
             android:screenOrientation="portrait"
@@ -93,11 +98,9 @@
                 <data
                     android:host="fun.animeplus.tv"
                     android:scheme="https" />
-
                 <data
                     android:host="fun.gogoanime1.com"
                     android:scheme="http" />
-
                 <data
                     android:host="fun.gogoanime1.com"
                     android:scheme="https" />
@@ -208,7 +211,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
-
         <!--
         <service android:name=".FirebaseMessage">
             <intent-filter>
@@ -222,9 +224,7 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
-        </service>
-        <!--<service android:name=".FirebaseMessage" />-->
-
+        </service> <!-- <service android:name=".FirebaseMessage" /> -->
         <!--
      Set custom default icon. This is used when no icon is set for incoming notification messages.
      See README(https://goo.gl/l4GJaQ) for more.
@@ -239,14 +239,11 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
         -->
-
-
         <!--
             <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="firebase_channel_id"/>
         -->
-
         <activity
             android:name=".otherfun.FavoriteShowsActivity"
             android:screenOrientation="portrait"
@@ -319,7 +316,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".otherfun.ShowCheckReceiver"
             android:process=":remote" />
@@ -331,7 +327,6 @@
         <receiver
             android:name=".otherfun.NotificationDismissedReceiver"
             android:exported="false" />
-
         <receiver
             android:name=".otherfun.NotificationGroupDismissedReceiver"
             android:exported="false" />
@@ -348,6 +343,7 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
             </intent-filter>
+
             <meta-data
                 android:name="android.service.quicksettings.ACTIVE_TILE"
                 android:value="true" />
