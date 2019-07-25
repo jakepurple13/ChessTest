@@ -131,8 +131,8 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 }
                 //updateNotiMap.addAll(KUtility.getNotifyList())
                 updateNotiList.addAll(KUtility.getNotiJsonList().list)
-                updateNotiList.add(ShowInfos("This is the name", 4, "01:30 AM", "http://www.animetoon.org/watch-archer"))
-                updateNotiList.add(ShowInfos("Soccer One", 4, "02:30 AM", "http://www.animeplus.tv/captain-tsubasa-2018-online"))
+                //updateNotiList.add(ShowInfos("This is the name", 4, "01:30 AM", "http://www.animetoon.org/watch-archer"))
+                //updateNotiList.add(ShowInfos("Soccer One", 4, "02:30 AM", "http://www.animeplus.tv/captain-tsubasa-2018-online"))
                 //updateNotiList.add(ShowInfos("Cute One With a really really long name", 4, "03:30 AM", "http://www.animeplus.tv/jingai-san-no-yome-episode-9-online"))
                 //val list = updateNotiMap.distinctBy { it }
                 val list = updateNotiList.distinctBy { it.url }
