@@ -1,5 +1,6 @@
 package com.crestron.aurora.showapi
 
+import com.crestron.aurora.Loged
 import com.google.gson.Gson
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -9,14 +10,14 @@ import java.io.InputStreamReader
 import java.net.URI
 import java.net.URL
 
-enum class Source(val link: String, val recent: Boolean = false) {
+enum class Source(val link: String, val recent: Boolean = false, var movie: Boolean = false) {
     //ANIME("http://www.animeplus.tv/anime-list"),
     ANIME("https://www.gogoanime1.com/home/anime-list"),
     CARTOON("http://www.animetoon.org/cartoon"),
     DUBBED("http://www.animetoon.org/dubbed-anime"),
     //ANIME_MOVIES("http://www.animeplus.tv/anime-movies"),
-    ANIME_MOVIES("https://www.gogoanime1.com/home/anime-list"),
-    CARTOON_MOVIES("http://www.animetoon.org/movies"),
+    ANIME_MOVIES("https://www.gogoanime1.com/home/anime-list", movie = true),
+    CARTOON_MOVIES("http://www.animetoon.org/movies", movie = true),
     //RECENT_ANIME("http://www.animeplus.tv/anime-updates", true),
     RECENT_ANIME("https://www.gogoanime1.com/home/latest-episodes", true),
     RECENT_CARTOON("http://www.animetoon.org/updates", true);
@@ -65,7 +66,7 @@ class ShowApi(private val source: Source) {
 
     private fun getList(): ArrayList<ShowInfo> {
         return if (source.link.contains("gogoanime")) {
-            if (source == Source.ANIME_MOVIES)
+            if (source == Source.ANIME_MOVIES || source.movie)
                 gogoAnimeMovies()
             else
                 gogoAnimeAll()

@@ -19,6 +19,7 @@ public interface ConstantValues {
     String UPDATE_CHECK = "updateCheck";
     String UPDATE_COUNT = "update_count";
     String SHOW_LINK = "show_link";
+    String SHOW_MOVIE = "show_movie";
     String APP_UPDATE = "appUpdate";
     String VERSION_URL = "https://raw.githubusercontent.com/jakepurple13/ForUsNerds/master/updated.json";
     String PAST_VERSION_URL = "https://raw.githubusercontent.com/jakepurple13/ForUsNerds/master/pastversions.json";

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -97,8 +98,10 @@ class ShowListActivity : AppCompatActivity() {
                     val episodeNumber = peekView.findViewById(R.id.episode_number_dialog) as TextView
                     val image = peekView.findViewById(R.id.image_dialog) as ImageView
                     val button = peekView.findViewById(R.id.button_dialog) as Button
+                    val button2 = peekView.findViewById(R.id.button_dialog_two) as Button
 
                     button.visibility = View.GONE
+                    button2.visibility = View.GONE
                     title.text = Html.fromHtml("<b>${info.name}<b>", Html.FROM_HTML_MODE_COMPACT)
                     title.setTextColor(Color.WHITE)
                     //description_dialog.text = description
@@ -134,7 +137,10 @@ class ShowListActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showAlert(info: ShowInfo) {
+
+        val alertDialog = AlertDialog.Builder(this@ShowListActivity)
 
         val inflater = layoutInflater
 
@@ -144,8 +150,12 @@ class ShowListActivity : AppCompatActivity() {
         val episodeNumber = peekView.findViewById(R.id.episode_number_dialog) as TextView
         val image = peekView.findViewById(R.id.image_dialog) as ImageView
         val button = peekView.findViewById(R.id.button_dialog) as Button
+        val button2 = peekView.findViewById(R.id.button_dialog_two) as Button
 
-        button.visibility = View.GONE
+        //button.visibility = View.GONE
+        //button2.visibility = View.GONE
+        button.text = "Cancel"
+        button2.text = "Go To Show"
         title.text = Html.fromHtml("<b>${info.name}<b>", Html.FROM_HTML_MODE_COMPACT)
         title.setTextColor(Color.WHITE)
         //description_dialog.text = description
@@ -173,16 +183,21 @@ class ShowListActivity : AppCompatActivity() {
             }
         }
 
-        val alertDialog = AlertDialog.Builder(this@ShowListActivity)
+        val alert = alertDialog
                 .setView(peekView)
-                .setPositiveButton("Go to Show") { _, _ ->
-                    actionHit.hit(info.name, info.url, random_button)
-                }
-                .setNegativeButton("Cancel") { _, _ ->
-
-                }
                 .create()
-        alertDialog.show()
+
+        button.setOnClickListener {
+            alert.dismiss()
+        }
+
+        button2.setOnClickListener {
+            alert.dismiss()
+            actionHit.hit(info.name, info.url, random_button)
+        }
+
+        alert.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        alert.show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -213,6 +228,7 @@ class ShowListActivity : AppCompatActivity() {
 
         val recentChoice = intent.getBooleanExtra(ConstantValues.RECENT_OR_NOT, false)
         val url = intent.getStringExtra(ConstantValues.SHOW_LINK)
+        val movie = intent.getBooleanExtra(ConstantValues.SHOW_MOVIE, false)
 
         if (recentChoice) {
 
@@ -240,7 +256,9 @@ class ShowListActivity : AppCompatActivity() {
 
             try {
 
-                val showApi = ShowApi(Source.getSourceFromUrl(urlToUse))
+                val source = Source.getSourceFromUrl(urlToUse)
+                source.movie = movie
+                val showApi = ShowApi(source)
 
                 listOfNameAndLink.addAll(showApi.showInfoList)
 
