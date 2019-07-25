@@ -1,10 +1,13 @@
 package com.crestron.aurora.utilities
 
+import android.graphics.Color
+import androidx.annotation.IntRange
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 /**
  * Finds similarities between two lists based on a predicate
@@ -34,3 +37,13 @@ fun RecyclerView.scrollAction(position: Int, action: () -> Unit) = GlobalScope.l
     delay(100)
     action()
 }
+
+/**
+ * returns a random color
+ */
+fun Random.nextColor(
+        @IntRange(from = 0, to = 255) alpha: Int = nextInt(0, 255),
+        @IntRange(from = 0, to = 255) red: Int = nextInt(0, 255),
+        @IntRange(from = 0, to = 255) green: Int = nextInt(0, 255),
+        @IntRange(from = 0, to = 255) blue: Int = nextInt(0, 255)
+): Int = Color.argb(alpha, red, green, blue)

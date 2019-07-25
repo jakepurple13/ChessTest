@@ -15,6 +15,10 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.AnimationUtility
 import com.crestron.aurora.utilities.ViewUtil
+import com.crestron.aurora.utilities.nextColor
+import com.crestron.aurora.views.BubbleEmitter
+import com.crestron.aurora.views.createBubbles
+import com.crestron.aurora.views.stopAllBubbles
 import com.plattysoft.leonids.ParticleSystem
 import hari.floatingtoast.FloatingToast
 import kotlinx.android.synthetic.main.activity_yahtzee.*
@@ -24,7 +28,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
-import java.util.*
+import kotlin.random.Random
 
 class YahtzeeActivity : AppCompatActivity() {
 
@@ -60,9 +64,8 @@ class YahtzeeActivity : AppCompatActivity() {
 
     }
 
-    private val gen = Random()
     private fun getRandomNum(): Int {
-        return gen.nextInt(6) + 1
+        return Random.nextInt(6) + 1
     }
 
     private var roll = 0
@@ -460,6 +463,8 @@ class YahtzeeActivity : AppCompatActivity() {
 
     private fun winDialog() {
 
+        startBubbles()
+
         val pref = defaultSharedPreferences
         val oldScore = pref.getInt("yahtzee_high_score", 0)
         var beat = false
@@ -478,10 +483,12 @@ class YahtzeeActivity : AppCompatActivity() {
                 "\nWant to play again?")
         // Add the buttons
         builder.setPositiveButton("Play Again") { _, _ ->
+            yahtzee_layout.stopAllBubbles(false)
             finish()
             startActivity(intent)
         }
         builder.setNegativeButton("Nope") { _, _ ->
+            yahtzee_layout.stopAllBubbles(false)
             finish()
         }
         val dialog = builder.create()
@@ -497,10 +504,19 @@ class YahtzeeActivity : AppCompatActivity() {
             super.onBackPressed()
         }
         builder.setNegativeButton("Nope") { _, _ ->
-
+            yahtzee_layout.stopAllBubbles(true)
         }
         val dialog = builder.create()
         dialog.show()
+        startBubbles()
+    }
+
+    private fun startBubbles() {
+        yahtzee_layout.createBubbles {
+            for(i in 0..10)
+                fillColorsToUse+=Random.nextColor()
+            touchEvent = BubbleEmitter.BUBBLE_POP
+        }.startEmitting()
     }
 
     fun playAgain(v: View) {

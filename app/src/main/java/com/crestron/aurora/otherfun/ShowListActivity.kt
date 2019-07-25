@@ -1,29 +1,25 @@
+@file:Suppress("DeferredResultUnused")
+
 package com.crestron.aurora.otherfun
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.util.Pair
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.text.Editable
 import android.text.Html
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.FormActivity
 import com.crestron.aurora.Loged
@@ -50,10 +46,6 @@ import java.util.*
 
 
 class ShowListActivity : AppCompatActivity() {
-
-    private val listOfLinks = arrayListOf<String>()
-    private val listOfNames = arrayListOf<String>()
-    private var listOfNameAndLinkToShow = arrayListOf<ShowInfo>()
     private val listOfNameAndLink = arrayListOf<ShowInfo>()
     private val actionHit = object : LinkAction {
         override fun hit(name: String, url: String, vararg view: View) {
@@ -227,29 +219,13 @@ class ShowListActivity : AppCompatActivity() {
         val showDatabase = ShowDatabase.getDatabase(this@ShowListActivity)
 
         val recentChoice = intent.getBooleanExtra(ConstantValues.RECENT_OR_NOT, false)
-        val url = intent.getStringExtra(ConstantValues.SHOW_LINK)
+        val url = intent.getStringExtra(ConstantValues.SHOW_LINK)!!
         val movie = intent.getBooleanExtra(ConstantValues.SHOW_MOVIE, false)
-
-        if (recentChoice) {
-
-        }
-
-        class ItemOffsetDecoration(private val mItemOffset: Int) : RecyclerView.ItemDecoration() {
-
-            //constructor(@NonNull context: Context, itemOffsetId: Int) : this(context.resources.getDimensionPixelSize(itemOffsetId)) {}
-
-            override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView,
-                                        state: RecyclerView.State) {
-                super.getItemOffsets(outRect, view, parent, state)
-                outRect.set(mItemOffset, mItemOffset, mItemOffset, mItemOffset)
-            }
-        }
 
         show_info.layoutManager = LinearLayoutManager(this).apply { this@apply.isSmoothScrollbarEnabled = true }
         show_info.setHasFixedSize(true)
         val dividerItemDecoration = DividerItemDecoration(show_info.context, (show_info.layoutManager as LinearLayoutManager).orientation)
         show_info.addItemDecoration(dividerItemDecoration)
-        //show_info.addItemDecoration(ItemOffsetDecoration(20))
         show_info.setIndexBarVisibility(!recentChoice)
 
         fun getListOfAnime(urlToUse: String) {
@@ -281,7 +257,7 @@ class ShowListActivity : AppCompatActivity() {
             }
         }
 
-        fun getStuff() = GlobalScope.async {
+        fun getStuffAsync() = GlobalScope.async {
             Loged.i(url)
             runOnUiThread {
                 hud.show()
@@ -290,7 +266,7 @@ class ShowListActivity : AppCompatActivity() {
         }
 
         if (Utility.isNetwork(this))
-            getStuff()
+            getStuffAsync()
         else {
             val builder = AlertDialog.Builder(this)
             builder.setTitle("No Internet")
@@ -306,13 +282,11 @@ class ShowListActivity : AppCompatActivity() {
 
         refresh_list.setOnRefreshListener {
             listOfNameAndLink.clear()
-            listOfNames.clear()
-            listOfLinks.clear()
             // Your code to refresh the list here.
             // Make sure you call swipeContainer.setRefreshing(false)
             // once the network request has completed successfully.
             favorite_show.isEnabled = false//!recentChoice
-            getStuff()
+            getStuffAsync()
         }
 
         search_info.addTextChangedListener(object : TextWatcher {
@@ -357,24 +331,7 @@ class ShowListActivity : AppCompatActivity() {
                     })
                 }
             }
-            /*val nameAndLink = listOfNameAndLink[gen.nextInt(listOfNameAndLink.size)]
-            actionHit.hit(nameAndLink.name, nameAndLink.url, it)*/
         }
-
-        /*random_button.setOnLongClickListener {
-            val num = 0//gen.nextInt(listOfNameAndLink.size)
-            show_info.smoothScrollAction(num) {
-                val l = show_info.findViewHolderForAdapterPosition(num) as? ViewHolderShow
-                val lay = l?.layout
-                lay?.flashScreen(duration = 500, color = Color.CYAN)
-                l?.linkType?.flash { i, textView ->
-                    textView.backgroundColor = i
-                }
-            }
-            //val nameAndLink = listOfNameAndLink[gen.nextInt(listOfNameAndLink.size)]
-            //actionHit.hit(nameAndLink.name, nameAndLink.url, it)
-            true
-        }*/
 
         search_info.isEnabled = false
         favorite_show.isEnabled = false

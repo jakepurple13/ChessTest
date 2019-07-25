@@ -18,10 +18,10 @@ import android.widget.ImageView
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
-import com.crestron.aurora.utilities.AnimationUtility
-import com.crestron.aurora.utilities.TimerUtil
-import com.crestron.aurora.utilities.TypingAnimation
-import com.crestron.aurora.utilities.ViewUtil
+import com.crestron.aurora.utilities.*
+import com.crestron.aurora.views.BubbleEmitter
+import com.crestron.aurora.views.createBubbles
+import com.crestron.aurora.views.stopAllBubbles
 import com.github.jinatonic.confetti.CommonConfetti
 import com.plattysoft.leonids.ParticleSystem
 import crestron.com.deckofcards.Card
@@ -365,7 +365,7 @@ class SolitaireActivity : AppCompatActivity() {
         foundation_3.performClick()
         foundation_4.performClick()
 
-        new_game_solitaire.setOnClickListener { _ ->
+        new_game_solitaire.setOnClickListener {
             time.cancel()
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Start a New Game?")
@@ -381,13 +381,15 @@ class SolitaireActivity : AppCompatActivity() {
                 time.startTimer(solitaire_timer)
             }
             builder.setOnDismissListener {
+                solitaire_layout.stopAllBubbles(true)
                 time.startTimer(solitaire_timer)
             }
             val dialog = builder.create()
             dialog.show()
+            startBubbles()
         }
 
-        back_button_solitaire.setOnClickListener { _ ->
+        back_button_solitaire.setOnClickListener {
             time.cancel()
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Done Playing?")
@@ -402,11 +404,13 @@ class SolitaireActivity : AppCompatActivity() {
                     time.startTimer(solitaire_timer)
             }
             builder.setOnDismissListener {
+                solitaire_layout.stopAllBubbles(true)
                 if (!win)
                     time.startTimer(solitaire_timer)
             }
             val dialog = builder.create()
             dialog.show()
+            startBubbles()
         }
 
         time.startTimer(solitaire_timer)
@@ -441,15 +445,18 @@ class SolitaireActivity : AppCompatActivity() {
                     "Fastest Time: ${if (lastTime == 0L) "N/A" else getTime(lastTime)}")
             // Add the buttons
             builder.setPositiveButton("Cool!") { _, _ ->
+                solitaire_layout.stopAllBubbles(true)
                 if (!win)
                     time.startTimer(solitaire_timer)
             }
             builder.setOnDismissListener {
+                solitaire_layout.stopAllBubbles(true)
                 if (!win)
                     time.startTimer(solitaire_timer)
             }
             val dialog = builder.create()
             dialog.show()
+            startBubbles()
         }
     }
 
@@ -459,7 +466,17 @@ class SolitaireActivity : AppCompatActivity() {
         return String.format("%02d:%02d", m, s)
     }
 
+    private fun startBubbles() {
+        solitaire_layout.createBubbles {
+            for(i in 0..10)
+                fillColorsToUse+= kotlin.random.Random.nextColor()
+            touchEvent = BubbleEmitter.BUBBLE_POP
+        }.startEmitting()
+    }
+
     private fun winDialog() {
+
+        startBubbles()
 
         val lastScore = this@SolitaireActivity.defaultSharedPreferences.getInt("solitaire_score", 0)
         val lastMove = this@SolitaireActivity.defaultSharedPreferences.getInt("solitaire_moves", 0)
@@ -530,10 +547,10 @@ class SolitaireActivity : AppCompatActivity() {
                     }?.performClick()
                 } else {
                     when {
-                        !foundation1.isEmpty() && foundation1.last().suit == card.suit -> foundation_1
-                        !foundation2.isEmpty() && foundation2.last().suit == card.suit -> foundation_2
-                        !foundation3.isEmpty() && foundation3.last().suit == card.suit -> foundation_3
-                        !foundation4.isEmpty() && foundation4.last().suit == card.suit -> foundation_4
+                        foundation1.isNotEmpty() && foundation1.last().suit == card.suit -> foundation_1
+                        foundation2.isNotEmpty() && foundation2.last().suit == card.suit -> foundation_2
+                        foundation3.isNotEmpty() && foundation3.last().suit == card.suit -> foundation_3
+                        foundation4.isNotEmpty() && foundation4.last().suit == card.suit -> foundation_4
                         else -> null
                     }?.performClick()
                 }
@@ -560,10 +577,10 @@ class SolitaireActivity : AppCompatActivity() {
             } else {
                 val suit = drawList[drawList.size - 1].suit
                 when {
-                    !foundation1.isEmpty() && foundation1.last().suit == suit -> foundation_1
-                    !foundation2.isEmpty() && foundation2.last().suit == suit -> foundation_2
-                    !foundation3.isEmpty() && foundation3.last().suit == suit -> foundation_3
-                    !foundation4.isEmpty() && foundation4.last().suit == suit -> foundation_4
+                    foundation1.isNotEmpty() && foundation1.last().suit == suit -> foundation_1
+                    foundation2.isNotEmpty() && foundation2.last().suit == suit -> foundation_2
+                    foundation3.isNotEmpty() && foundation3.last().suit == suit -> foundation_3
+                    foundation4.isNotEmpty() && foundation4.last().suit == suit -> foundation_4
                     else -> null
                 }?.performClick()
             }
@@ -654,7 +671,7 @@ class SolitaireActivity : AppCompatActivity() {
                         moveCount++
                     }
                 } catch (e1: Exception) {
-                    Log.e(Loged.TAG, e1.message)
+                    Log.e(Loged.TAG, e1.message!!)
                 }
             }
             refreshLayout()
@@ -715,19 +732,23 @@ class SolitaireActivity : AppCompatActivity() {
     override fun onBackPressed() {
         time.cancel()
         back_button_solitaire.performClick()
+        startBubbles()
     }
 
     override fun onDestroy() {
+        solitaire_layout.stopAllBubbles(false)
         time.cancel()
         super.onDestroy()
     }
 
     override fun onRestart() {
+        solitaire_layout.stopAllBubbles(false)
         time.cancel()
         super.onRestart()
     }
 
     override fun onPause() {
+        solitaire_layout.stopAllBubbles(false)
         time.cancel()
         super.onPause()
     }

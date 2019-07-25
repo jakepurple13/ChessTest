@@ -1,3 +1,5 @@
+@file:Suppress("SameParameterValue")
+
 package com.crestron.aurora.otherfun
 
 import android.annotation.SuppressLint
@@ -23,7 +25,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.collections.ArrayList
 
 class ShowCheckReceiver : BroadcastReceiver() {
@@ -93,12 +94,13 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 val filteredList = showApi.distinctBy { it.url }
                 val shows = showDatabase.showDao().allShows
                 //in order to only search for the shows that are in the database
-                val aColIds = shows.asSequence().map { it.link }.toSet()
-                val bColIds = filteredList.filter { it.url in aColIds }
+                //val aColIds = shows.asSequence().map { it.link }.toSet()
+                //val bColIds = filteredList.filter { it.url in aColIds }
 
                 val filtered = filteredList.intersect(shows) { one, two ->
                     one.url == two.link
                 }
+
                 for ((prog, i) in filtered.withIndex()) {
                 //for ((prog, i) in bColIds.withIndex()) {
                     sendRunningNotification(this@ShowCheckIntentService,
@@ -108,14 +110,13 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                         Loged.i("Checking ${i.name}")
                         val showList = EpisodeApi(i).episodeList.size
                         //if (showDatabase.showDao().getShow(i.name).showNum < showList) {
-                        if (showDatabase.showDao().getShowByURL(i.url).showNum < showList) {
+                        val show = showDatabase.showDao().getShowByURL(i.url)
+                        if (show.showNum < showList) {
+                            Loged.i("Checking ${i.name} with size ${show.showNum}")
                             val timeOfUpdate = SimpleDateFormat("MM/dd hh:mm a").format(System.currentTimeMillis())
-                            //nStyle.addLine("$timeOfUpdate - ${i.name} Updated: Episode $showList")
                             val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
                             Loged.wtf(infoToShow)
-                            //updateNotiMap.add(infoToShow)
                             updateNotiList.add(ShowInfos(i.name, showList, timeOfUpdate, i.url))
-                            val show = showDatabase.showDao().getShowByURL(i.url)
                             show.showNum = showList
                             showDatabase.showDao().updateShow(show)
                             count++
