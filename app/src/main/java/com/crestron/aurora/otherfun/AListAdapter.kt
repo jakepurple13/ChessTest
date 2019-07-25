@@ -16,15 +16,18 @@ import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.utilities.Flash
+import com.crestron.aurora.utilities.backgroundColor
 import com.crestron.aurora.utilities.flash
 import com.crestron.aurora.utilities.flashScreen
 import com.like.LikeButton
 import com.like.OnLikeListener
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.text_layout.view.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.*
 
 class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
 
@@ -128,13 +131,37 @@ class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
                 action.hit(stuff[position].name, stuff[position].url, it, holder.favorite)
             }
 
+            /*holder.linkType.setOnLongClickListener {
+                holder.layout.flashScreen(paramSetup = {
+                    it.alignParentStart()
+                    it.alignParentEnd()
+                    it.sameTop(holder.linkType)
+                    it.sameBottom(holder.linkType)
+                })
+                *//*GlobalScope.launch(Dispatchers.Main) {
+                    val params1 = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT).apply {
+                        alignParentStart()
+                        alignParentEnd()
+                        sameTop(holder.linkType)
+                        sameBottom(holder.linkType)
+                    }
+                    val rl = RelativeLayout(context)
+                    rl.setBackgroundColor(Color.BLUE)
+                    rl.z = Float.MAX_VALUE
+
+                    holder.layout.addView(rl, params1)
+                }*//*
+                Loged.i("Flash!")
+                true
+            }*/
+
             holder.layout.setOnClickListener {
                 holder.linkType.performClick()
             }
 
             action.longhit(stuff[position], holder.layout, holder.linkType)
 
-            Picasso.get().setIndicatorsEnabled(true)
+            //Picasso.get().setIndicatorsEnabled(true)
             holder.imageView.visibility = View.GONE
             /*if(!isRecent) {
                 //http://www.animeplus.tv/images/series/big/1.jpg

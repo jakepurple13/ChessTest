@@ -42,7 +42,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.defaultSharedPreferences
+import org.jetbrains.anko.*
 import uk.co.deanwild.flowtextview.FlowTextView
 import java.net.SocketTimeoutException
 import java.util.*
@@ -134,6 +134,57 @@ class ShowListActivity : AppCompatActivity() {
         }
     }
 
+    private fun showAlert(info: ShowInfo) {
+
+        val inflater = layoutInflater
+
+        val peekView = inflater.inflate(R.layout.image_dialog_layout, show_list_layout, false)
+        val title = peekView.findViewById(R.id.title_dialog) as TextView
+        val description = peekView.findViewById(R.id.ftv) as FlowTextView
+        val episodeNumber = peekView.findViewById(R.id.episode_number_dialog) as TextView
+        val image = peekView.findViewById(R.id.image_dialog) as ImageView
+        val button = peekView.findViewById(R.id.button_dialog) as Button
+
+        button.visibility = View.GONE
+        title.text = Html.fromHtml("<b>${info.name}<b>", Html.FROM_HTML_MODE_COMPACT)
+        title.setTextColor(Color.WHITE)
+        //description_dialog.text = description
+        episodeNumber.text = ""
+        description.textColor = Color.WHITE
+        description.setTextSize(episodeNumber.textSize)
+
+        GlobalScope.launch {
+            try {
+                val episode = EpisodeApi(info, 5000)
+                runOnUiThread {
+                    try {
+                        Picasso.get().load(episode.image)
+                                .error(R.drawable.apk).resize((600 * .6).toInt(), (800 * .6).toInt()).into(image)
+                    } catch (e: java.lang.IllegalArgumentException) {
+                        Picasso.get().load(android.R.drawable.stat_notify_error).resize((600 * .6).toInt(), (800 * .6).toInt()).into(image)
+                    }
+                    title.text = info.name
+                    description.text = episode.description
+                }
+            } catch (e: IllegalArgumentException) {
+
+            } catch (e: SocketTimeoutException) {
+
+            }
+        }
+
+        val alertDialog = AlertDialog.Builder(this@ShowListActivity)
+                .setView(peekView)
+                .setPositiveButton("Go to Show") { _, _ ->
+                    actionHit.hit(info.name, info.url, random_button)
+                }
+                .setNegativeButton("Cancel") { _, _ ->
+
+                }
+                .create()
+        alertDialog.show()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == 111 && data != null) {
@@ -182,7 +233,7 @@ class ShowListActivity : AppCompatActivity() {
         show_info.setHasFixedSize(true)
         val dividerItemDecoration = DividerItemDecoration(show_info.context, (show_info.layoutManager as LinearLayoutManager).orientation)
         show_info.addItemDecoration(dividerItemDecoration)
-        show_info.addItemDecoration(ItemOffsetDecoration(20))
+        //show_info.addItemDecoration(ItemOffsetDecoration(20))
         show_info.setIndexBarVisibility(!recentChoice)
 
         fun getListOfAnime(urlToUse: String) {
@@ -267,14 +318,29 @@ class ShowListActivity : AppCompatActivity() {
         val gen = Random()
 
         random_button.setOnClickListener {
-            /*val num = gen.nextInt(listOfNameAndLink.size)
+            val num = gen.nextInt(listOfNameAndLink.size)
             show_info.smoothScrollAction(num) {
-                val l = show_info.findViewHolderForAdapterPosition(num) as? ViewHolderShow
-                val lay = l?.layout
-                lay?.flashScreen(duration = 250)
-            }*/
-            val nameAndLink = listOfNameAndLink[gen.nextInt(listOfNameAndLink.size)]
-            actionHit.hit(nameAndLink.name, nameAndLink.url, it)
+                GlobalScope.launch {
+                    val l = show_info.findViewHolderForAdapterPosition(num) as? ViewHolderShow
+                    val lay = l?.layout
+                    lay?.flashScreen(duration = 250, paramSetup = {
+                        it.alignParentStart()
+                        it.alignParentEnd()
+                        it.sameTop(l.favorite)
+                        it.sameBottom(l.favorite)
+                    }, doOnEnd = {
+                        GlobalScope.launch {
+                            delay(250)
+                            runOnUiThread {
+                                val nameAndLink = listOfNameAndLink[num]
+                                showAlert(nameAndLink)
+                            }
+                        }
+                    })
+                }
+            }
+            /*val nameAndLink = listOfNameAndLink[gen.nextInt(listOfNameAndLink.size)]
+            actionHit.hit(nameAndLink.name, nameAndLink.url, it)*/
         }
 
         /*random_button.setOnLongClickListener {

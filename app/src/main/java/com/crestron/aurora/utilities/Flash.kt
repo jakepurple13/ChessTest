@@ -81,42 +81,13 @@ fun <T : ViewGroup> T.flashScreen(
 
     addView(rl, params1)
 
-    rl.alpha = 1f
     rl.animate()
             .alpha(0f)
             .setDuration(duration)
             .setInterpolator(FastOutLinearInInterpolator())
             .withEndAction {
-                rl.alpha = 0f
                 removeView(rl)
                 doOnEnd()
-            }
-            .start()
-}
-
-/**
- * Flashes a ViewGroup
- * @see flash
- */
-fun <T : ViewGroup> T.flashScreen(
-        color: Int = Color.WHITE,
-        duration: Long = 500
-) = GlobalScope.launch(Dispatchers.Main) {
-    val params1 = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)
-    val rl = RelativeLayout(context)
-    rl.setBackgroundColor(color)
-    rl.z = Float.MAX_VALUE
-
-    addView(rl, params1)
-
-    rl.alpha = 1f
-    rl.animate()
-            .alpha(0f)
-            .setDuration(duration)
-            .setInterpolator(FastOutLinearInInterpolator())
-            .withEndAction {
-                rl.alpha = 0f
-                removeView(rl)
             }
             .start()
 }
@@ -269,7 +240,6 @@ object Flash {
         colorAnimation.start()
     }
 
-    @Suppress("unused")
     fun flashAllViewsInGroup(
             view: ViewGroup,
             color: Int = Color.WHITE,
