@@ -1,19 +1,13 @@
 package com.crestron.aurora.otherfun
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
-import android.widget.Button
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityOptionsCompat
-import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,16 +17,14 @@ import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.showapi.EpisodeApi
-import com.crestron.aurora.showapi.EpisodeInfo
 import com.crestron.aurora.showapi.ShowInfo
+import com.crestron.aurora.utilities.KUtility
 import com.google.gson.Gson
-import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2.NetworkType
 import kotlinx.android.synthetic.main.activity_notification_bubble.*
 import kotlinx.android.synthetic.main.bubble_info_layout.view.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 class NotificationBubbleActivity : AppCompatActivity() {
 
@@ -45,6 +37,7 @@ class NotificationBubbleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notification_bubble)
 
+        KUtility.clearNotiJsonList()
         //val url = intent.getStringExtra(ConstantValues.URL_INTENT)!!
         //val name = intent.getStringExtra(ConstantValues.NAME_INTENT)!!
 

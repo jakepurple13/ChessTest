@@ -29,7 +29,7 @@ android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.crestron.aurora"
-        minSdkVersion 24
+        minSdkVersion 27
         targetSdkVersion 29
         versionCode 1
         versionName "9.0"
@@ -110,7 +110,7 @@ dependencies {
         transitive = true
     }
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.github.DanielMartinus:Stepper-Touch:0.6'
+    implementation 'com.github.DanielMartinus:Stepper-Touch:1.0.1'
     implementation 'com.jaredrummler:android-device-names:1.1.7'
     implementation 'com.github.antonKozyriatskyi:DevDrawer:1.0'
     implementation 'com.github.kittinunf.fuel:fuel-android:1.15.0'
@@ -146,6 +146,9 @@ dependencies {
     implementation 'jp.wasabeef:picasso-transformations:2.2.1'
     implementation 'androidx.navigation:navigation-fragment:2.1.0-beta02'
     implementation 'androidx.palette:palette:1.0.0'
+    implementation 'com.github.jakepurple13.DragSwipeApp:dragswipe:v1.6'
+    implementation 'com.github.jakepurple13.DragSwipeApp:dragswipeex:v1.6'
+    implementation 'jp.wasabeef:recyclerview-animators:3.0.0'
     // If you want to use the GPU Filters
     //implementation 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
 

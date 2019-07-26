@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/video_poker_layout"
     android:background="@drawable/drkgreen"
     tools:context=".cardgames.videopoker.VideoPokerActivity">
 
@@ -34,11 +35,31 @@
         android:layout_below="@+id/jack_or_better"
         android:text="Winnings" />
 
+    <Button
+        android:id="@+id/shuffle_hand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dialog_bg"
+        android:backgroundTint="@color/emeraldGreen"
+        android:layout_alignParentStart="true"
+        android:layout_above="@id/play_again"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="5dp"
+        android:text="Shuffle Hand" />
+
+    <TextView
+        android:id="@+id/cards_left"
+        android:text="Cards Left"
+        android:layout_below="@id/back_button_videopoker"
+        android:layout_alignParentStart="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <CheckBox
         android:id="@+id/jack_or_better"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/back_button_videopoker"
+        android:layout_below="@+id/cards_left"
         android:layout_alignParentStart="true"
         android:text="Jacks or Better" />
 
@@ -48,7 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:layout_marginStart="5dp"
-        android:layout_above="@+id/hold_button_layout_poker"
+        android:layout_above="@+id/rv_layout"
         android:layout_alignParentStart="true"
         android:background="@drawable/dialog_bg"
         android:backgroundTint="@color/emeraldGreen"
@@ -74,6 +95,7 @@
         android:layout_alignParentStart="true"
         android:layout_marginBottom="5dp"
         android:layout_marginStart="5dp"
+        android:visibility="gone"
         android:background="@drawable/dialog_bg"
         android:backgroundTint="@color/emeraldGreen"
         android:text="Submit" />
@@ -82,7 +104,7 @@
         android:id="@+id/current_hand"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/hold_button_layout_poker"
+        android:layout_above="@+id/rv_layout"
         android:layout_below="@id/bet_amount"
         android:layout_toStartOf="@id/discard_button"
         android:layout_toEndOf="@id/play_again"
@@ -101,11 +123,32 @@
         app:stepperTextColor="@color/inactiveGradientColor" />
 
     <LinearLayout
+        android:id="@+id/rv_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" >
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/video_poker_rv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            tools:itemCount="5"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/card_layout_poker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
+        android:visibility="gone"
         android:orientation="horizontal">
 
         <ImageView
@@ -157,6 +200,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:id="@+id/hold_button_layout_poker"
         android:layout_above="@+id/card_layout_poker"
         android:layout_alignParentStart="true"
