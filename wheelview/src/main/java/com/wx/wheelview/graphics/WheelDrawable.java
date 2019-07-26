@@ -18,6 +18,7 @@ package com.wx.wheelview.graphics;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 
 import com.wx.wheelview.common.WheelConstants;
@@ -65,6 +66,6 @@ public class WheelDrawable extends Drawable {
 
     @Override
     public int getOpacity() {
-        return 0;
+        return PixelFormat.UNKNOWN;
     }
 }

@@ -14,12 +14,12 @@ import android.graphics.drawable.Icon
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
-import androidx.annotation.DrawableRes
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Rational
 import android.view.View
 import android.view.WindowManager
+import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import hb.xvideoplayer.MxPlayerListener
@@ -186,9 +186,9 @@ class VideoPlayerActivity : AppCompatActivity() {
 
     override fun onUserLeaveHint() {
         //super.onUserLeaveHint()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             minimize()
-        }
+        //}
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

@@ -20,7 +20,7 @@ class ShowCheckTile : TileService() {
                 qsTile.updateTile()
                 val showCheck = Intent(this@ShowCheckTile, ShowCheckIntentService::class.java)
                 startService(showCheck)
-                delay(1000)
+                delay(500)
                 qsTile.state = Tile.STATE_INACTIVE
                 qsTile.updateTile()
             }
@@ -62,7 +62,7 @@ class ShowCheckTile : TileService() {
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        TileService.requestListeningState(this,
+        requestListeningState(this,
                 ComponentName(this, ShowCheckTile::class.java))
         return super.onBind(intent)!!
     }

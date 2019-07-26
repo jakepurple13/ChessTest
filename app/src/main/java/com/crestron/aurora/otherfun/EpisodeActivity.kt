@@ -1,24 +1,21 @@
 package com.crestron.aurora.otherfun
 
-import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
-import android.os.Build
 import android.os.Bundle
-import androidx.core.app.NotificationCompat
-import androidx.core.app.TaskStackBuilder
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.app.TaskStackBuilder
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
 import com.abdeveloper.library.MultiSelectDialog
 import com.abdeveloper.library.MultiSelectModel
 import com.crashlytics.android.Crashlytics
@@ -45,9 +42,7 @@ import com.tonyodev.fetch2core.DownloadBlock
 import kotlinx.android.synthetic.main.activity_episode.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.jetbrains.anko.defaultSharedPreferences
-import org.jsoup.Jsoup
 import programmer.box.utilityhelper.UtilNotification
 import spencerstudios.com.bungeelib.Bungee
 import java.net.SocketTimeoutException
@@ -94,10 +89,10 @@ class EpisodeActivity : AppCompatActivity() {
 
         mNotificationManager = this@EpisodeActivity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            UtilNotification.createNotificationChannel(this@EpisodeActivity, ConstantValues.CHANNEL_NAME, ConstantValues.CHANNEL_DES, ConstantValues.CHANNEL_ID)
-            UtilNotification.createNotificationGroup(this@EpisodeActivity, ConstantValues.GROUP_ID, ConstantValues.GROUP_NAME)
-        }
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        UtilNotification.createNotificationChannel(this@EpisodeActivity, ConstantValues.CHANNEL_NAME, ConstantValues.CHANNEL_DES, ConstantValues.CHANNEL_ID)
+        UtilNotification.createNotificationGroup(this@EpisodeActivity, ConstantValues.GROUP_ID, ConstantValues.GROUP_NAME)
+        //}
 
         handleIntent(intent)
 
@@ -140,14 +135,14 @@ class EpisodeActivity : AppCompatActivity() {
                     //download_info.text = nameUrl(info)
                 }
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
-                            info,
-                            download.progress,
-                            this@EpisodeActivity,
-                            DownloadViewerActivity::class.java,
-                            download.id)*/
-                }
+                //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
+                        info,
+                        download.progress,
+                        this@EpisodeActivity,
+                        DownloadViewerActivity::class.java,
+                        download.id)*/
+                //}
                 if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
                     DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             }
@@ -234,33 +229,31 @@ class EpisodeActivity : AppCompatActivity() {
                     DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
                 FetchingUtils.retryAll()
                 mNotificationManager.cancel(download.id)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    //UtilNotification.sendNotification(this@EpisodeActivity, android.R.mipmap.sym_def_app_icon, download.file.substring(download.file.lastIndexOf("/") + 1), "All Finished!", "showDownload", ChooseActivity::class.java, download.id)
-                    /*sendNotification(this@EpisodeActivity,
+                //UtilNotification.sendNotification(this@EpisodeActivity, android.R.mipmap.sym_def_app_icon, download.file.substring(download.file.lastIndexOf("/") + 1), "All Finished!", "showDownload", ChooseActivity::class.java, download.id)
+                /*sendNotification(this@EpisodeActivity,
+                        android.R.mipmap.sym_def_app_icon,
+                        download.file.substring(download.file.lastIndexOf("/") + 1),
+                        "All Finished!",
+                        ConstantValues.CHANNEL_ID,
+                        EpisodeActivity::class.java,
+                        download.id,
+                        KeyAndValue(ConstantValues.URL_INTENT, url),
+                        KeyAndValue(ConstantValues.NAME_INTENT, name))*/
+                if (defaultSharedPreferences.getBoolean("useNotifications", true)) {
+                    sendNotification(this@EpisodeActivity,
                             android.R.mipmap.sym_def_app_icon,
                             download.file.substring(download.file.lastIndexOf("/") + 1),
                             "All Finished!",
                             ConstantValues.CHANNEL_ID,
-                            EpisodeActivity::class.java,
+                            StartVideoFromNotificationActivity::class.java,
                             download.id,
-                            KeyAndValue(ConstantValues.URL_INTENT, url),
-                            KeyAndValue(ConstantValues.NAME_INTENT, name))*/
-                    if (defaultSharedPreferences.getBoolean("useNotifications", true)) {
-                        sendNotification(this@EpisodeActivity,
-                                android.R.mipmap.sym_def_app_icon,
-                                download.file.substring(download.file.lastIndexOf("/") + 1),
-                                "All Finished!",
-                                ConstantValues.CHANNEL_ID,
-                                StartVideoFromNotificationActivity::class.java,
-                                download.id,
-                                KeyAndValue("video_path", download.file),
-                                KeyAndValue("video_name", name))
-                        sendGroupNotification(this@EpisodeActivity,
-                                android.R.mipmap.sym_def_app_icon,
-                                "Finished Downloads",
-                                ConstantValues.CHANNEL_ID,
-                                ViewVideosActivity::class.java)
-                    }
+                            KeyAndValue("video_path", download.file),
+                            KeyAndValue("video_name", name))
+                    sendGroupNotification(this@EpisodeActivity,
+                            android.R.mipmap.sym_def_app_icon,
+                            "Finished Downloads",
+                            ConstantValues.CHANNEL_ID,
+                            ViewVideosActivity::class.java)
                 }
             }
         })
@@ -588,8 +581,8 @@ class EpisodeActivity : AppCompatActivity() {
             Loged.d("action: $action | data: $data | id: $id")
         } else {
             backChoice = true
-            url = intent.getStringExtra(ConstantValues.URL_INTENT)
-            name = intent.getStringExtra(ConstantValues.NAME_INTENT)
+            url = intent.getStringExtra(ConstantValues.URL_INTENT)!!
+            name = intent.getStringExtra(ConstantValues.NAME_INTENT)!!
         }
         KUtility.removeItemFromNotiJsonList(url)
     }
@@ -678,6 +671,7 @@ class EpisodeActivity : AppCompatActivity() {
         fun hit(name: String, url: String) {
             Loged.wtf("$name: $url")
         }
+
         fun hit(info: EpisodeInfo) {
             Loged.wtf("$info")
         }

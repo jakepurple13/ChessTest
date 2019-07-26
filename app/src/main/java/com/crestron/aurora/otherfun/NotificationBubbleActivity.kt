@@ -52,8 +52,8 @@ class NotificationBubbleActivity : AppCompatActivity() {
         /*for(i in urls.indices) {
             shows+=ShowInfo(names[i], urls[i])
         }*/
-        for(i in listString.list)
-            shows+=ShowInfo(i.name, i.url)
+        for (i in listString.list)
+            shows += ShowInfo(i.name, i.url)
 
         bubble_shows.layoutManager = LinearLayoutManager(this)
         class ItemOffsetDecoration(private val mItemOffset: Int) : RecyclerView.ItemDecoration() {
@@ -108,7 +108,6 @@ class NotificationBubbleActivity : AppCompatActivity() {
         fun downloadShow(name: String, url: String) {
             try {
                 GlobalScope.launch {
-
                     val epApi = EpisodeApi(ShowInfo(name, url))
 
                     val fetchingUtils = FetchingUtils(context)
@@ -116,7 +115,8 @@ class NotificationBubbleActivity : AppCompatActivity() {
                             EpisodeActivity.KeyAndValue(ConstantValues.URL_INTENT, url),
                             EpisodeActivity.KeyAndValue(ConstantValues.NAME_INTENT, name))
                 }
-            } catch(e: Exception) {}
+            } catch (e: Exception) {
+            }
         }
 
     }

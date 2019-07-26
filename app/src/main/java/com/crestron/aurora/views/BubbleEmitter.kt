@@ -205,6 +205,11 @@ class BubbleEmitter @JvmOverloads constructor(
         emit()
     }
 
+    private fun emitRunCustom(num: Int) = Runnable {
+        emitBubble(Random.nextInt(sizeFrom, sizeTo), true)
+        oneBubble(num-1)
+    }
+
     /**
      * If you want to change behavior of when you press on the bubbles
      */
@@ -389,6 +394,18 @@ class BubbleEmitter @JvmOverloads constructor(
         emitHandler.postDelayed(emitRun, Random.nextLong(timeFrom, timeTo))
     }
 
+    fun oneBubble(num: Int = 10) {
+        if (viewGroup != null && !viewGroup!!.contains(this))
+            viewGroup!!.addView(this, params)
+
+        if(num>0) {
+            emitHandler.postDelayed(emitRunCustom(num), Random.nextLong(timeFrom, timeTo))
+        } else {
+            stopEmitting(true)
+            return
+        }
+    }
+
     /**
      * Stops the bubbling
      * @param removeAtEnd If true, this view will be only removed at the end of the final bubble popping if this was created programmatically.
@@ -407,7 +424,7 @@ class BubbleEmitter @JvmOverloads constructor(
         bubbles.clear()
     }
 
-    private fun emitBubble(strength: Int) {
+    private fun emitBubble(strength: Int, customRun: Boolean = false) {
         if (bubbles.size >= bubbleLimit) {
             return
         }
@@ -423,7 +440,7 @@ class BubbleEmitter @JvmOverloads constructor(
         )
 
         pushHandler.postDelayed({
-            if (isBubbling)
+            if (isBubbling || customRun)
                 bubbles.add(bubble)
         }, emissionDelayMillis)
 

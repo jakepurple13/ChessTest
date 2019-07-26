@@ -2,7 +2,6 @@ package crestron.com.deckofcards
 
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
-import kotlin.properties.Delegates
 
 class TestTwo {
     @Test
@@ -339,7 +338,7 @@ class TestTwo {
         println(lazyValue)
         println(lazyValue)
 
-        class User(val map: Map<String, Any?>? = null) {
+        /*class User(val map: Map<String, Any?>? = null) {
             var name: String by Delegates.observable("<no name>") { _, old, new ->
                 println("$old -> $new")
             }
@@ -356,7 +355,7 @@ class TestTwo {
         user.name = "second"
         log(user.name)
         log(user.name1)
-        log("${user.age}")
+        log("${user.age}")*/
 
         val items = listOf(1, 2, 3, 4, 5)
         // Lambdas are code blocks enclosed in curly braces.

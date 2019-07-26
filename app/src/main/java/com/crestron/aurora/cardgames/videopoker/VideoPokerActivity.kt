@@ -45,6 +45,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import nl.dionsegijn.steppertouch.OnStepCallback
+import kotlin.math.abs
 
 class VideoPokerActivity : AppCompatActivity() {
 
@@ -346,7 +347,8 @@ class VideoPokerActivity : AppCompatActivity() {
                                     rotation = 180f
                                 }
                                 touchEvent = BubbleEmitter.BUBBLE_POP
-                                startEmitting()
+                                //startEmitting()
+                                oneBubble(abs(money))
                             }
                         }
                         delay(2500)

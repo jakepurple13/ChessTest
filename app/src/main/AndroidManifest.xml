@@ -26,7 +26,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="LockedOrientationActivity">
-        <activity android:name=".otherfun.NotificationBubbleActivity"
+        <activity
+            android:name=".otherfun.NotificationBubbleActivity"
             android:label="Download Show"
             android:allowEmbedded="true"
             android:documentLaunchMode="always"
@@ -77,48 +78,125 @@
             android:name=".otherfun.EpisodeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent">
-            <intent-filter android:autoVerify="true">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Anime -->
-                <data
-                    android:host="fun.animeplus.tv"
-                    android:scheme="http" />
-                <!--
-                <data
-                    android:host="www.animeplus.tv"
-                    android:scheme="https" />
 
                 <data
-                    android:host="www.animeplus.tv"
-                    android:scheme="http" />
-                -->
+                    android:scheme="http"
+                    android:host="fun.animeplus.tv" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:host="fun.animeplus.tv"
-                    android:scheme="https" />
+                    android:scheme="http"
+                    android:host="fun.animeplus.tv" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:host="fun.gogoanime1.com"
-                    android:scheme="http" />
+                    android:scheme="http"
+                    android:host="fun.gogoanime1.com" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:host="fun.gogoanime1.com"
-                    android:scheme="https" />
-                <!-- Cartoon -->
-                <!--
+                    android:scheme="http"
+                    android:host="fun.gogoanime1.com" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:host="www.animetoon.org"
-                    android:scheme="http" />
+                    android:scheme="http"
+                    android:host="fun.animetoon.org" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:host="www.animetoon.org"
-                    android:scheme="https" />
-                -->
+                    android:scheme="http"
+                    android:host="fun.animetoon.org" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:host="fun.animetoon.org"
-                    android:scheme="http" />
+                    android:scheme="https"
+                    android:host="fun.animeplus.tv" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:host="fun.animetoon.org"
-                    android:scheme="https" />
+                    android:scheme="https"
+                    android:host="fun.animeplus.tv" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="fun.gogoanime1.com" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="fun.gogoanime1.com" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="fun.animetoon.org" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="fun.animetoon.org" />
             </intent-filter>
         </activity>
         <activity

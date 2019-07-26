@@ -6,16 +6,16 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
-import androidx.core.app.ActivityOptionsCompat
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.text.Html
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityOptionsCompat
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
@@ -89,7 +89,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
 
             runOnUiThread {
                 val listScreen = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")
-                val showListsForScreen = Gson().fromJson<NameList>(listScreen, NameList::class.java)
+                val showListsForScreen = Gson().fromJson(listScreen, NameList::class.java)
                 favorite_text.append("\nFavorite Count: ${showList.size}")
                 list_to_choose.adapter = FavoriteShowsAdapter(stuff, this@FavoriteShowsActivity, showListsForScreen.list, object : ShowHit {
                     override fun longClick(name: String, url: String, checked: Boolean) {
@@ -100,7 +100,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
 
                     override fun isChecked(url: String): Boolean {
                         val list = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")
-                        val showLists = Gson().fromJson<NameList>(list, NameList::class.java)
+                        val showLists = Gson().fromJson(list, NameList::class.java)
                         return showLists.list.any { it.url == url }
                     }
 
@@ -194,7 +194,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
 
         Loged.i(list!!)
 
-        val showList = Gson().fromJson<NameList>(list, NameList::class.java)
+        val showList = Gson().fromJson(list, NameList::class.java)
 
         if (addOrRemove)
             showList.list.add(NameUrl(name, url))
