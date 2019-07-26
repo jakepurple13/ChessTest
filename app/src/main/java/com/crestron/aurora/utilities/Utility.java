@@ -96,7 +96,7 @@ public class Utility {
         Account[] accounts = manager.getAccountsByType("com.google");
         List<String> possibleEmails = new LinkedList<>();
         for (Account account : accounts) {
-            Loged.INSTANCE.d(account.name, "NAME", false);
+            Loged.INSTANCE.d(account.name, "NAME", false, true);
             possibleEmails.add(account.name);
         }
         if (!possibleEmails.isEmpty() && possibleEmails.get(0) != null) {

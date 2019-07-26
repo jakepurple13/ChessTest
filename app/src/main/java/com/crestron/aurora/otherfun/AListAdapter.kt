@@ -131,30 +131,6 @@ class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
                 action.hit(stuff[position].name, stuff[position].url, it, holder.favorite)
             }
 
-            /*holder.linkType.setOnLongClickListener {
-                holder.layout.flashScreen(paramSetup = {
-                    it.alignParentStart()
-                    it.alignParentEnd()
-                    it.sameTop(holder.linkType)
-                    it.sameBottom(holder.linkType)
-                })
-                *//*GlobalScope.launch(Dispatchers.Main) {
-                    val params1 = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT).apply {
-                        alignParentStart()
-                        alignParentEnd()
-                        sameTop(holder.linkType)
-                        sameBottom(holder.linkType)
-                    }
-                    val rl = RelativeLayout(context)
-                    rl.setBackgroundColor(Color.BLUE)
-                    rl.z = Float.MAX_VALUE
-
-                    holder.layout.addView(rl, params1)
-                }*//*
-                Loged.i("Flash!")
-                true
-            }*/
-
             holder.layout.setOnClickListener {
                 holder.linkType.performClick()
             }
@@ -187,19 +163,9 @@ class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
                         }
 
                         fun liked(like: Boolean) {
-                            launch {
+                            GlobalScope.launch {
                                 if (like) {
                                     show.showDao().insert(Show(stuff[position].url, stuff[position].name))
-                                    /*launch {
-                                        val s = show.showDao().getShow(stuff[position].name)
-                                        val showList = getEpisodeList(stuff[position]).await()
-                                        if (s.showNum < showList) {
-                                            s.showNum = showList
-                                            show.showDao().updateShow(s)
-                                        }
-                                        Loged.wtf("${s.name} and size is $showList")
-                                    }*/
-
                                 } else {
                                     show.showDao().deleteShow(stuff[position].name)
                                 }
@@ -208,41 +174,6 @@ class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
 
                     })
                 }
-
-                //holder.favorite.isLiked = show.showDao().isUrlInDatabase(stuff[position].url) > 0
-
-                /*holder.favorite.setOnLikeListener(object : OnLikeListener {
-                    override fun liked(p0: LikeButton?) {
-                        liked(p0!!.isLiked)
-                    }
-
-                    override fun unLiked(p0: LikeButton?) {
-                        liked(p0!!.isLiked)
-                    }
-
-                    fun liked(like: Boolean) {
-                        launch {
-                            if (like) {
-
-                                show.showDao().insert(Show(stuff[position].url, stuff[position].name))
-
-                                launch {
-                                    val s = show.showDao().getShow(stuff[position].name)
-                                    val showList = getEpisodeList(stuff[position]).await()
-                                    if (s.showNum < showList) {
-                                        s.showNum = showList
-                                        show.showDao().updateShow(s)
-                                    }
-                                    Loged.wtf("${s.name} and size is $showList")
-                                }
-
-                            } else {
-                                show.showDao().deleteShow(stuff[position].name)
-                            }
-                        }
-                    }
-
-                })*/
             }
 
         }

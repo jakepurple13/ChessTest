@@ -142,13 +142,13 @@ class ViewVideosActivity : AppCompatActivity() {
                     .negativeText("Cancel")
                     .setMinSelectionLimit(0) //you can set minimum checkbox selection limit (Optional)
                     .setMaxSelectionLimit(listOfFiles.size) //you can set maximum checkbox selection limit (Optional)
-                    .multiSelectList(java.util.ArrayList<MultiSelectModel>().apply {
+                    .multiSelectList(ArrayList<MultiSelectModel>().apply {
                         for (i in 0 until listOfFiles.size) {
                             add(MultiSelectModel(i, listOfFiles[i].name))
                         }
                     }) // the multi select model list with ids and name
                     .onSubmit(object : MultiSelectDialog.SubmitCallbackListener {
-                        override fun onSelected(selectedIds: java.util.ArrayList<Int>?, selectedNames: java.util.ArrayList<String>?, dataString: String?) {
+                        override fun onSelected(selectedIds: ArrayList<Int>?, selectedNames: ArrayList<String>?, dataString: String?) {
                             GlobalScope.launch {
                                 for (f in listOfFiles) {
                                     if (selectedNames!!.any { it == f.name }) {
@@ -157,7 +157,7 @@ class ViewVideosActivity : AppCompatActivity() {
                                         runOnUiThread {
                                             val index = listOfFiles.indexOf(f)
                                             listOfFiles.remove(f)
-                                            adapter!!.notifyItemRemoved(index)
+                                            adapter!!.remove(index)//notifyItemRemoved(index)
                                         }
                                     }
                                 }
@@ -301,7 +301,7 @@ class ViewVideosActivity : AppCompatActivity() {
             }
         }
 
-        private fun remove(position: Int) {
+        fun remove(position: Int) {
             context.defaultSharedPreferences.edit().remove(stuff[position].path).apply()
             val f = stuff.removeAt(position)
             if (f.exists())

@@ -77,7 +77,7 @@ public class ReadMoreOption {
                     }
 
                     ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) textView.getLayoutParams();
-                    Loged.INSTANCE.wtf(text, Loged.INSTANCE.getTAG(), true);
+                    Loged.INSTANCE.wtf(text, Loged.INSTANCE.getTAG(), true, true);
                     String subString = text.substring(textView.getLayout().getLineStart(0),
                             textView.getLayout().getLineEnd(textLength - 1));
                     textLengthNew = subString.length() - (moreLabel.length() + 4 + (lp.rightMargin / 6));

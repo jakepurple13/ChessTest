@@ -1,6 +1,5 @@
 package com.crestron.aurora.showapi
 
-import com.crestron.aurora.Loged
 import com.google.gson.Gson
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document

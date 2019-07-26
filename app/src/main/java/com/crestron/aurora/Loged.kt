@@ -3,7 +3,6 @@ package com.crestron.aurora
 import android.util.Log
 
 import java.util.ArrayList
-import java.util.Arrays
 
 /**
  * Created by Jacob on 10/3/17.
@@ -12,11 +11,12 @@ import java.util.Arrays
 object Loged {
 
     var SHOW_PRETTY: Boolean = true
+    var WITH_THREAD_NAME: Boolean = true
     var FILTER_BY_CLASS_NAME = ""
     var TAG = "Loged"
     private const val HELPER_NAME = "Loged"
 
-    private fun prettyLog(tag: String, msg: String, level: Int) {
+    private fun prettyLog(tag: String, msg: String, level: Int, threadName: Boolean) {
         //the main message to be logged
         var logged = msg
         //the arrow for the stack trace
@@ -24,7 +24,7 @@ object Loged {
         //the stack trace
         val stackTraceElement = Thread.currentThread().stackTrace
 
-        val elements = Arrays.asList(*stackTraceElement)
+        val elements = listOf(*stackTraceElement)
         val wanted = ArrayList<StackTraceElement>()
 
         for (i in elements.indices) {
@@ -58,12 +58,12 @@ object Loged {
 
         logged += loc
 
-        Log.println(level, tag, logged)
+        Log.println(level, tag + if(threadName)  "/${Thread.currentThread().name}" else "", logged)
     }
 
     //---------------------------------EVERYTHING BELOW WORKS FINE----------------------------------
 
-    private fun log(tag: String, msg: String, level: Int) {
+    private fun log(tag: String, msg: String, level: Int, threadName: Boolean) {
         val stackTraceElement = Thread.currentThread().stackTrace
         var currentIndex = -1
         for (i in stackTraceElement.indices) {
@@ -80,7 +80,7 @@ object Loged {
         val lineNumber = stackTraceElement[currentIndex].lineNumber
         val logged = "$msg\tat $fullClassName.$methodName($fileName:$lineNumber)"
 
-        Log.println(level, tag, logged)
+        Log.println(level, tag + if(threadName)  "/${Thread.currentThread().name}" else "", logged)
     }
 
     //Console Log-------------------------------------------------
@@ -90,10 +90,10 @@ object Loged {
      *
      * @param msg the message to log
      */
-    fun e(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY) {
+    fun e(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg, Log.ERROR)
-            false -> log(tag, msg, Log.ERROR)
+            true -> prettyLog(tag, msg, Log.ERROR, threadName)
+            false -> log(tag, msg, Log.ERROR, threadName)
         }
     }
 
@@ -102,10 +102,10 @@ object Loged {
      *
      * @param msg the message to log
      */
-    fun i(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY) {
+    fun i(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg, Log.INFO)
-            false -> log(tag, msg, Log.INFO)
+            true -> prettyLog(tag, msg, Log.INFO, threadName)
+            false -> log(tag, msg, Log.INFO, threadName)
         }
     }
 
@@ -114,10 +114,10 @@ object Loged {
      *
      * @param msg the message to log
      */
-    fun a(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY) {
+    fun a(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg, Log.ASSERT)
-            false -> log(tag, msg, Log.ASSERT)
+            true -> prettyLog(tag, msg, Log.ASSERT, threadName)
+            false -> log(tag, msg, Log.ASSERT, threadName)
         }
     }
 
@@ -126,10 +126,10 @@ object Loged {
      *
      * @param msg the message to log
      */
-    fun wtf(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY) {
+    fun wtf(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg, Log.ASSERT)
-            false -> log(tag, msg, Log.ASSERT)
+            true -> prettyLog(tag, msg, Log.ASSERT, threadName)
+            false -> log(tag, msg, Log.ASSERT, threadName)
         }
     }
 
@@ -138,10 +138,10 @@ object Loged {
      *
      * @param msg the message to log
      */
-    fun w(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY) {
+    fun w(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg, Log.WARN)
-            false -> log(tag, msg, Log.WARN)
+            true -> prettyLog(tag, msg, Log.WARN, threadName)
+            false -> log(tag, msg, Log.WARN, threadName)
         }
     }
 
@@ -150,10 +150,10 @@ object Loged {
      *
      * @param msg the message to log
      */
-    fun d(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY) {
+    fun d(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg, Log.DEBUG)
-            false -> log(tag, msg, Log.DEBUG)
+            true -> prettyLog(tag, msg, Log.DEBUG, threadName)
+            false -> log(tag, msg, Log.DEBUG, threadName)
         }
     }
 
@@ -162,10 +162,10 @@ object Loged {
      *
      * @param msg the message to log
      */
-    fun v(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY) {
+    fun v(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg, Log.VERBOSE)
-            false -> log(tag, msg, Log.VERBOSE)
+            true -> prettyLog(tag, msg, Log.VERBOSE, threadName)
+            false -> log(tag, msg, Log.VERBOSE, threadName)
         }
     }
 

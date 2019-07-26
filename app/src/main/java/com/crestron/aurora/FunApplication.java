@@ -69,8 +69,8 @@ public class FunApplication extends Application {
 
         context = this;
 
-        Loged.INSTANCE.wtf("We are connected: " + Utility.isNetwork(this), Loged.INSTANCE.getTAG(), true);
-        Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(KUtility.Util.getNextCheckTime()), "TAG", true);
+        Loged.INSTANCE.wtf("We are connected: " + Utility.isNetwork(this), Loged.INSTANCE.getTAG(), true, true);
+        Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(KUtility.Util.getNextCheckTime()), "TAG", true, true);
 
         SharedPreferences sharedPreferences = getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE);
         FetchingUtils.Fetched.setFolderLocation(sharedPreferences.getString(ConstantValues.FOLDER_LOCATION, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/Fun/"));
@@ -223,7 +223,7 @@ public class FunApplication extends Application {
                 scl.add(downloadViewer);
 
             } catch (SecurityException e) {
-                Loged.INSTANCE.wtf(e.getMessage(), Loged.INSTANCE.getTAG(), true);
+                Loged.INSTANCE.wtf(e.getMessage(), Loged.INSTANCE.getTAG(), true, true);
             }
 
             shortcutManager.setDynamicShortcuts(scl);
@@ -276,7 +276,7 @@ public class FunApplication extends Application {
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         AlarmManager.AlarmClockInfo al = alarm.getNextAlarmClock();
         try {
-            Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(al.getTriggerTime()), "TAG", true);
+            Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(al.getTriggerTime()), "TAG", true, true);
         } catch (NullPointerException e) {
             //Loged.INSTANCE.wtf(e.getMessage(), "TAG", true);
             //e.printStackTrace();

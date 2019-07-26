@@ -9,9 +9,8 @@ import com.crestron.aurora.utilities.KUtility
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
 import crestron.com.deckofcards.Suit
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.html.*
 import kotlinx.html.stream.appendHTML
 import kotlinx.html.stream.createHTML
@@ -169,9 +168,9 @@ class ExampleUnitTest {
         val methodName = stackTraceElement[currentIndex].methodName
         val fileName = stackTraceElement[currentIndex].fileName
         val lineNumber = stackTraceElement[currentIndex].lineNumber
-        val logged = "$msg\t.$methodName\t($fileName:$lineNumber)"
+        val logged = "${Thread.currentThread().name}/\t$msg\tat $fullClassName.$methodName($fileName:$lineNumber)"
 
-        System.out.println(logged)
+        println(logged)
     }
 
     @Test
@@ -532,13 +531,90 @@ class ExampleUnitTest {
             card(Suit.HEARTS, 7)
             card(Suit.DIAMONDS, 7)
             card(Suit.CLUBS, 7)
-            randomCard()
+            //randomCard()
         }
         d - Suit.CLUBS
         d - Suit.DIAMONDS
 
         System.out.println(d.toArrayString())
 
+    }
+
+    @Test
+    fun test5() {
+        log("Main Thread?")
+        runBlocking {
+            log("Launch Thread?")
+        }
+        runBlocking(Dispatchers.Default) {
+            log("Default Thread?")
+        }
+        runBlocking(Dispatchers.IO) {
+            log("IO Thread?")
+        }
+        runBlocking(Dispatchers.Unconfined) {
+            log("Unconfined Thread?")
+            coroutineContext[Job]
+        }
+        runBlocking(newSingleThreadContext("asdf")) {
+            log("asdf Thread?")
+        }
+        runBlocking(CoroutineName("Co-name")) {
+            parentResponsibilities()
+            log("My own name")
+        }
+        runBlocking(Dispatchers.Default + CoroutineName("test")) {
+            println("I'm working in thread ${Thread.currentThread().name}")
+            log("Where am I now?")
+        }
+        runBlocking {
+            threadLocalStuff()
+        }
+        runBlocking {
+            channelTest()
+        }
+
+    }
+
+    suspend fun channelTest() {
+        val channel = Channel<Int>()
+        GlobalScope.launch {
+            // this might be heavy CPU-consuming computation or async logic, we'll just send five squares
+            for (x in 1..5)  {
+                channel.send(x * x)
+            }
+        }
+        // here we print five received integers:
+        repeat(5) { println(channel.receive()) }
+        println("Done!")
+    }
+
+    suspend fun threadLocalStuff() {
+        val threadLocal = ThreadLocal<String?>()
+        threadLocal.set("NewThread")
+        println("Pre-main, current thread: ${Thread.currentThread()}, thread local value: '${threadLocal.get()}'")
+        val job = GlobalScope.launch(Dispatchers.Default + threadLocal.asContextElement(value = "launch")) {
+            println("Launch start, current thread: ${Thread.currentThread()}, thread local value: '${threadLocal.get()}'")
+            yield()
+            println("After yield, current thread: ${Thread.currentThread()}, thread local value: '${threadLocal.get()}'")
+        }
+        job.join()
+        println("Post-main, current thread: ${Thread.currentThread()}, thread local value: '${threadLocal.get()}'")
+    }
+
+    suspend fun parentResponsibilities() {
+        // launch a coroutine to process some kind of incoming request
+        val request = GlobalScope.launch {
+            repeat(3) { i -> // launch a few children jobs
+                launch  {
+                    delay((i + 1) * 200L) // variable delay 200ms, 400ms, 600ms
+                    println("Coroutine $i is done")
+                }
+            }
+            println("request: I'm done and I don't explicitly join my children that are still active")
+        }
+        request.join() // wait for completion of the request, including all its children
+        println("Now processing of the request is complete")
     }
 
 }
