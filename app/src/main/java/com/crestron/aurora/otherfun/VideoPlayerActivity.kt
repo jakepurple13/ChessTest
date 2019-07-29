@@ -19,7 +19,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
@@ -145,6 +144,38 @@ class VideoPlayerActivity : AppCompatActivity() {
 
     private var locked = false
 
+    private lateinit var gesture: GestureDetector
+
+    private var lockTimer = TimerStuff({
+        //video_lock.animate().setDuration(500).alpha(0f)
+        //video_back.animate().setDuration(500).alpha(0f)
+        video_info_layout.animate().setDuration(500).alpha(0f)
+    })
+
+    private var mDownX: Float = 0.toFloat()
+    private var mDownY: Float = 0.toFloat()
+    private var mChangeLight: Boolean = false
+    private var mChangeVolume: Boolean = false
+    private var mGestureDownVolume: Int = 0
+    private var mGestureDownBrightness: Int = 0
+
+    private var mScreenWidth: Int = 0
+    private var mScreenHeight: Int = 0
+
+    private lateinit var mAudioManager: AudioManager
+
+    @Suppress("PrivatePropertyName")
+    private val THRESHOLD = 70
+    @Suppress("PrivatePropertyName")
+    private val SCREEN_WINDOW_FULLSCREEN = 2
+    private var mCurrentScreen = SCREEN_WINDOW_FULLSCREEN
+
+    private var mVolumeDialog: Dialog? = null
+    private var mDialogVolumeProgressBar: ProgressBar? = null
+
+    private var mBrightnessDialog: Dialog? = null
+    private lateinit var mDialogBrightnessProgressBar: ProgressBar
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,8 +189,14 @@ class VideoPlayerActivity : AppCompatActivity() {
                 decorView.systemUiVisibility = flags
             }
         }
-        name = intent.getStringExtra("video_name")
-        path = intent.getStringExtra("video_path")
+        name = intent.getStringExtra("video_name")!!
+        path = intent.getStringExtra("video_path")!!
+
+        if(path.isEmpty()) {
+            finish()
+        }
+
+        video_name.text = name
 
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         currentVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
@@ -169,7 +206,6 @@ class VideoPlayerActivity : AppCompatActivity() {
 
         mAudioManager = audio
 
-
         player = ExoPlayerFactory.newSimpleInstance(this)
 
         playerView.player = player
@@ -178,7 +214,7 @@ class VideoPlayerActivity : AppCompatActivity() {
         player.prepare(videoSource)
         playerView.controllerAutoShow = true
         //playerView.controllerHideOnTouch = true
-        //playerView.controllerShowTimeoutMs = 500
+        playerView.controllerShowTimeoutMs = 2000
         playerView.player!!.playWhenReady = true
 
         video_lock.setImageDrawable(IconicsDrawable(this).icon(FontAwesome.Icon.faw_unlock).sizeDp(24))
@@ -186,8 +222,7 @@ class VideoPlayerActivity : AppCompatActivity() {
             locked = !locked
             video_lock.setImageDrawable(IconicsDrawable(this).icon(if (locked) FontAwesome.Icon.faw_lock else FontAwesome.Icon.faw_unlock).sizeDp(24))
         }
-        val backButton = playerView.findViewById<ImageView>(R.id.video_back)
-        backButton.setOnClickListener {
+        video_back.setOnClickListener {
             onBackPressed()
         }
 
@@ -287,8 +322,12 @@ class VideoPlayerActivity : AppCompatActivity() {
 
     override fun onStop() {
         //mpw_video_player.pauseVideo()
-        playerView.player!!.playWhenReady = false
-        playerView.player.release()
+        try {
+            playerView.player!!.playWhenReady = false
+            playerView.player.release()
+        } catch(e: IllegalStateException) {
+
+        }
         lockTimer.stopLock()
         super.onStop()
     }
@@ -302,8 +341,6 @@ class VideoPlayerActivity : AppCompatActivity() {
         playerView.player!!.release()
         super.onBackPressed()
     }
-
-    private lateinit var gesture: GestureDetector
 
     private fun initVideoPlayer() {
         gesture = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
@@ -331,26 +368,6 @@ class VideoPlayerActivity : AppCompatActivity() {
         })
         playerView.setOnTouchListener(onTouch)
     }
-
-    private var lockTimer = TimerStuff({
-        video_lock.animate().setDuration(500).alpha(0f)
-    })
-
-    private var mDownX: Float = 0.toFloat()
-    private var mDownY: Float = 0.toFloat()
-    private var mChangeLight: Boolean = false
-    private var mChangeVolume: Boolean = false
-    private var mGestureDownVolume: Int = 0
-    private var mGestureDownBrightness: Int = 0
-
-    private var mScreenWidth: Int = 0
-    private var mScreenHeight: Int = 0
-
-    private lateinit var mAudioManager: AudioManager
-
-    private val THRESHOLD = 70
-    private val SCREEN_WINDOW_FULLSCREEN = 2
-    private var mCurrentScreen = SCREEN_WINDOW_FULLSCREEN
 
     private val onTouch = View.OnTouchListener { v, event ->
         lockTimer.restartLock()
@@ -427,15 +444,12 @@ class VideoPlayerActivity : AppCompatActivity() {
 
         playerView.useController = !locked
 
-        video_lock.animate().setDuration(500).alpha(1f)
+        video_info_layout.animate().setDuration(500).alpha(1f)
+        //video_back.animate().setDuration(500).alpha(1f)
         lockTimer.startLock()
 
         false
     }
-
-
-    private var mVolumeDialog: Dialog? = null
-    private var mDialogVolumeProgressBar: ProgressBar? = null
 
     private fun showVolumeDialog(v: Float, volumePercent: Int) {
         if (mVolumeDialog == null) {
@@ -468,9 +482,6 @@ class VideoPlayerActivity : AppCompatActivity() {
             mVolumeDialog!!.dismiss()
         }
     }
-
-    private var mBrightnessDialog: Dialog? = null
-    private lateinit var mDialogBrightnessProgressBar: ProgressBar
 
     private fun showBrightnessDialog(v: Float, brightnessPercent: Int) {
         if (mBrightnessDialog == null) {
