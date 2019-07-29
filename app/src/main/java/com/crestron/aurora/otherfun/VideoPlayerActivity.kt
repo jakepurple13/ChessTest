@@ -10,6 +10,7 @@ import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.drawable.Icon
 import android.media.AudioManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -28,8 +29,11 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.source.ExtractorMediaSource
+import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
@@ -125,7 +129,6 @@ class VideoPlayerActivity : AppCompatActivity() {
         setPictureInPictureParams(mPictureInPictureParamsBuilder.build())
     }
 
-
     private val flags = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
             or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
             or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -147,8 +150,6 @@ class VideoPlayerActivity : AppCompatActivity() {
     private lateinit var gesture: GestureDetector
 
     private var lockTimer = TimerStuff({
-        //video_lock.animate().setDuration(500).alpha(0f)
-        //video_back.animate().setDuration(500).alpha(0f)
         video_info_layout.animate().setDuration(500).alpha(0f)
     })
 
@@ -209,9 +210,21 @@ class VideoPlayerActivity : AppCompatActivity() {
         player = ExoPlayerFactory.newSimpleInstance(this)
 
         playerView.player = player
-        val dataSourceFactory = DefaultDataSourceFactory(this, Util.getUserAgent(this, "Fun"))
-        val videoSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(path.toUri())
-        player.prepare(videoSource)
+
+        val dOrS = intent.getBooleanExtra("download_or_stream", true)
+         if(dOrS) {
+             val dataSourceFactory = DefaultDataSourceFactory(this, Util.getUserAgent(this, "Fun"))
+             val videoSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(path.toUri())
+             player.prepare(videoSource)
+         } else {
+             fun buildMediaSource(uri: Uri): MediaSource {
+                 return ExtractorMediaSource.Factory(
+                         DefaultHttpDataSourceFactory("exoplayer-codelab")).
+                         createMediaSource(uri)
+             }
+             val source = buildMediaSource(path.toUri())
+             player.prepare(source, true, false)
+         }
         playerView.controllerAutoShow = true
         //playerView.controllerHideOnTouch = true
         playerView.controllerShowTimeoutMs = 2000
@@ -288,11 +301,16 @@ class VideoPlayerActivity : AppCompatActivity() {
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         if (isInPictureInPictureMode) {
+            lockTimer.action()
             // Starts receiving events from action items in PiP mode.
             registerReceiver(mReceiver, IntentFilter(ACTION_MEDIA_CONTROL))
         } else {
             // We are out of PiP mode. We can stop receiving events from it.
-            unregisterReceiver(mReceiver)
+            try {
+                unregisterReceiver(mReceiver)
+            } catch(e: IllegalArgumentException) {
+
+            }
             // Show the video controls if the video is not playing
             //if (!mpw_video_player.isPlaying) {
             //.showControls()
@@ -340,6 +358,18 @@ class VideoPlayerActivity : AppCompatActivity() {
         }*/
         playerView.player!!.release()
         super.onBackPressed()
+    }
+
+    private fun playVideo() {
+        val pause = playerView.findViewById<ImageButton>(R.id.exo_pause)
+        if (pause.visibility != View.GONE)
+            pause.performClick()
+    }
+
+    private fun pauseVideo() {
+        val play = playerView.findViewById<ImageButton>(R.id.exo_play)
+        if (play.visibility != View.GONE)
+            play.performClick()
     }
 
     private fun initVideoPlayer() {
@@ -546,7 +576,7 @@ class VideoPlayerActivity : AppCompatActivity() {
         private var myHandler = Handler()
 
         fun startLock() {
-            myHandler.postDelayed(myRunnable, TIME_TO_WAIT.toLong())
+            myHandler.postDelayed(myRunnable, TIME_TO_WAIT)
         }
 
         fun stopLock() {
@@ -555,7 +585,7 @@ class VideoPlayerActivity : AppCompatActivity() {
 
         fun restartLock() {
             myHandler.removeCallbacks(myRunnable)
-            myHandler.postDelayed(myRunnable, TIME_TO_WAIT.toLong())
+            myHandler.postDelayed(myRunnable, TIME_TO_WAIT)
         }
     }
 

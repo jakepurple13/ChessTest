@@ -103,6 +103,13 @@
             android:summaryOn="Using Slider"
             android:title="Use a Slider or a Button to download videos" />
 
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="download_or_stream"
+            android:summaryOff="Stream"
+            android:summaryOn="Download"
+            android:title="Stream Videos or Download Videos" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

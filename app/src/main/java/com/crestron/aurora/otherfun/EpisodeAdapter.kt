@@ -1,11 +1,11 @@
 package com.crestron.aurora.otherfun
 
 import android.content.Context
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
 import com.agik.AGIKSwipeButton.Controller.OnSwipeCompleteListener
 import com.agik.AGIKSwipeButton.View.Swipe_Button_View
 import com.crestron.aurora.Loged
@@ -13,7 +13,6 @@ import com.crestron.aurora.R
 import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeInfo
-import com.crestron.aurora.showapi.ShowInfo
 import kotlinx.android.synthetic.main.episode_info.view.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -22,7 +21,7 @@ import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
 //class EpisodeAdapter(private val items: ArrayList<String>, private val links: ArrayList<String>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
-class EpisodeAdapter(private val items: ArrayList<EpisodeInfo>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
+class EpisodeAdapter(private val items: ArrayList<EpisodeInfo>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, val downloadOrStream: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
 
     // Gets the number of animals in the list
     override fun getItemCount(): Int {
@@ -60,6 +59,10 @@ class EpisodeAdapter(private val items: ArrayList<EpisodeInfo>, private val name
 
             }
         })
+
+        holder.episodeDownload.text = if(downloadOrStream) "Download" else "Stream"
+
+        holder.slideToDownload.setText(if(downloadOrStream) "Download" else "Stream")
 
         val show = ShowDatabase.getDatabase(this@EpisodeAdapter.context).showDao()
 
