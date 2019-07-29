@@ -2,9 +2,7 @@ package com.crestron.aurora.otherfun
 
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
-import android.app.PendingIntent
-import android.app.PictureInPictureParams
-import android.app.RemoteAction
+import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,18 +12,32 @@ import android.graphics.drawable.Icon
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Rational
+import android.os.Handler
+import android.provider.Settings
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.ProgressBar
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
-import hb.xvideoplayer.MxPlayerListener
-import hb.xvideoplayer.MxVideoPlayer
+import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.util.Util
+import com.mikepenz.fontawesome_typeface_library.FontAwesome
+import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_video_player.*
+import kotlinx.coroutines.Runnable
 import org.jetbrains.anko.defaultSharedPreferences
+import kotlin.math.abs
 
 
 class VideoPlayerActivity : AppCompatActivity() {
@@ -76,9 +88,13 @@ class VideoPlayerActivity : AppCompatActivity() {
 
                 // This is where we are called back from Picture-in-Picture action items.
                 val controlType = intent.getIntExtra(EXTRA_CONTROL_TYPE, 0)
-                when (controlType) {
+                /*when (controlType) {
                     CONTROL_TYPE_PLAY -> mpw_video_player.playVideo()
                     CONTROL_TYPE_PAUSE -> mpw_video_player.pauseVideo()
+                }*/
+                when (controlType) {
+                    CONTROL_TYPE_PLAY -> playerView.player!!.playWhenReady = true
+                    CONTROL_TYPE_PAUSE -> playerView.player!!.playWhenReady = false
                 }
             }
         }
@@ -118,12 +134,16 @@ class VideoPlayerActivity : AppCompatActivity() {
             or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
             or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
 
-    var currentVolume: Int = 0
+    private var currentVolume: Int = 0
 
     lateinit var path: String
     lateinit var name: String
 
-    var currentPos: Long = 0
+    private var currentPos: Long = 0
+
+    private lateinit var player: SimpleExoPlayer
+
+    private var locked = false
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,14 +164,44 @@ class VideoPlayerActivity : AppCompatActivity() {
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         currentVolume = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
 
-        mpw_video_player.hideFullScreenButton = true
-        mpw_video_player.autoStartPlay(path, MxVideoPlayer.SCREEN_WINDOW_FULLSCREEN, name)
+        mScreenWidth = this.resources.displayMetrics.widthPixels
+        mScreenHeight = this.resources.displayMetrics.heightPixels
+
+        mAudioManager = audio
+
+
+        player = ExoPlayerFactory.newSimpleInstance(this)
+
+        playerView.player = player
+        val dataSourceFactory = DefaultDataSourceFactory(this, Util.getUserAgent(this, "Fun"))
+        val videoSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(path.toUri())
+        player.prepare(videoSource)
+        playerView.controllerAutoShow = true
+        //playerView.controllerHideOnTouch = true
+        //playerView.controllerShowTimeoutMs = 500
+        playerView.player!!.playWhenReady = true
+
+        video_lock.setImageDrawable(IconicsDrawable(this).icon(FontAwesome.Icon.faw_unlock).sizeDp(24))
+        video_lock.setOnClickListener {
+            locked = !locked
+            video_lock.setImageDrawable(IconicsDrawable(this).icon(if (locked) FontAwesome.Icon.faw_lock else FontAwesome.Icon.faw_unlock).sizeDp(24))
+        }
+        val backButton = playerView.findViewById<ImageView>(R.id.video_back)
+        backButton.setOnClickListener {
+            onBackPressed()
+        }
+
+        initVideoPlayer()
+
+        //mpw_video_player.hideFullScreenButton = true
+        //mpw_video_player.autoStartPlay(path, MxVideoPlayer.SCREEN_WINDOW_FULLSCREEN, name)
 
         val pos = defaultSharedPreferences.getLong(path, 0)
         Loged.wtf("$path at $pos")
+        playerView.player!!.seekTo(pos)
         //mpw_video_player.seekToPosition(pos)
 
-        mpw_video_player.playerListener = object : MxPlayerListener {
+        /*mpw_video_player.playerListener = object : MxPlayerListener {
             override fun onComplete() {
                 try {
                     this@VideoPlayerActivity.onBackPressed()
@@ -173,30 +223,30 @@ class VideoPlayerActivity : AppCompatActivity() {
             }
 
             override fun onBackPress() {
-                //currentPos = mpw_video_player.currentPositionInVideo
+               //currentPos = mpw_video_player.currentPositionInVideo
                 finish()
             }
 
             override fun onPrepared() {
                 mpw_video_player.seekToPosition(pos)
             }
-        }
+        }*/
 
     }
 
     override fun onUserLeaveHint() {
         //super.onUserLeaveHint()
         //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            minimize()
+        minimize()
         //}
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     internal fun minimize() {
         // Hide the controls in picture-in-picture mode.
-        mpw_video_player.hideControls()
+        //mpw_video_player.hideControls()
         // Calculate the aspect ratio of the PiP screen.
-        mPictureInPictureParamsBuilder.setAspectRatio(Rational(mpw_video_player.width, mpw_video_player.height))
+        //mPictureInPictureParamsBuilder.setAspectRatio(Rational(mpw_video_player.width, mpw_video_player.height))
         enterPictureInPictureMode(mPictureInPictureParamsBuilder.build())
     }
 
@@ -209,9 +259,9 @@ class VideoPlayerActivity : AppCompatActivity() {
             // We are out of PiP mode. We can stop receiving events from it.
             unregisterReceiver(mReceiver)
             // Show the video controls if the video is not playing
-            if (!mpw_video_player.isPlaying) {
-                //.showControls()
-            }
+            //if (!mpw_video_player.isPlaying) {
+            //.showControls()
+            //}
         }
     }
 
@@ -221,8 +271,8 @@ class VideoPlayerActivity : AppCompatActivity() {
         defaultSharedPreferences.edit().putLong(path, position).apply()
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audio.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0)
-        MxVideoPlayer.backPress()
-        MxVideoPlayer.releaseAllVideos()
+        //MxVideoPlayer.backPress()
+        //MxVideoPlayer.releaseAllVideos()
         super.onDestroy()
     }
 
@@ -236,17 +286,266 @@ class VideoPlayerActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        mpw_video_player.pauseVideo()
+        //mpw_video_player.pauseVideo()
+        playerView.player!!.playWhenReady = false
+        playerView.player.release()
+        lockTimer.stopLock()
         super.onStop()
     }
 
     override fun onBackPressed() {
-        currentPos = mpw_video_player.currentPositionInVideo
-        if (MxVideoPlayer.backPress()) {
+        //currentPos = mpw_video_player.currentPositionInVideo
+        currentPos = playerView.player!!.currentPosition
+        /*if (MxVideoPlayer.backPress()) {
             return
-        }
+        }*/
+        playerView.player!!.release()
         super.onBackPressed()
     }
 
+    private lateinit var gesture: GestureDetector
+
+    private fun initVideoPlayer() {
+        gesture = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+
+        })
+        gesture.setOnDoubleTapListener(object : GestureDetector.OnDoubleTapListener {
+            override fun onDoubleTap(p0: MotionEvent?): Boolean {
+                val play = playerView.findViewById<ImageButton>(R.id.exo_play)
+                val pause = playerView.findViewById<ImageButton>(R.id.exo_pause)
+                if (play.visibility == View.GONE)
+                    pause.performClick()
+                else
+                    play.performClick()
+                return true
+            }
+
+            override fun onDoubleTapEvent(p0: MotionEvent?): Boolean {
+                return false
+            }
+
+            override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean {
+                return false
+            }
+
+        })
+        playerView.setOnTouchListener(onTouch)
+    }
+
+    private var lockTimer = TimerStuff({
+        video_lock.animate().setDuration(500).alpha(0f)
+    })
+
+    private var mDownX: Float = 0.toFloat()
+    private var mDownY: Float = 0.toFloat()
+    private var mChangeLight: Boolean = false
+    private var mChangeVolume: Boolean = false
+    private var mGestureDownVolume: Int = 0
+    private var mGestureDownBrightness: Int = 0
+
+    private var mScreenWidth: Int = 0
+    private var mScreenHeight: Int = 0
+
+    private lateinit var mAudioManager: AudioManager
+
+    private val THRESHOLD = 70
+    private val SCREEN_WINDOW_FULLSCREEN = 2
+    private var mCurrentScreen = SCREEN_WINDOW_FULLSCREEN
+
+    private val onTouch = View.OnTouchListener { v, event ->
+        lockTimer.restartLock()
+        //Loged.v("$event")
+        if (!locked) {
+            gesture.onTouchEvent(event!!)
+            val x = event.x
+            val y = event.y
+            val id = v.id
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    //Loged.i("onTouch: surfaceContainer actionDown [" + this.hashCode() + "] ")
+                    mDownX = x
+                    mDownY = y
+                    mChangeLight = false
+                    mChangeVolume = false
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    //Loged.i("onTouch: surfaceContainer actionMove [" + this.hashCode() + "] ")
+                    val deltaX = x - mDownX
+                    var deltaY = y - mDownY
+                    val absDeltaX = abs(deltaX)
+                    val absDeltaY = abs(deltaY)
+                    if (mCurrentScreen == SCREEN_WINDOW_FULLSCREEN) {
+                        if (!mChangeVolume && !mChangeLight) {
+                            if (absDeltaX > THRESHOLD || absDeltaY > THRESHOLD) {
+                                //cancelProgressTimer()
+                                if (x <= playerView.videoSurfaceView.width / 2) {  // adjust the volume
+                                    mChangeVolume = true
+                                    mGestureDownVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+                                } else {  // adjust the light
+                                    mChangeLight = true
+                                    mGestureDownBrightness = getScreenBrightness(this)
+                                }
+
+                            }
+                        }
+                    }
+                    if (mChangeVolume) {
+                        deltaY = -deltaY  // up is -, down is +
+                        val maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+                        val deltaV = (maxVolume.toFloat() * deltaY * 3f / mScreenHeight).toInt()
+                        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mGestureDownVolume + deltaV, 0)
+                        val volumePercent = (mGestureDownVolume * 100 / maxVolume + deltaY * 3f * 100f / mScreenHeight).toInt()
+                        showVolumeDialog(-deltaY, volumePercent)
+                    }
+                    if (mChangeLight) {
+                        deltaY = -deltaY  // up is -, down is +
+                        val deltaV = (255f * deltaY * 3f / mScreenHeight).toInt()
+                        val brightnessValue = mGestureDownBrightness + deltaV
+                        if (brightnessValue in 0..255) {
+                            setWindowBrightness(this@VideoPlayerActivity, brightnessValue.toFloat())
+                        }
+                        val brightnessPercent = (mGestureDownBrightness + deltaY * 255f * 3f / mScreenHeight).toInt()
+                        showBrightnessDialog(-deltaY, brightnessPercent)
+                    }
+                }
+                MotionEvent.ACTION_UP -> {
+                    Loged.i("onTouch: surfaceContainer actionUp [" + this.hashCode() + "] ")
+                    dismissVolumeDialog()
+                    dismissBrightnessDialog()
+                    if (mChangeVolume) {
+                        //onActionEvent(MxUserAction.ON_TOUCH_SCREEN_SEEK_VOLUME)
+                    }
+                    if (mChangeLight) {
+                        //onActionEvent(MxUserAction.ON_TOUCH_SCREEN_SEEK_BRIGHTNESS)
+                    }
+                    //startProgressTimer()
+                }
+                else -> {
+                }
+            }
+        }
+
+        playerView.useController = !locked
+
+        video_lock.animate().setDuration(500).alpha(1f)
+        lockTimer.startLock()
+
+        false
+    }
+
+
+    private var mVolumeDialog: Dialog? = null
+    private var mDialogVolumeProgressBar: ProgressBar? = null
+
+    private fun showVolumeDialog(v: Float, volumePercent: Int) {
+        if (mVolumeDialog == null) {
+            val localView = View.inflate(this, mxvideoplayer.app.com.xvideoplayer.R.layout.mx_mobile_volume_dialog, null)
+            mDialogVolumeProgressBar = localView.findViewById<View>(mxvideoplayer.app.com.xvideoplayer.R.id.volume_progressbar) as ProgressBar
+            mVolumeDialog = Dialog(this, mxvideoplayer.app.com.xvideoplayer.R.style.mx_style_dialog_progress)
+            mVolumeDialog!!.setContentView(localView)
+            if (mVolumeDialog!!.window != null) {
+                mVolumeDialog!!.window!!.addFlags(8)
+                mVolumeDialog!!.window!!.addFlags(32)
+                mVolumeDialog!!.window!!.addFlags(16)
+                mVolumeDialog!!.window!!.setLayout(-2, -2)
+            }
+            val params = mVolumeDialog!!.window!!.attributes
+            params.gravity = 49
+            params.y = resources
+                    .getDimensionPixelOffset(mxvideoplayer.app.com.xvideoplayer.R.dimen.mx_volume_dialog_margin_top)
+            params.width = resources
+                    .getDimensionPixelOffset(mxvideoplayer.app.com.xvideoplayer.R.dimen.mx_mobile_dialog_width)
+            mVolumeDialog!!.window!!.attributes = params
+        }
+        if (!mVolumeDialog!!.isShowing) {
+            mVolumeDialog!!.show()
+        }
+        mDialogVolumeProgressBar!!.progress = volumePercent
+    }
+
+    private fun dismissVolumeDialog() {
+        if (mVolumeDialog != null) {
+            mVolumeDialog!!.dismiss()
+        }
+    }
+
+    private var mBrightnessDialog: Dialog? = null
+    private lateinit var mDialogBrightnessProgressBar: ProgressBar
+
+    private fun showBrightnessDialog(v: Float, brightnessPercent: Int) {
+        if (mBrightnessDialog == null) {
+            val localView = View.inflate(this, mxvideoplayer.app.com.xvideoplayer.R.layout.mx_mobile_brightness_dialog, null)
+            mDialogBrightnessProgressBar = localView.findViewById<View>(mxvideoplayer.app.com.xvideoplayer.R.id.brightness_progressbar) as ProgressBar
+            mBrightnessDialog = Dialog(this, mxvideoplayer.app.com.xvideoplayer.R.style.mx_style_dialog_progress)
+            mBrightnessDialog!!.setContentView(localView)
+            if (mBrightnessDialog!!.window != null) {
+                mBrightnessDialog!!.window!!.addFlags(8)
+                mBrightnessDialog!!.window!!.addFlags(32)
+                mBrightnessDialog!!.window!!.addFlags(16)
+                mBrightnessDialog!!.window!!.setLayout(-2, -2)
+            }
+            val params = mBrightnessDialog!!.window!!.attributes
+            params.gravity = 49
+            params.y = resources
+                    .getDimensionPixelOffset(mxvideoplayer.app.com.xvideoplayer.R.dimen.mx_volume_dialog_margin_top)
+            params.width = resources
+                    .getDimensionPixelOffset(mxvideoplayer.app.com.xvideoplayer.R.dimen.mx_mobile_dialog_width)
+            mBrightnessDialog!!.window!!.attributes = params
+        }
+        if (!mBrightnessDialog!!.isShowing) {
+            mBrightnessDialog!!.show()
+        }
+        mDialogBrightnessProgressBar.progress = brightnessPercent
+    }
+
+    private fun dismissBrightnessDialog() {
+        if (mBrightnessDialog != null) {
+            mBrightnessDialog!!.dismiss()
+        }
+    }
+
+    private fun setWindowBrightness(activity: Activity, brightness: Float) {
+        val lp = activity.window.attributes
+        lp.screenBrightness = brightness / 255.0f
+        if (lp.screenBrightness > 1) {
+            lp.screenBrightness = 1f
+        } else if (lp.screenBrightness < 0.1) {
+            lp.screenBrightness = 0.1.toFloat()
+        }
+        activity.window.attributes = lp
+    }
+
+    private fun getScreenBrightness(activity: Activity): Int {
+        var nowBrightnessValue = 0
+        val resolver = activity.contentResolver
+        try {
+            nowBrightnessValue = Settings.System.getInt(resolver, Settings.System.SCREEN_BRIGHTNESS)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return nowBrightnessValue
+    }
+
+    class TimerStuff(var action: () -> Unit, private val TIME_TO_WAIT: Long = 2000) {
+        private var myRunnable: Runnable = Runnable {
+            action()
+        }
+
+        private var myHandler = Handler()
+
+        fun startLock() {
+            myHandler.postDelayed(myRunnable, TIME_TO_WAIT.toLong())
+        }
+
+        fun stopLock() {
+            myHandler.removeCallbacks(myRunnable)
+        }
+
+        fun restartLock() {
+            myHandler.removeCallbacks(myRunnable)
+            myHandler.postDelayed(myRunnable, TIME_TO_WAIT.toLong())
+        }
+    }
 
 }

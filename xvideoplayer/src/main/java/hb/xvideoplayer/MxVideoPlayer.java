@@ -1,6 +1,5 @@
 package hb.xvideoplayer;
 
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -14,7 +13,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.os.Handler;
-import androidx.appcompat.app.ActionBar;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -41,9 +39,11 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import androidx.appcompat.app.ActionBar;
 import mxvideoplayer.app.com.xvideoplayer.R;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
+import static hb.xvideoplayer.MxUtils.getAppComptActivity;
 import static hb.xvideoplayer.MxUtils.scanForActivity;
 
 
@@ -481,7 +481,7 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
         obtainCache();
         CLICK_QUIT_FULLSCREEN_TIME = System.currentTimeMillis();
         hideSupportActionBar(getContext());
-        MxUtils.getAppComptActivity(getContext()).setRequestedOrientation(FULLSCREEN_ORIENTATION);
+        getAppComptActivity(getContext()).setRequestedOrientation(FULLSCREEN_ORIENTATION);
 
         ViewGroup vp = (ViewGroup) (scanForActivity(getContext()))
                 .findViewById(Window.ID_ANDROID_CONTENT);
@@ -513,7 +513,7 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
     public static void startFullscreen(Context context, Class _class, String url, Object... objects) {
         Log.i(TAG, "startFullscreen: ===manual fullscreen===");
         hideSupportActionBar(context);
-        MxUtils.getAppComptActivity(context).setRequestedOrientation(FULLSCREEN_ORIENTATION);
+        getAppComptActivity(context).setRequestedOrientation(FULLSCREEN_ORIENTATION);
         ViewGroup vp = (ViewGroup) (scanForActivity(context))
                 .findViewById(Window.ID_ANDROID_CONTENT);
         View old = vp.findViewById(R.id.mx_fullscreen_id);
@@ -604,23 +604,23 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
 
     @SuppressLint("RestrictedApi")
     private static void hideSupportActionBar(Context context) {
-        ActionBar actionBar = MxUtils.getAppComptActivity(context).getSupportActionBar();
+        ActionBar actionBar = getAppComptActivity(context).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setShowHideAnimationEnabled(false);
             actionBar.hide();
         }
-        MxUtils.getAppComptActivity(context).getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        getAppComptActivity(context).getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
     @SuppressLint("RestrictedApi")
     private static void showSupportActionBar(Context context) {
-        ActionBar actionBar = MxUtils.getAppComptActivity(context).getSupportActionBar();
+        ActionBar actionBar = getAppComptActivity(context).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setShowHideAnimationEnabled(false);
             actionBar.show();
         }
-        MxUtils.getAppComptActivity(context).getWindow().
+        getAppComptActivity(context).getWindow().
                 clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
@@ -835,7 +835,7 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
                 mCurrentScreen == SCREEN_WINDOW_TINY) {
             clearFullscreenLayout();
         }
-        MxUtils.getAppComptActivity(getContext()).setRequestedOrientation(NORMAL_ORIENTATION);
+        getAppComptActivity(getContext()).setRequestedOrientation(NORMAL_ORIENTATION);
         clearCacheImage();
         if (playerListener != null)
             playerListener.onComplete();
@@ -905,7 +905,7 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
         Log.i(TAG, "quitFullscreenOrTinyListener: [" + this.hashCode() + "] ");
         mIsTryPlayOnError = false;
         obtainCache();
-        MxUtils.getAppComptActivity(getContext()).setRequestedOrientation(NORMAL_ORIENTATION);
+        getAppComptActivity(getContext()).setRequestedOrientation(NORMAL_ORIENTATION);
         if (mCurrentScreen == SCREEN_WINDOW_FULLSCREEN
                 || mCurrentScreen == SCREEN_WINDOW_TINY) {
             onActionEvent(mCurrentScreen == SCREEN_WINDOW_FULLSCREEN ?
@@ -1022,10 +1022,10 @@ public abstract class MxVideoPlayer extends FrameLayout implements MxMediaPlayer
                 && mCurrentScreen != SCREEN_WINDOW_FULLSCREEN
                 && mCurrentScreen != SCREEN_WINDOW_TINY) {
             if (x > 0) {
-                MxUtils.getAppComptActivity(getContext()).setRequestedOrientation(
+                getAppComptActivity(getContext()).setRequestedOrientation(
                         ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             } else {
-                MxUtils.getAppComptActivity(getContext()).setRequestedOrientation(
+                getAppComptActivity(getContext()).setRequestedOrientation(
                         ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
             }
             startWindowFullscreen();

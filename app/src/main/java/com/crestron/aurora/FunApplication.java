@@ -19,8 +19,6 @@ import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.palette.graphics.Palette;
 
 import com.crashlytics.android.Crashlytics;
 import com.crestron.aurora.otherfun.DownloadViewerActivity;
@@ -48,6 +46,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.palette.graphics.Palette;
 import io.fabric.sdk.android.Fabric;
 import programmer.box.utilityhelper.UtilNotification;
 

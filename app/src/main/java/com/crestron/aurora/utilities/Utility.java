@@ -12,8 +12,10 @@ import com.crestron.aurora.Loged;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Formatter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 public class Utility {
 
@@ -40,6 +42,23 @@ public class Utility {
         return connected;
     }
 
+    public static String stringForTime(long milliseconds) {
+        if (milliseconds < 0 || milliseconds >= 24 * 60 * 60 * 1000) {
+            return "00:00";
+        }
+        milliseconds /= 1000;
+        int minute = (int) (milliseconds / 60);
+        int hour = minute / 60;
+        int second = (int) (milliseconds % 60);
+        minute %= 60;
+        StringBuilder stringBuilder = new StringBuilder();
+        Formatter mFormatter = new Formatter(stringBuilder, Locale.getDefault());
+        if (hour > 0) {
+            return mFormatter.format("%02d:%02d:%02d", hour, minute, second).toString();
+        } else {
+            return mFormatter.format("%02d:%02d", minute, second).toString();
+        }
+    }
 
     public static String runAsRoot(String command) {
 

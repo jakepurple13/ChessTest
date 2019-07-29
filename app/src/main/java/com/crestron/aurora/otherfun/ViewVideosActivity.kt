@@ -6,16 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Rect
-import android.media.MediaPlayer
+import android.media.MediaMetadataRetriever
 import android.media.ThumbnailUtils
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,11 +18,17 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.abdeveloper.library.MultiSelectDialog
 import com.abdeveloper.library.MultiSelectModel
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
+import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.views.DeleteDialog
 import com.squareup.picasso.Picasso
@@ -37,7 +38,6 @@ import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2core.Func
 import github.nisrulz.recyclerviewhelper.RVHAdapter
 import github.nisrulz.recyclerviewhelper.RVHItemTouchHelperCallback
-import hb.xvideoplayer.MxUtils
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.activity_view_videos.*
 import kotlinx.android.synthetic.main.video_layout.view.*
@@ -324,13 +324,20 @@ class ViewVideosActivity : AppCompatActivity() {
         // Binds each animal in the ArrayList to a view
         @SuppressLint("SetTextI18n")
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.videoName.text = "${stuff[position].name} ${if (context.defaultSharedPreferences.contains(stuff[position].path)) "\nat ${MxUtils.stringForTime(context.defaultSharedPreferences.getLong(stuff[position].path, 0))}" else ""}"
+            holder.videoName.text = "${stuff[position].name} ${if (context.defaultSharedPreferences.contains(stuff[position].path)) "\nat ${Utility.stringForTime(context.defaultSharedPreferences.getLong(stuff[position].path, 0))}" else ""}"
 
             try {
                 //Video runtime text
-                val mp = MediaPlayer.create(context, Uri.parse(stuff[position].path))
-                val duration = mp.duration.toLong()
-                mp.release()
+                //val mp = MediaPlayer.create(context, Uri.parse(stuff[position].path))
+                //val duration = mp.duration.toLong()
+                //mp.release()
+                val retriever = MediaMetadataRetriever()
+                //use one of overloaded setDataSource() functions to set your data source
+                retriever.setDataSource(context, Uri.fromFile(File(stuff[position].path)))
+                val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                val duration = time.toLong()
+
+                retriever.release()
                 /*convert millis to appropriate time*/
                 val runTimeString = if (duration > TimeUnit.HOURS.toMillis(1)) {
                     String.format("%02d:%02d:%02d",
