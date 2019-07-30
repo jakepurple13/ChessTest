@@ -13,15 +13,15 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import androidx.core.app.NotificationCompat
-import androidx.core.app.TaskStackBuilder
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import android.text.InputType
 import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.app.TaskStackBuilder
 import com.box.shelfview.BookModel
 import com.box.shelfview.ShelfView
 import com.crestron.aurora.boardgames.chess.MainActivity
@@ -30,7 +30,7 @@ import com.crestron.aurora.boardgames.yahtzee.YahtzeeActivity
 import com.crestron.aurora.cardgames.BlackJackActivity
 import com.crestron.aurora.cardgames.calculation.CalculationActivity
 import com.crestron.aurora.cardgames.hilo.HiLoActivity
-import com.crestron.aurora.cardgames.matching.MatchingActivity
+import com.crestron.aurora.cardgames.matching.MatchingActivityTwo
 import com.crestron.aurora.cardgames.solitaire.SolitaireActivity
 import com.crestron.aurora.cardgames.videopoker.VideoPokerActivity
 import com.crestron.aurora.db.ShowDatabase
@@ -269,7 +269,7 @@ class ChoiceActivity : AppCompatActivity() {
                         }
                         ChoiceButton.MATCHING -> {
                             //startActivity(Intent(this@ChoiceActivity, MatchingActivity::class.java))
-                            ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, MatchingActivity::class.java))
+                            ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, MatchingActivityTwo::class.java))//if (Random().nextBoolean()) MatchingActivityTwo::class.java else MatchingActivity::class.java))
                         }
                         ChoiceButton.HILO -> {
                             //startActivity(Intent(this@ChoiceActivity, HiLoActivity::class.java))
@@ -1167,7 +1167,7 @@ class ChoiceActivity : AppCompatActivity() {
                         intent.putExtra(ConstantValues.RECENT_OR_NOT, rec)
                         if (url != null)
                             intent.putExtra(ConstantValues.SHOW_LINK, url)
-                        if(movie != null)
+                        if (movie != null)
                             intent.putExtra(ConstantValues.SHOW_MOVIE, movie)
                         if (shouldFinish) {
                             startForResult(intent) {

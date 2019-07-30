@@ -15,7 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @SuppressLint("ViewConstructor")
-class CardButton(context: Context?, private val card: Card, private val action: MatchingActivity.CardButtonFlip) : ImageView(context), View.OnClickListener {
+class CardButton(context: Context?, var card: Card = Card.BackCard, var action: MatchingActivity.CardButtonFlip) : ImageView(context), View.OnClickListener {
     var flipped = false
     override fun onClick(p0: View?) {
         Loged.wtf("$card")
@@ -47,6 +47,10 @@ class CardButton(context: Context?, private val card: Card, private val action: 
             }
 
         })
+    }
+
+    fun setCardImage() {
+        setImageResource(card.getImage(context))
     }
 
     private fun checkCo(cardFlipped: Card, buttonFlipped: CardButton) = GlobalScope.launch(Dispatchers.Main) {

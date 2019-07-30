@@ -20,7 +20,6 @@ import org.junit.Before
 import org.junit.Test
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 /**
@@ -32,7 +31,7 @@ import kotlin.collections.ArrayList
 typealias cad = Card
 
 fun cadTest() {
-    val d = cad(Suit.DIAMONDS, 3)
+    val d1 = cad(Suit.DIAMONDS, 3)
 }
 
 class ExampleUnitTest {
@@ -44,6 +43,13 @@ class ExampleUnitTest {
     @Before
     fun setUp() {
         Loged.FILTER_BY_CLASS_NAME = "crestron"
+    }
+
+    @Test
+    fun quickD() {
+        val d = Deck()
+        d.addCard(d[0])
+        log(d.toArrayPrettyString())
     }
 
     @Test
