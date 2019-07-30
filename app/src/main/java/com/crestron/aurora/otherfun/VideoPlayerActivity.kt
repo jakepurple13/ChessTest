@@ -15,12 +15,11 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
-import android.view.GestureDetector
-import android.view.MotionEvent
-import android.view.View
-import android.view.WindowManager
+import android.view.*
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -40,6 +39,8 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_video_player.*
 import kotlinx.coroutines.Runnable
 import org.jetbrains.anko.defaultSharedPreferences
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.abs
 
 
@@ -177,6 +178,16 @@ class VideoPlayerActivity : AppCompatActivity() {
     private var mBrightnessDialog: Dialog? = null
     private lateinit var mDialogBrightnessProgressBar: ProgressBar
 
+    private var mProgressDialog: Dialog? = null
+    private var mDialogProgressBar: ProgressBar? = null
+    private var mDialogSeekTime: TextView? = null
+    private var mDialogTotalTime: TextView? = null
+    private var mDialogIcon: ImageView? = null
+    private var mChangePosition: Boolean = false
+    private var mTouchingProgressBar = false
+    private var mDownPosition: Int = 0
+    private var mSeekTimePosition: Int = 0
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -193,7 +204,7 @@ class VideoPlayerActivity : AppCompatActivity() {
         name = intent.getStringExtra("video_name")!!
         path = intent.getStringExtra("video_path")!!
 
-        if(path.isEmpty()) {
+        if (path.isEmpty()) {
             finish()
         }
 
@@ -212,19 +223,19 @@ class VideoPlayerActivity : AppCompatActivity() {
         playerView.player = player
 
         val dOrS = intent.getBooleanExtra("download_or_stream", true)
-         if(dOrS) {
-             val dataSourceFactory = DefaultDataSourceFactory(this, Util.getUserAgent(this, "Fun"))
-             val videoSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(path.toUri())
-             player.prepare(videoSource)
-         } else {
-             fun buildMediaSource(uri: Uri): MediaSource {
-                 return ExtractorMediaSource.Factory(
-                         DefaultHttpDataSourceFactory("exoplayer-codelab")).
-                         createMediaSource(uri)
-             }
-             val source = buildMediaSource(path.toUri())
-             player.prepare(source, true, false)
-         }
+        if (dOrS) {
+            val dataSourceFactory = DefaultDataSourceFactory(this, Util.getUserAgent(this, "Fun"))
+            val videoSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(path.toUri())
+            player.prepare(videoSource)
+        } else {
+            fun buildMediaSource(uri: Uri): MediaSource {
+                return ExtractorMediaSource.Factory(
+                        DefaultHttpDataSourceFactory("exoplayer-codelab")).createMediaSource(uri)
+            }
+
+            val source = buildMediaSource(path.toUri())
+            player.prepare(source, true, false)
+        }
         playerView.controllerAutoShow = true
         //playerView.controllerHideOnTouch = true
         playerView.controllerShowTimeoutMs = 2000
@@ -308,7 +319,7 @@ class VideoPlayerActivity : AppCompatActivity() {
             // We are out of PiP mode. We can stop receiving events from it.
             try {
                 unregisterReceiver(mReceiver)
-            } catch(e: IllegalArgumentException) {
+            } catch (e: IllegalArgumentException) {
 
             }
             // Show the video controls if the video is not playing
@@ -343,7 +354,7 @@ class VideoPlayerActivity : AppCompatActivity() {
         try {
             playerView.player!!.playWhenReady = false
             playerView.player.release()
-        } catch(e: IllegalStateException) {
+        } catch (e: IllegalStateException) {
 
         }
         lockTimer.stopLock()
@@ -410,6 +421,8 @@ class VideoPlayerActivity : AppCompatActivity() {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     //Loged.i("onTouch: surfaceContainer actionDown [" + this.hashCode() + "] ")
+                    mTouchingProgressBar = true
+                    mChangePosition = false
                     mDownX = x
                     mDownY = y
                     mChangeLight = false
@@ -421,10 +434,15 @@ class VideoPlayerActivity : AppCompatActivity() {
                     var deltaY = y - mDownY
                     val absDeltaX = abs(deltaX)
                     val absDeltaY = abs(deltaY)
-                    if (mCurrentScreen == SCREEN_WINDOW_FULLSCREEN) {
-                        if (!mChangeVolume && !mChangeLight) {
-                            if (absDeltaX > THRESHOLD || absDeltaY > THRESHOLD) {
-                                //cancelProgressTimer()
+                    if (!mChangePosition && !mChangeVolume && !mChangeLight) {
+                        if (absDeltaX > THRESHOLD || absDeltaY > THRESHOLD) {
+                            //cancelProgressTimer()
+                            if (absDeltaX >= THRESHOLD) { // adjust progress
+                                //if (mCurrentState != CURRENT_STATE_ERROR) {
+                                mChangePosition = true
+                                mDownPosition = playerView.player.currentPosition.toInt()//getCurrentPositionWhenPlaying()
+                                //}
+                            } else {
                                 if (x <= playerView.videoSurfaceView.width / 2) {  // adjust the volume
                                     mChangeVolume = true
                                     mGestureDownVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
@@ -432,9 +450,18 @@ class VideoPlayerActivity : AppCompatActivity() {
                                     mChangeLight = true
                                     mGestureDownBrightness = getScreenBrightness(this)
                                 }
-
                             }
                         }
+                    }
+                    if (mChangePosition) {
+                        val totalTimeDuration = playerView.player.duration//getDuration()
+                        mSeekTimePosition = (mDownPosition + deltaX * 100).toInt()
+                        if (mSeekTimePosition > totalTimeDuration) {
+                            mSeekTimePosition = totalTimeDuration.toInt()
+                        }
+                        val seekTime = stringForTime(mSeekTimePosition.toLong())
+                        val totalTime = stringForTime(totalTimeDuration.toLong())
+                        showProgressDialog(deltaX, seekTime, mSeekTimePosition, totalTime, totalTimeDuration.toInt())
                     }
                     if (mChangeVolume) {
                         deltaY = -deltaY  // up is -, down is +
@@ -457,8 +484,16 @@ class VideoPlayerActivity : AppCompatActivity() {
                 }
                 MotionEvent.ACTION_UP -> {
                     Loged.i("onTouch: surfaceContainer actionUp [" + this.hashCode() + "] ")
+                    dismissProgressDialog()
                     dismissVolumeDialog()
                     dismissBrightnessDialog()
+                    if (mChangePosition) {
+                        //onActionEvent(MxUserAction.ON_TOUCH_SCREEN_SEEK_POSITION)
+                        //val duration = playerView.player.duration
+                        //val progress = mSeekTimePosition * 100 / if (duration == 0L) 1 else duration
+                        playerView.player.seekTo(mSeekTimePosition.toLong())
+                        //mProgressBar.setProgress(progress)
+                    }
                     if (mChangeVolume) {
                         //onActionEvent(MxUserAction.ON_TOUCH_SCREEN_SEEK_VOLUME)
                     }
@@ -479,6 +514,51 @@ class VideoPlayerActivity : AppCompatActivity() {
         lockTimer.startLock()
 
         false
+    }
+
+    private fun showProgressDialog(deltaX: Float, seekTime: String,
+                                   seekTimePosition: Int, totalTime: String, totalTimeDuration: Int) {
+        if (mProgressDialog == null) {
+            val localView = View.inflate(this, mxvideoplayer.app.com.xvideoplayer.R.layout.mx_progress_dialog, null)
+            mDialogProgressBar = localView.findViewById<View>(mxvideoplayer.app.com.xvideoplayer.R.id.duration_progressbar) as ProgressBar
+            //mDialogProgressBar = ((PreviewSeekBar) localView.findViewById(R.id.duration_progressbar));
+            mDialogSeekTime = localView.findViewById<View>(mxvideoplayer.app.com.xvideoplayer.R.id.video_current) as TextView
+            mDialogTotalTime = localView.findViewById<View>(mxvideoplayer.app.com.xvideoplayer.R.id.video_duration) as TextView
+            mDialogIcon = localView.findViewById<View>(mxvideoplayer.app.com.xvideoplayer.R.id.duration_image_tip) as ImageView
+            mProgressDialog = Dialog(this, mxvideoplayer.app.com.xvideoplayer.R.style.mx_style_dialog_progress)
+            mProgressDialog!!.setContentView(localView)
+            if (mProgressDialog!!.window != null) {
+                mProgressDialog!!.window!!.addFlags(Window.FEATURE_ACTION_BAR)
+                mProgressDialog!!.window!!.addFlags(32)
+                mProgressDialog!!.window!!.addFlags(16)
+                mProgressDialog!!.window!!.setLayout(-2, -2)
+            }
+            val params = mProgressDialog!!.window!!.attributes
+            params.gravity = 49
+            params.y = resources.getDimensionPixelOffset(mxvideoplayer.app.com.xvideoplayer.R.dimen.mx_progress_dialog_margin_top)
+            params.width = this.resources
+                    .getDimensionPixelOffset(mxvideoplayer.app.com.xvideoplayer.R.dimen.mx_mobile_dialog_width)
+            mProgressDialog!!.window!!.attributes = params
+        }
+        if (!mProgressDialog!!.isShowing) {
+            mProgressDialog!!.show()
+        }
+        val seekedTime = abs(playerView.player.currentPosition - seekTimePosition).toLong()
+        val seekTimeText = "(" + stringForTime(seekedTime) + ") " + seekTime
+        mDialogSeekTime!!.text = seekTimeText
+        mDialogTotalTime!!.text = String.format(" / %s", totalTime)
+        mDialogProgressBar!!.progress = if (totalTimeDuration <= 0) 0 else seekTimePosition * 100 / totalTimeDuration
+        if (deltaX > 0) {
+            mDialogIcon!!.setBackgroundResource(mxvideoplayer.app.com.xvideoplayer.R.drawable.mx_forward_icon)
+        } else {
+            mDialogIcon!!.setBackgroundResource(mxvideoplayer.app.com.xvideoplayer.R.drawable.mx_backward_icon)
+        }
+    }
+
+    private fun dismissProgressDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog!!.dismiss()
+        }
     }
 
     private fun showVolumeDialog(v: Float, volumePercent: Int) {
@@ -566,6 +646,25 @@ class VideoPlayerActivity : AppCompatActivity() {
         }
 
         return nowBrightnessValue
+    }
+
+    fun stringForTime(milliseconds: Long): String {
+        var milliseconds = milliseconds
+        if (milliseconds < 0 || milliseconds >= 24 * 60 * 60 * 1000) {
+            return "00:00"
+        }
+        milliseconds /= 1000
+        var minute = (milliseconds / 60).toInt()
+        val hour = minute / 60
+        val second = (milliseconds % 60).toInt()
+        minute %= 60
+        val stringBuilder = StringBuilder()
+        val mFormatter = Formatter(stringBuilder, Locale.getDefault())
+        return if (hour > 0) {
+            mFormatter.format("%02d:%02d:%02d", hour, minute, second).toString()
+        } else {
+            mFormatter.format("%02d:%02d", minute, second).toString()
+        }
     }
 
     class TimerStuff(var action: () -> Unit, private val TIME_TO_WAIT: Long = 2000) {

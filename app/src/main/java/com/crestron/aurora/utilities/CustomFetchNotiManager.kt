@@ -436,7 +436,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.R
@@ -467,7 +466,7 @@ class CustomFetchNotificationManager(context: Context) : FetchNotificationManage
     override val notificationManagerAction: String = "DEFAULT_FETCH2_NOTIFICATION_MANAGER_ACTION_" + System.currentTimeMillis()
 
     override val broadcastReceiver: BroadcastReceiver
-        get() = object: BroadcastReceiver() {
+        get() = object : BroadcastReceiver() {
 
             override fun onReceive(context: Context?, intent: Intent?) {
                 onDownloadNotificationActionTriggered(context, intent, this@CustomFetchNotificationManager)
@@ -493,14 +492,12 @@ class CustomFetchNotificationManager(context: Context) : FetchNotificationManage
     }
 
     override fun createNotificationChannels(context: Context, notificationManager: NotificationManager) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = context.getString(R.string.fetch_notification_default_channel_id)
-            var channel: NotificationChannel? = notificationManager.getNotificationChannel(channelId)
-            if (channel == null) {
-                val channelName = context.getString(R.string.fetch_notification_default_channel_name)
-                channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
-                notificationManager.createNotificationChannel(channel)
-            }
+        val channelId = context.getString(R.string.fetch_notification_default_channel_id)
+        var channel: NotificationChannel? = notificationManager.getNotificationChannel(channelId)
+        if (channel == null) {
+            val channelName = context.getString(R.string.fetch_notification_default_channel_name)
+            channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
+            notificationManager.createNotificationChannel(channel)
         }
     }
 
@@ -669,18 +666,18 @@ class CustomFetchNotificationManager(context: Context) : FetchNotificationManage
             downloadNotification.isDownloading -> {
                 notificationBuilder.addAction(R.drawable.fetch_notification_pause,
                         context.getString(R.string.fetch_notification_download_pause),
-                        getActionPendingIntent(downloadNotification, DownloadNotification.ActionType.PAUSE))
+                        getActionPendingIntent(downloadNotification, PAUSE))
                         .addAction(R.drawable.fetch_notification_cancel,
                                 context.getString(R.string.fetch_notification_download_cancel),
-                                getActionPendingIntent(downloadNotification, DownloadNotification.ActionType.CANCEL))
+                                getActionPendingIntent(downloadNotification, CANCEL))
             }
             downloadNotification.isPaused -> {
                 notificationBuilder.addAction(R.drawable.fetch_notification_resume,
                         context.getString(R.string.fetch_notification_download_resume),
-                        getActionPendingIntent(downloadNotification, DownloadNotification.ActionType.RESUME))
+                        getActionPendingIntent(downloadNotification, RESUME))
                         .addAction(R.drawable.fetch_notification_cancel,
                                 context.getString(R.string.fetch_notification_download_cancel),
-                                getActionPendingIntent(downloadNotification, DownloadNotification.ActionType.CANCEL))
+                                getActionPendingIntent(downloadNotification, CANCEL))
             }
         }
 
@@ -780,12 +777,13 @@ class CustomFetchNotificationManager(context: Context) : FetchNotificationManage
                     notificationBuilder = getNotificationBuilder(notificationId, groupId)
                     updateNotification(notificationBuilder, downloadNotification, context)
                     notificationManager.notify(notificationId, notificationBuilder.build())
-                    when(downloadNotification.status) {
+                    when (downloadNotification.status) {
                         Status.COMPLETED,
                         Status.FAILED -> {
                             downloadNotificationExcludeSet.add(downloadNotification.notificationId)
                         }
-                        else -> {}
+                        else -> {
+                        }
                     }
                 }
             }
