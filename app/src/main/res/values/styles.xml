@@ -47,4 +47,8 @@
         </item>
     </style>
 
+    <style name="MiniControllerTextAppearace" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#ffffff</item>
+    </style>
+
 </resources>

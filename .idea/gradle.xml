@@ -10,6 +10,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/caster" />
             <option value="$PROJECT_DIR$/deckofcards" />
             <option value="$PROJECT_DIR$/library" />
             <option value="$PROJECT_DIR$/nicespinner" />
@@ -19,6 +20,7 @@
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
+        <option name="testRunner" value="PLATFORM" />
       </GradleProjectSettings>
     </option>
   </component>

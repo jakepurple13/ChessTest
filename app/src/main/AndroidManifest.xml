@@ -1,20 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.crestron.aurora">
-
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="com.google.android.things.permission.MANAGE_BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+<manifest package="com.crestron.aurora"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:name=".FunApplication"
@@ -26,11 +13,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="LockedOrientationActivity">
+        <activity android:name=".otherfun.CastingActivity" />
         <activity
             android:name=".otherfun.NotificationBubbleActivity"
-            android:label="Download Show"
             android:allowEmbedded="true"
             android:documentLaunchMode="always"
+            android:label="Download Show"
             android:resizeableActivity="true" />
         <activity
             android:name=".boardgames.chess.MainActivity"
@@ -85,8 +73,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
-                    android:host="fun.animeplus.tv" />
+                    android:host="fun.animeplus.tv"
+                    android:scheme="http" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -95,8 +83,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
-                    android:host="fun.animeplus.tv" />
+                    android:host="fun.animeplus.tv"
+                    android:scheme="http" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -105,8 +93,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
-                    android:host="fun.gogoanime1.com" />
+                    android:host="fun.gogoanime1.com"
+                    android:scheme="http" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -115,8 +103,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
-                    android:host="fun.gogoanime1.com" />
+                    android:host="fun.gogoanime1.com"
+                    android:scheme="http" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -125,8 +113,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
-                    android:host="fun.animetoon.org" />
+                    android:host="fun.animetoon.org"
+                    android:scheme="http" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -135,8 +123,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
-                    android:host="fun.animetoon.org" />
+                    android:host="fun.animetoon.org"
+                    android:scheme="http" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -145,8 +133,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
-                    android:host="fun.animeplus.tv" />
+                    android:host="fun.animeplus.tv"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -155,8 +143,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
-                    android:host="fun.animeplus.tv" />
+                    android:host="fun.animeplus.tv"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -165,8 +153,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
-                    android:host="fun.gogoanime1.com" />
+                    android:host="fun.gogoanime1.com"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -175,8 +163,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
-                    android:host="fun.gogoanime1.com" />
+                    android:host="fun.gogoanime1.com"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -185,8 +173,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
-                    android:host="fun.animetoon.org" />
+                    android:host="fun.animetoon.org"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -195,8 +183,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
-                    android:host="fun.animetoon.org" />
+                    android:host="fun.animetoon.org"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
         <activity
@@ -204,6 +192,104 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent" />
 
+        <activity
+            android:name=".SettingsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".otherfun.DownloadViewerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
+        <activity
+            android:name=".ChoiceActivity"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".boardgames.yahtzee.YahtzeeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
+        <activity
+            android:name=".SettingsActivity2"
+            android:label="@string/title_activity_settings2"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".otherfun.FavoriteShowsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
+
+        <activity
+            android:name=".otherfun.RssActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
+        <activity
+            android:name=".FormActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent" />
+
+        <activity android:name=".viewtesting.ViewTesting" />
+
+        <activity
+            android:name=".viewtesting.basic_test"
+            android:label="@string/title_activity_basic_test"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".otherfun.ViewVideosActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".otherfun.VideoPlayerActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:resizeableActivity="true"
+            android:screenOrientation="sensorLandscape"
+            android:supportsPictureInPicture="true" />
+
+        <activity android:name=".otherfun.StartVideoFromNotificationActivity" />
+        <!--
+        <service android:name=".FirebaseMessage">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        -->
+        <activity
+            android:name=".boardgames.pong.PongActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.Design.NoActionBar" /> <!-- <service android:name=".FirebaseMessage" /> -->
+        <!--
+     Set custom default icon. This is used when no icon is set for incoming notification messages.
+     See README(https://goo.gl/l4GJaQ) for more.
+        -->
+        <!--
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notifications_black_24dp" />
+        &lt;!&ndash; Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more. &ndash;&gt;
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent" />
+        -->
+        <!--
+            <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="firebase_channel_id"/>
+        -->
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="914a898632a14cf4fc0bb8b8c61e20ab674bf310" />
+        <provider
+            android:name=".otherfun.GenericFileProvider"
+            android:authorities="com.crestron.aurora.otherfun.GenericFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
         <receiver
             android:name=".otherfun.NotificationBroadcastReceiver"
             android:enabled="true"
@@ -244,117 +330,12 @@
                 <action android:name="fun.com.crestron.UPDATE_APP" />
             </intent-filter>
         </receiver>
-
-        <service
-            android:name=".otherfun.UpdateCheckService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <activity
-            android:name=".SettingsActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".otherfun.DownloadViewerActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Transparent" />
-
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="914a898632a14cf4fc0bb8b8c61e20ab674bf310" />
-
-        <activity
-            android:name=".ChoiceActivity"
-            android:launchMode="singleTask">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".boardgames.yahtzee.YahtzeeActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Transparent" />
-        <activity
-            android:name=".SettingsActivity2"
-            android:label="@string/title_activity_settings2"
-            android:screenOrientation="portrait" />
-
-        <provider
-            android:name=".otherfun.GenericFileProvider"
-            android:authorities="com.crestron.aurora.otherfun.GenericFileProvider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
-        </provider>
-        <!--
-        <service android:name=".FirebaseMessage">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
-            </intent-filter>
-        </service>
-        -->
-        <service
-            android:name=".MessagingFirebase"
-            tools:ignore="ExportedService">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service> <!-- <service android:name=".FirebaseMessage" /> -->
-        <!--
-     Set custom default icon. This is used when no icon is set for incoming notification messages.
-     See README(https://goo.gl/l4GJaQ) for more.
-        -->
-        <!--
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/ic_notifications_black_24dp" />
-        &lt;!&ndash; Set color used with incoming notification messages. This is used when no color is set for the incoming
-             notification message. See README(https://goo.gl/6BKBk7) for more. &ndash;&gt;
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/colorAccent" />
-        -->
-        <!--
-            <meta-data
-            android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="firebase_channel_id"/>
-        -->
-        <activity
-            android:name=".otherfun.FavoriteShowsActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Transparent" />
-        <activity
-            android:name=".otherfun.RssActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Transparent" />
-        <activity
-            android:name=".FormActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Transparent" />
-        <activity android:name=".viewtesting.ViewTesting" />
-        <activity
-            android:name=".viewtesting.basic_test"
-            android:label="@string/title_activity_basic_test"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".otherfun.ViewVideosActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".otherfun.VideoPlayerActivity"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:resizeableActivity="true"
-            android:screenOrientation="sensorLandscape"
-            android:supportsPictureInPicture="true" />
-        <activity android:name=".otherfun.StartVideoFromNotificationActivity" />
-
         <receiver android:name=".ChoiceActivity$BroadcastReceiverDownload">
             <intent-filter>
                 <action android:name="cast.Download" />
             </intent-filter>
         </receiver>
+
         <receiver android:name=".otherfun.ViewVideosActivity$BroadcastReceiverVideoView">
             <intent-filter>
                 <action android:name="cast.Video" />
@@ -378,15 +359,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/downloads_widget_info" />
         </receiver>
-
-        <service
-            android:name=".views.MyWidgetRemoteViewsService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-        <service
-            android:name=".views.PlayPauseWidgetService"
-            android:enabled="true"
-            android:exported="true" />
-
         <receiver
             android:name=".otherfun.BootUpReceiver"
             android:enabled="false">
@@ -394,19 +366,44 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
         <receiver
             android:name=".otherfun.ShowCheckReceiver"
             android:process=":remote" />
-
-        <service
-            android:name=".otherfun.ShowCheckIntentService"
-            android:exported="false" />
-
         <receiver
             android:name=".otherfun.NotificationDismissedReceiver"
             android:exported="false" />
+
         <receiver
             android:name=".otherfun.NotificationGroupDismissedReceiver"
+            android:exported="false" />
+        <receiver
+            android:name=".utilities.AppUpdateCheckReceiver"
+            android:exported="false" />
+
+        <service
+            android:name=".otherfun.UpdateCheckService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name=".MessagingFirebase"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".views.MyWidgetRemoteViewsService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
+            android:name=".views.PlayPauseWidgetService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <service
+            android:name=".otherfun.ShowCheckIntentService"
             android:exported="false" />
 
         <service
@@ -426,15 +423,19 @@
                 android:name="android.service.quicksettings.ACTIVE_TILE"
                 android:value="true" />
         </service>
-
-        <receiver
-            android:name=".utilities.AppUpdateCheckReceiver"
-            android:exported="false" />
-
-        <activity
-            android:name=".boardgames.pong.PongActivity"
-            android:screenOrientation="landscape"
-            android:theme="@style/Theme.Design.NoActionBar" />
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.things.permission.MANAGE_BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
 </manifest>

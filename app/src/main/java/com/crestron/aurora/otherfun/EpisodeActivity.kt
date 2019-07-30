@@ -31,6 +31,7 @@ import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.views.DownloadsWidget
+import com.google.gson.Gson
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.like.LikeButton
 import com.like.OnLikeListener
@@ -343,22 +344,34 @@ class EpisodeActivity : AppCompatActivity() {
                                     KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
                                     KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
                         }*/
-                        GlobalScope.launch {
-                            if (downloadOrStream) {
-                                runOnUiThread {
-                                    Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
-                                }
-                                fetching.getVideo(info, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
-                                        KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
-                                        KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
-                            } else {
-                                startActivity(Intent(this@EpisodeActivity, VideoPlayerActivity::class.java).apply {
-                                    putExtra("video_path", info.getVideoLink())
-                                    putExtra("video_name", name)
-                                    putExtra("download_or_stream", false)
-                                })
-                            }
-                        }
+                        //GlobalScope.launch {
+                            AlertDialog.Builder(this@EpisodeActivity).setMessage("Want to Cast?")
+                                    .setPositiveButton("Yes!") { _, _ ->
+                                        GlobalScope.launch {
+                                            startActivity(Intent(this@EpisodeActivity, CastingActivity::class.java).apply {
+                                                putExtra("cast_info", Gson().toJson(CastVideoInfo(video_name = name, video_url = info.getVideoLink(), video_image = epApi!!.image, video_des = epApi.description)))
+                                            })
+                                        }
+                                    }
+                                    .setNegativeButton("No") { _, _ ->
+                                        GlobalScope.launch {
+                                            if (downloadOrStream) {
+                                                runOnUiThread {
+                                                    Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
+                                                }
+                                                fetching.getVideo(info, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
+                                                        KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
+                                                        KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
+                                            } else {
+                                                startActivity(Intent(this@EpisodeActivity, VideoPlayerActivity::class.java).apply {
+                                                    putExtra("video_path", info.getVideoLink())
+                                                    putExtra("video_name", name)
+                                                    putExtra("download_or_stream", false)
+                                                })
+                                            }
+                                        }
+                                    }.show()
+                        //}
                     }
                 })
                 Loged.d("${(episode_list.adapter!! as EpisodeAdapter).itemCount}")
