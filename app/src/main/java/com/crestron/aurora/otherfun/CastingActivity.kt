@@ -18,7 +18,7 @@ import kotlin.math.roundToInt
 
 class CastingActivity : AppCompatActivity() {
 
-    private var VIDEO_URL = "http://gateway.play44.net:3010/old/at_harmonquest_2_-_10.mp4?st=MmE0YmJkMDMwYzIwMjVmZjUwY2Y4YmM5MGY2MGZhOGE&e=1564433897"
+    private var VIDEO_URL = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4"
 
     private var playButton: Button? = null
     private var resumeButton: Button? = null
@@ -121,12 +121,12 @@ class CastingActivity : AppCompatActivity() {
 
     private fun setUpMediaRouteButton() {
         //val mediaRouteButton = findViewById<MediaRouteButton>(R.id.media_route_button)
-        caster!!.setupMediaRouteButton(media_route_button, false)
+        caster!!.setupMediaRouteButton(media_route_button, true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         super.onCreateOptionsMenu(menu)
-        caster!!.addMediaRouteMenuItem(menu, true)
+        //caster!!.addMediaRouteMenuItem(menu, true)
         menuInflater.inflate(R.menu.cast_menu, menu)
         /*menu.findItem(R.id.paste_new_link).setOnMenuItemClickListener {
             val clip = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -139,10 +139,11 @@ class CastingActivity : AppCompatActivity() {
     }
 
     private fun createMediaData(castVideoInfo: CastVideoInfo): MediaData {
-        VIDEO_URL = castVideoInfo.video_url
-        return MediaData.Builder(castVideoInfo.video_url)
+        VIDEO_URL = castVideoInfo.video_url + ".mp4"
+        return MediaData.Builder(VIDEO_URL)
                 .setStreamType(MediaData.STREAM_TYPE_BUFFERED)
-                .setContentType("application/x-mpegURL")
+                //.setContentType("application/x-mpegURL")
+                .setContentType("videos/mp4")
                 .setMediaType(MediaData.MEDIA_TYPE_MOVIE)
                 .setTitle(castVideoInfo.video_name)
                 .setDescription(castVideoInfo.video_des)
