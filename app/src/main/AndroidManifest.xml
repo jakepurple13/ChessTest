@@ -13,7 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="LockedOrientationActivity">
+
         <activity android:name=".otherfun.CastingActivity" />
+
         <activity android:name=".cardgames.matching.MatchingActivityTwo" />
         <activity
             android:name=".otherfun.NotificationBubbleActivity"
@@ -192,10 +194,10 @@
             android:name=".otherfun.ShowListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent" />
-
         <activity
             android:name=".SettingsActivity"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".otherfun.DownloadViewerActivity"
             android:screenOrientation="portrait"
@@ -217,7 +219,6 @@
             android:name=".SettingsActivity2"
             android:label="@string/title_activity_settings2"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".otherfun.FavoriteShowsActivity"
             android:screenOrientation="portrait"
@@ -227,17 +228,18 @@
             android:name=".otherfun.RssActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent" />
+
         <activity
             android:name=".FormActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent" />
-
         <activity android:name=".viewtesting.ViewTesting" />
 
         <activity
             android:name=".viewtesting.basic_test"
             android:label="@string/title_activity_basic_test"
             android:theme="@style/AppTheme" />
+
         <activity
             android:name=".otherfun.ViewVideosActivity"
             android:screenOrientation="portrait" />
@@ -247,8 +249,12 @@
             android:resizeableActivity="true"
             android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true" />
-
         <activity android:name=".otherfun.StartVideoFromNotificationActivity" />
+
+        <activity
+            android:name=".boardgames.pong.PongActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.Design.NoActionBar" />
         <!--
         <service android:name=".FirebaseMessage">
             <intent-filter>
@@ -256,10 +262,7 @@
             </intent-filter>
         </service>
         -->
-        <activity
-            android:name=".boardgames.pong.PongActivity"
-            android:screenOrientation="landscape"
-            android:theme="@style/Theme.Design.NoActionBar" /> <!-- <service android:name=".FirebaseMessage" /> -->
+        <!-- <service android:name=".FirebaseMessage" /> -->
         <!--
      Set custom default icon. This is used when no icon is set for incoming notification messages.
      See README(https://goo.gl/l4GJaQ) for more.
@@ -291,6 +294,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
+
         <receiver
             android:name=".otherfun.NotificationBroadcastReceiver"
             android:enabled="true"
@@ -425,6 +429,7 @@
                 android:value="true" />
         </service>
     </application>
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

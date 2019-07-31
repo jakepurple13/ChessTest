@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
@@ -22,8 +21,6 @@ class CastingActivity : AppCompatActivity() {
 
     private var VIDEO_URL = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4"
 
-    private var playButton: Button? = null
-    private var resumeButton: Button? = null
     private var caster: Caster? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,9 +35,9 @@ class CastingActivity : AppCompatActivity() {
         caster!!.addMiniController(R.layout.custom_mini_controller)
 
         val style = ExpandedControlsStyle.Builder()
-                .setSeekbarLineColor(Color.GREEN)
+                .setSeekbarLineColor(Color.BLUE)
                 .setSeekbarThumbColor(Color.WHITE)
-                .setStatusTextColor(Color.GREEN)
+                .setStatusTextColor(Color.BLUE)
                 .build()
 
         caster!!.setExpandedPlayerStyle(style)
@@ -62,12 +59,10 @@ class CastingActivity : AppCompatActivity() {
     }
 
     private fun setUpPlayButton(castVideoInfo: CastVideoInfo) {
-        playButton = findViewById(R.id.button_play)
-        resumeButton = findViewById(R.id.button_resume)
 
-        playButton!!.setOnClickListener { caster!!.player.loadMediaAndPlay(createMediaData(castVideoInfo)) }
+        button_play.setOnClickListener { caster!!.player.loadMediaAndPlay(createMediaData(castVideoInfo)) }
 
-        resumeButton!!.setOnClickListener {
+        button_resume!!.setOnClickListener {
             if (caster!!.player.isPaused) {
                 caster!!.player.togglePlayPause()
             }
@@ -100,14 +95,14 @@ class CastingActivity : AppCompatActivity() {
         caster!!.setOnConnectChangeListener(object : Caster.OnConnectChangeListener {
 
             override fun onConnected() {
-                playButton!!.isEnabled = true
+                button_play!!.isEnabled = true
                 volume_bar.isEnabled = true
                 volume_bar.progress = (caster!!.castSession!!.volume * 100).toInt()
             }
 
             override fun onDisconnected() {
-                playButton!!.isEnabled = false
-                resumeButton!!.isEnabled = false
+                button_play!!.isEnabled = false
+                button_resume!!.isEnabled = false
                 volume_bar.isEnabled = false
             }
         })
@@ -115,29 +110,29 @@ class CastingActivity : AppCompatActivity() {
         caster!!.setOnCastSessionStateChanged(object : Caster.OnCastSessionStateChanged {
 
             override fun onCastSessionBegan() {
-                playButton!!.isEnabled = false
-                resumeButton!!.isEnabled = false
+                button_play!!.isEnabled = false
+                button_resume!!.isEnabled = false
                 Log.e("Caster", "Began playing video")
             }
 
             override fun onCastSessionFinished() {
-                playButton!!.isEnabled = true
-                resumeButton!!.isEnabled = false
+                button_play!!.isEnabled = true
+                button_resume!!.isEnabled = false
                 Log.e("Caster", "Finished playing video")
             }
 
             override fun onCastSessionPlaying() {
                 val playingURL = caster!!.player.currentPlayingMediaUrl
 
-                playButton!!.isEnabled = !(playingURL != null && playingURL == VIDEO_URL)
+                button_play!!.isEnabled = !(playingURL != null && playingURL == VIDEO_URL)
 
-                resumeButton!!.isEnabled = false
+                button_resume!!.isEnabled = false
                 Log.e("Caster", "Playing video")
             }
 
             override fun onCastSessionPaused() {
-                playButton!!.isEnabled = false
-                resumeButton!!.isEnabled = true
+                button_play!!.isEnabled = false
+                button_resume!!.isEnabled = true
                 Log.e("Caster", "Paused video")
             }
         })
