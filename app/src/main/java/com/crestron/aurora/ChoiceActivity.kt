@@ -68,7 +68,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
-import spencerstudios.com.bungeelib.Bungee
 import java.io.File
 import java.net.SocketTimeoutException
 import java.net.URL
@@ -153,24 +152,24 @@ class ChoiceActivity : AppCompatActivity() {
             GlobalScope.launch {
                 val pInfo = packageManager.getPackageInfo(packageName, 0)
                 val version = pInfo.versionName
-                runOnUiThread {
-                    if (!SharedPrefVariables.hasShownForLatest) {
-                        SharedPrefVariables.latestVersion = version.toFloat()
-                        if (SharedPrefVariables.hasShownForLatest) {
-                            val url = URL(ConstantValues.VERSION_URL).readText()
-                            Loged.i(url)
-                            val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
-                            Loged.w("$info")
-                            val builder = AlertDialog.Builder(this@ChoiceActivity)
-                            builder.setTitle("New Version Notes!")
-                            builder.setMessage("Version: ${info.version}\n${info.devNotes}")
-                            builder.setNeutralButton("Cool!") { _, _ ->
+                if (!SharedPrefVariables.hasShownForLatest) {
+                    SharedPrefVariables.latestVersion = version.toFloat()
+                    if (SharedPrefVariables.hasShownForLatest) {
+                        val url = URL(ConstantValues.VERSION_URL).readText()
+                        Loged.i(url)
+                        val info: AppInfo = Gson().fromJson(url, AppInfo::class.java)
+                        Loged.w("$info")
+                        val builder = AlertDialog.Builder(this@ChoiceActivity)
+                        builder.setTitle("New Version Notes!")
+                        builder.setMessage("Version: ${info.version}\n${info.devNotes}")
+                        builder.setNeutralButton("Cool!") { _, _ ->
 
-                            }
-                            builder.setOnDismissListener {
-                                SharedPrefVariables.hasShownForLatest = true
-                            }
-                            val dialog = builder.create()
+                        }
+                        builder.setOnDismissListener {
+                            SharedPrefVariables.hasShownForLatest = true
+                        }
+                        val dialog = builder.create()
+                        runOnUiThread {
                             dialog.show()
                         }
                     }
@@ -215,7 +214,6 @@ class ChoiceActivity : AppCompatActivity() {
                     when (book) {
                         ChoiceButton.BLACKJACK -> {
                             startActivity(Intent(this@ChoiceActivity, BlackJackActivity::class.java))
-                            Bungee.swipeLeft(this@ChoiceActivity)
                             //ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, BlackJackActivity::class.java))
                         }
                         ChoiceButton.SOLITAIRE -> {
@@ -483,7 +481,6 @@ class ChoiceActivity : AppCompatActivity() {
                     intented.putExtra(ConstantValues.URL_INTENT, bookId)
                     intented.putExtra(ConstantValues.NAME_INTENT, bookTitle)
                     startActivity(intented)
-                    Bungee.slideLeft(this@ChoiceActivity)
                     //ViewUtil.presentActivity(view, this@ChoiceActivity, intented)
                     //ViewUtil.revealing(findViewById(android.R.id.content), intent)
 

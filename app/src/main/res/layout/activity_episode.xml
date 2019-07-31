@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/goto_downloads"
         android:layout_toEndOf="@+id/goto_downloads"
-        android:text="Reverse Order" />
+        android:text="Cast" />
 
     <LinearLayout
         android:layout_width="match_parent"

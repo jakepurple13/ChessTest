@@ -206,6 +206,7 @@ class VideoPokerActivity : AppCompatActivity() {
                     }
                     cards_left.text = "${deckOfCards.deckCount()} Cards Left"
                     play_again.isEnabled = true
+                    winning += betAmount
                 }
             }
         }
@@ -272,7 +273,6 @@ class VideoPokerActivity : AppCompatActivity() {
                     hand.add(i.c)
             }
         })
-
 
         //, swipeDirs = Direction.UP.value)
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,31 +12,87 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Play"
-        android:enabled="false"/>
+        android:enabled="false"
+        android:text="Play" />
 
     <Button
         android:id="@+id/button_resume"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:layout_below="@id/button_play"
-        android:text="Resume"
-        android:enabled="false"/>
+        android:layout_gravity="center"
+        android:enabled="false"
+        android:text="Resume" />
 
-    <androidx.mediarouter.app.MediaRouteButton
-        android:id="@+id/media_route_button"
-        android:layout_below="@id/button_resume"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <RelativeLayout
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/volume_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <SeekBar
+        <TextView
+            android:text="Title"
+            android:layout_toEndOf="@id/cast_image"
+            android:id="@+id/cast_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        
+        <ImageView
+            android:id="@+id/cast_image"
+            android:src="@drawable/ic_volume_low_grey600_36dp"
+            android:layout_width="360px"
+            android:layout_height="480px" />
+
+        <ScrollView
+            android:layout_toEndOf="@id/cast_image"
+            android:layout_below="@id/cast_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/cast_des"
+                android:text="Description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </ScrollView>
+        
+    </RelativeLayout>
+
+    <!--<SeekBar
         android:id="@+id/volume_bar"
         android:max="100"
         android:layout_marginBottom="50dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content" />-->
+
+    <TextView
+        android:id="@+id/volume_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/volume_bar"
+        android:layout_alignTop="@id/volume_bar"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@id/volume_bar"
+        android:gravity="center"
+        android:text="Percentage" />
+
+    <androidx.mediarouter.app.MediaRouteButton
+        android:id="@+id/media_route_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/button_play" />
+
+    <com.hmomeni.verticalslider.VerticalSlider
+        android:id="@+id/volume_bar"
+        android:layout_width="120dp"
+        android:layout_height="250dp"
+        android:layout_below="@id/button_resume"
+        android:layout_marginTop="5dp"
+        app:vs_cornerRadius="10dp"
+        app:vs_iconHigh="@drawable/ic_volume_high_grey600_36dp"
+        app:vs_iconLow="@drawable/ic_volume_low_grey600_36dp"
+        app:vs_iconMedium="@drawable/ic_volume_medium_grey600_36dp"
+        app:vs_max="100" />
 
 </RelativeLayout>

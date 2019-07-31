@@ -45,7 +45,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import programmer.box.utilityhelper.UtilNotification
-import spencerstudios.com.bungeelib.Bungee
 import java.net.SocketTimeoutException
 import java.util.*
 
@@ -344,34 +343,33 @@ class EpisodeActivity : AppCompatActivity() {
                                     KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
                                     KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
                         }*/
-
-                        if (downloadOrStream) {
-                            GlobalScope.launch {
+                        GlobalScope.launch {
+                            if (reverse_order.isChecked) {
                                 runOnUiThread {
-                                    Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this@EpisodeActivity, "Getting Info...", Toast.LENGTH_SHORT).show()
                                 }
-                                fetching.getVideo(info, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
-                                        KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
-                                        KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
-                            }
-                        } else {
-                            AlertDialog.Builder(this@EpisodeActivity).setTitle("Want to Cast?").setMessage("Want to cast or stream?")
-                                    .setPositiveButton("Cast!") { _, _ ->
-                                        GlobalScope.launch {
-                                            startActivity(Intent(this@EpisodeActivity, CastingActivity::class.java).apply {
-                                                putExtra("cast_info", Gson().toJson(CastVideoInfo(video_name = name, video_url = info.getVideoLink(), video_image = epApi!!.image, video_des = epApi.description)))
-                                            })
-                                        }
+                                startActivity(Intent(this@EpisodeActivity, CastingActivity::class.java).apply {
+                                    putExtra("cast_info", Gson().toJson(CastVideoInfo(video_name = name, video_url = info.getVideoLink(), video_image = epApi!!.image, video_des = epApi.description)))
+                                })
+                            } else {
+                                if (downloadOrStream) {
+                                    runOnUiThread {
+                                        Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
                                     }
-                                    .setNegativeButton("Stream!") { _, _ ->
-                                        GlobalScope.launch {
-                                            startActivity(Intent(this@EpisodeActivity, VideoPlayerActivity::class.java).apply {
-                                                putExtra("video_path", info.getVideoLink())
-                                                putExtra("video_name", name)
-                                                putExtra("download_or_stream", false)
-                                            })
-                                        }
-                                    }.show()
+                                    fetching.getVideo(info, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
+                                            KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
+                                            KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
+                                } else {
+                                    runOnUiThread {
+                                        Toast.makeText(this@EpisodeActivity, "Getting Info...", Toast.LENGTH_SHORT).show()
+                                    }
+                                    startActivity(Intent(this@EpisodeActivity, VideoPlayerActivity::class.java).apply {
+                                        putExtra("video_path", info.getVideoLink())
+                                        putExtra("video_name", name)
+                                        putExtra("download_or_stream", false)
+                                    })
+                                }
+                            }
                         }
                     }
                 })
@@ -410,7 +408,7 @@ class EpisodeActivity : AppCompatActivity() {
 
         episode_refresh.isEnabled = false
 
-        reverse_order.setOnCheckedChangeListener { _, b ->
+        /*reverse_order.setOnCheckedChangeListener { _, b ->
             if (b) {
                 //Toast.makeText(this@EpisodeActivity, "Will only download on Wifi", Toast.LENGTH_LONG).show()
             } else {
@@ -422,8 +420,11 @@ class EpisodeActivity : AppCompatActivity() {
             listOfEpisodes.reverse()
 
             runOnUiThread {
-                val slideOrButton = defaultSharedPreferences.getBoolean(ConstantValues.SLIDE_OR_BUTTON, true)
-                episode_list.adapter = EpisodeAdapter(listOfEpisodes, name, reverse = b, context = this@EpisodeActivity, slideOrButton = slideOrButton, downloadOrStream = true, action = object : EpisodeAction {
+                //val slideOrButton = defaultSharedPreferences.getBoolean(ConstantValues.SLIDE_OR_BUTTON, true)
+                (episode_list.adapter as EpisodeAdapter).items.reverse()
+                (episode_list.adapter as EpisodeAdapter).notifyItemRangeChanged(0, episode_list.adapter!!.itemCount)
+
+                *//*= EpisodeAdapter(listOfEpisodes, name, reverse = b, context = this@EpisodeActivity, slideOrButton = slideOrButton, downloadOrStream = true, action = object : EpisodeAction {
                     override fun hit(name: String, url: String) {
                         super.hit(name, url)
                         FetchingUtils.downloadCount++
@@ -445,11 +446,11 @@ class EpisodeActivity : AppCompatActivity() {
                                     KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
                         }
                     }
-                })
+                })*//*
                 Loged.d("${(episode_list.adapter!! as EpisodeAdapter).itemCount}")
             }
 
-        }
+        }*/
 
         goto_downloads.setOnClickListener {
             startActivity(Intent(this@EpisodeActivity, DownloadViewerActivity::class.java))
@@ -595,7 +596,6 @@ class EpisodeActivity : AppCompatActivity() {
             val intent = Intent(this@EpisodeActivity, ChoiceActivity::class.java)
             startActivity(intent)
             //finish()
-            Bungee.slideRight(this@EpisodeActivity)
             supportFinishAfterTransition()
         }
     }

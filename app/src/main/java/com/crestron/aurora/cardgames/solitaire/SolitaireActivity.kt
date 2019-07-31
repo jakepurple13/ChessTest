@@ -5,16 +5,16 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
@@ -31,11 +31,9 @@ import crestron.com.deckofcards.Suit
 import kotlinx.android.synthetic.main.activity_solitaire.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
-import spencerstudios.com.bungeelib.Bungee
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -375,7 +373,6 @@ class SolitaireActivity : AppCompatActivity() {
                 intent.putExtra(ConstantValues.DRAW_AMOUNT, drawAmount)
                 finish()
                 startActivity(intent)
-                Bungee.swipeLeft(this@SolitaireActivity)
             }
             builder.setNegativeButton("Nope") { _, _ ->
                 time.startTimer(solitaire_timer)
@@ -397,7 +394,6 @@ class SolitaireActivity : AppCompatActivity() {
             // Add the buttons
             builder.setPositiveButton("Yes, I want to stop") { _, _ ->
                 finish()
-                Bungee.shrink(this@SolitaireActivity)
             }
             builder.setNegativeButton("No, I do not want to stop") { _, _ ->
                 if (!win)
@@ -498,11 +494,9 @@ class SolitaireActivity : AppCompatActivity() {
             intent.putExtra(ConstantValues.DRAW_AMOUNT, drawAmount)
             finish()
             startActivity(intent)
-            Bungee.swipeLeft(this@SolitaireActivity)
         }
         builder.setNegativeButton("Nope") { _, _ ->
             finish()
-            Bungee.swipeLeft(this@SolitaireActivity)
         }
         val dialog = builder.create()
         dialog.show()

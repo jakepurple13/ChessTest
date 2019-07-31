@@ -5,15 +5,15 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.views.HintedImageView
@@ -26,10 +26,8 @@ import kotlinx.android.synthetic.main.activity_black_jack.*
 import kotlinx.android.synthetic.main.card_item.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import spencerstudios.com.bungeelib.Bungee
 import java.util.*
 
 
@@ -189,7 +187,6 @@ Back = Rewind Button
 
         backButtonJack.setOnClickListener {
             finish()
-            Bungee.swipeRight(this@BlackJackActivity)
         }
 
         val layoutManagerPlayer = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)

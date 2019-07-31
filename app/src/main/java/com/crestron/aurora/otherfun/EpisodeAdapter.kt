@@ -21,7 +21,7 @@ import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
 //class EpisodeAdapter(private val items: ArrayList<String>, private val links: ArrayList<String>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
-class EpisodeAdapter(private val items: ArrayList<EpisodeInfo>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, val downloadOrStream: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
+class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, val downloadOrStream: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
 
     // Gets the number of animals in the list
     override fun getItemCount(): Int {

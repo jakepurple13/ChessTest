@@ -1,20 +1,22 @@
 package com.crestron.aurora.otherfun
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.widget.Button
-import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.google.gson.Gson
+import com.hmomeni.verticalslider.VerticalSlider
+import com.mikepenz.materialize.util.UIUtils
 import com.mradzinski.caster.Caster
 import com.mradzinski.caster.ExpandedControlsStyle
 import com.mradzinski.caster.MediaData
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_casting.*
-import kotlin.math.roundToInt
 
 class CastingActivity : AppCompatActivity() {
 
@@ -45,6 +47,18 @@ class CastingActivity : AppCompatActivity() {
 
         setUpPlayButton(castInfo)
         setUpMediaRouteButton()
+
+        cast_des.text = castInfo.video_des
+        cast_title.text = castInfo.video_name
+
+        try {
+            Picasso.get().load(castInfo.video_image)
+                    .error(R.drawable.apk)
+                    .resize((600 * .6).toInt(), (800 * .6).toInt())
+                    .into(cast_image)
+        } catch (e: java.lang.IllegalArgumentException) {
+            Picasso.get().load(android.R.drawable.stat_notify_error).resize((600 * .6).toInt(), (800 * .6).toInt()).into(cast_image)
+        }
     }
 
     private fun setUpPlayButton(castVideoInfo: CastVideoInfo) {
@@ -59,7 +73,7 @@ class CastingActivity : AppCompatActivity() {
             }
         }
 
-        volume_bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        /*volume_bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStartTrackingTouch(p0: SeekBar?) {
 
             }
@@ -71,14 +85,24 @@ class CastingActivity : AppCompatActivity() {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 caster?.castSession?.volume = p1.toDouble()/100.0
             }
-        })
+        })*/
+
+        volume_bar.cornerRadius = UIUtils.convertDpToPixel(10f, this)
+
+        volume_bar.onProgressChangeListener = object : VerticalSlider.OnSliderProgressChangeListener {
+            @SuppressLint("SetTextI18n")
+            override fun onChanged(progress: Int, max: Int) {
+                caster?.castSession?.volume = progress.toDouble() / max
+                volume_info.text = "${((progress.toDouble() / max) * 100).toInt()}%"
+            }
+        }
 
         caster!!.setOnConnectChangeListener(object : Caster.OnConnectChangeListener {
 
             override fun onConnected() {
                 playButton!!.isEnabled = true
                 volume_bar.isEnabled = true
-                volume_bar.progress = (caster!!.castSession!!.volume*100).roundToInt()
+                volume_bar.progress = (caster!!.castSession!!.volume * 100).toInt()
             }
 
             override fun onDisconnected() {
