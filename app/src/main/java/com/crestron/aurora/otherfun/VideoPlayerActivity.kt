@@ -28,7 +28,6 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
@@ -151,7 +150,9 @@ class VideoPlayerActivity : AppCompatActivity() {
     private lateinit var gesture: GestureDetector
 
     private var lockTimer = TimerStuff({
-        video_info_layout.animate().setDuration(500).alpha(0f)
+        video_info_layout.animate().setDuration(500).alpha(0f).withEndAction {
+            topShowing = false
+        }
     })
 
     private var mDownX: Float = 0.toFloat()
@@ -187,6 +188,8 @@ class VideoPlayerActivity : AppCompatActivity() {
     private var mTouchingProgressBar = false
     private var mDownPosition: Int = 0
     private var mSeekTimePosition: Int = 0
+
+    private var topShowing = true
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -229,7 +232,7 @@ class VideoPlayerActivity : AppCompatActivity() {
             player.prepare(videoSource)
         } else {
             fun buildMediaSource(uri: Uri): MediaSource {
-                return ExtractorMediaSource.Factory(
+                return ProgressiveMediaSource.Factory(
                         DefaultHttpDataSourceFactory("exoplayer-codelab")).createMediaSource(uri)
             }
 
@@ -411,7 +414,7 @@ class VideoPlayerActivity : AppCompatActivity() {
     }
 
     private val onTouch = View.OnTouchListener { v, event ->
-        lockTimer.restartLock()
+        lockTimer.stopLock()
         //Loged.v("$event")
         if (!locked) {
             gesture.onTouchEvent(event!!)
@@ -509,11 +512,19 @@ class VideoPlayerActivity : AppCompatActivity() {
 
         playerView.useController = !locked
 
-        video_info_layout.animate().setDuration(500).alpha(1f)
-        //video_back.animate().setDuration(500).alpha(1f)
-        lockTimer.startLock()
-
+        if(topShowing) {
+            lockTimer.action()
+        } else {
+            showLayout()
+            lockTimer.startLock()
+        }
         false
+    }
+
+    private fun showLayout() {
+        video_info_layout.animate().setDuration(500).alpha(1f).withEndAction {
+            topShowing = true
+        }
     }
 
     private fun showProgressDialog(deltaX: Float, seekTime: String,
