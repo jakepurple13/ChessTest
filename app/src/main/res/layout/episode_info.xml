@@ -45,6 +45,7 @@
         app:outer_color="@color/emeraldGreen"
         android:layout_weight="1"
         app:animate_completion="true"
+        app:area_margin="10dp"
         app:text="Download"
         app:slider_icon_color="@color/emeraldGreen" />
 

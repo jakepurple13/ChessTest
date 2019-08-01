@@ -72,6 +72,8 @@ class EpisodeActivity : AppCompatActivity() {
 
     var stats: StatusPlay = StatusPlay.PLAY
 
+    lateinit var adapter: EpisodeAdapter
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -311,7 +313,7 @@ class EpisodeActivity : AppCompatActivity() {
                 val downloadOrStream = defaultSharedPreferences.getBoolean(ConstantValues.DOWNLOAD_OR_STREAM, true)
                 Loged.i("$downloadOrStream")
 
-                episode_list.adapter = EpisodeAdapter(listOfEpisodes, name, context = this@EpisodeActivity, slideOrButton = slideOrButton, downloadOrStream = downloadOrStream, action = object : EpisodeAction {
+                adapter = EpisodeAdapter(listOfEpisodes, name, context = this@EpisodeActivity, slideOrButton = slideOrButton, downloadOrStream = downloadOrStream, action = object : EpisodeAction {
                     override fun hit(name: String, url: String) {
                         super.hit(name, url)
                         FetchingUtils.downloadCount++
@@ -373,6 +375,7 @@ class EpisodeActivity : AppCompatActivity() {
                         }
                     }
                 })
+                episode_list.adapter = adapter
                 Loged.d("${(episode_list.adapter!! as EpisodeAdapter).itemCount}")
             }
             runOnUiThread {
@@ -407,6 +410,11 @@ class EpisodeActivity : AppCompatActivity() {
         }
 
         episode_refresh.isEnabled = false
+
+        reverse_order.setOnCheckedChangeListener { _, b ->
+            adapter.casting = b
+            adapter.notifyDataSetChanged()
+        }
 
         /*reverse_order.setOnCheckedChangeListener { _, b ->
             if (b) {

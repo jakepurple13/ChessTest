@@ -23,6 +23,8 @@ import java.util.*
 //class EpisodeAdapter(private val items: ArrayList<String>, private val links: ArrayList<String>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
 class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, val downloadOrStream: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
 
+    var casting = false
+
     // Gets the number of animals in the list
     override fun getItemCount(): Int {
         return items.size
@@ -78,11 +80,14 @@ class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String
         //holder.slideToDownload.setText(if(downloadOrStream) "Download" else "Stream")
         holder.slideToDownload.text = if(downloadOrStream) "Download" else "Stream"
 
+        if(casting)
+            holder.slideToDownload.text = "Cast"
+
         val show = ShowDatabase.getDatabase(this@EpisodeAdapter.context).showDao()
 
         GlobalScope.launch {
             val episodes = show.getEpisodes(name)//show.getEpisodeFromShow(name)
-            Loged.wtf("$episodes")
+            //Loged.wtf("$episodes")
 
             /*holder.watched.isChecked = episodes.any {
                 "${name
