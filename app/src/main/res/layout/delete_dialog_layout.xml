@@ -8,7 +8,7 @@
     tools:ignore="HardcodedText"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.agik.AGIKSwipeButton.View.Swipe_Button_View
+    <!--<com.agik.AGIKSwipeButton.View.Swipe_Button_View
         android:id="@+id/slide_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,7 +22,20 @@
         app:sb_swipe_animate_text="true"
         app:sb_swipe_text="Delete">
 
-    </com.agik.AGIKSwipeButton.View.Swipe_Button_View>
+    </com.agik.AGIKSwipeButton.View.Swipe_Button_View>-->
+
+    <com.ncorti.slidetoact.SlideToActView
+        android:id="@+id/slide_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textView6"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        app:slider_icon_color="@color/alizarin"
+        app:outer_color="@color/alizarin"
+        app:text="Delete" />
 
     <TextView
         android:id="@+id/textView6"

@@ -6,11 +6,10 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Window
-import com.agik.AGIKSwipeButton.Controller.OnSwipeCompleteListener
-import com.agik.AGIKSwipeButton.View.Swipe_Button_View
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.otherfun.FetchingUtils
+import com.ncorti.slidetoact.SlideToActView
 import com.tonyodev.fetch2.Download
 import kotlinx.android.synthetic.main.delete_dialog_layout.*
 import java.io.File
@@ -63,7 +62,7 @@ class DeleteDialog(context: Context?, var title: String = "", val download: Down
             all_download_info.text = file.path
         }
 
-        slide_button.setOnSwipeCompleteListener_forward_reverse(object : OnSwipeCompleteListener {
+        /*slide_button.setOnSwipeCompleteListener_forward_reverse(object : OnSwipeCompleteListener {
             override fun onSwipe_Forward(p0: Swipe_Button_View?) {
                 Loged.w("Forward")
                 if (download != null) {
@@ -78,7 +77,20 @@ class DeleteDialog(context: Context?, var title: String = "", val download: Down
             override fun onSwipe_Reverse(p0: Swipe_Button_View?) {
                 Loged.w("Reverse")
             }
-        })
+        })*/
+
+        slide_button.onSlideCompleteListener = object : SlideToActView.OnSlideCompleteListener {
+            override fun onSlideComplete(view: SlideToActView) {
+                Loged.w("Forward")
+                if (download != null) {
+                    FetchingUtils.delete(download)
+                    FetchingUtils.downloadCount--
+                }
+                file?.delete()
+                this@DeleteDialog.dismiss()
+                listener?.onDelete()
+            }
+        }
 
         delete_dismiss_button.setOnClickListener {
             dismiss()

@@ -6,16 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.agik.AGIKSwipeButton.Controller.OnSwipeCompleteListener
-import com.agik.AGIKSwipeButton.View.Swipe_Button_View
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeInfo
+import com.ncorti.slidetoact.SlideToActView
 import kotlinx.android.synthetic.main.episode_info.view.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.runOnUiThread
 import java.util.*
@@ -48,7 +48,7 @@ class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String
             action.hit(items[position])
         }
 
-        holder.slideToDownload.setOnSwipeCompleteListener_forward_reverse(object : OnSwipeCompleteListener {
+        /*holder.slideToDownload.setOnSwipeCompleteListener_forward_reverse(object : OnSwipeCompleteListener {
             override fun onSwipe_Forward(p0: Swipe_Button_View?) {
                 //action.hit(items[position], links[position])
                 //action.hit(items[position].name, items[position].url)
@@ -58,11 +58,25 @@ class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String
             override fun onSwipe_Reverse(p0: Swipe_Button_View?) {
 
             }
-        })
+        })*/
+
+        holder.slideToDownload.onSlideCompleteListener = object : SlideToActView.OnSlideCompleteListener {
+            override fun onSlideComplete(view: SlideToActView) {
+                action.hit(items[position])
+
+                GlobalScope.launch {
+                    delay(500)
+                    context.runOnUiThread {
+                        view.resetSlider()
+                    }
+                }
+            }
+        }
 
         holder.episodeDownload.text = if(downloadOrStream) "Download" else "Stream"
 
-        holder.slideToDownload.setText(if(downloadOrStream) "Download" else "Stream")
+        //holder.slideToDownload.setText(if(downloadOrStream) "Download" else "Stream")
+        holder.slideToDownload.text = if(downloadOrStream) "Download" else "Stream"
 
         val show = ShowDatabase.getDatabase(this@EpisodeAdapter.context).showDao()
 

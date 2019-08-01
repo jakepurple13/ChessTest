@@ -158,7 +158,7 @@ class CastingActivity : AppCompatActivity() {
     }
 
     private fun createMediaData(castVideoInfo: CastVideoInfo): MediaData {
-        VIDEO_URL = castVideoInfo.video_url + ".mp4"
+        VIDEO_URL = castVideoInfo.video_url
         return MediaData.Builder(VIDEO_URL)
                 .setStreamType(MediaData.STREAM_TYPE_BUFFERED)
                 //.setContentType("application/x-mpegURL")

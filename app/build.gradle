@@ -158,6 +158,7 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.10.3'
     implementation 'androidx.mediarouter:mediarouter:1.0.0'
     implementation 'com.hmomeni.verticalslider:verticalslider:0.2.0'
+    implementation 'com.ncorti:slidetoact:0.7.0'
 }
 kotlin {
     experimental {
