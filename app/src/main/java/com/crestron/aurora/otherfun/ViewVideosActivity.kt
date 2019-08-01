@@ -20,7 +20,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.abdeveloper.library.MultiSelectDialog
@@ -31,13 +30,15 @@ import com.crestron.aurora.R
 import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.views.DeleteDialog
+import com.programmerbox.dragswipe.Direction
+import com.programmerbox.dragswipe.DragSwipeActions
+import com.programmerbox.dragswipe.DragSwipeAdapter
+import com.programmerbox.dragswipe.DragSwipeUtils
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Request
 import com.squareup.picasso.RequestHandler
 import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2core.Func
-import github.nisrulz.recyclerviewhelper.RVHAdapter
-import github.nisrulz.recyclerviewhelper.RVHItemTouchHelperCallback
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
 import kotlinx.android.synthetic.main.activity_view_videos.*
 import kotlinx.android.synthetic.main.video_layout.view.*
@@ -49,6 +50,7 @@ import org.jetbrains.anko.runOnUiThread
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 
 class ViewVideosActivity : AppCompatActivity() {
@@ -109,16 +111,32 @@ class ViewVideosActivity : AppCompatActivity() {
                 }, instance)
             else {
                 val list = listOfFiles
-                list.addAll(adapter!!.stuff)
+                list.addAll(adapter!!.list)
                 adapter!!.add(list.distinctBy { it })
             }
             view_videos_recyclerview.swapAdapter(adapter, true)
-            val callback = RVHItemTouchHelperCallback(adapter
+            /*val callback = RVHItemTouchHelperCallback(adapter
                     , false
                     , true
                     , true)
             val helper = ItemTouchHelper(callback)
-            helper.attachToRecyclerView(view_videos_recyclerview)
+            helper.attachToRecyclerView(view_videos_recyclerview)*/
+
+            DragSwipeUtils.setDragSwipeUp(adapter!!, view_videos_recyclerview, Direction.NOTHING.value, Direction.START + Direction.END, object : DragSwipeActions<File, ViewHolder> {
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Direction, dragSwipeAdapter: DragSwipeAdapter<File, ViewHolder>) {
+                    if (dragSwipeAdapter.list.isNotEmpty())
+                        DeleteDialog(this@ViewVideosActivity, dragSwipeAdapter.list[viewHolder.adapterPosition].name, listener = adapter!!.listener(viewHolder.adapterPosition)).show()
+                    else
+                        adapter!!.notifyDataSetChanged()
+
+
+                    /*if (stuff.isNotEmpty())
+                        DeleteDialog(context, stuff[position].name, listener = listener(position)).show()
+                    else
+                        notifyDataSetChanged()*/
+                    //super.onSwiped(viewHolder, direction, dragSwipeAdapter)
+                }
+            })
 
             runOnUiThread {
                 video_refresh.isRefreshing = false
@@ -264,7 +282,7 @@ class ViewVideosActivity : AppCompatActivity() {
         }
     }
 
-    class VideoAdapter(var stuff: ArrayList<File>,
+    /*class VideoAdapter(var stuff: ArrayList<File>,
                        var context: Context,
                        private val videoListener: DeleteVideoListener,
                        val picasso: Picasso) : RecyclerView.Adapter<ViewHolder>(), RVHAdapter {
@@ -288,11 +306,11 @@ class ViewVideosActivity : AppCompatActivity() {
 
         fun listener(position: Int) = object : DeleteDialog.DeleteDialogListener {
             override fun onDelete() {
-                /*context.defaultSharedPreferences.edit().remove(stuff[position].path).apply()
+                *//*context.defaultSharedPreferences.edit().remove(stuff[position].path).apply()
                 //videoListener.videoDelete(position)
                 stuff[position].delete()
                 stuff.removeAt(position)
-                notifyItemRemoved(position)*/
+                notifyItemRemoved(position)*//*
                 remove(position)
             }
 
@@ -338,7 +356,7 @@ class ViewVideosActivity : AppCompatActivity() {
                 val duration = time.toLong()
 
                 retriever.release()
-                /*convert millis to appropriate time*/
+                *//*convert millis to appropriate time*//*
                 val runTimeString = if (duration > TimeUnit.HOURS.toMillis(1)) {
                     String.format("%02d:%02d:%02d",
                             TimeUnit.MILLISECONDS.toHours(duration),
@@ -371,6 +389,123 @@ class ViewVideosActivity : AppCompatActivity() {
                 holder.videoLayout.setOnLongClickListener {
                     if (position != RecyclerView.NO_POSITION)
                         DeleteDialog(context, stuff[position].name, file = stuff[position], listener = listener(holder.adapterPosition)).show()
+                    true
+                }
+            } catch (e: IllegalStateException) {
+                holder.videoRuntime.text = "???"
+                holder.videoThumbnail.setImageResource(android.R.drawable.stat_notify_error)
+                holder.videoLayout.setOnClickListener {
+                    Toast.makeText(context, "Still Downloading", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+    }*/
+
+    class VideoAdapter(list: ArrayList<File>,
+                       var context: Context,
+                       private val videoListener: DeleteVideoListener,
+                       val picasso: Picasso) : DragSwipeAdapter<File, ViewHolder>(list) {
+
+
+
+        /*override fun onItemDismiss(position: Int, direction: Int) {
+            if (stuff.isNotEmpty())
+                DeleteDialog(context, stuff[position].name, listener = listener(position)).show()
+            else
+                notifyDataSetChanged()
+        }
+
+        override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
+            return false
+        }*/
+
+        fun add(lists: Collection<File>) {
+            list.addAll(lists)
+            list = list.distinctBy { it } as ArrayList<File>
+            notifyDataSetChanged()
+        }
+
+        fun listener(position: Int) = object : DeleteDialog.DeleteDialogListener {
+            override fun onDelete() {
+                /*context.defaultSharedPreferences.edit().remove(stuff[position].path).apply()
+                //videoListener.videoDelete(position)
+                stuff[position].delete()
+                stuff.removeAt(position)
+                notifyItemRemoved(position)*/
+                remove(position)
+            }
+
+            override fun onCancel() {
+                notifyDataSetChanged()
+            }
+        }
+
+        fun remove(position: Int) {
+            context.defaultSharedPreferences.edit().remove(list[position].path).apply()
+            val f = list.removeAt(position)
+            if (f.exists())
+                f.delete()
+            notifyItemRemoved(position)
+            //notifyDataSetChanged()
+            //videoListener.videoDelete(position)
+        }
+
+        // Inflates the item views
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            return ViewHolder(LayoutInflater.from(context).inflate(R.layout.video_layout, parent, false))
+        }
+
+        // Binds each animal in the ArrayList to a view
+        @SuppressLint("SetTextI18n")
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.videoName.text = "${list[position].name} ${if (context.defaultSharedPreferences.contains(list[position].path)) "\nat ${Utility.stringForTime(context.defaultSharedPreferences.getLong(list[position].path, 0))}" else ""}"
+
+            try {
+                //Video runtime text
+                //val mp = MediaPlayer.create(context, Uri.parse(stuff[position].path))
+                //val duration = mp.duration.toLong()
+                //mp.release()
+                val retriever = MediaMetadataRetriever()
+                //use one of overloaded setDataSource() functions to set your data source
+                retriever.setDataSource(context, Uri.fromFile(File(list[position].path)))
+                val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                val duration = time.toLong()
+
+                retriever.release()
+                /*convert millis to appropriate time*/
+                val runTimeString = if (duration > TimeUnit.HOURS.toMillis(1)) {
+                    String.format("%02d:%02d:%02d",
+                            TimeUnit.MILLISECONDS.toHours(duration),
+                            TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration)),
+                            TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration)))
+                } else {
+                    String.format("%02d:%02d",
+                            TimeUnit.MILLISECONDS.toMinutes(duration),
+                            TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration)))
+                }
+                holder.videoRuntime.text = runTimeString
+                context.runOnUiThread {
+                    //Thumbnail image
+                    picasso.load(VideoRequestHandler.SCHEME_VIDEO + ":" + list[position].path)?.transform(RoundedCornersTransformation(5, 5))?.into(holder.videoThumbnail)
+                }
+                //to play video
+                holder.videoLayout.setOnClickListener {
+                    if (context.defaultSharedPreferences.getBoolean("videoPlayer", false)) {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(list[position].path))
+                        intent.setDataAndType(Uri.parse(list[position].path), "video/mp4")
+                        context.startActivity(intent)
+                    } else {
+                        context.startActivity(Intent(context, VideoPlayerActivity::class.java).apply {
+                            putExtra("video_path", list[position].path)
+                            putExtra("video_name", list[position].name)
+                        })
+                        //MxVideoPlayerWidget.startFullscreen(context, MxVideoPlayerWidget::class.java, stuff[position].path, stuff[position].name)
+                    }
+                }
+                holder.videoLayout.setOnLongClickListener {
+                    if (position != RecyclerView.NO_POSITION)
+                        DeleteDialog(context, list[position].name, file = list[position], listener = listener(holder.adapterPosition)).show()
                     true
                 }
             } catch (e: IllegalStateException) {

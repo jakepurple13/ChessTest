@@ -39,6 +39,7 @@ import kotlinx.android.synthetic.main.activity_video_player.*
 import kotlinx.coroutines.Runnable
 import org.jetbrains.anko.defaultSharedPreferences
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.collections.ArrayList
 import kotlin.math.abs
 
@@ -151,7 +152,7 @@ class VideoPlayerActivity : AppCompatActivity() {
 
     private var lockTimer = TimerStuff({
         video_info_layout.animate().setDuration(500).alpha(0f).withEndAction {
-            topShowing = false
+            topShowing.set(false)
         }
     })
 
@@ -189,7 +190,7 @@ class VideoPlayerActivity : AppCompatActivity() {
     private var mDownPosition: Int = 0
     private var mSeekTimePosition: Int = 0
 
-    private var topShowing = true
+    private var topShowing = AtomicBoolean(true)
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -463,7 +464,7 @@ class VideoPlayerActivity : AppCompatActivity() {
                             mSeekTimePosition = totalTimeDuration.toInt()
                         }
                         val seekTime = stringForTime(mSeekTimePosition.toLong())
-                        val totalTime = stringForTime(totalTimeDuration.toLong())
+                        val totalTime = stringForTime(totalTimeDuration)
                         showProgressDialog(deltaX, seekTime, mSeekTimePosition, totalTime, totalTimeDuration.toInt())
                     }
                     if (mChangeVolume) {
@@ -512,7 +513,7 @@ class VideoPlayerActivity : AppCompatActivity() {
 
         playerView.useController = !locked
 
-        if(topShowing) {
+        if(topShowing.get()) {
             lockTimer.action()
         } else {
             showLayout()
@@ -523,7 +524,7 @@ class VideoPlayerActivity : AppCompatActivity() {
 
     private fun showLayout() {
         video_info_layout.animate().setDuration(500).alpha(1f).withEndAction {
-            topShowing = true
+            topShowing.set(true)
         }
     }
 
@@ -554,7 +555,7 @@ class VideoPlayerActivity : AppCompatActivity() {
         if (!mProgressDialog!!.isShowing) {
             mProgressDialog!!.show()
         }
-        val seekedTime = abs(playerView.player.currentPosition - seekTimePosition).toLong()
+        val seekedTime = abs(playerView.player.currentPosition - seekTimePosition)
         val seekTimeText = "(" + stringForTime(seekedTime) + ") " + seekTime
         mDialogSeekTime!!.text = seekTimeText
         mDialogTotalTime!!.text = String.format(" / %s", totalTime)
@@ -659,8 +660,8 @@ class VideoPlayerActivity : AppCompatActivity() {
         return nowBrightnessValue
     }
 
-    fun stringForTime(milliseconds: Long): String {
-        var milliseconds = milliseconds
+    private fun stringForTime(milliseconded: Long): String {
+        var milliseconds = milliseconded
         if (milliseconds < 0 || milliseconds >= 24 * 60 * 60 * 1000) {
             return "00:00"
         }
