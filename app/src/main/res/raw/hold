@@ -1,0 +1,100 @@
+import json
+import re
+import subprocess
+import requests
+from bs4 import BeautifulSoup
+
+class PutLocker(object):
+    def __init__(self, url):
+        self.s = requests.Session()
+        self.url = url
+        self.s.headers = {
+            'authority': 'www.putlocker.fyi',
+            'pragma': 'no-cache',
+            'cache-control': 'no-cache',
+            'upgrade-insecure-requests': '1',
+            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'referer': url,
+            'accept-encoding': 'gzip, deflate',
+            'accept-language': 'en-US,en;q=0.9',
+            'dnt': '1',
+        }
+    def _get_webpage(self, url):
+        req = self.s.get(url)
+        res_code = req.status_code
+        if res_code == 200:
+            print("got webpage with {}".format(res_code))
+            return req.text
+    def _get_rows(self, in_soup):
+        print("getting rows")
+        rows = in_soup.find_all(
+            'div', attrs={'class': 'col-lg-12'})[2].find_all('div', attrs={'class': 'row'})
+        return rows
+    def _parse_title(self, text):
+        print("parsing title")
+        m = re.sub(
+            r'.*?Season ([\d]+) Episode ([\d]+) - (.*$)', r'S\1E\2 - \3', text)
+        return m
+    def _parse_episodes(self, episodes):
+        print("parsing episodes")
+        return [{
+            "link": e['href'],
+            "vid_url": self._get_embed_src(e['data-pid']),
+            "title": self._parse_title(e['title'])
+        } for e in episodes]
+    def _parse_row(self, in_row):
+        try:
+            season = in_row.find_all('a', attrs={'class': 'btn-season'})
+            episodes = in_row.find_all('a', attrs={'class': 'btn-episode'})
+        except error as e:
+            print(error)
+        if season:
+            print("season row")
+            season = re.sub(r'[^\d]+([\d]+)', r'S\1', season[0].text)
+            return season
+        if episodes:
+            print("episodes row")
+            episodes = self._parse_episodes(episodes)
+            return episodes
+    def _get_embed_src(self, p_id):
+        print("getting video from {}".format(p_id))
+        url = 'https://www.putlocker.fyi/embed-src/{}'.format(p_id)
+        webpage = self.s.get(url).text
+        embed_url = re.search(
+            r'<iframe[^>]+src="([^"]+)"[^>]*><\/iframe>', webpage).group(1)
+        webpage = self.s.get(embed_url).text
+        token = re.search(
+            r'<p[^>]+id="videolink">([^>]*)<\/p>', webpage).group(1)
+        vid_url = 'https://verystream.com/gettoken/{}?mime=true'.format(token)
+        return vid_url
+    def _write_json(self, in_name, in_dict):
+        print("writing json")
+        with open(in_name, 'w') as f:
+            json.dump(in_dict, f)
+    def _get_show_name(self, in_soup):
+        breadcrumbs = in_soup.find_all(
+            'li', attrs={'class': 'breadcrumb-item'})[::-1][0]
+        return breadcrumbs.text
+    def _dl_aria(self, url):
+        cmd = ['aria2c', '-c', '-j', '3', '-x',
+               '3', '-s', '3', '-k', '1M', url]
+        ps = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE)
+        out, err = ps.communicate()
+    def main(self):
+        webpage = self._get_webpage(self.url)
+        with open('putlocker.html', 'w') as f:
+            f.write(webpage)
+        proj_path = '/Users/mflorczak/Projects/python-testing/py_files/scripts/putlocker'
+        soup = BeautifulSoup(webpage, 'html.parser')
+        show_name = self._get_show_name(soup).lower().replace(
+            ' ', '_') + "_putlocker.json"
+        show_json = {}
+        rows = self._get_rows(soup)
+        back = [self._parse_row(r) for r in rows]
+        for s, e in zip(back[::2], back[1::2]):
+            show_json[s] = e
+        self._write_json(show_name, show_json)
+
+PutLocker('https://www.putlocker.fyi/show/silicon-valley/').main()
