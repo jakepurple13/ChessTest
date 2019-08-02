@@ -249,6 +249,8 @@ class VideoPlayerActivity : AppCompatActivity() {
         video_lock.setOnClickListener {
             locked = !locked
             video_lock.setImageDrawable(IconicsDrawable(this).icon(if (locked) FontAwesome.Icon.faw_lock else FontAwesome.Icon.faw_unlock).sizeDp(24))
+            if(!locked)
+                playerView.showController()
         }
         video_back.setOnClickListener {
             onBackPressed()

@@ -44,7 +44,7 @@ class ShowCheckReceiver : BroadcastReceiver() {
         }
     }
 }
-
+//TODO: GET BUBBLE NOTIFICATION WORKING CORRECTLY!!!
 class BootUpReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent!!.action == "android.intent.action.BOOT_COMPLETED") {
@@ -103,6 +103,8 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                     one.url == two.link
                 }
 
+                val updateList = arrayListOf<ShowInfos>()
+
                 for ((prog, i) in filtered.withIndex()) {
                     //for ((prog, i) in bColIds.withIndex()) {
                     sendRunningNotification(this@ShowCheckIntentService,
@@ -118,7 +120,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                             val timeOfUpdate = SimpleDateFormat("MM/dd hh:mm a").format(System.currentTimeMillis())
                             val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
                             Loged.wtf(infoToShow)
-                            updateNotiList.add(ShowInfos(i.name, showList, timeOfUpdate, i.url))
+                            updateList.add(ShowInfos(i.name, showList, timeOfUpdate, i.url))
                             show.showNum = showList
                             showDatabase.showDao().updateShow(show)
                             count++
@@ -130,33 +132,37 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                     }
                 }
                 //updateNotiMap.addAll(KUtility.getNotifyList())
-                updateNotiList.addAll(KUtility.getNotiJsonList().list)
+
+                //updateList.addAll(KUtility.getNotiJsonList().list)
+
                 //updateNotiList.add(ShowInfos("This is the name", 4, "01:30 AM", "http://www.animetoon.org/watch-archer"))
                 //updateNotiList.add(ShowInfos("Soccer One", 4, "02:30 AM", "http://www.animeplus.tv/captain-tsubasa-2018-online"))
                 //updateNotiList.add(ShowInfos("Cute One With a really really long name", 4, "03:30 AM", "http://www.animeplus.tv/jingai-san-no-yome-episode-9-online"))
                 //val list = updateNotiMap.distinctBy { it }
-                val list = updateNotiList.distinctBy { it.url }
+                val list = updateList.distinctBy { it.url }
                 if (list.isNotEmpty()) {
                     defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT,
                             defaultSharedPreferences.getInt(ConstantValues.UPDATE_COUNT, 0) + count).apply()
                     //updateNotiMap.clear()
                     //updateNotiMap.addAll(list)
-                    updateNotiList.clear()
-                    updateNotiList.addAll(list)
+
+                    //updateList.clear()
+                    //updateList.addAll(list)
+
                     //KUtility.commitNotiList(updateNotiMap.toMutableSet())
-                    KUtility.commitNotiJsonList(ShowInfosList(updateNotiList))
+                    //KUtility.commitNotiJsonList(ShowInfosList(updateList))
 
                     if (defaultSharedPreferences.getBoolean("useNotifications", true)) {
                         val links = arrayListOf<String>()
                         val names = arrayListOf<String>()
                         dismissCurrentNotis(this@ShowCheckIntentService)
-                        @Suppress("IMPLICIT_CAST_TO_ANY") val nStyle = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        @Suppress("IMPLICIT_CAST_TO_ANY") val nStyle = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             Notification.InboxStyle()
                         } else {
                             NotificationCompat.InboxStyle()
                         }
                         for ((j, i) in list.withIndex()) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                                 (nStyle as Notification.InboxStyle).addLine(i.name)
                             } else {
                                 (nStyle as NotificationCompat.InboxStyle).addLine(i.name)
@@ -183,12 +189,12 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                         NameWithUrl(i.name, i.url))
                             //}
                         }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             (nStyle as Notification.InboxStyle).addLine("${list.size} show${if (list.size == 1) "" else "s"} had updates!")
                         } else {
                             (nStyle as NotificationCompat.InboxStyle).addLine("${list.size} show${if (list.size == 1) "" else "s"} had updates!")
                         }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             sendBubbleGroupNotification(this@ShowCheckIntentService,
                                     android.R.mipmap.sym_def_app_icon,
                                     "${list.size} show${if (list.size == 1) "" else "s"} had updates!",
@@ -260,7 +266,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         mNotificationManager.cancel(0)
     }
 
-    @RequiresApi(Build.VERSION_CODES.P)
+    @RequiresApi(Build.VERSION_CODES.Q)
     fun setUpBubble(context: Context, notification: Notification.Builder, notification_id: Int = 0, bubbleIntentSetup: (Intent) -> Unit) {
         // Create bubble intent
         val target = Intent(context, NotificationBubbleActivity::class.java)
@@ -274,7 +280,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 .setIcon(Icon.createWithResource(context, R.mipmap.ic_launcher))
                 .setIntent(bubbleIntent)
                 //.setSuppressNotification(true)
-                //.setDeleteIntent(createOnGroupDismissedIntent(context, notification_id))
+                .setDeleteIntent(createOnGroupDismissedIntent(context, 0))
                 .build()
 
         // Create notification
@@ -445,7 +451,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         )
         mBuilder.setContentIntent(resultPendingIntent)
         mBuilder.setDeleteIntent(createOnGroupDismissedIntent(context, 0))
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             setUpBubble(context, mBuilder, 50) {
                 val list = arrayListOf<ShowInfos>()
                 for (i in links.indices) {

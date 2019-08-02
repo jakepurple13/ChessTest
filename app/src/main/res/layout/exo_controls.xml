@@ -52,10 +52,17 @@
                 android:includeFontPadding="false"
                 android:textColor="#FFBEBEBE"/>
 
-            <View android:id="@id/exo_progress_placeholder"
+            <!--<View android:id="@id/exo_progress_placeholder"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="26dp"/>
+                android:layout_height="26dp"/>-->
+            <!--TODO: MAKE YOUR OWN EXPANDING TIME BAR ALSO TRY TO SEE IF YOU CAN GET IMAGES WORKING WITH THIS PREVIEW ONE!-->
+
+            <com.google.android.exoplayer2.ui.DefaultTimeBar
+                android:id="@id/exo_progress"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="26dp" />
 
             <TextView android:id="@id/exo_duration"
                 android:layout_width="wrap_content"
