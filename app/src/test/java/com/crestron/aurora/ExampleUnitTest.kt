@@ -46,6 +46,76 @@ class ExampleUnitTest {
     }
 
     @Test
+    fun putLockTV() {
+        val link = "https://www.putlocker.fyi/a-z-shows/"
+        val s = Jsoup.connect(link).get()
+        val d = s.select("a.az_ls_ent")//s.select("tr")//s.select("a.az_ls_ent")
+        data class Showsa(val title: String, val url: String) {
+            override fun toString(): String {
+                return "$title - $url"
+            }
+        }
+        val listOfShows = arrayListOf<Showsa>()
+        for(i in d) {
+            listOfShows+=Showsa(i.text(), i.attr("abs:href"))
+        }
+
+        //listOfShows.sortBy { it.title }
+
+        log("${listOfShows.subList(0, 10)}")
+
+        val newLink = "https://www.putlocker.fyi/"
+
+        log(listOfShows[10].title)
+        getShowStuff(listOfShows.random().url)
+    }
+
+    fun getShowStuff(url: String) {
+        val s = Jsoup.connect(url).get()
+        //val s = Jsoup.connect("https://www.putlocker.fyi/show/holey-moley/").get()
+        //log("$s")
+        val name = s.select("li.breadcrumb-item").last().text()
+        log(name)
+
+        val image = s.select("div.thumb").select("img[src^=http]").attr("abs:src")
+        log(image)
+
+        /*val rowList = s.select("div.col-lg-12").select("div.row")
+
+        val seasons = rowList.select("a.btn-season")
+        for(i in seasons) {
+            //log(i.text())
+        }
+        val episodes = rowList.select("a.btn-episode")
+        data class Eps(var title: String, var link: String, var vidUrl: String) {
+            override fun toString(): String {
+                return "$title: $link and $vidUrl"
+            }
+        }
+
+        val epList = arrayListOf<Eps>()
+        for(i in episodes) {
+            val ep = Eps(i.text(), i.attr("abs:href"), "https://www.putlocker.fyi/embed-src/${i.attr("data-pid")}")
+            epList+=ep
+        }
+        log("$epList")
+        log(getVidUrl(epList.random().vidUrl))*/
+    }
+
+    fun getVidUrl(secondUrl: String): String {
+        val doc = Jsoup.connect(secondUrl).get()
+        val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(doc.toString())
+        if(d.find()) {
+            val f = Jsoup.connect(d.group(1)!!).get()
+            val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(f.toString())
+            if(a.find()) {
+                return "https://verystream.com/gettoken/${a.group(1)!!}?mime=true"
+            }
+        }
+        return "N/A"
+    }
+
+    @Test
     fun putLocker() {
         val s = Jsoup.connect("https://www.putlocker.fyi/show/silicon-valley/").get()
         //val s = Jsoup.connect("https://www.putlocker.fyi/show/holey-moley/").get()

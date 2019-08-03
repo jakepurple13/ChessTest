@@ -19,7 +19,8 @@ enum class Source(val link: String, val recent: Boolean = false, var movie: Bool
     CARTOON_MOVIES("http://www.animetoon.org/movies", movie = true),
     //RECENT_ANIME("http://www.animeplus.tv/anime-updates", true),
     RECENT_ANIME("https://www.gogoanime1.com/home/latest-episodes", true),
-    RECENT_CARTOON("http://www.animetoon.org/updates", true);
+    RECENT_CARTOON("http://www.animetoon.org/updates", true),
+    LIVE_ACTION("https://www.putlocker.fyi/a-z-shows/");
 
     companion object SourceUrl {
         fun getSourceFromUrl(url: String): Source {
@@ -31,6 +32,7 @@ enum class Source(val link: String, val recent: Boolean = false, var movie: Bool
                 CARTOON_MOVIES.link -> CARTOON_MOVIES
                 RECENT_ANIME.link -> RECENT_ANIME
                 RECENT_CARTOON.link -> RECENT_CARTOON
+                LIVE_ACTION.link -> LIVE_ACTION
                 else -> ANIME
             }
         }
@@ -69,6 +71,13 @@ class ShowApi(private val source: Source) {
                 gogoAnimeMovies()
             else
                 gogoAnimeAll()
+        } else if (source.link.contains("putlocker")) {
+            val d = doc.select("a.az_ls_ent")
+            val listOfShows = arrayListOf<ShowInfo>()
+            for (i in d) {
+                listOfShows += ShowInfo(i.text(), i.attr("abs:href"))
+            }
+            return listOfShows
         } else {
             val lists = doc.allElements
             val listOfStuff = lists.select("td").select("a[href^=http]")
@@ -167,7 +176,9 @@ class EpisodeApi(private val source: ShowInfo, timeOut: Int = 10000) {
      */
     val name: String
         get() {
-            return if (source.url.contains("gogoanime")) {
+            return if(source.url.contains("putlocker")) {
+                doc.select("li.breadcrumb-item").last().text()
+            } else if (source.url.contains("gogoanime")) {
                 doc.select("div.anime-title").text()
             } else {
                 doc.select("div.right_col h1").text()
@@ -179,7 +190,9 @@ class EpisodeApi(private val source: ShowInfo, timeOut: Int = 10000) {
      */
     val image: String
         get() {
-            return if (source.url.contains("gogoanime")) {
+            return if (source.url.contains("putlocker")) {
+                doc.select("div.thumb").select("img[src^=http]").attr("abs:src")
+            } else if (source.url.contains("gogoanime")) {
                 doc.select("div.animeDetail-image").select("img[src^=http]").attr("abs:src")
             } else {
                 doc.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
@@ -192,7 +205,9 @@ class EpisodeApi(private val source: ShowInfo, timeOut: Int = 10000) {
      */
     val description: String
         get() {
-            if (source.url.contains("gogoanime")) {
+            if(source.url.contains("putlocker")) {
+                return "There is none here"
+            } else if (source.url.contains("gogoanime")) {
                 val des = doc.select("p.anime-details").text()
                 return if (des.isNullOrBlank()) "Sorry, an error has occurred" else des
             } else {
@@ -220,7 +235,20 @@ class EpisodeApi(private val source: ShowInfo, timeOut: Int = 10000) {
     val episodeList: List<EpisodeInfo>
         get() {
             var listOfShows = arrayListOf<EpisodeInfo>()
-            if (source.url.contains("gogoanime")) {
+            if (source.url.contains("putlocker")) {
+                val rowList = doc.select("div.col-lg-12").select("div.row")
+
+                //val seasons = rowList.select("a.btn-season")
+                /*for (i in seasons) {
+                    //log(i.text())
+                }*/
+                val episodes = rowList.select("a.btn-episode")
+
+                for (i in episodes) {
+                    val ep = EpisodeInfo(i.text(), "https://www.putlocker.fyi/embed-src/${i.attr("data-pid")}")//i.attr("abs:href"))
+                    listOfShows.add(ep)
+                }
+            } else if (source.url.contains("gogoanime")) {
                 val stuffList = doc.select("ul.check-list").select("li")
                 val showList = arrayListOf<EpisodeInfo>()
                 for (i in stuffList) {
@@ -272,7 +300,18 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
      * # Use for anything but movies
      */
     fun getVideoLink(): String {
-        if (url.contains("gogoanime")) {
+        if (url.contains("putlocker")) {
+            val doc = Jsoup.connect(url).get()
+            val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(doc.toString())
+            if (d.find()) {
+                val f = Jsoup.connect(d.group(1)!!).get()
+                val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(f.toString())
+                if (a.find()) {
+                    return "https://verystream.com/gettoken/${a.group(1)!!}?mime=true"
+                }
+            }
+            return "N/A"
+        } else if (url.contains("gogoanime")) {
             val doc = Jsoup.connect(url).get()
             return doc.select("a[download^=http]").attr("abs:download")
         } else {
@@ -303,7 +342,18 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
      * # Use for movies
      */
     fun getVideoLinks(): List<String> {
-        if (url.contains("gogoanime")) {
+        if (url.contains("putlocker")) {
+            val doc = Jsoup.connect(url).get()
+            val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(doc.toString())
+            if (d.find()) {
+                val f = Jsoup.connect(d.group(1)!!).get()
+                val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(f.toString())
+                if (a.find()) {
+                    return arrayListOf("https://verystream.com/gettoken/${a.group(1)!!}?mime=true")
+                }
+            }
+            return arrayListOf("N/A")
+        } else if (url.contains("gogoanime")) {
             val doc = Jsoup.connect(url).get()
             return arrayListOf(doc.select("a[download^=http]").attr("abs:download"))
         } else {
@@ -362,7 +412,24 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
      * # You can use this for anything. This just returns some extra information.
      */
     fun getVideoInfo(): List<Storage> {
-        if (url.contains("gogoanime")) {
+        if (url.contains("putlocker")) {
+            val doc = Jsoup.connect(url).get()
+            val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(doc.toString())
+            if (d.find()) {
+                val f = Jsoup.connect(d.group(1)!!).get()
+                val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(f.toString())
+                if (a.find()) {
+                    val stor = Storage()
+                    stor.link = "https://verystream.com/gettoken/${a.group(1)!!}?mime=true"
+                    stor.filename = name
+                    stor.quality = "720"
+                    stor.source = "PutLocker"
+                    stor.sub = "No"
+                    return arrayListOf(stor)
+                }
+            }
+            return arrayListOf()
+        } else if (url.contains("gogoanime")) {
             val doc = Jsoup.connect(url).get()
             val storage = Storage()
             storage.link = doc.select("a[download^=http]").attr("abs:download")

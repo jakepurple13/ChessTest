@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
@@ -16,6 +17,11 @@ import com.mradzinski.caster.ExpandedControlsStyle
 import com.mradzinski.caster.MediaData
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_casting.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import java.net.HttpURLConnection
+import java.net.URL
 
 class CastingActivity : AppCompatActivity() {
 
@@ -34,6 +40,12 @@ class CastingActivity : AppCompatActivity() {
         caster = Caster.create(this)
         caster!!.addMiniController(R.layout.custom_mini_controller)
 
+        GlobalScope.launch {
+            val s = if (canReachSite(castInfo.video_url).await()) "You can continue" else "Please Retry"
+            runOnUiThread {
+                Toast.makeText(this@CastingActivity, s, Toast.LENGTH_SHORT).show()
+            }
+        }
         val style = ExpandedControlsStyle.Builder()
                 .setSeekbarLineColor(Color.BLUE)
                 .setSeekbarThumbColor(Color.WHITE)
@@ -55,6 +67,22 @@ class CastingActivity : AppCompatActivity() {
                     .into(cast_image)
         } catch (e: java.lang.IllegalArgumentException) {
             Picasso.get().load(android.R.drawable.stat_notify_error).resize((600 * .6).toInt(), (800 * .6).toInt()).into(cast_image)
+        }
+
+    }
+
+    fun canReachSite(url: String) = GlobalScope.async {
+        val urlChecker = URL(url)
+        val connection = urlChecker.openConnection() as HttpURLConnection
+        val code = connection.responseCode
+
+        if (code == 200) {
+            // reachable
+            Loged.d("Yeah! We can get it")
+            true
+        } else {
+            Loged.wtf("Nope!")
+            false
         }
     }
 
@@ -167,6 +195,7 @@ class CastingActivity : AppCompatActivity() {
                 .setTitle(castVideoInfo.video_name)
                 .setDescription(castVideoInfo.video_des)
                 .setThumbnailUrl(castVideoInfo.video_image)
+                //.setThumbnailUrl("https://www.google.com/url?sa=i&source=images&cd=&ved=2ahUKEwiZjNznyOLjAhVKhOAKHVEGAAYQjRx6BAgBEAU&url=https%3A%2F%2Fwww.polygon.com%2F2019%2F4%2F6%2F18291042%2Fbest-new-anime-spring-2019-watch-streaming&psig=AOvVaw3iBm_KCrnzvtpbeVMJSiB5&ust=1564779706691909")
                 .setPlaybackRate(MediaData.PLAYBACK_RATE_NORMAL)
                 .setAutoPlay(true)
                 .build()
