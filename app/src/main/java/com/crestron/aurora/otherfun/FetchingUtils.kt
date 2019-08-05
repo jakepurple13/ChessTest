@@ -9,24 +9,18 @@ import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.FunApplication
 import com.crestron.aurora.Loged
 import com.crestron.aurora.showapi.EpisodeInfo
-import com.google.gson.Gson
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
 import com.tonyodev.fetch2core.Func
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import org.jsoup.Jsoup
 import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLEncoder
 import java.text.DecimalFormat
-import java.util.*
 
 
 class FetchingUtils(val context: Context, private var fetchAction: FetchAction = object : FetchAction {}) {
@@ -353,7 +347,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         }
 
         override fun onError(download: Download, error: Error, throwable: Throwable?) {
-            Loged.wtf("${download.error}")
+            Loged.wtf("${download.error} with code ${download.error.httpResponse?.code}")
         }
 
         override fun onPaused(download: Download) {

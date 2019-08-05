@@ -1,6 +1,5 @@
 package com.crestron.aurora
 
-import com.crestron.aurora.Loged.FILTER_BY_CLASS_NAME
 import com.crestron.aurora.boardgames.yahtzee.Dice
 import com.crestron.aurora.boardgames.yahtzee.YahtzeeScores
 import com.crestron.aurora.showapi.*
@@ -20,8 +19,6 @@ import org.jsoup.Jsoup
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
@@ -40,7 +37,7 @@ fun cadTest() {
     val d1 = cad(Suit.DIAMONDS, 3)
 }
 
-@RunWith(RobolectricTestRunner::class)
+//@RunWith(RobolectricTestRunner::class)
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
@@ -66,17 +63,32 @@ class ExampleUnitTest {
             if (resCode == HttpURLConnection.HTTP_SEE_OTHER
                     || resCode == HttpURLConnection.HTTP_MOVED_PERM
                     || resCode == HttpURLConnection.HTTP_MOVED_TEMP) {
-                var Location = con.getHeaderField("Location")
-                if (Location.startsWith("/")) {
-                    Location = url.protocol + "://" + url.host + Location
+                var location = con.getHeaderField("Location")
+                if (location.startsWith("/")) {
+                    location = url.protocol + "://" + url.host + location
                 }
-                return getFinalURL(URL(Location))
+                return getFinalURL(URL(location))
             }
         } catch (e: Exception) {
             println(e.message)
         }
 
         return url
+    }
+
+    @Test
+    fun putLock2() {
+
+        val show = ShowApi(Source.LIVE_ACTION).showInfoList
+        val ep = show.getEpisodeApi(0)
+
+        val epUrl = ep.episodeList[0].getVideoLink()
+        prettyLog(epUrl)
+        val url = getFinalURL(URL(epUrl))!!
+        prettyLog(url.toExternalForm())
+        prettyLog("$url")
+        prettyLog(url.toString())
+        prettyLog("${url.toURI()}")
     }
 
     @Test
@@ -116,21 +128,6 @@ class ExampleUnitTest {
         val jsonObj = JSONObject(resString)
         prettyLog(jsonObj.getString("Plot"))
 
-    }
-
-    @Test
-    fun putLock2() {
-
-        val show = ShowApi(Source.LIVE_ACTION).showInfoList
-        val ep = show.getEpisodeApi(0)
-
-        val epUrl = ep.episodeList[0].getVideoLink()
-        prettyLog(epUrl)
-        val url = getFinalURL(URL(epUrl))!!
-        prettyLog(url.toExternalForm())
-        prettyLog("$url")
-        prettyLog(url.toString())
-        prettyLog("${url.toURI()}")
     }
 
     @Test
@@ -781,7 +778,7 @@ class ExampleUnitTest {
         val stackTraceElement = Thread.currentThread().stackTrace
 
         val elements = listOf(*stackTraceElement)
-        val wanted = elements.filter { it.className.contains(FILTER_BY_CLASS_NAME) && !it.methodName.contains("prettyLog") }
+        val wanted = elements.filter { it.className.contains(Loged.FILTER_BY_CLASS_NAME) && !it.methodName.contains("prettyLog") }
 
         var loc = "\n"
 

@@ -73,7 +73,8 @@ public class FunApplication extends Application {
         Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(KUtility.Util.getNextCheckTime()), "TAG", true, true);
 
         SharedPreferences sharedPreferences = getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE);
-        FetchingUtils.Fetched.setFolderLocation(sharedPreferences.getString(ConstantValues.FOLDER_LOCATION, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/Fun/"));
+        FetchingUtils.Fetched.setFolderLocation(
+                sharedPreferences.getString(ConstantValues.FOLDER_LOCATION, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/Fun/"));
         boolean wifiOnly = KUtility.Util.canDownload(this);
         FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this)
                 .enableAutoStart(true)
@@ -96,11 +97,11 @@ public class FunApplication extends Application {
 
         //episode update
         UtilNotification.createNotificationChannel(this, "episode_update",
-                "episode_update_info",
-                "episodeUpdate");
+                                                   "episode_update_info",
+                                                   "episodeUpdate");
         UtilNotification.createNotificationGroup(this,
-                "episode_group_id",
-                "episode_group");
+                                                 "episode_group_id",
+                                                 "episode_group");
         //show check update running
             /*UtilNotification.createNotificationChannel(this, "updateCheckRun",
                     "episode check update",
@@ -117,11 +118,11 @@ public class FunApplication extends Application {
         }
         //app update
         UtilNotification.createNotificationChannel(this, "update_notification",
-                "update_notification",
-                "update_notification");
+                                                   "update_notification",
+                                                   "update_notification");
         UtilNotification.createNotificationGroup(this,
-                "update_notification_group",
-                "update_notification_group");
+                                                 "update_notification_group",
+                                                 "update_notification_group");
         //float length = getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE).getFloat("updateCheck", 1f);
         //JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
         //if (jobScheduler != null && jobScheduler.getPendingJob(1) == null)
@@ -190,9 +191,9 @@ public class FunApplication extends Application {
             int p = Palette.from(bitmap).generate().getDominantColor(Color.BLACK);
 
             Icon icon = Icon.createWithBitmap(new IconicsDrawable(this)
-                    .icon(GoogleMaterial.Icon.gmd_video_library)
-                    .color(getComplimentColor(p))
-                    .toBitmap());
+                                                      .icon(GoogleMaterial.Icon.gmd_video_library)
+                                                      .color(getComplimentColor(p))
+                                                      .toBitmap());
 
             ShortcutInfo videoView = new ShortcutInfo.Builder(context, "id4")
                     .setShortLabel("View Videos")
@@ -206,9 +207,9 @@ public class FunApplication extends Application {
             intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, DownloadViewerActivity.class);
 
             Icon downloadIcon = Icon.createWithBitmap(new IconicsDrawable(this)
-                    .icon(GoogleMaterial.Icon.gmd_file_download)
-                    .color(getComplimentColor(p))
-                    .toBitmap());
+                                                              .icon(GoogleMaterial.Icon.gmd_file_download)
+                                                              .color(getComplimentColor(p))
+                                                              .toBitmap());
 
             ShortcutInfo downloadViewer = new ShortcutInfo.Builder(context, "id5")
                     .setShortLabel("View Downloads")
@@ -218,7 +219,6 @@ public class FunApplication extends Application {
                     .build();
 
             scl.add(downloadViewer);
-
         } catch (SecurityException e) {
             Loged.INSTANCE.wtf(e.getMessage(), Loged.INSTANCE.getTAG(), true, true);
         }
@@ -233,7 +233,8 @@ public class FunApplication extends Application {
 
     public static void fetchSetUp(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE);
-        FetchingUtils.Fetched.setFolderLocation(sharedPreferences.getString(ConstantValues.FOLDER_LOCATION, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/Fun/"));
+        FetchingUtils.Fetched.setFolderLocation(
+                sharedPreferences.getString(ConstantValues.FOLDER_LOCATION, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/Fun/"));
         boolean wifiOnly = KUtility.Util.canDownload(context);
         FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(context)
                 .enableAutoStart(true)
@@ -243,6 +244,7 @@ public class FunApplication extends Application {
                 .setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
                 .setDownloadConcurrentLimit(sharedPreferences.getInt("downloadNumber", 1))
                 .setNotificationManager(new DefaultFetchNotificationManager(context) {
+
                     @NotNull
                     @Override
                     public Fetch getFetchInstanceForNamespace(@NotNull String s) {
@@ -290,5 +292,4 @@ public class FunApplication extends Application {
     public static Context getAppContext() {
         return FunApplication.context;
     }
-
 }

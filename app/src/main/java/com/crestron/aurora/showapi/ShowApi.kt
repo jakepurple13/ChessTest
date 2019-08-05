@@ -8,6 +8,7 @@ import org.jsoup.nodes.Document
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
 
@@ -322,6 +323,33 @@ class EpisodeApi(private val source: ShowInfo, timeOut: Int = 10000) {
  */
 class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
 
+    private fun getFinalURL(url: URL): URL? {
+        //TODO: Try this out when you get home
+        try {
+            val con = url.openConnection() as HttpURLConnection
+            con.instanceFollowRedirects = false
+            con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0")
+            con.addRequestProperty("Accept-Language", "en-US,en;q=0.5")
+            con.addRequestProperty("Referer", "http://thewebsite.com")
+            con.connect()
+            //con.getInputStream();
+            val resCode = con.responseCode
+            if (resCode == HttpURLConnection.HTTP_SEE_OTHER
+                    || resCode == HttpURLConnection.HTTP_MOVED_PERM
+                    || resCode == HttpURLConnection.HTTP_MOVED_TEMP) {
+                var location = con.getHeaderField("Location")
+                if (location.startsWith("/")) {
+                    location = url.protocol + "://" + url.host + location
+                }
+                return getFinalURL(URL(location))
+            }
+        } catch (e: Exception) {
+            println(e.message)
+        }
+
+        return url
+    }
+
     /**
      * returns a url link to the episodes video
      * # Use for anything but movies
@@ -335,10 +363,13 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
                 val f = Jsoup.connect(d.group(1)!!).get()
                 val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(f.toString())
                 if (a.find()) {
-                    return "https://verystream.com/gettoken/${a.group(1)!!}?mime=true"
+                    //TODO: Link is what was there originally ---v
+                    //return "https://verystream.com/gettoken/${a.group(1)!!}?mime=true"
+                    val link = "https://verystream.com/gettoken/${a.group(1)!!}?mime=true"
+                    val lastLink = getFinalURL(URL(link))!!
+                    return lastLink.toExternalForm()
                 }
             }
-            return "N/A"
         } else if (url.contains("gogoanime")) {
             val doc = Jsoup.connect(url).get()
             return doc.select("a[download^=http]").attr("abs:download")
