@@ -2,9 +2,7 @@ package com.crestron.aurora
 
 import com.crestron.aurora.boardgames.yahtzee.Dice
 import com.crestron.aurora.boardgames.yahtzee.YahtzeeScores
-import com.crestron.aurora.showapi.EpisodeApi
-import com.crestron.aurora.showapi.ShowApi
-import com.crestron.aurora.showapi.Source
+import com.crestron.aurora.showapi.*
 import com.crestron.aurora.utilities.KUtility
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
@@ -43,6 +41,22 @@ class ExampleUnitTest {
     @Before
     fun setUp() {
         Loged.FILTER_BY_CLASS_NAME = "crestron"
+    }
+
+    @Test
+    fun putlocktest2() {
+        //This is what I get from the app
+        //https://verystream.com/gettoken/cnjoAVarrQ2~1565007281~173.3.0.0~VBMxlX7W?mime=true
+        //This is what I get when I put the link above into the browser url
+        //https://wowsoamaze.verystream.net/stream/cnjoAVarrQ2/lw7ID5F1CsOe5n7T/rnL9Tc3WHG5amPKmGnyAkp5Tc5EMccRfcERY4eGnapJ2_vrzDY-V-u40wEUqDnk1CF5UJRkB3STundcN3pXO21_JhKeiUpO9E521zJUENTzpFjFML_mWR9Q3goPjcw9XpBZ4s9pkV1bkE6kbomIR1sc3W7m7GNY6gXcsJdTmqLEsfgUNUqC64K7O5YIICWLrbT9FRYDSe3zNPQicDHUgxwSbi6hOhrwHnncHLoRHtgtyy3V75MVMb7-uPXKW9lb0iJRXa_3EOspJlOi6clPALBm0UPjeKd7tJuBr2D0lAgXKnH-ejxkOBS2ke7Ikbbc9rZ5kmVJz0S2Kkxm8_lDpL99g1-58wLDec0DOG6aEhd2UDHht6wgWAwXqMf6EY0Lv8Rab2RM9cc__sulWx0Fy1JqyoRj_LIWZz7W7zMZaT2GiNlgBqs5Gs9uhqREpa_ph47v6Alq85KCVxszvNkvXqw/Marvels.Agents.of.S.H.I.E.L.D.S06E13.HDTV.x264-KILLERS.mp4?mime=true
+        val link = "https://www.putlocker.fyi/show/marvels-agents-of-s-h-i-e-l-d/"
+        val epApi = EpisodeApi(ShowInfo("asdf", link))
+        val show = epApi.episodeList[0]
+        log(show.name)
+        val links = show.getVideoLink()
+        log(links)
+        val ep = EpisodeInfo("Shield", "https://www.putlocker.fyi/show/marvels-agents-of-s-h-i-e-l-d/season-6/episode-13/")
+        log("${ep.getVideoLink()}")
     }
 
     @Test

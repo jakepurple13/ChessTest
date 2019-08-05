@@ -301,6 +301,7 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
      */
     fun getVideoLink(): String {
         if (url.contains("putlocker")) {
+            //TODO: Try to see why I might be getting error 302 (aka Redirection)
             val doc = Jsoup.connect(url).get()
             val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(doc.toString())
             if (d.find()) {
