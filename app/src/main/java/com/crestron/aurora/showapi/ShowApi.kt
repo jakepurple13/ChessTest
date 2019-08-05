@@ -1,6 +1,8 @@
 package com.crestron.aurora.showapi
 
 import com.google.gson.Gson
+import okhttp3.OkHttpClient
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.BufferedReader
@@ -176,7 +178,7 @@ class EpisodeApi(private val source: ShowInfo, timeOut: Int = 10000) {
      */
     val name: String
         get() {
-            return if(source.url.contains("putlocker")) {
+            return if (source.url.contains("putlocker")) {
                 doc.select("li.breadcrumb-item").last().text()
             } else if (source.url.contains("gogoanime")) {
                 doc.select("div.anime-title").text()
@@ -205,8 +207,37 @@ class EpisodeApi(private val source: ShowInfo, timeOut: Int = 10000) {
      */
     val description: String
         get() {
-            if(source.url.contains("putlocker")) {
-                return "There is none here"
+            if (source.url.contains("putlocker")) {
+                try {
+                    val client = OkHttpClient()
+                    val request = okhttp3.Request.Builder()
+                            .url("http://www.omdbapi.com/?t=$name&plot=full&apikey=e91b86ee")
+                            .get()
+                            .build()
+                    val response = client.newCall(request).execute()
+                    val resString = response.body()!!.string()
+                    val jsonObj = JSONObject(resString)
+                    val year = jsonObj.getString("Year")
+                    val released = jsonObj.getString("Released")
+                    val plot = jsonObj.getString("Plot")
+                    return "Years Active: $year\nReleased: $released\n$plot"
+                } catch (e: Exception) {
+                    var textToReturn = ""
+                    val des = doc.select(".mov-desc")
+                    val para = des.select("p")
+                    for (i in para.withIndex()) {
+                        val text = when (i.index) {
+                            1 -> "Release: "
+                            2 -> "Genre: "
+                            3 -> "Director: "
+                            4 -> "Stars: "
+                            5 -> "Synopsis: "
+                            else -> ""
+                        } + i.value.text()
+                        textToReturn += text + "\n"
+                    }
+                    return textToReturn.trim()
+                }
             } else if (source.url.contains("gogoanime")) {
                 val des = doc.select("p.anime-details").text()
                 return if (des.isNullOrBlank()) "Sorry, an error has occurred" else des
@@ -238,10 +269,6 @@ class EpisodeApi(private val source: ShowInfo, timeOut: Int = 10000) {
             if (source.url.contains("putlocker")) {
                 val rowList = doc.select("div.col-lg-12").select("div.row")
 
-                //val seasons = rowList.select("a.btn-season")
-                /*for (i in seasons) {
-                    //log(i.text())
-                }*/
                 val episodes = rowList.select("a.btn-episode")
 
                 for (i in episodes) {

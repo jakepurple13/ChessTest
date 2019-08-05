@@ -294,7 +294,12 @@ class EpisodeActivity : AppCompatActivity() {
 
             runOnUiThread {
 
-                download_info.text = if (epApi != null) nameUrl(epApi.description) else "An error has occured"
+                GlobalScope.launch {
+                    val des = if (epApi != null) nameUrl(epApi.description) else "An error has occurred"
+                    runOnUiThread {
+                        download_info.text = des
+                    }
+                }
 
                 if (epApi != null) {
                     try {

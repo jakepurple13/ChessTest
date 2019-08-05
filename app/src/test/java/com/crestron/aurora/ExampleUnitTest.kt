@@ -1,5 +1,6 @@
 package com.crestron.aurora
 
+import com.crestron.aurora.Loged.FILTER_BY_CLASS_NAME
 import com.crestron.aurora.boardgames.yahtzee.Dice
 import com.crestron.aurora.boardgames.yahtzee.YahtzeeScores
 import com.crestron.aurora.showapi.*
@@ -12,10 +13,17 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.html.*
 import kotlinx.html.stream.appendHTML
 import kotlinx.html.stream.createHTML
+import okhttp3.OkHttpClient
+import org.intellij.lang.annotations.Language
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import java.net.HttpURLConnection
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -32,6 +40,7 @@ fun cadTest() {
     val d1 = cad(Suit.DIAMONDS, 3)
 }
 
+@RunWith(RobolectricTestRunner::class)
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
@@ -41,6 +50,87 @@ class ExampleUnitTest {
     @Before
     fun setUp() {
         Loged.FILTER_BY_CLASS_NAME = "crestron"
+    }
+
+    fun getFinalURL(url: URL): URL? {
+        //TODO: Try this out when you get home
+        try {
+            val con = url.openConnection() as HttpURLConnection
+            con.instanceFollowRedirects = false
+            con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0")
+            con.addRequestProperty("Accept-Language", "en-US,en;q=0.5")
+            con.addRequestProperty("Referer", "http://thewebsite.com")
+            con.connect()
+            //con.getInputStream();
+            val resCode = con.responseCode
+            if (resCode == HttpURLConnection.HTTP_SEE_OTHER
+                    || resCode == HttpURLConnection.HTTP_MOVED_PERM
+                    || resCode == HttpURLConnection.HTTP_MOVED_TEMP) {
+                var Location = con.getHeaderField("Location")
+                if (Location.startsWith("/")) {
+                    Location = url.protocol + "://" + url.host + Location
+                }
+                return getFinalURL(URL(Location))
+            }
+        } catch (e: Exception) {
+            println(e.message)
+        }
+
+        return url
+    }
+
+    @Test
+    fun putLock3() {
+        val show = ShowApi(Source.LIVE_ACTION).showInfoList
+        val ep = show.getEpisodeApi(0)
+        //prettyLog(ep.description)
+        //To get Main Json object
+        /*val jsonObjectRequest = JsonObjectRequest(Request.Method.GET,
+                "http://www.omdbapi.com/?i=" + ep.name + "",
+                Response.Listener<JSONObject> { response ->
+                    try {
+                        //To get JSON array inside the Json object
+                        // val movieArray = response.getJSONArray("Search")
+
+                        prettyLog("Plot - " + response.getString("Plot"))
+
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                    }
+                }, Response.ErrorListener { error -> VolleyLog.d("MainActivityError ", error.message) })*/
+        //val queue = Volley.newRequestQueue()
+
+        @Language("JSON") val s = "{\"Title\":\"100 Things to Do Before High School\",\"Year\":\"2014–2016\",\"Rated\":\"TV-G\",\"Released\":\"11 Nov 2014\",\"Runtime\":\"30 min\",\"Genre\":\"Comedy, Family\",\"Director\":\"N/A\",\"Writer\":\"Scott Fellows\",\"Actors\":\"Isabela Moner, Jaheem Toombs, Owen Joyner, Jack De Sena\",\"Plot\":\"Follows three best friends as they navigate the highs and lows of middle school, with the help of a list of adventures that help them overcome class cliques, terrifying bullies and clueless teachers.\",\"Language\":\"English\",\"Country\":\"USA\",\"Awards\":\"4 wins & 1 nomination.\",\"Poster\":\"https://m.media-amazon.com/images/M/MV5BMjA3NDMwNDk5N15BMl5BanBnXkFtZTgwMzU1MDQ0MzE@._V1_SX300.jpg\",\"Ratings\":[{\"Source\":\"Internet Movie Database\",\"Value\":\"6.3/10\"}],\"Metascore\":\"N/A\",\"imdbRating\":\"6.3\",\"imdbVotes\":\"799\",\"imdbID\":\"tt3904078\",\"Type\":\"series\",\"totalSeasons\":\"1\",\"Response\":\"True\"}"
+
+        //Year
+        //Released
+
+        val client = OkHttpClient()
+        val request = okhttp3.Request.Builder()
+                .url("http://www.omdbapi.com/?t=${ep.name}&apikey=e91b86ee")
+                .get()
+                .build()
+        val response = client.newCall(request).execute()
+        val resString = response.body()!!.string()
+        prettyLog(resString)
+        val jsonObj = JSONObject(resString)
+        prettyLog(jsonObj.getString("Plot"))
+
+    }
+
+    @Test
+    fun putLock2() {
+
+        val show = ShowApi(Source.LIVE_ACTION).showInfoList
+        val ep = show.getEpisodeApi(0)
+
+        val epUrl = ep.episodeList[0].getVideoLink()
+        prettyLog(epUrl)
+        val url = getFinalURL(URL(epUrl))!!
+        prettyLog(url.toExternalForm())
+        prettyLog("$url")
+        prettyLog(url.toString())
+        prettyLog("${url.toURI()}")
     }
 
     @Test
@@ -64,14 +154,16 @@ class ExampleUnitTest {
         val link = "https://www.putlocker.fyi/a-z-shows/"
         val s = Jsoup.connect(link).get()
         val d = s.select("a.az_ls_ent")//s.select("tr")//s.select("a.az_ls_ent")
+
         data class Showsa(val title: String, val url: String) {
             override fun toString(): String {
                 return "$title - $url"
             }
         }
+
         val listOfShows = arrayListOf<Showsa>()
-        for(i in d) {
-            listOfShows+=Showsa(i.text(), i.attr("abs:href"))
+        for (i in d) {
+            listOfShows += Showsa(i.text(), i.attr("abs:href"))
         }
 
         //listOfShows.sortBy { it.title }
@@ -119,10 +211,10 @@ class ExampleUnitTest {
     fun getVidUrl(secondUrl: String): String {
         val doc = Jsoup.connect(secondUrl).get()
         val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(doc.toString())
-        if(d.find()) {
+        if (d.find()) {
             val f = Jsoup.connect(d.group(1)!!).get()
             val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(f.toString())
-            if(a.find()) {
+            if (a.find()) {
                 return "https://verystream.com/gettoken/${a.group(1)!!}?mime=true"
             }
         }
@@ -139,13 +231,14 @@ class ExampleUnitTest {
         //'div', attrs={'class': 'col-lg-12'})[2].find_all('div', attrs={'class': 'row'})
         val rowList = s.select("div.col-lg-12").select("div.row")
         //for(i in rowList) {
-         //   log(i.text())
+        //   log(i.text())
         //}
         val seasons = rowList.select("a.btn-season")
-        for(i in seasons) {
+        for (i in seasons) {
             //log(i.text())
         }
         val episodes = rowList.select("a.btn-episode")
+
         data class Eps(var title: String, var link: String, var vidUrl: String) {
             override fun toString(): String {
                 return "$title: $link and $vidUrl"
@@ -154,14 +247,14 @@ class ExampleUnitTest {
         //"link": e['href'],
         //            "vid_url": self._get_embed_src(e['data-pid']),
         //            "title": self._parse_title(e['title'])
-        for(i in episodes) {
+        for (i in episodes) {
             val secondUrl = "https://www.putlocker.fyi/embed-src/${i.attr("data-pid")}"
             val doc = Jsoup.connect(secondUrl).get()
             val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(doc.toString())
-            if(d.find()) {
+            if (d.find()) {
                 val f = Jsoup.connect(d.group(1)!!).get()
                 val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(f.toString())
-                if(a.find()) {
+                if (a.find()) {
                     val lastUrl = "https://verystream.com/gettoken/${a.group(1)!!}?mime=true"
                     val ep = Eps(i.text(), i.attr("abs:href"), lastUrl)
                     log("$ep")
@@ -668,7 +761,7 @@ class ExampleUnitTest {
                 break
             }
         }
-        currentIndex++
+        //currentIndex++
 
         val fullClassName = stackTraceElement[currentIndex].className
         val methodName = stackTraceElement[currentIndex].methodName
@@ -677,6 +770,45 @@ class ExampleUnitTest {
         val logged = "${Thread.currentThread().name}: \t$msg\tat $fullClassName.$methodName($fileName:$lineNumber)"
 
         println(logged)
+    }
+
+    private fun prettyLog(msg: String) {
+        //the main message to be logged
+        var logged = msg
+        //the arrow for the stack trace
+        val arrow = "${9552.toChar()}${9655.toChar()}\t"
+        //the stack trace
+        val stackTraceElement = Thread.currentThread().stackTrace
+
+        val elements = listOf(*stackTraceElement)
+        val wanted = elements.filter { it.className.contains(FILTER_BY_CLASS_NAME) && !it.methodName.contains("prettyLog") }
+
+        var loc = "\n"
+
+        for (i in wanted.indices.reversed()) {
+            val fullClassName = wanted[i].className
+            //get the method name
+            val methodName = wanted[i].methodName
+            //get the file name
+            val fileName = wanted[i].fileName
+            //get the line number
+            val lineNumber = wanted[i].lineNumber
+            //add this to location in a format where we can click on the number in the console
+            loc += "$fullClassName.$methodName($fileName:$lineNumber)"
+
+            if (wanted.size > 1 && i - 1 >= 0) {
+                val typeOfArrow: Char =
+                        if (i - 1 > 0)
+                            9568.toChar() //middle arrow
+                        else
+                            9562.toChar() //ending arrow
+                loc += "\n\t$typeOfArrow$arrow"
+            }
+        }
+
+        logged += loc
+
+        println(logged + "\n")
     }
 
     @Test
@@ -801,7 +933,7 @@ class ExampleUnitTest {
             for (i in stuffList) {
                 //if(!i.select("a[href^=http]").text().contains(doc.select("div.anime-title").text()))
                 val episodeName = i.select("a").text()
-                val epName = if(episodeName.contains(name)) {
+                val epName = if (episodeName.contains(name)) {
                     episodeName.substring(name.length)
                 } else {
                     episodeName
@@ -856,12 +988,12 @@ class ExampleUnitTest {
     }
 
     //need it
-    /*fun person(block: (Person) -> Unit): Person {
-        val p = Person()
-        block(p)
-        return p
-    }*/
-    //no it
+/*fun person(block: (Person) -> Unit): Person {
+    val p = Person()
+    block(p)
+    return p
+}*/
+//no it
     fun person(block: Person.() -> Unit): Person = Person().apply(block)
 
     fun Person.address(block: Address.() -> Unit) {
@@ -1086,7 +1218,7 @@ class ExampleUnitTest {
         val channel = Channel<Int>()
         GlobalScope.launch {
             // this might be heavy CPU-consuming computation or async logic, we'll just send five squares
-            for (x in 1..5)  {
+            for (x in 1..5) {
                 channel.send(x * x)
             }
         }
@@ -1111,8 +1243,9 @@ class ExampleUnitTest {
     suspend fun parentResponsibilities() {
         // launch a coroutine to process some kind of incoming request
         val request = GlobalScope.launch {
-            repeat(3) { i -> // launch a few children jobs
-                launch  {
+            repeat(3) { i ->
+                // launch a few children jobs
+                launch {
                     delay((i + 1) * 200L) // variable delay 200ms, 400ms, 600ms
                     println("Coroutine $i is done")
                 }
