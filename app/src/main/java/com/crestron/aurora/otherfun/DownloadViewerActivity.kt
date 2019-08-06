@@ -6,11 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.abdeveloper.library.MultiSelectDialog
 import com.abdeveloper.library.MultiSelectModel
 import com.crashlytics.android.Crashlytics
@@ -258,9 +258,9 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             try {
                 deleteFile(download.file)
             } catch (e: IllegalArgumentException) {
-                e.printStackTrace()
+                Loged.w(e.message!!)//e.printStackTrace()
             } catch (e: java.lang.NullPointerException) {
-                e.printStackTrace()
+                Loged.w(e.message!!)//e.printStackTrace()
             }
             if (DownloadsWidget.isWidgetActive(this@DownloadViewerActivity))
                 DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)
@@ -281,9 +281,9 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
             try {
                 deleteFile(download.file)
             } catch (e: IllegalArgumentException) {
-                e.printStackTrace()
+                Loged.w(e.message!!)//e.printStackTrace()
             } catch (e: java.lang.NullPointerException) {
-                e.printStackTrace()
+                Loged.w(e.message!!)//e.printStackTrace()
             }
             if (DownloadsWidget.isWidgetActive(this@DownloadViewerActivity))
                 DownloadsWidget.sendRefreshBroadcast(this@DownloadViewerActivity)

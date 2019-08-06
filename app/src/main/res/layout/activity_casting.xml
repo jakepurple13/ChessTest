@@ -23,6 +23,20 @@
         android:enabled="false"
         android:text="Resume" />
 
+    <com.crestron.aurora.views.ENPlayView
+        android:id="@+id/play_pause_button"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_width="80dp"
+        android:layout_height="80dp" />
+
+    <com.crestron.aurora.views.ENVolumeView
+        android:id="@+id/volume_view"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_width="80dp"
+        android:layout_height="80dp"/>
+
     <SeekBar
         android:id="@+id/time_bar"
         android:layout_below="@id/button_resume"
@@ -38,6 +52,8 @@
         android:layout_height="wrap_content" />
 
     <RelativeLayout
+        android:layout_above="@id/volume_view"
+        android:id="@+id/cast_show_info"
         android:layout_marginTop="5dp"
         android:layout_below="@id/time_bar"
         android:layout_width="match_parent"

@@ -155,9 +155,9 @@ class EpisodeActivity : AppCompatActivity() {
                 try {
                     deleteFile(download.file)
                 } catch (e: IllegalArgumentException) {
-                    e.printStackTrace()
+                    Loged.w(e.message!!)//e.printStackTrace()
                 } catch (e: java.lang.NullPointerException) {
-                    e.printStackTrace()
+                    Loged.w(e.message!!)//e.printStackTrace()
                 }
                 progressBar2.progress = 0
                 //download_info.text = nameUrl("0% at 0 b/s with 0 secs left")

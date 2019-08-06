@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
+import com.crestron.aurora.views.ENPlayView
 import com.google.gson.Gson
 import com.mradzinski.caster.Caster
 import com.mradzinski.caster.ExpandedControlsStyle
@@ -94,6 +95,23 @@ class CastingActivity : AppCompatActivity() {
                 caster!!.player.togglePlayPause()
             }
         }
+
+        play_pause_button.listener = object : ENPlayView.ENPlayListener {
+            override fun onPlay() {
+                caster!!.player.play()
+            }
+
+            override fun onPause() {
+                caster!!.player.pause()
+            }
+        }
+
+        /*caster!!.castSession!!.addCastListener(object : Cast.Listener() {
+            override fun onVolumeChanged() {
+                super.onVolumeChanged()
+                volume_view.updateVolumeValue(caster!!.castSession!!.volume.toInt()*100)
+            }
+        })*/
 
         /*volume_bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStartTrackingTouch(p0: SeekBar?) {

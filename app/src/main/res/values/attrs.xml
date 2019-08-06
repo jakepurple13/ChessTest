@@ -5,4 +5,18 @@
         <attr name="typingSpeed" format="integer"/>
     </declare-styleable>
 
+    <declare-styleable name="play">
+        <attr name="play_line_color" format="color" />
+        <attr name="play_bg_line_color" format="color" />
+        <attr name="play_line_width" format="integer" />
+        <attr name="play_bg_line_width" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="volume">
+        <attr name="volume_line_color" format="color" />
+        <attr name="volume_line_width" format="integer" />
+        <attr name="volume_bg_line_color" format="color" />
+        <attr name="volume_bg_line_width" format="integer" />
+    </declare-styleable>
+
 </resources>

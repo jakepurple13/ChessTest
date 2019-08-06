@@ -42,6 +42,7 @@ import com.tonyodev.fetch2core.Downloader;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,9 @@ import java.util.Objects;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.palette.graphics.Palette;
 import io.fabric.sdk.android.Fabric;
+import okhttp3.Interceptor;
+import okhttp3.Request;
+import okhttp3.Response;
 import programmer.box.utilityhelper.UtilNotification;
 
 public class FunApplication extends Application {
@@ -74,6 +78,11 @@ public class FunApplication extends Application {
         Loged.INSTANCE.wtf("We are connected: " + Utility.isNetwork(this), Loged.INSTANCE.getTAG(), true, true);
         Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(KUtility.Util.getNextCheckTime()), "TAG", true, true);
 
+        /*OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addNetworkInterceptor(new LoggingInterceptor())
+                .addInterceptor(new LoggingInterceptor())
+                .build();*/
+
         SharedPreferences sharedPreferences = getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE);
         FetchingUtils.Fetched.setFolderLocation(
                 sharedPreferences.getString(ConstantValues.FOLDER_LOCATION, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/Fun/"));
@@ -85,6 +94,7 @@ public class FunApplication extends Application {
                 .setProgressReportingInterval(1000L)
                 .setGlobalNetworkType(wifiOnly ? NetworkType.WIFI_ONLY : NetworkType.ALL)
                 .setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
+                //.setHttpDownloader(new OkHttpDownloader(okHttpClient, Downloader.FileDownloaderType.PARALLEL))
                 .setDownloadConcurrentLimit(sharedPreferences.getInt("downloadNumber", 1))
                 .setNotificationManager(new CustomFetchNotificationManager(this))
                 /*setNotificationManager(new DefaultFetchNotificationManager(this) {
@@ -235,6 +245,28 @@ public class FunApplication extends Application {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
     }
 
+    public class LoggingInterceptor implements Interceptor {
+
+        @SuppressLint("DefaultLocale")
+        @Override
+        public Response intercept(Interceptor.Chain chain) throws IOException {
+            Request request = chain.request();
+
+            long t1 = System.nanoTime();
+            Loged.INSTANCE.i(String.format("Sending request %s on %s%n%s",
+                                  request.url(), chain.connection(), request.headers()), "TAG", true, true);
+
+            Response response = chain.proceed(request);
+
+            long t2 = System.nanoTime();
+            String info = String.format("Received response for %s in %.1fms%n%s\n%s",
+                                        response.request().url(), (t2 - t1) / 1e6d, response.headers(), response.message());
+            Loged.INSTANCE.i(info, "TAG", true, true);
+
+            return response;
+        }
+    }
+
     public static void fetchSetUp(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE);
         FetchingUtils.Fetched.setFolderLocation(
@@ -279,7 +311,7 @@ public class FunApplication extends Application {
         assert alarm != null;
         AlarmManager.AlarmClockInfo al = alarm.getNextAlarmClock();
         try {
-            Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a",  Locale.getDefault()).format(al.getTriggerTime()), "TAG", true, true);
+            Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a", Locale.getDefault()).format(al.getTriggerTime()), "TAG", true, true);
         } catch (NullPointerException e) {
             //Loged.INSTANCE.wtf(e.getMessage(), "TAG", true);
             //e.printStackTrace();

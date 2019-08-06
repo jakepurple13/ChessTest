@@ -373,8 +373,8 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
                 val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(getHtml(d.group(1)!!))
                 if (a.find()) {
                     //return arrayListOf("https://verystream.com/gettoken/${a.group(1)!!}?mime=true")
-                    val link = getFinalURL(URL("https://verystream.com/gettoken/${a.group(1)!!}?mime=true"))
-                    return arrayListOf(link!!.toExternalForm())
+                    val link = getFinalURL(URL("https://verystream.com/gettoken/${a.group(1)!!}?mime=true"))!!.toExternalForm()
+                    return arrayListOf(link)
                 }
             }
             return arrayListOf("N/A")

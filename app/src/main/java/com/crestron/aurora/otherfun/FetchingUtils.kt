@@ -94,7 +94,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
             if (ap) {
                 request.addHeader("Accept-Language", "en-US,en;q=0.5")
                 request.addHeader("User-Agent", "\"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0\"")
-                request.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                request.addHeader("Accept", "text/html,video/mp4,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
                 request.addHeader("Referer", "http://thewebsite.com")
                 request.addHeader("Connection", "keep-alive")
             }
