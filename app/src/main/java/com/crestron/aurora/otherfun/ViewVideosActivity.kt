@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Rect
 import android.media.MediaMetadataRetriever
+import android.media.MediaPlayer
 import android.media.ThumbnailUtils
 import android.net.Uri
 import android.os.Bundle
@@ -466,13 +467,18 @@ class ViewVideosActivity : AppCompatActivity() {
                 //val mp = MediaPlayer.create(context, Uri.parse(stuff[position].path))
                 //val duration = mp.duration.toLong()
                 //mp.release()
-                val retriever = MediaMetadataRetriever()
-                //use one of overloaded setDataSource() functions to set your data source
-                retriever.setDataSource(context, Uri.fromFile(File(list[position].path)))
-                val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                val duration = time.toLong()
+                val duration = try {
+                    val retriever = MediaMetadataRetriever()
+                    //use one of overloaded setDataSource() functions to set your data source
+                    retriever.setDataSource(context, Uri.fromFile(File(list[position].path)))
+                    val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                    retriever.release()
+                    time.toLong()
+                } catch(e: Exception) {
+                    val mp = MediaPlayer.create(context, Uri.parse(list[position].path))
+                    mp.duration.toLong()
+                }
 
-                retriever.release()
                 /*convert millis to appropriate time*/
                 val runTimeString = if (duration > TimeUnit.HOURS.toMillis(1)) {
                     String.format("%02d:%02d:%02d",

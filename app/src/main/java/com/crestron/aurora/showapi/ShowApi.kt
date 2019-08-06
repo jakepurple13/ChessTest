@@ -364,10 +364,10 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
                 val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(f.toString())
                 if (a.find()) {
                     //TODO: Link is what was there originally ---v
-                    //return "https://verystream.com/gettoken/${a.group(1)!!}?mime=true"
-                    val link = "https://verystream.com/gettoken/${a.group(1)!!}?mime=true"
-                    val lastLink = getFinalURL(URL(link))!!
-                    return lastLink.toExternalForm()
+                    return "https://verystream.com/gettoken/${a.group(1)!!}?mime=true"
+                    //val link = "https://verystream.com/gettoken/${a.group(1)!!}?mime=true"
+                    //val lastLink = getFinalURL(URL(link))!!
+                    //return lastLink.toExternalForm()
                 }
             }
         } else if (url.contains("gogoanime")) {
