@@ -10,7 +10,6 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.text.InputType
@@ -133,20 +132,17 @@ class ChoiceActivity : AppCompatActivity() {
 
         setUpDrawer(savedInstanceState)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (!packageManager.canRequestPackageInstalls()) {
-                val builder = AlertDialog.Builder(this@ChoiceActivity)
-                builder.setTitle("Some Permissions Needed")
-                builder.setMessage("Please Allow Install from Unknown Sources so you can stay up to date!")
-                builder.setPositiveButton("Take me there!") { _, _ ->
-                    startActivity(Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:com.crestron.aurora")))
-                }
-                builder.setNegativeButton("Nah") { _, _ ->
-
-                }
-                Toast.makeText(this, "Please Allow Install from Unknown Sources so you can stay up to date!", Toast.LENGTH_SHORT).show()
-                builder.show()
+        if (!packageManager.canRequestPackageInstalls()) {
+            val builder = AlertDialog.Builder(this@ChoiceActivity)
+            builder.setTitle("Some Permissions Needed")
+            builder.setMessage("Please Allow Install from Unknown Sources so you can stay up to date!")
+            builder.setPositiveButton("Take me there!") { _, _ ->
+                startActivity(Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:com.crestron.aurora")))
             }
+            builder.setNegativeButton("Nah") { _, _ ->
+                Toast.makeText(this, "Please Allow Install from Unknown Sources so you can stay up to date!", Toast.LENGTH_SHORT).show()
+            }
+            builder.show()
         }
 
         if (Utility.isNetworkToast(this@ChoiceActivity))

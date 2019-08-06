@@ -45,6 +45,8 @@ import org.jetbrains.annotations.NotNull;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.palette.graphics.Palette;
@@ -133,7 +135,7 @@ public class FunApplication extends Application {
         List<ShortcutInfo> scl = new ArrayList<>();
         ShortcutManager shortcutManager = getSystemService(ShortcutManager.class);
 
-        if (shortcutManager.getDynamicShortcuts().size() == 0) {
+        if (shortcutManager != null && shortcutManager.getDynamicShortcuts().size() == 0) {
             // Application restored. Need to re-publish dynamic shortcuts.
             if (shortcutManager.getPinnedShortcuts().size() > 0) {
                 // Pinned shortcuts have been restored. Use
@@ -220,10 +222,12 @@ public class FunApplication extends Application {
 
             scl.add(downloadViewer);
         } catch (SecurityException e) {
-            Loged.INSTANCE.wtf(e.getMessage(), Loged.INSTANCE.getTAG(), true, true);
+            Loged.INSTANCE.wtf(Objects.requireNonNull(e.getMessage()), Loged.INSTANCE.getTAG(), true, true);
         }
 
-        shortcutManager.setDynamicShortcuts(scl);
+        if (shortcutManager != null) {
+            shortcutManager.setDynamicShortcuts(scl);
+        }
         //if (KUtility.Util.getSharedPref(this).getBoolean("run_update_check", true))
         KUtility.Util.setAlarmUp(context);
         //KUtility.Util.setUpdateCheckAlarm(context);
@@ -272,9 +276,10 @@ public class FunApplication extends Application {
 
     public static void seeNextAlarm(Context context) {
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        assert alarm != null;
         AlarmManager.AlarmClockInfo al = alarm.getNextAlarmClock();
         try {
-            Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(al.getTriggerTime()), "TAG", true, true);
+            Loged.INSTANCE.d(new SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a",  Locale.getDefault()).format(al.getTriggerTime()), "TAG", true, true);
         } catch (NullPointerException e) {
             //Loged.INSTANCE.wtf(e.getMessage(), "TAG", true);
             //e.printStackTrace();

@@ -10,8 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.google.gson.Gson
-import com.hmomeni.verticalslider.VerticalSlider
-import com.mikepenz.materialize.util.UIUtils
 import com.mradzinski.caster.Caster
 import com.mradzinski.caster.ExpandedControlsStyle
 import com.mradzinski.caster.MediaData
@@ -41,7 +39,7 @@ class CastingActivity : AppCompatActivity() {
         caster!!.addMiniController(R.layout.custom_mini_controller)
 
         GlobalScope.launch {
-            val s = if (canReachSite(castInfo.video_url).await()) "You can continue" else "Please Retry"
+            val s = if (canReachSiteAsync(castInfo.video_url).await()) "You can continue" else "Please Retry"
             runOnUiThread {
                 Toast.makeText(this@CastingActivity, s, Toast.LENGTH_SHORT).show()
             }
@@ -71,7 +69,7 @@ class CastingActivity : AppCompatActivity() {
 
     }
 
-    fun canReachSite(url: String) = GlobalScope.async {
+    private fun canReachSiteAsync(url: String) = GlobalScope.async {
         val urlChecker = URL(url)
         val connection = urlChecker.openConnection() as HttpURLConnection
         val code = connection.responseCode
@@ -86,6 +84,7 @@ class CastingActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setUpPlayButton(castVideoInfo: CastVideoInfo) {
 
         button_play.setOnClickListener { caster!!.player.loadMediaAndPlay(createMediaData(castVideoInfo)) }
@@ -110,30 +109,23 @@ class CastingActivity : AppCompatActivity() {
             }
         })*/
 
-        volume_bar.cornerRadius = UIUtils.convertDpToPixel(10f, this)
-
-        volume_bar.onProgressChangeListener = object : VerticalSlider.OnSliderProgressChangeListener {
-            @SuppressLint("SetTextI18n")
-            override fun onChanged(progress: Int, max: Int) {
-                caster?.castSession?.volume = progress.toDouble() / max
-                volume_info.text = "${((progress.toDouble() / max) * 100).toInt()}%"
-            }
-        }
-
         caster!!.setOnConnectChangeListener(object : Caster.OnConnectChangeListener {
 
             override fun onConnected() {
                 button_play!!.isEnabled = true
-                volume_bar.isEnabled = true
-                volume_bar.progress = (caster!!.castSession!!.volume * 100).toInt()
             }
 
             override fun onDisconnected() {
                 button_play!!.isEnabled = false
                 button_resume!!.isEnabled = false
-                volume_bar.isEnabled = false
             }
         })
+
+        caster!!.setOnCastSessionProgressUpdateListener { progressMs, durationMs ->
+            time_bar.max = durationMs.toInt()
+            time_bar.progress = progressMs.toInt()
+            time_bar_info.text = "${getTimeString(progressMs)}/${getTimeString(durationMs)}"
+        }
 
         caster!!.setOnCastSessionStateChanged(object : Caster.OnCastSessionStateChanged {
 
@@ -164,6 +156,22 @@ class CastingActivity : AppCompatActivity() {
                 Log.e("Caster", "Paused video")
             }
         })
+    }
+
+    private fun getTimeString(etaInMilliSeconds: Long): String {
+        if (etaInMilliSeconds < 0) {
+            return ""
+        }
+        var seconds = (etaInMilliSeconds / 1000).toInt()
+        val hours = (seconds / 3600).toLong()
+        seconds -= (hours * 3600).toInt()
+        val minutes = (seconds / 60).toLong()
+        seconds -= (minutes * 60).toInt()
+        return when {
+            hours > 0 -> String.format("%02d:%02d:%02d", hours, minutes, seconds)
+            minutes > 0 -> String.format("%02d:%02d", minutes, seconds)
+            else -> "$seconds"
+        }
     }
 
     private fun setUpMediaRouteButton() {

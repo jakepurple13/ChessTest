@@ -52,7 +52,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
         }
     }
 
-    var homeScreen = false
+    private var homeScreen = false
     var shouldReset = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,7 +95,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
                     override fun longClick(name: String, url: String, checked: Boolean) {
                         super.longClick(name, url, checked)
                         shouldReset = true
-                        addOrRemoveToHomescreen(name, url, checked)
+                        addOrRemoveToHomeScreen(name, url, checked)
                     }
 
                     override fun isChecked(url: String): Boolean {
@@ -188,7 +188,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
 
     open class NameUrl(val name: String, val url: String)
 
-    fun addOrRemoveToHomescreen(name: String, url: String, addOrRemove: Boolean) {
+    fun addOrRemoveToHomeScreen(name: String, url: String, addOrRemove: Boolean) {
 
         val list = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")
 

@@ -197,9 +197,9 @@ class EpisodeActivity : AppCompatActivity() {
                 try {
                     deleteFile(download.file)
                 } catch (e: IllegalArgumentException) {
-                    e.printStackTrace()
+                    Loged.w(e.message!!)//e.printStackTrace()
                 } catch (e: java.lang.NullPointerException) {
-                    e.printStackTrace()
+                    Loged.w(e.message!!)////e.printStackTrace()
                 }
                 if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
                     DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)

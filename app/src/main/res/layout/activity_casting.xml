@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -24,9 +23,23 @@
         android:enabled="false"
         android:text="Resume" />
 
+    <SeekBar
+        android:id="@+id/time_bar"
+        android:layout_below="@id/button_resume"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/time_bar_info"
+        android:layout_above="@id/time_bar"
+        android:layout_alignParentEnd="true"
+        android:text="Info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <RelativeLayout
         android:layout_marginTop="5dp"
-        android:layout_below="@id/volume_bar"
+        android:layout_below="@id/time_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -39,6 +52,7 @@
         
         <ImageView
             android:id="@+id/cast_image"
+            android:layout_marginEnd="5dp"
             android:src="@drawable/ic_volume_low_grey600_36dp"
             android:layout_width="360px"
             android:layout_height="480px" />
@@ -47,7 +61,7 @@
             android:layout_toEndOf="@id/cast_image"
             android:layout_below="@id/cast_title"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
             <TextView
                 android:id="@+id/cast_des"
                 android:text="Description"
@@ -66,33 +80,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />-->
 
-    <TextView
-        android:id="@+id/volume_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/volume_bar"
-        android:layout_alignTop="@id/volume_bar"
-        android:layout_marginStart="5dp"
-        android:layout_toEndOf="@id/volume_bar"
-        android:gravity="center"
-        android:text="Percentage" />
-
     <androidx.mediarouter.app.MediaRouteButton
         android:id="@+id/media_route_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/button_play" />
-
-    <com.hmomeni.verticalslider.VerticalSlider
-        android:id="@+id/volume_bar"
-        android:layout_width="120dp"
-        android:layout_height="250dp"
-        android:layout_below="@id/button_resume"
-        android:layout_marginTop="5dp"
-        app:vs_cornerRadius="10dp"
-        app:vs_iconHigh="@drawable/ic_volume_high_grey600_36dp"
-        app:vs_iconLow="@drawable/ic_volume_low_grey600_36dp"
-        app:vs_iconMedium="@drawable/ic_volume_medium_grey600_36dp"
-        app:vs_max="100" />
 
 </RelativeLayout>

@@ -5,9 +5,9 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import android.widget.Toast
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.google.gson.Gson
@@ -167,7 +167,7 @@ class AniDownloadActivity : AppCompatActivity() {
         }
 
         delete_stuff.setOnClickListener {
-            try {
+            /*try {
                 deleteFile(fetching.filePath)
             } catch (e: IllegalArgumentException) {
                 e.printStackTrace()
@@ -176,7 +176,7 @@ class AniDownloadActivity : AppCompatActivity() {
             }
             fetching.deleteAll()
             progressBar.progress = 0
-            progress_info.text = "0% at 0 b/s with 0 secs left"
+            progress_info.text = "0% at 0 b/s with 0 secs left"*/
         }
 
         open_stuff.setOnClickListener {

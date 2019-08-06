@@ -14,6 +14,7 @@ import com.tonyodev.fetch2core.DownloadBlock
 import com.tonyodev.fetch2core.Func
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
@@ -25,8 +26,9 @@ import java.text.DecimalFormat
 
 class FetchingUtils(val context: Context, private var fetchAction: FetchAction = object : FetchAction {}) {
 
-    var filePath: String? = null
-    var fetch: Fetch = Fetch.getDefaultInstance()
+    var fetch: Fetch = Fetch.getDefaultInstance().apply {
+        addListener(fetchAction)
+    }
 
     private fun fetchIt(url: String, ap: Boolean = false, networkType: NetworkType = NetworkType.ALL, keyAndValue: Array<out EpisodeActivity.KeyAndValue>) {
 
@@ -36,7 +38,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
             return Uri.parse(url).lastPathSegment
         }
 
-        filePath = folderLocation + getNameFromUrl(url) + ".mp4"
+        val filePath = folderLocation + getNameFromUrl(url) + ".mp4"
         Loged.wtf("${File(filePath).exists()}")
         val request = Request(url, filePath!!)
         request.priority = Priority.HIGH
@@ -51,12 +53,12 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         if (ap) {
             request.addHeader("Accept-Language", "en-US,en;q=0.5")
             request.addHeader("User-Agent", "\"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0\"")
-            request.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            request.addHeader("Accept", "text/html,video/mp4,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
             request.addHeader("Referer", "http://thewebsite.com")
             request.addHeader("Connection", "keep-alive")
         }
 
-        fetch.addListener(fetchAction)
+        //fetch.addListener(fetchAction)
 
         fetch.enqueue(request, Func {
 
@@ -77,9 +79,9 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
 
         for (i in url) {
 
-            filePath = folderLocation + getNameFromUrl(i) + ".mp4"
+            val filePath = folderLocation + getNameFromUrl(i) + ".mp4"
             Loged.wtf("${File(filePath).exists()}")
-            val request = Request(i, filePath!!)
+            val request = Request(i, filePath)
             request.priority = Priority.HIGH
             request.networkType = networkType
             //request.enqueueAction = EnqueueAction.DO_NOT_ENQUEUE_IF_EXISTING
@@ -101,7 +103,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
 
         }
 
-        fetch.addListener(fetchAction)
+        //fetch.addListener(fetchAction)
 
         fetch.enqueue(requestList, Func {
 
@@ -136,11 +138,11 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         return file
     }
 
-    fun getVideo(urlToUse: EpisodeInfo, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.async {
+    fun getVideo(urlToUse: EpisodeInfo, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.launch {
         fetchIt(urlToUse.getVideoLinks(), true, networkType, keyAndValue)
     }
 
-    fun getVideo(urlToUse: Collection<EpisodeInfo>, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.async {
+    fun getVideo(urlToUse: Collection<EpisodeInfo>, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.launch {
 
         val urlList = arrayListOf<String>()
 
