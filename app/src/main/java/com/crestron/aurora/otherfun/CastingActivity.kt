@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.views.ENPlayView
+import com.google.android.gms.cast.Cast
 import com.google.gson.Gson
 import com.mradzinski.caster.Caster
 import com.mradzinski.caster.ExpandedControlsStyle
@@ -131,6 +132,15 @@ class CastingActivity : AppCompatActivity() {
 
             override fun onConnected() {
                 button_play!!.isEnabled = true
+
+                caster!!.castSession!!.addCastListener(object : Cast.Listener() {
+                    override fun onVolumeChanged() {
+                        super.onVolumeChanged()
+                        volume_view.updateVolumeValue(caster!!.castSession!!.volume.toInt()*100)
+                    }
+                })
+
+                volume_view.updateVolumeValue(caster!!.castSession!!.volume.toInt()*100)
             }
 
             override fun onDisconnected() {

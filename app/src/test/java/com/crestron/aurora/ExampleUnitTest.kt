@@ -1,5 +1,6 @@
 package com.crestron.aurora
 
+import android.os.Handler
 import com.crestron.aurora.boardgames.yahtzee.Dice
 import com.crestron.aurora.boardgames.yahtzee.YahtzeeScores
 import com.crestron.aurora.showapi.*
@@ -51,7 +52,42 @@ class ExampleUnitTest {
         Loged.FILTER_BY_CLASS_NAME = "crestron"
     }
 
-    fun getFinalURL(url: URL): URL? {
+    @Test
+    fun handleTest() {
+        /*Handler().postDelayed(object : Runnable {
+            override fun run() {
+                prettyLog("Hello")
+                Handler().postDelayed(this, 5000)
+            }
+        }, 5000)*/
+        val s = object {
+            val d = 5
+        }
+
+        val f = Loged
+        f.TAG
+    }
+
+    private fun doActionOnRepeat(delay: Long = 2500, action: () -> Boolean) {
+        Thread(object : Runnable {
+            override fun run() {
+                Thread.sleep(delay)
+                if (action())
+                    Thread(this).start()
+            }
+        }).start()
+    }
+
+    private fun doActionRepeatedly(delay: Long = 2500, action: () -> Boolean) {
+        Handler().postDelayed(object : Runnable {
+            override fun run() {
+                if (action())
+                    Handler().postDelayed(this, delay)
+            }
+        }, delay)
+    }
+
+    private fun getFinalURL(url: URL): URL? {
         //TODO: Try this out when you get home
         try {
             val con = url.openConnection() as HttpURLConnection
@@ -143,20 +179,20 @@ class ExampleUnitTest {
         }
     }
 
-    data class TrackInfo (
+    data class TrackInfo(
             @SerializedName("message") val message: Message
     )
 
-    data class Message (
+    data class Message(
             @SerializedName("header") val header: Header,
             @SerializedName("body") val body: Body
     )
 
-    data class Body (
+    data class Body(
             @SerializedName("track") val track: Track
     )
 
-    data class Track (
+    data class Track(
             @SerializedName("track_id") val trackID: Long,
             @SerializedName("track_name") val trackName: String,
             @SerializedName("track_name_translation_list") val trackNameTranslationList: List<Any?>,
@@ -179,11 +215,11 @@ class ExampleUnitTest {
             @SerializedName("primary_genres") val primaryGenres: PrimaryGenres
     )
 
-    data class PrimaryGenres (
+    data class PrimaryGenres(
             @SerializedName("music_genre_list") val musicGenreList: List<Any?>
     )
 
-    data class Header (
+    data class Header(
             @SerializedName("status_code") val statusCode: Long,
             @SerializedName("execute_time") val executeTime: Double,
             @SerializedName("confidence") val confidence: Long,
@@ -191,25 +227,25 @@ class ExampleUnitTest {
             @SerializedName("cached") val cached: Long
     )
 
-    data class TrackInfoLyric (
+    data class TrackInfoLyric(
             @SerializedName("message") val message: MessageLyric
     )
 
-    data class MessageLyric (
-            @SerializedName("header")  val header: HeaderLyric,
+    data class MessageLyric(
+            @SerializedName("header") val header: HeaderLyric,
             @SerializedName("body") val body: BodyLyric
     )
 
-    data class BodyLyric (
+    data class BodyLyric(
             @SerializedName("lyrics") val lyrics: Lyrics
     )
 
-    data class HeaderLyric (
+    data class HeaderLyric(
             @SerializedName("status_code") val statusCode: Long,
             @SerializedName("execute_time") val executeTime: Double
     )
 
-    data class Lyrics (
+    data class Lyrics(
             @SerializedName("lyrics_id") val lyricsID: Long,
             //@SerializedName("restricted") val restricted: Long,
             //@SerializedName("instrumental") val instrumental: Long,
@@ -248,7 +284,7 @@ class ExampleUnitTest {
         }) {
             prettyLog(it)
         }
-        
+
         val songName = "Hurt"
 
         getApiCalls("https://api.musixmatch.com/ws/1.1/matcher.track.get?q_track=$songName&q_artist=Johnny Cash&apikey=67053f507ef88fc99c544f4d7052dfa8", onError = {
@@ -801,7 +837,7 @@ class ExampleUnitTest {
         private var dob: Date = Date()
         var dateOfBirth: String = ""
             set(value) {
-                dob = SimpleDateFormat("yyyy-MM-dd").parse(value)
+                dob = SimpleDateFormat("yyyy-MM-dd").parse(value)!!
             }
 
         private var address: AddressA? = null
@@ -836,7 +872,7 @@ class ExampleUnitTest {
         private var dob: Date = Date()
         var dateOfBirth: String = ""
             set(value) {
-                dob = SimpleDateFormat("yyyy-MM-dd").parse(value)
+                dob = SimpleDateFormat("yyyy-MM-dd").parse(value)!!
             }
 
         private val addresses = mutableListOf<AddressA>()
