@@ -114,19 +114,37 @@ class ExampleUnitTest {
         return url
     }
 
+    private fun Collection<ShowInfo>.randomEpisode(): EpisodeApi = EpisodeApi(random())
+
     @Test
     fun putLock2() {
 
         val show = ShowApi(Source.LIVE_ACTION).showInfoList
-        val ep = show.getEpisodeApi(0)
+        val ep = show.getEpisodeApi(0)//randomEpisode()
+        //prettyLog("${ep.name} with ${ep.source.url} with ${ep.episodeList[0].url}")
+        //prettyLog(ep.episodeList[0].getVideoLink())
+        //prettyLog(ep.episodeList[0].getVideoLinks()[0])
+        //val epUrl = ep.episodeList[0].getVideoLink()
+        //prettyLog(epUrl)
+        //val url = getFinalURL(URL(epUrl))!!
+        //prettyLog(url.toExternalForm())
+        //prettyLog("$url")
+        //prettyLog(url.toString())
+        //prettyLog("${url.toURI()}")
 
-        val epUrl = ep.episodeList[0].getVideoLink()
-        prettyLog(epUrl)
-        val url = getFinalURL(URL(epUrl))!!
-        prettyLog(url.toExternalForm())
-        prettyLog("$url")
-        prettyLog(url.toString())
-        prettyLog("${url.toURI()}")
+        val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(Jsoup.connect(ep.episodeList[0].url).get().html())
+        if (d.find()) {
+            val d1 = d.group(1)!!
+            prettyLog(d1)
+            prettyLog(Jsoup.connect(d1).get().html())
+            /*val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(Jsoup.connect(d1).get().html())
+            if (a.find()) {
+                val a1 = a.group(1)!!
+                prettyLog(a1)
+                prettyLog("https://verystream.com/gettoken/$a1?mime=true")
+            }*/
+        }
+
     }
 
     @Test

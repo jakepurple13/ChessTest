@@ -171,7 +171,7 @@ fun List<ShowInfo>.getEpisodeApi(index: Int): EpisodeApi = EpisodeApi(this[index
 /**
  * Actual Show information
  */
-class EpisodeApi(private val source: ShowInfo, timeOut: Int = 10000) {
+class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
     private var doc: Document = Jsoup.connect(source.url).timeout(timeOut).get()
 
     /**
@@ -522,6 +522,9 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
         val connection = URL(url).openConnection()
         connection.connectTimeout = 5000
         connection.readTimeout = 5000
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0")
+        connection.addRequestProperty("Accept-Language", "en-US,en;q=0.5")
+        connection.addRequestProperty("Referer", "http://thewebsite.com")
         connection.connect()
 
         // Read and store the result line by line then return the entire string.
