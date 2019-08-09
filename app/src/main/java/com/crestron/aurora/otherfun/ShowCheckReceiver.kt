@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
+import kotlin.random.Random
 
 class ShowCheckReceiver : BroadcastReceiver() {
     @SuppressLint("SimpleDateFormat")
@@ -179,6 +180,17 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                         j + 3 + (Math.random() * 50).toInt(),
                                         NameWithUrl(i.name, i.url))
                             } else {*/
+                            if(list.size==1) {
+                                Loged.i("We came here")
+                                sendBubbleNotification(this@ShowCheckIntentService,
+                                        android.R.mipmap.sym_def_app_icon,
+                                        i.name,
+                                        i.toString(),
+                                        "episodeUpdate",
+                                        EpisodeActivity::class.java,
+                                        j + 3 + (Math.random() * 50).toInt(),
+                                        NameWithUrl(i.name, i.url))
+                            } else {
                                 sendNotification(this@ShowCheckIntentService,
                                         android.R.mipmap.sym_def_app_icon,
                                         i.name,
@@ -187,7 +199,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                         EpisodeActivity::class.java,
                                         j + 3 + (Math.random() * 50).toInt(),
                                         NameWithUrl(i.name, i.url))
-                            //}
+                            }
                         }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             (nStyle as Notification.InboxStyle).addLine("${list.size} show${if (list.size == 1) "" else "s"} had updates!")
@@ -200,7 +212,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                     "${list.size} show${if (list.size == 1) "" else "s"} had updates!",
                                     nStyle as Notification.InboxStyle,
                                     "episodeUpdate",
-                                    ShowListActivity::class.java, links, names)
+                                    ShowListActivity::class.java, list as ArrayList<ShowInfos>)
                         } else {
                             sendGroupNotification(this@ShowCheckIntentService,
                                     android.R.mipmap.sym_def_app_icon,
@@ -367,6 +379,11 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 .setChannelId(channel_id)
                 .setGroup("episode_group")
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            setUpBubble(context, mBuilder, notification_id) {
+                it.putExtra(NotificationBubbleActivity.BUBBLE_LINKS, Gson().toJson(ShowInfosList(arrayListOf(ShowInfos(nameUrl.name, 0, "", nameUrl.url)))))
+            }
+        }
 
         mBuilder.setContentIntent(resultPendingIntent)
         mBuilder.setDeleteIntent(createOnDismissedIntent(context, notification_id, nameUrl.url))
@@ -419,7 +436,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun sendBubbleGroupNotification(context: Context, smallIconId: Int, title: String, messages: Notification.Style = Notification.InboxStyle(), channel_id: String, gotoActivity: Class<*>, links: ArrayList<String>, names: ArrayList<String>) {
+    private fun sendBubbleGroupNotification(context: Context, smallIconId: Int, title: String, messages: Notification.Style = Notification.InboxStyle(), channel_id: String, gotoActivity: Class<*>, shows: ArrayList<ShowInfos>) {
 
         // The id of the channel.
         val mBuilder = Notification.Builder(context, "episodeUpdate")
@@ -452,12 +469,8 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         mBuilder.setContentIntent(resultPendingIntent)
         mBuilder.setDeleteIntent(createOnGroupDismissedIntent(context, 0))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            setUpBubble(context, mBuilder, 50) {
-                val list = arrayListOf<ShowInfos>()
-                for (i in links.indices) {
-                    list += ShowInfos(names[i], 0, "", links[i])
-                }
-                it.putExtra(NotificationBubbleActivity.BUBBLE_LINKS, Gson().toJson(ShowInfosList(list)))
+            setUpBubble(context, mBuilder, Random.nextInt()) {
+                it.putExtra(NotificationBubbleActivity.BUBBLE_LINKS, Gson().toJson(ShowInfosList(shows)))
             }
         }
         val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

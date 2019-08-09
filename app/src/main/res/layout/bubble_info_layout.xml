@@ -13,11 +13,11 @@
         android:id="@+id/bubble_title_name"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
+        android:layout_weight="0.75"
         android:gravity="center_vertical"
         android:text="Episode Name" />
 
-    <com.agik.AGIKSwipeButton.View.Swipe_Button_View
+    <!--<com.agik.AGIKSwipeButton.View.Swipe_Button_View
         android:id="@+id/bubble_show_download"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -28,6 +28,19 @@
         app:sb_swipe_text="Download"
         app:sb_thumb_bg_color="@color/emeraldGreen">
 
-    </com.agik.AGIKSwipeButton.View.Swipe_Button_View>
+    </com.agik.AGIKSwipeButton.View.Swipe_Button_View>-->
+
+    <com.ncorti.slidetoact.SlideToActView
+        android:id="@+id/bubble_show_download"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.25"
+        android:visibility="visible"
+        app:outer_color="@color/emeraldGreen"
+        app:animate_completion="true"
+        app:rotate_icon="false"
+        app:area_margin="10dp"
+        app:text="Download"
+        app:slider_icon_color="@color/emeraldGreen" />
 
 </LinearLayout>

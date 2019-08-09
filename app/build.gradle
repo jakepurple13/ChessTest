@@ -161,6 +161,7 @@ dependencies {
     implementation 'com.ncorti:slidetoact:0.7.0'
     implementation 'com.dubsmash.volley:library:2.0.1'
     testImplementation 'org.robolectric:robolectric:4.3'
+    testImplementation 'org.json:json:20190722'
 }
 kotlin {
     experimental {

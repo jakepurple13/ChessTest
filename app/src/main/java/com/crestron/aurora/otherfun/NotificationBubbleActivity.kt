@@ -11,8 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.agik.AGIKSwipeButton.Controller.OnSwipeCompleteListener
-import com.agik.AGIKSwipeButton.View.Swipe_Button_View
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
@@ -20,6 +18,7 @@ import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.utilities.KUtility
 import com.google.gson.Gson
+import com.ncorti.slidetoact.SlideToActView
 import com.tonyodev.fetch2.NetworkType
 import kotlinx.android.synthetic.main.activity_notification_bubble.*
 import kotlinx.android.synthetic.main.bubble_info_layout.view.*
@@ -46,7 +45,7 @@ class NotificationBubbleActivity : AppCompatActivity() {
 
         val listString = Gson().fromJson(intent.getStringExtra(BUBBLE_LINKS)!!, ShowInfosList::class.java)
 
-        Loged.wtf("${listString.list}")
+        Loged.wtf(listString.list.joinToString { "${it.name} with ${it.url}" })
 
         val shows = arrayListOf<ShowInfo>()
         /*for(i in urls.indices) {
@@ -84,7 +83,7 @@ class NotificationBubbleActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.title.text = list[position].name
-            holder.button.setOnSwipeCompleteListener_forward_reverse(object : OnSwipeCompleteListener {
+            /*holder.button.setOnSwipeCompleteListener_forward_reverse(object : OnSwipeCompleteListener {
                 override fun onSwipe_Forward(swipe_button_view: Swipe_Button_View?) {
                     downloadShow(list[position].name, list[position].url)
                 }
@@ -92,7 +91,12 @@ class NotificationBubbleActivity : AppCompatActivity() {
                 override fun onSwipe_Reverse(swipe_button_view: Swipe_Button_View?) {
 
                 }
-            })
+            })*/
+            holder.button.onSlideCompleteListener = object : SlideToActView.OnSlideCompleteListener {
+                override fun onSlideComplete(view: SlideToActView) {
+                    downloadShow(list[position].name, list[position].url)
+                }
+            }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -111,7 +115,7 @@ class NotificationBubbleActivity : AppCompatActivity() {
                     val epApi = EpisodeApi(ShowInfo(name, url))
 
                     val fetchingUtils = FetchingUtils(context)
-                    fetchingUtils.getVideo(epApi.episodeList.last(), NetworkType.ALL,
+                    fetchingUtils.getVideo(epApi.episodeList.first(), NetworkType.ALL,
                             EpisodeActivity.KeyAndValue(ConstantValues.URL_INTENT, url),
                             EpisodeActivity.KeyAndValue(ConstantValues.NAME_INTENT, name))
                 }
@@ -123,7 +127,7 @@ class NotificationBubbleActivity : AppCompatActivity() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.bubble_title_name!!
-        val button: Swipe_Button_View = view.bubble_show_download!!
+        val button: SlideToActView = view.bubble_show_download!!
     }
 
 }

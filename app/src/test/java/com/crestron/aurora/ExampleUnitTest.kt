@@ -50,6 +50,7 @@ class ExampleUnitTest {
     @Before
     fun setUp() {
         Loged.FILTER_BY_CLASS_NAME = "crestron"
+        Loged.WITH_THREAD_NAME = true
     }
 
     @Test
@@ -305,7 +306,8 @@ class ExampleUnitTest {
 
         val songName = "Hurt"
 
-        getApiCalls("https://api.musixmatch.com/ws/1.1/matcher.track.get?q_track=$songName&q_artist=Johnny Cash&apikey=67053f507ef88fc99c544f4d7052dfa8", onError = {
+        //getApiCalls("https://api.musixmatch.com/ws/1.1/matcher.track.get?q_track=$songName&q_artist=Johnny Cash&apikey=67053f507ef88fc99c544f4d7052dfa8", onError = {
+        getApiCalls("https://api.musixmatch.com/ws/1.1/matcher.track.get?q_track=starlight brigade&q_artist=twrp&apikey=67053f507ef88fc99c544f4d7052dfa8", onError = {
             prettyLog("Code is ${it.code()}\n$it")
         }) {
             prettyLog(it)

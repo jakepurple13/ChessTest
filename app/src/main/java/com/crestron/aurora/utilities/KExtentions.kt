@@ -47,3 +47,23 @@ fun Random.nextColor(
         @IntRange(from = 0, to = 255) green: Int = nextInt(0, 255),
         @IntRange(from = 0, to = 255) blue: Int = nextInt(0, 255)
 ): Int = Color.argb(alpha, red, green, blue)
+
+fun String.regex(regex: String): String? {
+    val s = regex.toRegex().toPattern().matcher(this)
+    return if(s.find()) {
+        s.group(1)
+    } else {
+        null
+    }
+}
+
+fun String.findRegex(string: String): String? {
+    val s = toRegex().toPattern().matcher(string)
+    return if(s.find()) {
+        s.group(1)
+    } else {
+        null
+    }
+}
+
+

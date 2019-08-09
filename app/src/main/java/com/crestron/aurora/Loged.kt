@@ -1,8 +1,7 @@
 package com.crestron.aurora
 
 import android.util.Log
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by Jacob on 10/3/17.
@@ -90,10 +89,10 @@ object Loged {
      *
      * @param msg the message to log
      */
-    fun e(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
+    fun e(msg: Any, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg, Log.ERROR, threadName)
-            false -> log(tag, msg, Log.ERROR, threadName)
+            true -> prettyLog(tag, msg.toString(), Log.ERROR, threadName)
+            false -> log(tag, msg.toString(), Log.ERROR, threadName)
         }
     }
 
@@ -102,10 +101,10 @@ object Loged {
      *
      * @param msg the message to log
      */
-    fun i(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
+    fun i(msg: Any, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg, Log.INFO, threadName)
-            false -> log(tag, msg, Log.INFO, threadName)
+            true -> prettyLog(tag, msg.toString(), Log.INFO, threadName)
+            false -> log(tag, msg.toString(), Log.INFO, threadName)
         }
     }
 
@@ -114,10 +113,10 @@ object Loged {
      *
      * @param msg the message to log
      */
-    fun a(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
+    fun a(msg: Any, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg, Log.ASSERT, threadName)
-            false -> log(tag, msg, Log.ASSERT, threadName)
+            true -> prettyLog(tag, msg.toString(), Log.ASSERT, threadName)
+            false -> log(tag, msg.toString(), Log.ASSERT, threadName)
         }
     }
 
@@ -126,10 +125,10 @@ object Loged {
      *
      * @param msg the message to log
      */
-    fun wtf(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
+    fun wtf(msg: Any, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg, Log.ASSERT, threadName)
-            false -> log(tag, msg, Log.ASSERT, threadName)
+            true -> prettyLog(tag, msg.toString(), Log.ASSERT, threadName)
+            false -> log(tag, msg.toString(), Log.ASSERT, threadName)
         }
     }
 
@@ -138,10 +137,10 @@ object Loged {
      *
      * @param msg the message to log
      */
-    fun w(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
+    fun w(msg: Any, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg, Log.WARN, threadName)
-            false -> log(tag, msg, Log.WARN, threadName)
+            true -> prettyLog(tag, msg.toString(), Log.WARN, threadName)
+            false -> log(tag, msg.toString(), Log.WARN, threadName)
         }
     }
 
@@ -150,10 +149,10 @@ object Loged {
      *
      * @param msg the message to log
      */
-    fun d(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
+    fun d(msg: Any, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg, Log.DEBUG, threadName)
-            false -> log(tag, msg, Log.DEBUG, threadName)
+            true -> prettyLog(tag, msg.toString(), Log.DEBUG, threadName)
+            false -> log(tag, msg.toString(), Log.DEBUG, threadName)
         }
     }
 
@@ -162,10 +161,10 @@ object Loged {
      *
      * @param msg the message to log
      */
-    fun v(msg: String, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
+    fun v(msg: Any, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg, Log.VERBOSE, threadName)
-            false -> log(tag, msg, Log.VERBOSE, threadName)
+            true -> prettyLog(tag, msg.toString(), Log.VERBOSE, threadName)
+            false -> log(tag, msg.toString(), Log.VERBOSE, threadName)
         }
     }
 
