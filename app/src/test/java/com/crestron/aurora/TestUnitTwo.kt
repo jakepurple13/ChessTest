@@ -1,5 +1,6 @@
 package com.crestron.aurora
 
+import androidx.annotation.IntRange
 import com.google.gson.Gson
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -108,6 +109,13 @@ class TestUnitTwo {
             @SerializedName("music_genre_list") val musicGenreList: List<Any?>
     )
 
+    data class SecondaryGenres(
+            @SerializedName("music_genre_list")
+            @Expose
+            var musicGenreList: List<Any?>
+    )
+
+
     data class Lyrics(
             @SerializedName("lyrics_id") val lyricsID: Long,
             //@SerializedName("restricted") val restricted: Long,
@@ -121,9 +129,59 @@ class TestUnitTwo {
             //@SerializedName("updated_time") val updatedTime: String
     )
 
-    data class Snippet(val snippet_language: String, val restricted: Number, val instrumental: Number, val snippet_body: String, val script_tracking_url: String, val pixel_tracking_url: String, val html_tracking_url: String, val updated_time: String)
+    data class Album(
 
-    data class TrackList(@SerializedName("track_list") val tracks: List<Track>)
+        @SerializedName("album_id")
+        @Expose
+        var albumId: Int,
+        @SerializedName("album_mbid")
+        @Expose
+        var albumMbid: Any,
+        @SerializedName("album_name")
+        @Expose
+        var albumName: String,
+        @SerializedName("album_rating")
+        @Expose
+        var albumRating: Int,
+        @SerializedName("album_track_count")
+        @Expose
+        var albumTrackCount: Int,
+        @SerializedName("album_release_date")
+        @Expose
+        var albumReleaseDate: String,
+        @SerializedName("album_release_type")
+        @Expose
+        var albumReleaseType: String,
+        @SerializedName("artist_id")
+        @Expose
+        var artistId: Int,
+        @SerializedName("artist_name")
+        @Expose
+        var artistName: String,
+        @SerializedName("primary_genres")
+        @Expose
+        var primaryGenres: PrimaryGenres,
+        @SerializedName("secondary_genres")
+        @Expose
+        var secondaryGenres: SecondaryGenres,
+        @SerializedName("album_pline")
+        @Expose
+        var albumPline: String,
+        @SerializedName("album_copyright")
+        @Expose
+        var albumCopyright: String,
+        @SerializedName("album_label")
+        @Expose
+        var albumLabel: String,
+        @SerializedName("updated_time")
+        @Expose
+        var updatedTime: String,
+        @SerializedName("album_coverart_100x100")
+        @Expose
+        var albumCoverart100x100: String
+    )
+
+    data class Snippet(val snippet_language: String, val restricted: Number, val instrumental: Number, val snippet_body: String, val script_tracking_url: String, val pixel_tracking_url: String, val html_tracking_url: String, val updated_time: String)
 
     data class TrackList2(
             @SerializedName("track")
@@ -132,9 +190,21 @@ class TestUnitTwo {
     )
 
     data class SnippetMessage(
-        @SerializedName("track_list")
-        @Expose
-        var trackList: List<TrackList2>
+            @SerializedName("track_list")
+            @Expose
+            var trackList: List<TrackList2>
+    )
+
+    data class AlbumList(
+            @SerializedName("album")
+            @Expose
+            var album: Album
+    )
+
+    data class AlbumMessage(
+            @SerializedName("album_list")
+            @Expose
+            var albumList: List<AlbumList>
     )
 
     companion object API {
@@ -214,20 +284,68 @@ class TestUnitTwo {
         }
     }
 
+    enum class ChartName(val value: String) {
+        TOP("top"), HOT("hot"), MXMWEEKLY("mxmweekly"), MXMWEEKLY_NEW("mxmweekly_new")
+    }
+
     class TrackApi {
 
         companion object {
             fun getTrack(name: String, artist: String? = null): Track = GetAPI.getInfo("matcher.track.get?q_track=$name${if (artist != null) "&q_artist=$artist" else ""}")
-            fun getTopTracks(): List<Track> {
-                val s = GetAPI.getInfo<SnippetMessage>("chart.tracks.get?chart_name=top&page=1&page_size=5&f_has_lyrics=1").trackList
+            fun getTopTracks(chartName: ChartName = ChartName.TOP, @IntRange(from = 1, to = 100) amount: Int = 5): List<Track> {
+                val s = GetAPI.getInfo<SnippetMessage>("chart.tracks.get?chart_name=${chartName.value}&page=1&page_size=$amount&f_has_lyrics=1").trackList
                 val list = arrayListOf<Track>()
-                for(i in s) {
-                    list+=i.track
+                s.forEach {
+                    list += it.track
                 }
                 return list
             }
         }
 
+    }
+
+    class ArtistApi {
+        companion object {
+            fun getArtistAlbums(track: Track): List<Album> {
+                val s = GetAPI.getInfo<AlbumMessage>("artist.albums.get?artist_id=${track.artistId}&s_release_date=desc&g_album_name=1").albumList
+                val list = arrayListOf<Album>()
+                s.forEach {
+                    list += it.album
+                }
+                return list
+            }
+
+            fun getArtistAlbums(id: Int): List<Album> {
+                val s = GetAPI.getInfo<AlbumMessage>("artist.albums.get?artist_id=$id&s_release_date=desc&g_album_name=1").albumList
+                val list = arrayListOf<Album>()
+                s.forEach {
+                    list += it.album
+                }
+                return list
+            }
+        }
+    }
+
+    class AlbumApi {
+        companion object {
+            fun getAlbum(album: Album): List<Track> {
+                val s = GetAPI.getInfo<SnippetMessage>("album.tracks.get?album_id=${album.albumId}&f_has_lyrics=1").trackList
+                val list = arrayListOf<Track>()
+                s.forEach {
+                    list += it.track
+                }
+                return list
+            }
+
+            fun getAlbum(track: Track): List<Track> {
+                val s = GetAPI.getInfo<SnippetMessage>("album.tracks.get?album_id=${track.albumId}&f_has_lyrics=1").trackList
+                val list = arrayListOf<Track>()
+                s.forEach {
+                    list += it.track
+                }
+                return list
+            }
+        }
     }
 
     class LyricApi {
@@ -251,21 +369,18 @@ class TestUnitTwo {
         prettyLog(snippet.snippet_body)
         val trackList = TrackApi.getTopTracks()
         //prettyLog(trackList.tracks.joinToString { "\n$it" })
-        prettyLog(trackList.joinToString { "\n$it" })
-        prettyLog(trackList[0].trackName)
-        trackList.forEach {
+        prettyLog(trackList.joinToString { "\n${it.trackName}" })
+        //prettyLog(trackList[0].trackName)
+        /*trackList.forEach {
             val newSnippet = LyricApi.getLyricSnippet(it)
             prettyLog("${it.trackName}: ${newSnippet.snippet_body}")
-        }
-
-        getApiCalls("https://api.musixmatch.com/ws/1.1/catalogue.dump.get&apikey=67053f507ef88fc99c544f4d7052dfa8") {
-            prettyLog(it)
-        }
-
-        //prettyLog(trackList.count())
-        //prettyLog(trackList[0].albumName)
-        //val newSnippet = LyricApi.getLyricSnippet(trackList.random())
-        //prettyLog(newSnippet.snippet_body)
+        }*/
+        val trackLists = TrackApi.getTopTracks(ChartName.MXMWEEKLY, 10)
+        prettyLog(trackLists.joinToString { "\n${it.trackName}" })
+        val tracking = AlbumApi.getAlbum(track)
+        prettyLog(tracking.joinToString { "\n${it.trackName}" })
+        val trackings = ArtistApi.getArtistAlbums(trackLists.random())
+        prettyLog(trackings.joinToString { "\n${it.albumName}" })
     }
 
     @Test
