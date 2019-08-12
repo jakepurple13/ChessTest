@@ -1,6 +1,7 @@
 package com.crestron.aurora.boardgames.musicGame
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -12,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.isBlankOrEmpty
+import com.crestron.aurora.views.BubbleEmitter
+import com.crestron.aurora.views.createBubbles
 import com.google.gson.Gson
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -128,7 +131,7 @@ class MusicGameActivity : AppCompatActivity() {
         val chooseOrTop = Switch(this@MusicGameActivity)
         chooseOrTop.layoutParams = lp
         chooseOrTop.textOn = "Custom"
-        chooseOrTop.textOff = "Hot Songs"
+        chooseOrTop.textOff = "Songs From The Chart"
         chooseOrTop.showText = true
         chooseOrTop.splitTrack = true
         chooseOrTop.isChecked = true
@@ -153,7 +156,7 @@ class MusicGameActivity : AppCompatActivity() {
                 trackList = if (chooseOrTop.isChecked)
                     TrackApi.getTrackByInfo(artistName = artistInput.text.toString(), anyLyrics = lyricInput.text.toString()).toMutableList()
                 else
-                    TrackApi.getTopTracks(ChartName.HOT, 100).toMutableList()
+                    TrackApi.getTopTracks(ChartName.values().random(), 100).toMutableList()
                 nextQuestion()
             }
         }
@@ -178,6 +181,11 @@ class MusicGameActivity : AppCompatActivity() {
             Loged.d("You did it!")
             getButton(value)!!.text = "${getButton(correctTrack)!!.text} ✅"
             currentRight++
+            musicGameLayout.createBubbles {
+                setColors(fill = Color.GREEN)
+                touchEvent = BubbleEmitter.BUBBLE_POP
+                oneBubble(10)
+            }
         } else {
             Loged.e("You got it wrong")
             // else "❌"
@@ -199,7 +207,9 @@ class MusicGameActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     fun nextQuestion() {
         if(trackList.size<=4) {
-            getInfo()
+            runOnUiThread {
+                getInfo()
+            }
         } else {
             current = trackList.randomRemoveAndUpdate()
 
