@@ -164,7 +164,7 @@ class MusicGameActivity : AppCompatActivity() {
         questionChoice.addState(State("Track Name"))
         questionChoice.addState(State("Random"))
         questionChoice.addStateListener { stateIndex, state ->
-            qChoice = when(stateIndex) {
+            qChoice = when (stateIndex) {
                 0 -> QuestionChoice.SNIPPET
                 1 -> QuestionChoice.NAME
                 else -> QuestionChoice.values().random()
@@ -180,7 +180,7 @@ class MusicGameActivity : AppCompatActivity() {
         answerChoice.addState(State("Album"))
         answerChoice.addState(State("Random"))
         answerChoice.addStateListener { stateIndex, state ->
-            aChoice = when(stateIndex) {
+            aChoice = when (stateIndex) {
                 0 -> AnswerChoice.NAME
                 1 -> AnswerChoice.ARTIST
                 2 -> AnswerChoice.ALBUM
@@ -216,6 +216,9 @@ class MusicGameActivity : AppCompatActivity() {
                 }
                 nextQuestion()
             }
+        }
+        builder.setNegativeButton("Never Mind") { _, _ ->
+            finish()
         }
         val dialog = builder.create()
         dialog.show()
