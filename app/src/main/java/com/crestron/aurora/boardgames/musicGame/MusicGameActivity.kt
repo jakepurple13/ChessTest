@@ -238,7 +238,8 @@ class MusicGameActivity : AppCompatActivity() {
             musicGameLayout.createBubbles {
                 setColors(fill = Color.GREEN)
                 touchEvent = BubbleEmitter.BUBBLE_POP
-                oneBubble(10)
+                rotation = 180f
+                oneBubble(5)
             }
         } else {
             Loged.e("You got it wrong")
@@ -302,14 +303,14 @@ class MusicGameActivity : AppCompatActivity() {
     }
 
     @SuppressLint("SetTextI18n")
-    fun setButtons() = runOnUiThread {
+    private fun setButtons() = runOnUiThread {
         buttonA.text = "(A) ${choices[0]}".trimStart()
         buttonB.text = "(B) ${choices[1]}".trimStart()
         buttonC.text = "(C) ${choices[2]}".trimStart()
         buttonD.text = "(D) ${choices[3]}".trimStart()
     }
 
-    fun enableButtons(enable: Boolean) {
+    private fun enableButtons(enable: Boolean) {
         buttonA.isEnabled = enable
         buttonB.isEnabled = enable
         buttonC.isEnabled = enable
