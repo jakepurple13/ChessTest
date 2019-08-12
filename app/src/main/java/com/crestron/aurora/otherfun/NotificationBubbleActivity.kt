@@ -11,19 +11,26 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.crashlytics.android.Crashlytics
+import com.crestron.aurora.ChoiceActivity
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.utilities.KUtility
+import com.crestron.aurora.views.DownloadsWidget
 import com.google.gson.Gson
 import com.ncorti.slidetoact.SlideToActView
+import com.tonyodev.fetch2.Download
+import com.tonyodev.fetch2.Error
 import com.tonyodev.fetch2.NetworkType
+import com.tonyodev.fetch2core.DownloadBlock
 import kotlinx.android.synthetic.main.activity_notification_bubble.*
 import kotlinx.android.synthetic.main.bubble_info_layout.view.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.defaultSharedPreferences
 
 class NotificationBubbleActivity : AppCompatActivity() {
 
@@ -114,7 +121,82 @@ class NotificationBubbleActivity : AppCompatActivity() {
                 GlobalScope.launch {
                     val epApi = EpisodeApi(ShowInfo(name, url))
 
-                    val fetchingUtils = FetchingUtils(context)
+                    val fetchingUtils = FetchingUtils(context,  object : FetchingUtils.FetchAction {
+
+                        override fun onStarted(download: Download, downloadBlocks: List<DownloadBlock>, totalBlocks: Int) {
+                            super.onStarted(download, downloadBlocks, totalBlocks)
+                            if (DownloadsWidget.isWidgetActive(context))
+                                DownloadsWidget.sendRefreshBroadcast(context)
+                        }
+
+                        override fun onQueued(download: Download, waitingOnNetwork: Boolean) {
+                            super.onQueued(download, waitingOnNetwork)
+                            if (DownloadsWidget.isWidgetActive(context))
+                                DownloadsWidget.sendRefreshBroadcast(context)
+                        }
+
+                        override fun onProgress(download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
+                            super.onProgress(download, etaInMilliSeconds, downloadedBytesPerSecond)
+                            if (DownloadsWidget.isWidgetActive(context))
+                                DownloadsWidget.sendRefreshBroadcast(context)
+                        }
+
+                        override fun onCancelled(download: Download) {
+                            super.onCancelled(download)
+                            try {
+                                context.deleteFile(download.file)
+                            } catch (e: IllegalArgumentException) {
+                                Loged.w(e.message!!)//e.printStackTrace()
+                            } catch (e: java.lang.NullPointerException) {
+                                Loged.w(e.message!!)//e.printStackTrace()
+                            }
+                            if (DownloadsWidget.isWidgetActive(context))
+                                DownloadsWidget.sendRefreshBroadcast(context)
+                        }
+
+                        override fun onPaused(download: Download) {
+                            super.onPaused(download)
+                            if (DownloadsWidget.isWidgetActive(context))
+                                DownloadsWidget.sendRefreshBroadcast(context)
+                        }
+
+                        override fun onResumed(download: Download) {
+                            super.onResumed(download)
+                            if (DownloadsWidget.isWidgetActive(context))
+                                DownloadsWidget.sendRefreshBroadcast(context)
+                        }
+
+                        override fun onDeleted(download: Download) {
+                            super.onDeleted(download)
+                            try {
+                                context.deleteFile(download.file)
+                            } catch (e: IllegalArgumentException) {
+                                Loged.w(e.message!!)//e.printStackTrace()
+                            } catch (e: java.lang.NullPointerException) {
+                                Loged.w(e.message!!)////e.printStackTrace()
+                            }
+                            if (DownloadsWidget.isWidgetActive(context))
+                                DownloadsWidget.sendRefreshBroadcast(context)
+                        }
+
+                        override fun onError(download: Download, error: Error, throwable: Throwable?) {
+                            super.onError(download, error, throwable)
+                            Crashlytics.log("${error.throwable?.message}")
+                            if (context.defaultSharedPreferences.getBoolean(ConstantValues.AUTO_RETRY, false))
+                                FetchingUtils.retry(download)
+                            if (DownloadsWidget.isWidgetActive(context))
+                                DownloadsWidget.sendRefreshBroadcast(context)
+                        }
+
+                        override fun onCompleted(download: Download) {
+                            super.onCompleted(download)
+                            ChoiceActivity.downloadCast(context, ChoiceActivity.BroadCastInfo.KVObject("view_download_item_count", "1"))
+                            ViewVideosActivity.videoCast(context)
+                            if (DownloadsWidget.isWidgetActive(context))
+                                DownloadsWidget.sendRefreshBroadcast(context)
+                            FetchingUtils.retryAll()
+                        }
+                    })
                     fetchingUtils.getVideo(epApi.episodeList.first(), NetworkType.ALL,
                             EpisodeActivity.KeyAndValue(ConstantValues.URL_INTENT, url),
                             EpisodeActivity.KeyAndValue(ConstantValues.NAME_INTENT, name))

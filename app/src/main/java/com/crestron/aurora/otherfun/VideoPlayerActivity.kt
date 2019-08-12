@@ -199,6 +199,7 @@ class VideoPlayerActivity : AppCompatActivity() {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.activity_video_player)
         window.decorView.systemUiVisibility = flags
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         val decorView = window.decorView
         decorView.setOnSystemUiVisibilityChangeListener { visibility ->
             if (visibility.and(View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
