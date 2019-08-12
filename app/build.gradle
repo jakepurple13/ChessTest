@@ -162,6 +162,7 @@ dependencies {
     implementation 'com.dubsmash.volley:library:2.0.1'
     testImplementation 'org.robolectric:robolectric:4.3'
     testImplementation 'org.json:json:20190722'
+    implementation 'com.github.davidmigloz:multi-state-switch:+'
 }
 kotlin {
     experimental {

@@ -3,6 +3,7 @@ package com.crestron.aurora.boardgames.musicGame
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
+import android.text.InputType
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -15,6 +16,8 @@ import com.crestron.aurora.R
 import com.crestron.aurora.utilities.isBlankOrEmpty
 import com.crestron.aurora.views.BubbleEmitter
 import com.crestron.aurora.views.createBubbles
+import com.davidmiguel.multistateswitch.MultiStateSwitch
+import com.davidmiguel.multistateswitch.State
 import com.google.gson.Gson
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -29,13 +32,18 @@ import kotlin.random.Random
 
 class MusicGameActivity : AppCompatActivity() {
 
-    enum class TrackChoice {
-        NAME, ALBUM, ARTIST
+    enum class QuestionChoice {
+        SNIPPET, NAME
+    }
+
+    enum class AnswerChoice {
+        NAME, ARTIST, ALBUM
     }
 
     private lateinit var trackList: MutableList<Track>
 
-    private var choice: TrackChoice = TrackChoice.values().random()
+    private var qChoice = QuestionChoice.SNIPPET
+    private var aChoice = AnswerChoice.NAME
 
     private var choices: Array<String> = arrayOf("", "", "", "")
 
@@ -100,14 +108,14 @@ class MusicGameActivity : AppCompatActivity() {
             }
         }
 
-        whatToGuess.text = "Q: ${when (choice) {
-            TrackChoice.NAME -> "Song Snippet"
+        whatToGuess.text = "Q: ${when (qChoice) {
+            QuestionChoice.SNIPPET -> "Song Snippet"
             else -> "Track Name"
         }
-        }\nA: ${when (choice) {
-            TrackChoice.NAME -> "Song Name"
-            TrackChoice.ALBUM -> "Album Name"
-            TrackChoice.ARTIST -> "Artist Name"
+        }\nA: ${when (aChoice) {
+            AnswerChoice.NAME -> "Song Name"
+            AnswerChoice.ALBUM -> "Album Name"
+            AnswerChoice.ARTIST -> "Artist Name"
         }
         }"
 
@@ -128,6 +136,11 @@ class MusicGameActivity : AppCompatActivity() {
         lyricInput.layoutParams = lp
         lyricInput.hint = "Lyrics"
 
+        val amountInput = EditText(this@MusicGameActivity)
+        amountInput.layoutParams = lp
+        amountInput.hint = "Number Of Songs to Have (Default is 100)"
+        amountInput.inputType = InputType.TYPE_CLASS_NUMBER
+
         val chooseOrTop = Switch(this@MusicGameActivity)
         chooseOrTop.layoutParams = lp
         chooseOrTop.textOn = "Custom"
@@ -140,7 +153,42 @@ class MusicGameActivity : AppCompatActivity() {
             artistInput.isEnabled = b
         }
 
+        val questionChoice = MultiStateSwitch(this@MusicGameActivity)
+        questionChoice.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                100)
+        questionChoice.addState(State("Song Snippet"))
+        questionChoice.addState(State("Track Name"))
+        questionChoice.addState(State("Random"))
+        questionChoice.addStateListener { stateIndex, state ->
+            qChoice = when(stateIndex) {
+                0 -> QuestionChoice.SNIPPET
+                1 -> QuestionChoice.NAME
+                else -> QuestionChoice.values().random()
+            }
+        }
+
+        val answerChoice = MultiStateSwitch(this@MusicGameActivity)
+        answerChoice.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                100)
+        answerChoice.addState(State("Track"))
+        answerChoice.addState(State("Artist"))
+        answerChoice.addState(State("Album"))
+        answerChoice.addState(State("Random"))
+        answerChoice.addStateListener { stateIndex, state ->
+            aChoice = when(stateIndex) {
+                0 -> AnswerChoice.NAME
+                1 -> AnswerChoice.ARTIST
+                2 -> AnswerChoice.ALBUM
+                else -> AnswerChoice.values().random()
+            }
+        }
+
         linearLayout.addView(chooseOrTop)
+        linearLayout.addView(questionChoice)
+        linearLayout.addView(answerChoice)
+        linearLayout.addView(amountInput)
         linearLayout.addView(artistInput)
         linearLayout.addView(lyricInput)
 
@@ -153,10 +201,16 @@ class MusicGameActivity : AppCompatActivity() {
         builder.setPositiveButton("Okay!") { _, _ ->
             GlobalScope.launch {
                 //trackList = TrackApi.getTopTracks(ChartName.HOT, 100).toMutableList()
-                trackList = if (chooseOrTop.isChecked)
+                trackList = if (chooseOrTop.isChecked) {
                     TrackApi.getTrackByInfo(artistName = artistInput.text.toString(), anyLyrics = lyricInput.text.toString()).toMutableList()
-                else
-                    TrackApi.getTopTracks(ChartName.values().random(), 100).toMutableList()
+                } else {
+                    val amount = try {
+                        amountInput.text.toString().toInt()
+                    } catch (e: Exception) {
+                        100
+                    }
+                    TrackApi.getTopTracks(ChartName.values().random(), amount).toMutableList()
+                }
                 nextQuestion()
             }
         }
@@ -192,21 +246,22 @@ class MusicGameActivity : AppCompatActivity() {
             getButton(correctTrack)!!.text = "${getButton(correctTrack)!!.text} ✅"
         }
         nextQuestionButton.isEnabled = true
+        enableButtons(false)
         //}
 
     }
 
     private fun getChoice(t: Track): String {
-        return when (choice) {
-            TrackChoice.NAME -> t.trackName
-            TrackChoice.ALBUM -> t.albumName
-            TrackChoice.ARTIST -> t.artistName
+        return when (aChoice) {
+            AnswerChoice.NAME -> t.trackName
+            AnswerChoice.ALBUM -> t.albumName
+            AnswerChoice.ARTIST -> t.artistName
         }
     }
 
     @SuppressLint("SetTextI18n")
     fun nextQuestion() {
-        if(trackList.size<=4) {
+        if (trackList.size <= 4) {
             runOnUiThread {
                 getInfo()
             }
@@ -222,16 +277,16 @@ class MusicGameActivity : AppCompatActivity() {
             choices[2] = getChoice(listOfTracks[2])
             choices[3] = getChoice(listOfTracks[3])
 
-            if (choice != TrackChoice.NAME) {
-                runOnUiThread {
-                    questionText.text = current.trackName
-                }
-            } else {
-                GlobalScope.launch {
+            GlobalScope.launch {
+                val qText = if (qChoice == QuestionChoice.NAME) {
+                    current.trackName
+                } else {
                     val snippet = LyricApi.getLyricSnippet(current)
-                    runOnUiThread {
-                        questionText.text = snippet.snippet_body
-                    }
+                    snippet.snippet_body
+                }
+                runOnUiThread {
+                    questionText.text = qText
+                    enableButtons(true)
                 }
             }
 
@@ -252,6 +307,13 @@ class MusicGameActivity : AppCompatActivity() {
         buttonB.text = "(B) ${choices[1]}".trimStart()
         buttonC.text = "(C) ${choices[2]}".trimStart()
         buttonD.text = "(D) ${choices[3]}".trimStart()
+    }
+
+    fun enableButtons(enable: Boolean) {
+        buttonA.isEnabled = enable
+        buttonB.isEnabled = enable
+        buttonC.isEnabled = enable
+        buttonD.isEnabled = enable
     }
 
 }
@@ -514,11 +576,11 @@ class TrackApi {
             return list
         }
 
-        fun getTrackByInfo(trackName: String? = null, artistName: String? = null, anyLyrics: String? = null): List<Track> {
+        fun getTrackByInfo(trackName: String? = null, artistName: String? = null, anyLyrics: String? = null, amount: Int = 100): List<Track> {
             val tName = if (trackName != null && !trackName.isBlankOrEmpty()) "q_track=$trackName" else ""
-            val aName = if (artistName != null&& !artistName.isBlankOrEmpty()) "${if (tName.isBlankOrEmpty()) "" else "&"}q_artist=$artistName" else ""
+            val aName = if (artistName != null && !artistName.isBlankOrEmpty()) "${if (tName.isBlankOrEmpty()) "" else "&"}q_artist=$artistName" else ""
             val lyric = if (anyLyrics != null && !anyLyrics.isBlankOrEmpty()) "${if (tName.isBlankOrEmpty() && aName.isBlankOrEmpty()) "" else "&"}q_lyrics=$anyLyrics" else ""
-            val s = GetAPI.getInfo<SnippetMessage>("track.search?$tName$aName$lyric&f_lyrics_language=en&page_size=100&page=1&f_has_lyrics=1").trackList
+            val s = GetAPI.getInfo<SnippetMessage>("track.search?$tName$aName$lyric&f_lyrics_language=en&page_size=$amount&page=1&f_has_lyrics=1").trackList
             val list = arrayListOf<Track>()
             s.forEach {
                 list += it.track
