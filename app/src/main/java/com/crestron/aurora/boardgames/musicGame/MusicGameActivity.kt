@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -131,10 +132,12 @@ class MusicGameActivity : AppCompatActivity() {
         val artistInput = EditText(this@MusicGameActivity)
         artistInput.layoutParams = lp
         artistInput.hint = "Artist Name"
+        artistInput.imeOptions = EditorInfo.IME_ACTION_NEXT
 
         val lyricInput = EditText(this@MusicGameActivity)
         lyricInput.layoutParams = lp
         lyricInput.hint = "Lyrics"
+        lyricInput.imeOptions = EditorInfo.IME_ACTION_GO
 
         val amountInput = EditText(this@MusicGameActivity)
         amountInput.layoutParams = lp
