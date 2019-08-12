@@ -50,7 +50,7 @@ fun Random.nextColor(
 
 fun String.regex(regex: String): String? {
     val s = regex.toRegex().toPattern().matcher(this)
-    return if(s.find()) {
+    return if (s.find()) {
         s.group(1)
     } else {
         null
@@ -59,11 +59,11 @@ fun String.regex(regex: String): String? {
 
 fun String.findRegex(string: String): String? {
     val s = toRegex().toPattern().matcher(string)
-    return if(s.find()) {
+    return if (s.find()) {
         s.group(1)
     } else {
         null
     }
 }
 
-
+fun String.isBlankOrEmpty(): Boolean = isBlank() || isEmpty()

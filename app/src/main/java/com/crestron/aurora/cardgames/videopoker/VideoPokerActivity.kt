@@ -497,7 +497,7 @@ class VideoPokerActivity : AppCompatActivity() {
                 //holder.holdButton.text = if (list[index].hold) "Holding" else "Hold"
                 holder.holdButton.text = if (list[index].hold) "✅" else "❌"
             }
-            holder.holdButton.text = if (list[index].hold) "✅" else "❌"//"❌"
+            holder.holdButton.text = if (list[index].hold) "✅" else "❌"
             //list[index].hold = false
             holder.cardView.setImageResource(list[index].c.getImage(context))
             holder.cardView.setOnClickListener(listener)

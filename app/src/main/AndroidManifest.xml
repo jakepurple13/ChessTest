@@ -13,9 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="LockedOrientationActivity">
-
+        <activity android:name=".boardgames.musicGame.MusicGameActivity" />
         <activity android:name=".otherfun.CastingActivity" />
-
         <activity android:name=".cardgames.matching.MatchingActivityTwo" />
         <activity
             android:name=".otherfun.NotificationBubbleActivity"
@@ -197,7 +196,6 @@
         <activity
             android:name=".SettingsActivity"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".otherfun.DownloadViewerActivity"
             android:screenOrientation="portrait"
@@ -223,23 +221,19 @@
             android:name=".otherfun.FavoriteShowsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent" />
-
         <activity
             android:name=".otherfun.RssActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent" />
-
         <activity
             android:name=".FormActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent" />
         <activity android:name=".viewtesting.ViewTesting" />
-
         <activity
             android:name=".viewtesting.basic_test"
             android:label="@string/title_activity_basic_test"
             android:theme="@style/AppTheme" />
-
         <activity
             android:name=".otherfun.ViewVideosActivity"
             android:screenOrientation="portrait" />
@@ -250,7 +244,6 @@
             android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true" />
         <activity android:name=".otherfun.StartVideoFromNotificationActivity" />
-
         <activity
             android:name=".boardgames.pong.PongActivity"
             android:screenOrientation="landscape"
@@ -285,6 +278,7 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="914a898632a14cf4fc0bb8b8c61e20ab674bf310" />
+
         <provider
             android:name=".otherfun.GenericFileProvider"
             android:authorities="com.crestron.aurora.otherfun.GenericFileProvider"
@@ -340,7 +334,6 @@
                 <action android:name="cast.Download" />
             </intent-filter>
         </receiver>
-
         <receiver android:name=".otherfun.ViewVideosActivity$BroadcastReceiverVideoView">
             <intent-filter>
                 <action android:name="cast.Video" />
@@ -371,14 +364,12 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".otherfun.ShowCheckReceiver"
             android:process=":remote" />
         <receiver
             android:name=".otherfun.NotificationDismissedReceiver"
             android:exported="false" />
-
         <receiver
             android:name=".otherfun.NotificationGroupDismissedReceiver"
             android:exported="false" />
@@ -390,7 +381,6 @@
             android:name=".otherfun.UpdateCheckService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".MessagingFirebase"
             tools:ignore="ExportedService">
@@ -401,16 +391,13 @@
         <service
             android:name=".views.MyWidgetRemoteViewsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
-
         <service
             android:name=".views.PlayPauseWidgetService"
             android:enabled="true"
             android:exported="true" />
-
         <service
             android:name=".otherfun.ShowCheckIntentService"
             android:exported="false" />
-
         <service
             android:name=".otherfun.ShowCheckTile"
             android:enabled="true"
@@ -429,7 +416,6 @@
                 android:value="true" />
         </service>
     </application>
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

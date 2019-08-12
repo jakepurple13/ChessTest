@@ -1,15 +1,19 @@
 package com.crestron.aurora
 
 import androidx.annotation.IntRange
+import com.crestron.aurora.utilities.isBlankOrEmpty
 import com.google.gson.Gson
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import org.json.JSONException
 import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
+import kotlin.random.Random
 
 
 class TestUnitTwo {
@@ -131,54 +135,54 @@ class TestUnitTwo {
 
     data class Album(
 
-        @SerializedName("album_id")
-        @Expose
-        var albumId: Int,
-        @SerializedName("album_mbid")
-        @Expose
-        var albumMbid: Any,
-        @SerializedName("album_name")
-        @Expose
-        var albumName: String,
-        @SerializedName("album_rating")
-        @Expose
-        var albumRating: Int,
-        @SerializedName("album_track_count")
-        @Expose
-        var albumTrackCount: Int,
-        @SerializedName("album_release_date")
-        @Expose
-        var albumReleaseDate: String,
-        @SerializedName("album_release_type")
-        @Expose
-        var albumReleaseType: String,
-        @SerializedName("artist_id")
-        @Expose
-        var artistId: Int,
-        @SerializedName("artist_name")
-        @Expose
-        var artistName: String,
-        @SerializedName("primary_genres")
-        @Expose
-        var primaryGenres: PrimaryGenres,
-        @SerializedName("secondary_genres")
-        @Expose
-        var secondaryGenres: SecondaryGenres,
-        @SerializedName("album_pline")
-        @Expose
-        var albumPline: String,
-        @SerializedName("album_copyright")
-        @Expose
-        var albumCopyright: String,
-        @SerializedName("album_label")
-        @Expose
-        var albumLabel: String,
-        @SerializedName("updated_time")
-        @Expose
-        var updatedTime: String,
-        @SerializedName("album_coverart_100x100")
-        @Expose
-        var albumCoverart100x100: String
+            @SerializedName("album_id")
+            @Expose
+            var albumId: Int,
+            @SerializedName("album_mbid")
+            @Expose
+            var albumMbid: Any,
+            @SerializedName("album_name")
+            @Expose
+            var albumName: String,
+            @SerializedName("album_rating")
+            @Expose
+            var albumRating: Int,
+            @SerializedName("album_track_count")
+            @Expose
+            var albumTrackCount: Int,
+            @SerializedName("album_release_date")
+            @Expose
+            var albumReleaseDate: String,
+            @SerializedName("album_release_type")
+            @Expose
+            var albumReleaseType: String,
+            @SerializedName("artist_id")
+            @Expose
+            var artistId: Int,
+            @SerializedName("artist_name")
+            @Expose
+            var artistName: String,
+            @SerializedName("primary_genres")
+            @Expose
+            var primaryGenres: PrimaryGenres,
+            @SerializedName("secondary_genres")
+            @Expose
+            var secondaryGenres: SecondaryGenres,
+            @SerializedName("album_pline")
+            @Expose
+            var albumPline: String,
+            @SerializedName("album_copyright")
+            @Expose
+            var albumCopyright: String,
+            @SerializedName("album_label")
+            @Expose
+            var albumLabel: String,
+            @SerializedName("updated_time")
+            @Expose
+            var updatedTime: String,
+            @SerializedName("album_coverart_100x100")
+            @Expose
+            var albumCoverart100x100: String
     )
 
     data class Snippet(val snippet_language: String, val restricted: Number, val instrumental: Number, val snippet_body: String, val script_tracking_url: String, val pixel_tracking_url: String, val html_tracking_url: String, val updated_time: String)
@@ -292,8 +296,21 @@ class TestUnitTwo {
 
         companion object {
             fun getTrack(name: String, artist: String? = null): Track = GetAPI.getInfo("matcher.track.get?q_track=$name${if (artist != null) "&q_artist=$artist" else ""}")
+
             fun getTopTracks(chartName: ChartName = ChartName.TOP, @IntRange(from = 1, to = 100) amount: Int = 5): List<Track> {
                 val s = GetAPI.getInfo<SnippetMessage>("chart.tracks.get?chart_name=${chartName.value}&page=1&page_size=$amount&f_has_lyrics=1").trackList
+                val list = arrayListOf<Track>()
+                s.forEach {
+                    list += it.track
+                }
+                return list
+            }
+
+            fun getTrackByInfo(trackName: String? = null, artistName: String? = null, anyLyrics: String? = null): List<Track> {
+                val tName = if (trackName != null) "q_track=$trackName" else ""
+                val aName = if (artistName != null) "${if (tName.isBlankOrEmpty()) "" else "&"}q_artist=$artistName" else ""
+                val lyric = if (anyLyrics != null) "${if (tName.isBlankOrEmpty() && aName.isBlankOrEmpty()) "" else "&"}q_lyrics=$anyLyrics" else ""
+                val s = GetAPI.getInfo<SnippetMessage>("track.search?$tName$aName$lyric&f_lyrics_language=en&page_size=100&page=1&f_has_lyrics=1").trackList
                 val list = arrayListOf<Track>()
                 s.forEach {
                     list += it.track
@@ -337,6 +354,15 @@ class TestUnitTwo {
                 return list
             }
 
+            fun getAlbum(id: Int): List<Track> {
+                val s = GetAPI.getInfo<SnippetMessage>("album.tracks.get?album_id=$id&f_has_lyrics=1").trackList
+                val list = arrayListOf<Track>()
+                s.forEach {
+                    list += it.track
+                }
+                return list
+            }
+
             fun getAlbum(track: Track): List<Track> {
                 val s = GetAPI.getInfo<SnippetMessage>("album.tracks.get?album_id=${track.albumId}&f_has_lyrics=1").trackList
                 val list = arrayListOf<Track>()
@@ -357,10 +383,75 @@ class TestUnitTwo {
 
     }
 
+    private fun <T> Collection<T>.prettyPrint(transform: (T) -> CharSequence) {
+        prettyLog(joinToString(separator = "\n") { transform(it) })
+    }
+
+    private fun <T> MutableList<T>.randomRemove(): T {
+        return removeAt(Random.nextInt(0, size))
+    }
+
+    @Test
+    fun snippetGame() {
+        val trackList = TrackApi.getTopTracks(ChartName.HOT, 20).toMutableList()
+
+        runBlocking {
+            while(trackList.isNotEmpty()) {
+                val track = trackList.randomRemove()
+                val snippet = LyricApi.getLyricSnippet(track)
+
+                val listOfTracks = listOf(track, trackList.randomRemove(), trackList.randomRemove(), trackList.randomRemove()).shuffled()
+
+                fun toQuestions(list: List<Track>): String {
+                    var selections = ""
+                    for (i in list.withIndex()) {
+                        selections += "(${(i.index + 65).toChar()}) ${i.value.trackName}\n"
+                    }
+                    return selections
+                }
+
+                prettyLog("${snippet.snippet_body}\n\nYou're choices are: \n${toQuestions(listOfTracks)}")
+
+                delay(5000)
+                println(track.trackName)
+            }
+        }
+
+    }
+
+    @Test
+    fun trackSearch2() {
+        val posTracks = TrackApi.getTrackByInfo(anyLyrics = "No fate but that in which we make")
+        posTracks.prettyPrint { "\n${it.trackName} \n\tAlbum: ${it.albumName} \n\t\tby ${it.artistName}" }
+        //val trackings = ArtistApi.getArtistAlbums(posTracks.random())
+        //prettyLog(trackings.joinToString { "\n${it.albumName} with ${it.albumTrackCount}" })
+    }
+
+    @Test
+    fun trackSearch() {
+        //val posTracks = TrackApi.getTrackByInfo("starlight brigade", "twrp", anyLyrics = "Starlight Brigade")
+        //val posTracks = TrackApi.getTrackByInfo(artistName = "twrp", anyLyrics = "Starlight Brigade")
+        //val posTracks = TrackApi.getTrackByInfo(trackName = "starlight brigade", anyLyrics = "Starlight Brigade")
+        //val posTracks = TrackApi.getTrackByInfo(trackName = "starlight brigade")
+        val posTracks = TrackApi.getTrackByInfo(artistName = "ninja sex party")
+        //prettyLog(posTracks.joinToString { "\n${it.trackName} - in the album ${it.albumName} - by ${it.artistName}" })
+        val listing = posTracks.groupBy { it.albumName }
+        prettyLog(listing.keys.toString())
+        listing.keys.forEach {
+            prettyLog("$it\n${listing[it]!!.joinToString { it1 -> "\n${it1.trackName}" }}")
+        }
+        val sortedTracks = posTracks.sortedBy { it.albumName }
+        //prettyLog(sortedTracks.joinToString { "\n${it.trackName} - in the album ${it.albumName} - by ${it.artistName}" })
+        //sortedTracks.prettyPrint { "\n${it.trackName} - in the album ${it.albumName} - by ${it.artistName}" }
+        val trackings = ArtistApi.getArtistAlbums(posTracks.random())
+        prettyLog(trackings.joinToString { "\n${it.albumName} with ${it.albumTrackCount}" })
+    }
+
     @Test
     fun newApi() {
         //val t = TrackApi()
         //val track = t("Starlight Brigade", "TWRP")
+
         val track = TrackApi.getTrack("Starlight brigade", "twrp")
         prettyLog(track.albumName)
         val lyrics = LyricApi.getLyrics(track)

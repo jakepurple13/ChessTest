@@ -24,6 +24,7 @@ import androidx.core.app.TaskStackBuilder
 import com.box.shelfview.BookModel
 import com.box.shelfview.ShelfView
 import com.crestron.aurora.boardgames.chess.MainActivity
+import com.crestron.aurora.boardgames.musicGame.MusicGameActivity
 import com.crestron.aurora.boardgames.pong.PongActivity
 import com.crestron.aurora.boardgames.yahtzee.YahtzeeActivity
 import com.crestron.aurora.cardgames.BlackJackActivity
@@ -85,6 +86,7 @@ class ChoiceActivity : AppCompatActivity() {
         CHESS("chess", "Chess"),
         YAHTZEE("yahtzee", "Yahtzee"),
         PONG("pong", "Pong"),
+        MUSIC_MATCH("music_match", "Music Match"),
         SETTINGS("settings", "Settings"),
         ANIME("anime", "Anime"),
         CARTOON("cartoon", "Cartoon"),
@@ -277,6 +279,9 @@ class ChoiceActivity : AppCompatActivity() {
                         ChoiceButton.YAHTZEE -> {
                             //startActivity(Intent(this@ChoiceActivity, YahtzeeActivity::class.java))
                             ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, YahtzeeActivity::class.java))
+                        }
+                        ChoiceButton.MUSIC_MATCH -> {
+                            startActivity(Intent(this@ChoiceActivity, MusicGameActivity::class.java))
                         }
                         ChoiceButton.SETTINGS -> {
                             permissionCheck(SettingsActivity2::class.java, shouldFinish = true)
@@ -502,6 +507,7 @@ class ChoiceActivity : AppCompatActivity() {
         models.add(drawableModel(R.drawable.black_chess_knight, ChoiceButton.CHESS))
         models.add(drawableModel(R.drawable.apk, ChoiceButton.PONG))
         models.add(drawableModel(R.drawable.matchinglogo, ChoiceButton.MATCHING))
+        models.add(drawableModel(R.drawable.matchinglogo, ChoiceButton.MUSIC_MATCH))
 
         models.add(drawableModel(android.R.drawable.ic_menu_today, ChoiceButton.RSS_FEED))
         models.add(drawableModel(R.drawable.recents, ChoiceButton.RECENT_ANIME, defaultSharedPreferences.getInt(ConstantValues.UPDATE_COUNT, 0)))
