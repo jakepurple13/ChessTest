@@ -201,14 +201,14 @@ class MusicGameActivity : AppCompatActivity() {
         builder.setPositiveButton("Okay!") { _, _ ->
             GlobalScope.launch {
                 //trackList = TrackApi.getTopTracks(ChartName.HOT, 100).toMutableList()
+                val amount = try {
+                    amountInput.text.toString().toInt()
+                } catch (e: Exception) {
+                    100
+                }
                 trackList = if (chooseOrTop.isChecked) {
-                    TrackApi.getTrackByInfo(artistName = artistInput.text.toString(), anyLyrics = lyricInput.text.toString()).toMutableList()
+                    TrackApi.getTrackByInfo(artistName = artistInput.text.toString(), anyLyrics = lyricInput.text.toString(), amount = amount).toMutableList()
                 } else {
-                    val amount = try {
-                        amountInput.text.toString().toInt()
-                    } catch (e: Exception) {
-                        100
-                    }
                     TrackApi.getTopTracks(ChartName.values().random(), amount).toMutableList()
                 }
                 nextQuestion()
