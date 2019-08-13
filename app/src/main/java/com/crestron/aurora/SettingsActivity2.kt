@@ -337,6 +337,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                                     show.insert(i)
                                 }
                             }
+                            File(path).delete()
                         }
                     //}
                     GlobalScope.launch(Dispatchers.Main) {
