@@ -287,7 +287,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
 
                         Loged.wtf("$path and $string")
 
-                        val file = File("$path/fun.json")
+                        val file = File("$path/fun_${show.size}.json")
                         if (!file.exists())
                             file.createNewFile()
 
@@ -328,7 +328,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
 
                 // get path that the user has chosen
                 chooser.setOnSelectListener { path ->
-                    if (path.contains("fun.json")) {
+                    //if (path.contains("fun.json")) {
                         GlobalScope.launch {
                             val show = ShowDatabase.getDatabase(this@GeneralPreferenceFragment.context).showDao()
                             val g = Gson().fromJson(mReadJsonData(path), Array<Show>::class.java)
@@ -338,7 +338,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                                 }
                             }
                         }
-                    }
+                    //}
                     GlobalScope.launch(Dispatchers.Main) {
                         Toast.makeText(this@GeneralPreferenceFragment.context, "Finished Importing", Toast.LENGTH_SHORT).show()
                     }
