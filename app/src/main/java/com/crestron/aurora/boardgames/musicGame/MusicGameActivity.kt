@@ -587,7 +587,7 @@ class TrackApi {
             val tName = if (trackName != null && !trackName.isBlankOrEmpty()) "q_track=$trackName" else ""
             val aName = if (artistName != null && !artistName.isBlankOrEmpty()) "${if (tName.isBlankOrEmpty()) "" else "&"}q_artist=$artistName" else ""
             val lyric = if (anyLyrics != null && !anyLyrics.isBlankOrEmpty()) "${if (tName.isBlankOrEmpty() && aName.isBlankOrEmpty()) "" else "&"}q_lyrics=$anyLyrics" else ""
-            val s = GetAPI.getInfo<SnippetMessage>("track.search?$tName$aName$lyric&f_lyrics_language=en&page_size=$amount&page=1&f_has_lyrics=1").trackList
+            val s = GetAPI.getInfo<SnippetMessage>("track.search?$tName$aName$lyric&page_size=$amount&page=1&f_has_lyrics=1").trackList
             val list = arrayListOf<Track>()
             s.forEach {
                 list += it.track

@@ -15,9 +15,9 @@ object Loged {
     var TAG = "Loged"
     private const val HELPER_NAME = "Loged"
 
-    private fun prettyLog(tag: String, msg: String, level: Int, threadName: Boolean) {
+    private fun prettyLog(tag: String, msg: Any, level: Int, threadName: Boolean) {
         //the main message to be logged
-        var logged = msg
+        var logged = msg.toString()
         //the arrow for the stack trace
         val arrow = "${9552.toChar()}${9655.toChar()}\t"
         //the stack trace
@@ -62,7 +62,7 @@ object Loged {
 
     //---------------------------------EVERYTHING BELOW WORKS FINE----------------------------------
 
-    private fun log(tag: String, msg: String, level: Int, threadName: Boolean) {
+    private fun log(tag: String, msg: Any, level: Int, threadName: Boolean) {
         val stackTraceElement = Thread.currentThread().stackTrace
         var currentIndex = -1
         for (i in stackTraceElement.indices) {
@@ -91,8 +91,8 @@ object Loged {
      */
     fun e(msg: Any, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg.toString(), Log.ERROR, threadName)
-            false -> log(tag, msg.toString(), Log.ERROR, threadName)
+            true -> prettyLog(tag, msg, Log.ERROR, threadName)
+            false -> log(tag, msg, Log.ERROR, threadName)
         }
     }
 
@@ -103,8 +103,8 @@ object Loged {
      */
     fun i(msg: Any, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg.toString(), Log.INFO, threadName)
-            false -> log(tag, msg.toString(), Log.INFO, threadName)
+            true -> prettyLog(tag, msg, Log.INFO, threadName)
+            false -> log(tag, msg, Log.INFO, threadName)
         }
     }
 
@@ -115,8 +115,8 @@ object Loged {
      */
     fun a(msg: Any, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg.toString(), Log.ASSERT, threadName)
-            false -> log(tag, msg.toString(), Log.ASSERT, threadName)
+            true -> prettyLog(tag, msg, Log.ASSERT, threadName)
+            false -> log(tag, msg, Log.ASSERT, threadName)
         }
     }
 
@@ -127,8 +127,8 @@ object Loged {
      */
     fun wtf(msg: Any, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg.toString(), Log.ASSERT, threadName)
-            false -> log(tag, msg.toString(), Log.ASSERT, threadName)
+            true -> prettyLog(tag, msg, Log.ASSERT, threadName)
+            false -> log(tag, msg, Log.ASSERT, threadName)
         }
     }
 
@@ -139,8 +139,8 @@ object Loged {
      */
     fun w(msg: Any, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg.toString(), Log.WARN, threadName)
-            false -> log(tag, msg.toString(), Log.WARN, threadName)
+            true -> prettyLog(tag, msg, Log.WARN, threadName)
+            false -> log(tag, msg, Log.WARN, threadName)
         }
     }
 
@@ -151,8 +151,8 @@ object Loged {
      */
     fun d(msg: Any, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg.toString(), Log.DEBUG, threadName)
-            false -> log(tag, msg.toString(), Log.DEBUG, threadName)
+            true -> prettyLog(tag, msg, Log.DEBUG, threadName)
+            false -> log(tag, msg, Log.DEBUG, threadName)
         }
     }
 
@@ -163,8 +163,8 @@ object Loged {
      */
     fun v(msg: Any, tag: String = TAG, showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME) {
         when (showPretty) {
-            true -> prettyLog(tag, msg.toString(), Log.VERBOSE, threadName)
-            false -> log(tag, msg.toString(), Log.VERBOSE, threadName)
+            true -> prettyLog(tag, msg, Log.VERBOSE, threadName)
+            false -> log(tag, msg, Log.VERBOSE, threadName)
         }
     }
 
