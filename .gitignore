@@ -8,3 +8,7 @@
 /build
 /captures
 .externalNativeBuild
+
+# Project exclude paths
+/nicespinner/build/
+/nicespinner/build/intermediates/javac/debug/classes/

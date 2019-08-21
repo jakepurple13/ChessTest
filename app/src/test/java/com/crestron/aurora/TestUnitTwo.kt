@@ -396,7 +396,7 @@ class TestUnitTwo {
         val trackList = TrackApi.getTopTracks(ChartName.HOT, 20).toMutableList()
 
         runBlocking {
-            while(trackList.isNotEmpty()) {
+            while (trackList.isNotEmpty()) {
                 val track = trackList.randomRemove()
                 val snippet = LyricApi.getLyricSnippet(track)
 
@@ -474,9 +474,201 @@ class TestUnitTwo {
         prettyLog(trackings.joinToString { "\n${it.albumName}" })
     }
 
+    data class City(
+            @SerializedName("id")
+            @Expose
+            var id: Int,
+            @SerializedName("name")
+            @Expose
+            var name: String,
+            @SerializedName("coord")
+            @Expose
+            var coord: Coord,
+            @SerializedName("country")
+            @Expose
+            var country: String,
+            @SerializedName("timezone")
+            @Expose
+            var timezone: Int,
+            @SerializedName("cod")
+            @Expose
+            var cod: String,
+            @SerializedName("message")
+            @Expose
+            var message: Double,
+            @SerializedName("cnt")
+            @Expose
+            var cnt: Int,
+            @SerializedName("list")
+            @Expose
+            var list: List<Lists>)
+
+    data class Clouds(
+            @SerializedName("all")
+            @Expose
+            var all: Int)
+
+    data class Coord(
+            @SerializedName("lon")
+            @Expose
+            var lon: Double,
+            @SerializedName("lat")
+            @Expose
+            var lat: Double
+    )
+
+    data class Lists(
+
+            @SerializedName("dt")
+            @Expose
+            var dt: Int,
+            @SerializedName("main")
+            @Expose
+            var main: Main,
+            @SerializedName("weather")
+            @Expose
+            var weather: List<Weather>,
+            @SerializedName("clouds")
+            @Expose
+            var clouds: Clouds,
+            @SerializedName("wind")
+            @Expose
+            var wind: Wind,
+            @SerializedName("sys")
+            @Expose
+            var sys: Sys,
+            @SerializedName("dt_txt")
+            @Expose
+            var dtTxt: String
+
+    )
+
+    data class Main(
+            @SerializedName("temp")
+            @Expose
+            var temp: Double,
+            @SerializedName("temp_min")
+            @Expose
+            var tempMin: Double,
+            @SerializedName("temp_max")
+            @Expose
+            var tempMax: Double,
+            @SerializedName("pressure")
+            @Expose
+            var pressure: Double,
+            @SerializedName("sea_level")
+            @Expose
+            var seaLevel: Double,
+            @SerializedName("grnd_level")
+            @Expose
+            var grndLevel: Double,
+            @SerializedName("humidity")
+            @Expose
+            var humidity: Int,
+            @SerializedName("temp_kf")
+            @Expose
+            var tempKf: Double
+    )
+
+    data class WeatherInfo(
+            @SerializedName("city")
+            @Expose
+            var city: City
+    )
+
+    data class Sys(
+            @SerializedName("pod")
+            @Expose
+            var pod: String
+    )
+
+    data class Weather(
+            @SerializedName("id")
+            @Expose
+            var id: Int,
+            @SerializedName("main")
+            @Expose
+            var main: String,
+            @SerializedName("description")
+            @Expose
+            var description: String,
+            @SerializedName("icon")
+            @Expose
+            var icon: String
+    )
+
+    data class Wind(
+            @SerializedName("speed")
+            @Expose
+            var speed: Double,
+            @SerializedName("deg")
+            @Expose
+            var deg: Double
+    )
+
     @Test
     fun apiTeststuff() {
+        val key = "&APPID=edcdd001d2885f30ffdffa7beece7067"
+        val url = "https://api.openweathermap.org/data/2.5/forecast?zip=07675,us$key"
+        getApiCalls(url, onError = {
+            prettyLog(it)
+        }) {
+            prettyLog(it)
+            val json = JSONObject(it)
+            for (i in json.keys()) {
+                try {
+                    val json1 = json.getJSONArray(i)
+                    prettyLog(json1)
+                    val json2 = JSONObject(json1[0].toString())
+                    prettyLog(json2)
+                    for (j in json2.keys()) {
+                        try {
+                            val json3 = json2.getJSONArray(j)
+                            prettyLog(json3)
+                        } catch (e: JSONException) {
 
+                        }
+                    }
+                } catch (e: JSONException) {
+
+                }
+            }
+            val stuff = Gson().fromJson(it, WeatherInfo::class.java)
+            prettyLog(stuff)
+            //prettyLog(stuff.city.list[0].weather.joinToString { ", " })
+        }
+    }
+
+    class JObject : JSONObject() {
+
+        inline infix operator fun String.invoke(obj: JObject.() -> Unit) {
+            put(this, JObject().apply(obj))
+        }
+
+        infix fun String.to(value: Any) {
+            put(this, value)
+        }
+    }
+
+
+    inline fun jsonObj(builder: JObject.() -> Unit): JSONObject {
+        return JObject().apply(builder)
+    }
+
+    @Test
+    fun objectiveTest() {
+        val o = jsonObj {
+            "asdf" {
+                "a" to "d"
+                "e" to 4
+            }
+            "list2" {
+                "z" to arrayListOf(1,2,3)
+            }
+            "d" to 4
+        }
+
+        prettyLog(o)
     }
 
     private fun prettyLog(msg: Any) {
