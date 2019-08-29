@@ -270,7 +270,7 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
                     val rowList = doc.select("div.col-lg-12").select("div.row")
                     val episodes = rowList.select("a.btn-episode")
                     for (i in episodes) {
-                        val ep = EpisodeInfo(i.text(), "https://www.putlocker.fyi/embed-src/${i.attr("data-pid")}")//i.attr("abs:href"))
+                        val ep = EpisodeInfo(i.attr("title"), "https://www.putlocker.fyi/embed-src/${i.attr("data-pid")}")//i.attr("abs:href"))
                         listOfShows.add(ep)
                     }
                 }
