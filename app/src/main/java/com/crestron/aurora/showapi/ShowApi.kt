@@ -23,7 +23,8 @@ enum class Source(val link: String, val recent: Boolean = false, var movie: Bool
     //RECENT_ANIME("http://www.animeplus.tv/anime-updates", true),
     RECENT_ANIME("https://www.gogoanime1.com/home/latest-episodes", true),
     RECENT_CARTOON("http://www.animetoon.org/updates", true),
-    LIVE_ACTION("https://www.putlocker.fyi/a-z-shows/");
+    LIVE_ACTION("https://www.putlocker.fyi/a-z-shows/"),
+    RECENT_LIVE_ACTION("https://www1.putlocker.fyi/recent-episodes/", true);
 
     companion object SourceUrl {
         fun getSourceFromUrl(url: String): Source {
@@ -36,6 +37,7 @@ enum class Source(val link: String, val recent: Boolean = false, var movie: Bool
                 RECENT_ANIME.link -> RECENT_ANIME
                 RECENT_CARTOON.link -> RECENT_CARTOON
                 LIVE_ACTION.link -> LIVE_ACTION
+                RECENT_LIVE_ACTION.link -> RECENT_LIVE_ACTION
                 else -> ANIME
             }
         }
@@ -55,6 +57,25 @@ open class ShowInfo(val name: String, val url: String) {
  * The actual api!
  */
 class ShowApi(private val source: Source) {
+
+    companion object {
+        fun getAll(): List<ShowInfo> {
+            val a = ShowApi(Source.ANIME).showInfoList.toList()
+            val c = ShowApi(Source.CARTOON).showInfoList.toList()
+            val cm = ShowApi(Source.CARTOON_MOVIES).showInfoList.toList()
+            val d = ShowApi(Source.DUBBED).showInfoList.toList()
+            val l = ShowApi(Source.LIVE_ACTION).showInfoList.toList()
+            return a + c + cm + d + l
+        }
+
+        fun getAllRecent(): List<ShowInfo> {
+            val a = ShowApi(Source.RECENT_ANIME).showInfoList.toList()
+            val c = ShowApi(Source.RECENT_CARTOON).showInfoList.toList()
+            val cm = ShowApi(Source.RECENT_LIVE_ACTION).showInfoList.toList()
+            return a + c + cm
+        }
+    }
+
     private var doc: Document = Jsoup.connect(source.link).get()
 
     /**
@@ -128,6 +149,14 @@ class ShowApi(private val source: Source) {
     private fun getRecentList(): ArrayList<ShowInfo> {
         return if (source.link.contains("gogoanime")) {
             gogoAnimeRecent()
+        } else if (source.link.contains("putlocker")) {
+            val listOfStuff = doc.allElements.select("div.col-6")
+            val list = arrayListOf<ShowInfo>()
+            for (i in listOfStuff) {
+                val url = i.select("a.thumbnail").attr("abs:href")
+                list.add(ShowInfo(i.select("span.mov_title").text(), url.substring(0, url.indexOf("season"))))
+            }
+            list
         } else {
             var listOfStuff = doc.allElements.select("div.left_col").select("table#updates")
                     .select("a[href^=http]")

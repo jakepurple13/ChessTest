@@ -96,6 +96,7 @@ class ChoiceActivity : AppCompatActivity() {
         RECENT_ANIME("recent_anime", "Recent Anime"),
         RECENT_CARTOON("recent_cartoon", "Recent Cartoon"),
         LIVE_ACTION("live_action", "TV Shows"),
+        RECENT_LIVE_ACTION("recent_live_action", "Recent TV Shows"),
         UPDATE_APP("update_app", "Update App"),
         VIEW_DOWNLOADS("view_downloads", "View Downloads"),
         VIEW_VIDEOS("view_videos", "View Videos"),
@@ -307,6 +308,9 @@ class ChoiceActivity : AppCompatActivity() {
                         ChoiceButton.RECENT_ANIME -> {
                             permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_ANIME.link, view = view)
                         }
+                        ChoiceButton.RECENT_LIVE_ACTION -> {
+                            permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_LIVE_ACTION.link, view = view)
+                        }
                         ChoiceButton.RECENT_CARTOON -> {
                             //defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT, 0).apply()
                             permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_CARTOON.link, view = view)
@@ -513,6 +517,7 @@ class ChoiceActivity : AppCompatActivity() {
         models.add(drawableModel(R.drawable.recents, ChoiceButton.RECENT_ANIME, defaultSharedPreferences.getInt(ConstantValues.UPDATE_COUNT, 0)))
         models.add(drawableModel(R.drawable.ten2, ChoiceButton.ANIME))
         models.add(drawableModel(R.drawable.mov, ChoiceButton.ANIME_MOVIES))
+        models.add(drawableModel(R.drawable.cartoon_recent_cover, ChoiceButton.RECENT_LIVE_ACTION))
         models.add(drawableModel(R.drawable.mov, ChoiceButton.LIVE_ACTION))
         models.add(drawableModel(R.drawable.ten4, ChoiceButton.DUBBED))
         models.add(drawableModel(R.drawable.cartoon_recent_cover, ChoiceButton.RECENT_CARTOON))
