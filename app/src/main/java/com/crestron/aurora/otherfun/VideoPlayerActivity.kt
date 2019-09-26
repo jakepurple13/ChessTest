@@ -72,8 +72,8 @@ class VideoPlayerActivity : AppCompatActivity() {
     }
 
     /** The arguments to be used for Picture-in-Picture mode.  */
-    @SuppressLint("NewApi")
-    private val mPictureInPictureParamsBuilder = PictureInPictureParams.Builder()
+    //@SuppressLint("NewApi")
+    //private val mPictureInPictureParamsBuilder = PictureInPictureParams.Builder()
 
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
@@ -107,7 +107,7 @@ class VideoPlayerActivity : AppCompatActivity() {
     private val labelPlay: String by lazy { "Play" }
     private val labelPause: String by lazy { "Pause" }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    /*@TargetApi(Build.VERSION_CODES.O)
     internal fun updatePictureInPictureActions(@DrawableRes iconId: Int, title: String,
                                                controlType: Int, requestCode: Int) {
 
@@ -128,7 +128,7 @@ class VideoPlayerActivity : AppCompatActivity() {
         // Note this call can happen even when the app is not in PiP mode. In that case, the
         // arguments will be used for at the next call of #enterPictureInPictureMode.
         setPictureInPictureParams(mPictureInPictureParamsBuilder.build())
-    }
+    }*/
 
     private val flags = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
             or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -300,7 +300,7 @@ class VideoPlayerActivity : AppCompatActivity() {
 
     }
 
-    override fun onUserLeaveHint() {
+    /*override fun onUserLeaveHint() {
         //super.onUserLeaveHint()
         //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         minimize()
@@ -314,7 +314,7 @@ class VideoPlayerActivity : AppCompatActivity() {
         // Calculate the aspect ratio of the PiP screen.
         //mPictureInPictureParamsBuilder.setAspectRatio(Rational(mpw_video_player.width, mpw_video_player.height))
         enterPictureInPictureMode(mPictureInPictureParamsBuilder.build())
-    }
+    }*/
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)

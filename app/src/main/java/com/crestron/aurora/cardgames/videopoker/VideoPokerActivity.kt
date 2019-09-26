@@ -26,11 +26,11 @@ import com.crestron.aurora.views.BubbleEmitter
 import com.crestron.aurora.views.VideoPokerDialog
 import com.crestron.aurora.views.createBubbles
 import com.crestron.aurora.views.stopAllBubbles
-import com.programmerbox.dragswipe.Direction
+/*import com.programmerbox.dragswipe.Direction
 import com.programmerbox.dragswipe.DragSwipeActions
 import com.programmerbox.dragswipe.DragSwipeAdapter
 import com.programmerbox.dragswipe.DragSwipeUtils
-import com.programmerbox.dragswipeex.shuffleItems
+import com.programmerbox.dragswipeex.shuffleItems*/
 import com.wx.wheelview.widget.WheelView
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
@@ -265,14 +265,14 @@ class VideoPokerActivity : AppCompatActivity() {
         video_poker_rv.setHasFixedSize(true)
         video_poker_rv.itemAnimator = SlideInDownAnimator(LinearInterpolator())
         video_poker_rv.adapter = adapter
-        DragSwipeUtils.setDragSwipeUp(adapter, video_poker_rv, dragDirs = Direction.START + Direction.END, dragSwipeActions = object : DragSwipeActions<CardHold, ViewHolder> {
+        /*DragSwipeUtils.setDragSwipeUp(adapter, video_poker_rv, dragDirs = Direction.START + Direction.END, dragSwipeActions = object : DragSwipeActions<CardHold, ViewHolder> {
             override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder, dragSwipeAdapter: DragSwipeAdapter<CardHold, ViewHolder>) {
                 super.onMove(recyclerView, viewHolder, target, dragSwipeAdapter)
                 hand.clearHand()
                 for (i in adapter.list)
                     hand.add(i.c)
             }
-        })
+        })*/
 
         //, swipeDirs = Direction.UP.value)
 
@@ -285,7 +285,7 @@ class VideoPokerActivity : AppCompatActivity() {
         score_view.text = Html.fromHtml(scores.htmlValues(betAmount), Html.FROM_HTML_MODE_COMPACT)
 
         shuffle_hand.setOnClickListener {
-            adapter.shuffleItems()
+            //adapter.shuffleItems()
             hand.clearHand()
             for (i in adapter.list)
                 hand.add(i.c)
@@ -305,8 +305,8 @@ class VideoPokerActivity : AppCompatActivity() {
                 //cardsAndButtons[i]!!.longClick = false
                 if (!adapter.list[i].hold) {
                     val ch = CardHold(hand.getCard(i))
-                    adapter.removeItem(i)
-                    adapter.addItem(ch, i)
+                    //adapter.removeItem(i)
+                    //adapter.addItem(ch, i)
                 }
             }
 
@@ -489,7 +489,11 @@ class VideoPokerActivity : AppCompatActivity() {
         fun isDebugged(): Boolean
     }
 
-    class VideoPokerAdapter(list: ArrayList<CardHold>, val context: Context, private val listeners: VideoPokerListeners, val debugListener: DebugListener) : DragSwipeAdapter<CardHold, ViewHolder>(list) {
+    class VideoPokerAdapter(val list: ArrayList<CardHold>, val context: Context, private val listeners: VideoPokerListeners, val debugListener: DebugListener) : RecyclerView.Adapter<ViewHolder>() {
+
+        override fun getItemCount(): Int {
+            return list.size
+        }
 
         override fun onBindViewHolder(holder: ViewHolder, index: Int) {
             val listener = View.OnClickListener {
@@ -519,10 +523,10 @@ class VideoPokerActivity : AppCompatActivity() {
         }
 
         fun setNewList(newList: List<CardHold>) {
-            for (i in newList.withIndex()) {
+            /*for (i in newList.withIndex()) {
                 removeItem(i.index)
                 addItem(i.value, i.index)
-            }
+            }*/
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

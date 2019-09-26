@@ -135,7 +135,7 @@ class ChoiceActivity : AppCompatActivity() {
 
         setUpDrawer(savedInstanceState)
 
-        if (!packageManager.canRequestPackageInstalls()) {
+        /*if (!packageManager.canRequestPackageInstalls()) {
             val builder = AlertDialog.Builder(this@ChoiceActivity)
             builder.setTitle("Some Permissions Needed")
             builder.setMessage("Please Allow Install from Unknown Sources so you can stay up to date!")
@@ -146,9 +146,9 @@ class ChoiceActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please Allow Install from Unknown Sources so you can stay up to date!", Toast.LENGTH_SHORT).show()
             }
             builder.show()
-        }
+        }*/
 
-        if (Utility.isNetworkToast(this@ChoiceActivity))
+        /*if (Utility.isNetworkToast(this@ChoiceActivity))
             GlobalScope.launch {
                 val pInfo = packageManager.getPackageInfo(packageName, 0)
                 val version = pInfo.versionName
@@ -174,10 +174,10 @@ class ChoiceActivity : AppCompatActivity() {
                         }
                     }
                 }
-            }
+            }*/
 
         //Loged.d(FirebaseInstanceId.getInstance().token!!)
-        if (KUtility.canAppUpdate(this) && KUtility.shouldGetUpdate)
+        /*if (KUtility.canAppUpdate(this) && KUtility.shouldGetUpdate)
         //if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false)) {
             GlobalScope.launch {
                 val url = URL(ConstantValues.VERSION_URL).readText()
@@ -190,7 +190,7 @@ class ChoiceActivity : AppCompatActivity() {
                 if (version.toDouble() < info.version) {
                     getAppPermissions(info)
                 }
-            }
+            }*/
         //}
         //FunApplication.scheduleAlarm(this, length)
         /*if (KUtility.currentUpdateTime != length )
@@ -517,7 +517,7 @@ class ChoiceActivity : AppCompatActivity() {
         models.add(drawableModel(R.drawable.recents, ChoiceButton.RECENT_ANIME, defaultSharedPreferences.getInt(ConstantValues.UPDATE_COUNT, 0)))
         models.add(drawableModel(R.drawable.ten2, ChoiceButton.ANIME))
         models.add(drawableModel(R.drawable.mov, ChoiceButton.ANIME_MOVIES))
-        models.add(drawableModel(R.drawable.cartoon_recent_cover, ChoiceButton.RECENT_LIVE_ACTION))
+        models.add(drawableModel(R.drawable.mov, ChoiceButton.RECENT_LIVE_ACTION))
         models.add(drawableModel(R.drawable.mov, ChoiceButton.LIVE_ACTION))
         models.add(drawableModel(R.drawable.ten4, ChoiceButton.DUBBED))
         models.add(drawableModel(R.drawable.cartoon_recent_cover, ChoiceButton.RECENT_CARTOON))

@@ -66,9 +66,9 @@ public class FunApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
-        Stetho.initializeWithDefaults(this);
-        FirebaseApp.initializeApp(this);
+        //Fabric.with(this, new Crashlytics());
+        //Stetho.initializeWithDefaults(this);
+        //FirebaseApp.initializeApp(this);
         JobManager.create(this).addJobCreator(new JobCreation());
 
         Loged.INSTANCE.setFILTER_BY_CLASS_NAME("crestron");
@@ -95,8 +95,8 @@ public class FunApplication extends Application {
                 .setGlobalNetworkType(wifiOnly ? NetworkType.WIFI_ONLY : NetworkType.ALL)
                 .setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
                 //.setHttpDownloader(new OkHttpDownloader(okHttpClient, Downloader.FileDownloaderType.PARALLEL))
-                .setDownloadConcurrentLimit(sharedPreferences.getInt("downloadNumber", 1))
-                .setNotificationManager(new CustomFetchNotificationManager(this))
+                //.setDownloadConcurrentLimit(sharedPreferences.getInt("downloadNumber", 1))
+                //.setNotificationManager(new CustomFetchNotificationManager(this))
                 /*setNotificationManager(new DefaultFetchNotificationManager(this) {
                     @NotNull
                     @Override
@@ -108,12 +108,12 @@ public class FunApplication extends Application {
         Fetch.Impl.setDefaultInstanceConfiguration(fetchConfiguration);
 
         //episode update
-        UtilNotification.createNotificationChannel(this, "episode_update",
+        /*UtilNotification.createNotificationChannel(this, "episode_update",
                                                    "episode_update_info",
                                                    "episodeUpdate");
         UtilNotification.createNotificationGroup(this,
                                                  "episode_group_id",
-                                                 "episode_group");
+                                                 "episode_group");*/
         //show check update running
             /*UtilNotification.createNotificationChannel(this, "updateCheckRun",
                     "episode check update",
@@ -121,20 +121,24 @@ public class FunApplication extends Application {
             UtilNotification.createNotificationGroup(this,
                     "show_check_update",
                     "update_check");*/
-        NotificationChannel channel = new NotificationChannel("updateCheckRun", "updateCheckRun", NotificationManager.IMPORTANCE_MIN);
-        channel.enableVibration(false);
-        channel.enableLights(false);
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (mNotificationManager != null) {
-            mNotificationManager.createNotificationChannel(channel);
+        NotificationChannel channel;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            channel = new NotificationChannel("updateCheckRun", "updateCheckRun", NotificationManager.IMPORTANCE_MIN);
+            channel.enableVibration(false);
+            channel.enableLights(false);
+            NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (mNotificationManager != null) {
+                mNotificationManager.createNotificationChannel(channel);
+            }
         }
+
         //app update
-        UtilNotification.createNotificationChannel(this, "update_notification",
+        /*UtilNotification.createNotificationChannel(this, "update_notification",
                                                    "update_notification",
                                                    "update_notification");
         UtilNotification.createNotificationGroup(this,
                                                  "update_notification_group",
-                                                 "update_notification_group");
+                                                 "update_notification_group");*/
         //float length = getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE).getFloat("updateCheck", 1f);
         //JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
         //if (jobScheduler != null && jobScheduler.getPendingJob(1) == null)

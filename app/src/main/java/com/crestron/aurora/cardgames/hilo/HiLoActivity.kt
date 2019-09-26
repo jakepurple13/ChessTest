@@ -13,10 +13,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.AnimationUtility
-import com.crestron.aurora.utilities.ViewUtil
+import com.crestron.aurora.utilities.ViewUtil/*
 import com.programmerbox.dragswipe.Direction
 import com.programmerbox.dragswipe.DragSwipeAdapter
-import com.programmerbox.dragswipe.DragSwipeUtils
+import com.programmerbox.dragswipe.DragSwipeUtils*/
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
@@ -67,7 +67,7 @@ class HiLoActivity : AppCompatActivity() {
         hilo_past_cards.adapter = adapter
         hilo_past_cards.itemAnimator = SlideInUpAnimator(OvershootInterpolator())
 
-        DragSwipeUtils.setDragSwipeUp(adapter, hilo_past_cards, dragDirs = Direction.START + Direction.END)
+        //DragSwipeUtils.setDragSwipeUp(adapter, hilo_past_cards, dragDirs = Direction.START + Direction.END)
 
         hilo_show_past_cards.isChecked = true
 
@@ -118,7 +118,7 @@ class HiLoActivity : AppCompatActivity() {
         low.setOnClickListener(clicking(false))
         next.setOnClickListener {
             if (mysteryCard != null) {
-                adapter.addItem(playerCard!!, 0)
+                //adapter.addItem(playerCard!!, 0)
                 chosen_cards.setImageResource(Card.BackCard.getImage(this@HiLoActivity))
                 playerCard = mysteryCard
                 player_card_view.setImageResource(playerCard!!.getImage(this@HiLoActivity))
@@ -135,7 +135,11 @@ class HiLoActivity : AppCompatActivity() {
 
     }
 
-    class HiLoAdapter(list: ArrayList<Card>, val context: Context) : DragSwipeAdapter<Card, ViewHolder>(list) {
+    class HiLoAdapter(val list: ArrayList<Card>, val context: Context) : RecyclerView.Adapter<ViewHolder>() {
+
+        override fun getItemCount(): Int {
+            return list.size
+        }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val iv = ImageView(context)

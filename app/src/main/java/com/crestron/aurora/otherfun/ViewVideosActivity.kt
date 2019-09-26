@@ -30,11 +30,11 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.utilities.ViewUtil
-import com.crestron.aurora.views.DeleteDialog
+import com.crestron.aurora.views.DeleteDialog/*
 import com.programmerbox.dragswipe.Direction
 import com.programmerbox.dragswipe.DragSwipeActions
 import com.programmerbox.dragswipe.DragSwipeAdapter
-import com.programmerbox.dragswipe.DragSwipeUtils
+import com.programmerbox.dragswipe.DragSwipeUtils*/
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Request
 import com.squareup.picasso.RequestHandler
@@ -112,10 +112,10 @@ class ViewVideosActivity : AppCompatActivity() {
                 }, instance)
             else {
                 val list = listOfFiles
-                list.addAll(adapter!!.list)
+                //list.addAll(adapter!!.list)
                 adapter!!.add(list.distinctBy { it })
             }
-            view_videos_recyclerview.swapAdapter(adapter, true)
+            //view_videos_recyclerview.swapAdapter(adapter, true)
             /*val callback = RVHItemTouchHelperCallback(adapter
                     , false
                     , true
@@ -123,7 +123,7 @@ class ViewVideosActivity : AppCompatActivity() {
             val helper = ItemTouchHelper(callback)
             helper.attachToRecyclerView(view_videos_recyclerview)*/
 
-            DragSwipeUtils.setDragSwipeUp(adapter!!, view_videos_recyclerview, Direction.NOTHING.value, Direction.START + Direction.END, object : DragSwipeActions<File, ViewHolder> {
+            /*DragSwipeUtils.setDragSwipeUp(adapter!!, view_videos_recyclerview, Direction.NOTHING.value, Direction.START + Direction.END, object : DragSwipeActions<File, ViewHolder> {
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Direction, dragSwipeAdapter: DragSwipeAdapter<File, ViewHolder>) {
                     if (dragSwipeAdapter.list.isNotEmpty())
                         DeleteDialog(this@ViewVideosActivity, dragSwipeAdapter.list[viewHolder.adapterPosition].name, listener = adapter!!.listener(viewHolder.adapterPosition)).show()
@@ -131,13 +131,13 @@ class ViewVideosActivity : AppCompatActivity() {
                         adapter!!.notifyDataSetChanged()
 
 
-                    /*if (stuff.isNotEmpty())
+                    *//*if (stuff.isNotEmpty())
                         DeleteDialog(context, stuff[position].name, listener = listener(position)).show()
                     else
-                        notifyDataSetChanged()*/
+                        notifyDataSetChanged()*//*
                     //super.onSwiped(viewHolder, direction, dragSwipeAdapter)
                 }
-            })
+            })*/
 
             runOnUiThread {
                 video_refresh.isRefreshing = false
@@ -196,7 +196,7 @@ class ViewVideosActivity : AppCompatActivity() {
 
         val br = BroadcastReceiverVideoView(object : VideoBroadcast {
             override fun onCall(intent: Intent) {
-                adapter!!.notifyDataSetChanged()
+                //adapter!!.notifyDataSetChanged()
             }
         })
         val filter = IntentFilter().apply {
@@ -403,12 +403,14 @@ class ViewVideosActivity : AppCompatActivity() {
 
     }*/
 
-    class VideoAdapter(list: ArrayList<File>,
+    class VideoAdapter(var list: ArrayList<File>,
                        var context: Context,
                        private val videoListener: DeleteVideoListener,
-                       val picasso: Picasso) : DragSwipeAdapter<File, ViewHolder>(list) {
+                       val picasso: Picasso) : RecyclerView.Adapter<ViewHolder>() {
 
-
+        override fun getItemCount(): Int {
+            return list.size
+        }
 
         /*override fun onItemDismiss(position: Int, direction: Int) {
             if (stuff.isNotEmpty())

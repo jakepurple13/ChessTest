@@ -14,11 +14,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.TimerUtil
-import com.crestron.aurora.utilities.ViewUtil
+import com.crestron.aurora.utilities.ViewUtil/*
 import com.programmerbox.dragswipe.Direction
 import com.programmerbox.dragswipe.DragSwipeAdapter
 import com.programmerbox.dragswipe.DragSwipeUtils
-import com.programmerbox.dragswipe.plus
+import com.programmerbox.dragswipe.plus*/
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.CardDescriptor
 import crestron.com.deckofcards.Deck
@@ -122,7 +122,7 @@ class MatchingActivityTwo : AppCompatActivity() {
 
         matching_rv.adapter = adapter
 
-        DragSwipeUtils.setDragSwipeUp(adapter, matching_rv, Direction.START + Direction.END + Direction.UP + Direction.DOWN)
+        //DragSwipeUtils.setDragSwipeUp(adapter, matching_rv, Direction.START + Direction.END + Direction.UP + Direction.DOWN)
 
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Matching!")
@@ -151,7 +151,10 @@ class MatchingActivityTwo : AppCompatActivity() {
         deck.shuffle()
     }
 
-    class MatchAdapter(list: ArrayList<CardButton>, val context: Context) : DragSwipeAdapter<CardButton, ViewHolder>(list) {
+    class MatchAdapter(val list: ArrayList<CardButton>, val context: Context) : RecyclerView.Adapter<ViewHolder>() {
+        override fun getItemCount(): Int {
+            return list.size
+        }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.linearLayout.addView(list[position], LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT))
