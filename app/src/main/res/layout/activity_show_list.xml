@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -49,4 +49,118 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:text="Show Favorites" />
-</RelativeLayout>
+</RelativeLayout>-->
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@+id/show_list_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cod_gray"
+    tools:context=".otherfun.ShowListActivity">
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refresh_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/search_info"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <in.myinnos.alphabetsindexfastscrollrecycler.IndexFastScrollRecyclerView
+            android:id="@+id/show_info"
+            tools:listitem="@layout/text_layout"
+            android:orientation="vertical"
+            tools:itemCount="10"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!--<androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    </androidx.core.widget.NestedScrollView>-->
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:collapsedTitleTextAppearance="?attr/textAppearanceHeadline6"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleGravity="bottom"
+            app:expandedTitleMarginBottom="56dp"
+            app:expandedTitleTextAppearance="?attr/textAppearanceHeadline5"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+
+            <!-- <androidx.appcompat.widget.Toolbar
+                 android:id="@+id/toolbar"
+                 android:layout_width="match_parent"
+                 android:layout_height="?attr/actionBarSize"
+                 app:layout_collapseMode="pin"
+                 app:title="Collapsing Title" />-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/cod_gray"
+                app:layout_collapseMode="pin">
+
+                <Switch
+                    android:id="@+id/favorite_show"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/search_layout"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="5dp"
+                    android:text="Show Favorites" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/search_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@id/favorite_show"
+                    app:hintAnimationEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/search_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:hint="Search"
+                        tools:ignore="HardcodedText" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </RelativeLayout>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/toTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="5dp"
+        android:clickable="true"
+        app:srcCompat="@android:drawable/ic_menu_upload" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/random_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="Random Show"
+        app:icon="@drawable/random"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="bottom|right|end" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

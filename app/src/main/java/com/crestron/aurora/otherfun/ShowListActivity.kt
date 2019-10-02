@@ -30,6 +30,7 @@ import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.*
+import com.google.android.material.snackbar.Snackbar
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.like.LikeButton
 import com.peekandpop.shalskar.peekandpop.PeekAndPop
@@ -306,6 +307,12 @@ class ShowListActivity : AppCompatActivity() {
             }
 
         })
+
+        toTop.setOnClickListener {
+            show_info.smoothScrollAction(0) {
+                Snackbar.make(show_info, "At Top", Snackbar.LENGTH_SHORT).show()
+            }
+        }
 
         val gen = Random()
 

@@ -23,6 +23,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
+import java.net.InetAddress
+import java.net.Socket
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
@@ -924,7 +926,6 @@ class ExampleUnitTest {
                 city = "Paris"
             }
         }
-
 
         val personB = personB {
             name = "John"

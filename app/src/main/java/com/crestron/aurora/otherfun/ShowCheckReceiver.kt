@@ -91,8 +91,8 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 val showDatabase = ShowDatabase.getDatabase(this@ShowCheckIntentService)
                 var count = 0
                 //gets the list from the source
-                val showApi = ShowApi(Source.RECENT_ANIME).showInfoList as ArrayList<ShowInfo>
-                showApi.addAll(ShowApi(Source.RECENT_CARTOON).showInfoList)
+                val showApi = ShowApi.getAllRecent()/*ShowApi(Source.RECENT_ANIME).showInfoList as ArrayList<ShowInfo>
+                showApi.addAll(ShowApi(Source.RECENT_CARTOON).showInfoList)*/
                 //this part filters the two lists with the list in the database
                 val filteredList = showApi.distinctBy { it.url }
                 val shows = showDatabase.showDao().allShows
