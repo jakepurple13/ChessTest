@@ -7,12 +7,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import androidx.core.app.ActivityOptionsCompat
-import androidx.core.util.Pair
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import android.text.Editable
 import android.text.Html
 import android.text.TextWatcher
@@ -20,6 +14,13 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.graphics.toColorInt
+import androidx.core.util.Pair
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.FormActivity
 import com.crestron.aurora.Loged
@@ -29,12 +30,13 @@ import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
-import com.crestron.aurora.utilities.*
+import com.crestron.aurora.utilities.Utility
+import com.crestron.aurora.utilities.ViewUtil
+import com.crestron.aurora.utilities.flashScreen
+import com.crestron.aurora.utilities.smoothScrollAction
 import com.google.android.material.snackbar.Snackbar
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.like.LikeButton
-import com.like.OnLikeListener
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import com.peekandpop.shalskar.peekandpop.PeekAndPop
@@ -336,7 +338,13 @@ class ShowListActivity : AppCompatActivity() {
 
         toTop.setOnClickListener {
             show_info.smoothScrollAction(0) {
-                Snackbar.make(show_info, "At Top", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(show_info, "At Top", Snackbar.LENGTH_SHORT)
+                        .setBackgroundTint("#323232".toColorInt())
+                        .setTextColor(Color.WHITE)
+                        .show()
+                runOnUiThread {
+                    app_bar.setExpanded(true, true)
+                }
             }
         }
 
