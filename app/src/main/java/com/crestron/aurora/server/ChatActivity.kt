@@ -34,6 +34,7 @@ import com.google.gson.internal.LinkedTreeMap
 import com.kennyc.bottomsheet.BottomSheetListener
 import com.kennyc.bottomsheet.BottomSheetMenuDialogFragment
 import com.programmerbox.dragswipe.DragSwipeAdapter
+import com.programmerbox.quizlibrary.QuizActivity
 import com.yarolegovich.lovelydialog.LovelyTextInputDialog
 import io.ktor.client.features.websocket.DefaultClientWebSocketSession
 import io.ktor.http.cio.websocket.readText
@@ -144,6 +145,7 @@ class ChatActivity : AppCompatActivity() {
                     ) { text ->
                         if (!text.isNullOrBlank()) {
                             ClientHandler.host = text
+                            QuizActivity.hostAddress = text
                         }
                         GlobalScope.launch {
                             clientHandler = ClientHandler(object : ClientUISetup {

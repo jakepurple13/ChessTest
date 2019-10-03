@@ -5,6 +5,10 @@ import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.db.ShowSource
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
+import com.programmerbox.quizlibrary.QuizActivity
+import com.programmerbox.quizlibrary.QuizChoiceType
+import com.programmerbox.quizlibrary.QuizQuestions
+import com.programmerbox.quizlibrary.quizMaker
 
 class ShowQuizActivity : QuizActivity() {
     override val dialogHintText: String = "Choose a Source"
@@ -38,8 +42,8 @@ class TestQuizActivity : QuizActivity() {
     override fun getInfoLink(type: String): String = ""
     override fun onCreated(savedInstanceState: Bundle?) {
         titleText = "Test Quiz"
-        type = QuizChoiceType.NONE
     }
+
     override suspend fun getQuestions(chosen: String): Array<QuizQuestions> {
         return quizMaker(mutableListOf("asdf", "zxcv", "qwer", "jkl;"))
     }
@@ -55,6 +59,7 @@ class QuizShowActivity : QuizActivity() {
         type = QuizChoiceType.CHOICES
         setChoices("All", "Putlocker", "Gogoanime", "Animetoon")
     }
+
     override suspend fun getQuestions(chosen: String): Array<QuizQuestions> {
         val source = when (chosen) {
             "Putlocker" -> ShowSource.PUTLOCKER

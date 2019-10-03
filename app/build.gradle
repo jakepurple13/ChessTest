@@ -90,6 +90,7 @@ dependencies {
     implementation project(':wheelview')
     implementation project(':xvideoplayer')
     implementation project(':caster')
+    implementation project(':quizlibrary')
     implementation 'com.github.jinatonic.confetti:confetti:1.1.1'
     implementation 'com.plattysoft.leonids:LeonidsLib:1.3.2'
     implementation 'com.github.IONsoft-Indonesia:RandomNumberAnimation:1.3.1'

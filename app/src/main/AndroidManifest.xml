@@ -13,7 +13,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="LockedOrientationActivity">
-        <activity android:name=".server.QuizActivity" />
         <activity android:name=".server.MusicQuizActivity" />
         <activity android:name=".server.ShowQuizActivity" />
         <activity android:name=".server.TestQuizActivity" />

@@ -1,4 +1,6 @@
-package com.crestron.aurora.server
+@file:Suppress("unused")
+
+package com.programmerbox.quizlibrary
 
 
 import android.annotation.SuppressLint
@@ -7,8 +9,6 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.crestron.aurora.R
-import com.crestron.aurora.utilities.randomRemove
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.kaopiz.kprogresshud.KProgressHUD
@@ -18,11 +18,24 @@ import io.ktor.http.HttpMethod
 import kotlinx.android.synthetic.main.activity_quiz.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.random.Random
+
+
+fun <T> MutableList<T>.randomRemove(): T {
+    return removeAt(Random.nextInt(0, size))
+}
 
 enum class QuizChoiceType {
     TEXT, CHOICES, NONE
 }
 
+/**
+ * QuizQuestions
+ * A nice an easy to understand format
+ * @param question The question to ask
+ * @param choices The 4 possible choices to choose from
+ * @param correctAnswer the correct answer
+ */
 data class QuizQuestions(
         val question: String,
         val choices: List<String>,
@@ -33,9 +46,16 @@ data class QuizQuestions(
     }
 }
 
-data class UserInfo(val name: String, val artist: String, val score: String)
+data class UserInfo(val name: String, val quizChoice: String, val score: String)
 
-@Suppress("unused")
+/**
+ * quizMaker
+ * This creates a bunch of questions based off of a list of items
+ * @param questionList the list you are creating a quiz off of
+ * @param question Modifying the way a question is displayed
+ * @param answers modifying the way the answers are displayed
+ * @return an array of [QuizQuestions]
+ */
 fun <T : QuizActivity, V> T.quizMaker(questionList: MutableList<V>, question: (V) -> String = { it.toString() }, answers: (V) -> String = { it.toString() }): Array<QuizQuestions> {
     val qList = mutableListOf<QuizQuestions>()
     if (questionList.size < 4) {
@@ -59,11 +79,32 @@ fun <T : QuizActivity, V> T.quizMaker(questionList: MutableList<V>, question: (V
 
 abstract class QuizActivity : AppCompatActivity() {
 
+    companion object {
+        var hostAddress = ""
+    }
+    /**
+     * The title of the dialog
+     */
     abstract val dialogTitle: String
+    /**
+     * The hint text of the dialog if needed
+     */
     abstract val dialogHintText: String
+    /**
+     * The dialog message to describe what the user is choosing
+     */
     abstract val dialogMessage: String
+    /**
+     * override this if you have a link to post their score to
+     */
     open val postHighScoreLink: String? = null
+    /**
+     * override this if there is a link to get high scores
+     */
     open val highScoreLink: String? = null
+    /**
+     * This describes what kind of quiz this is
+     */
     var titleText: String = "Quiz"
         set(value) {
             field = value
@@ -71,14 +112,83 @@ abstract class QuizActivity : AppCompatActivity() {
                 title_text.text = titleText
             }
         }
+    /**
+     * This allows you to let the user:
+     * [QuizChoiceType.TEXT] - Type in their choice
+     * [QuizChoiceType.CHOICES] - Give the user choices to choose from
+     * [QuizChoiceType.NONE] - Do not give them any choices
+     */
     var type = QuizChoiceType.NONE
     private var choices = mutableListOf<String>()
 
+    /**
+     * This is a url to get information from
+     */
     abstract fun getInfoLink(type: String): String
+
+    /**
+     * If you want to add anything into the [onCreate]
+     */
     open fun onCreated(savedInstanceState: Bundle?) {}
+
+    /**
+     * When the user moves to the next question
+     */
     open fun nextQuestionAction() {}
+
+    /**
+     * When the user moves to the previous question
+     */
     open fun previousQuestionAction() {}
+
+    /**
+     * When we are doing our answer checking
+     */
     open fun answerChecking() {}
+
+    /**
+     * override this if you want to customize where you are getting high scores from
+     */
+    open suspend fun getHighScore(): String {
+        return client.get(highScoreLink!!) {
+            method = HttpMethod.Get
+            host = hostAddress
+            port = 8080
+        }
+    }
+
+    /**
+     * override this if you want to customize where you are posting the score to
+     */
+    open suspend fun postHighScore(userInfo: UserInfo) {
+        client.post<String>(postHighScoreLink!!) {
+            method = HttpMethod.Post
+            host = hostAddress
+            port = 8080
+            header("Content-type", "application/json")
+            body = userInfo.toJson()
+        }
+    }
+
+    /**
+     * override this if you want to customize where/how you are getting questions
+     */
+    open suspend fun getQuestions(chosen: String): Array<QuizQuestions> {
+        val choice = getInfoLink(chosen)
+        val s = client.get<String>(choice) {
+            method = HttpMethod.Get
+            host = hostAddress
+            port = 8080
+        }
+        return Gson().fromJson(s, Array<QuizQuestions>::class.java)
+    }
+
+    /**
+     * If you are doing choices, this allows you to set the choices
+     */
+    fun setChoices(vararg s: String) {
+        choices.addAll(s)
+    }
 
     private val client = HttpClient()
     private lateinit var quizQuestions: Array<QuizQuestions>
@@ -143,34 +253,6 @@ abstract class QuizActivity : AppCompatActivity() {
         }
     }
 
-    open suspend fun getHighScore(): String {
-        return client.get(highScoreLink!!) {
-            method = HttpMethod.Get
-            host = ClientHandler.host
-            port = 8080
-        }
-    }
-
-    open suspend fun postHighScore(userInfo: UserInfo) {
-        client.post<String>(postHighScoreLink!!) {
-            method = HttpMethod.Post
-            host = ClientHandler.host
-            port = 8080
-            header("Content-type", "application/json")
-            body = userInfo.toJson()
-        }
-    }
-
-    open suspend fun getQuestions(chosen: String): Array<QuizQuestions> {
-        val choice = getInfoLink(chosen)
-        val s = client.get<String>(choice) {
-            method = HttpMethod.Get
-            host = ClientHandler.host
-            port = 8080
-        }
-        return Gson().fromJson(s, Array<QuizQuestions>::class.java)
-    }
-
     @SuppressLint("SetTextI18n")
     private fun getInfo() {
         resetQuestions()
@@ -191,7 +273,6 @@ abstract class QuizActivity : AppCompatActivity() {
                     choiceInput = EditText(this)
                     choiceInput.hint = dialogHintText
                     choiceInput.imeOptions = EditorInfo.IME_ACTION_NEXT
-
                 }
                 QuizChoiceType.CHOICES -> {
                     if (choices.isEmpty())
@@ -251,10 +332,6 @@ abstract class QuizActivity : AppCompatActivity() {
                 answerD.isEnabled = true
             }
         }
-    }
-
-    fun setChoices(vararg s: String) {
-        choices.addAll(s)
     }
 
     private fun answerCheck() {
@@ -391,5 +468,7 @@ abstract class QuizActivity : AppCompatActivity() {
         answerC.isEnabled = false
         answerD.isEnabled = false
     }
+
+    fun Any.toJson(): String = Gson().toJson(this)
 
 }
