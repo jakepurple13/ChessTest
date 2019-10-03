@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--<item
+        android:id="@+id/shows"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="Shows" />-->
+
+    <item
+        android:id="@+id/help"
+        android:icon="@android:drawable/ic_menu_help"
+        android:title="Help" />
+
+    <item
+        android:id="@+id/profileChange"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="Profile" />
+
+    <item
+        android:id="@+id/musicGame"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="Music" />
+
+    <item
+        android:id="@+id/showGame"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="Show Quiz" />
+
+    <item
+        android:id="@+id/testGame"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="Test" />
+
+    <item
+        android:id="@+id/boldText"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="Bold" />
+
+    <item
+        android:id="@+id/underlineText"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="Underline" />
+
+    <item
+        android:id="@+id/italicText"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="Italics" />
+
+    <item
+        android:id="@+id/colorText"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="Color" />
+
+    <item
+        android:id="@+id/bigText"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="Big" />
+
+    <item
+        android:id="@+id/smallText"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="Small" />
+
+    <item
+        android:id="@+id/supText"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="Sup" />
+
+    <item
+        android:id="@+id/subText"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="Sub" />
+
+    <item
+        android:id="@+id/strikethroughText"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="Strikethrough" />
+
+</menu>

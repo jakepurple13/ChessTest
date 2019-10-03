@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.isBlankOrEmpty
+import com.crestron.aurora.utilities.randomRemove
 import com.crestron.aurora.views.BubbleEmitter
 import com.crestron.aurora.views.createBubbles
 import com.davidmiguel.multistateswitch.MultiStateSwitch
@@ -29,7 +30,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Response
 import org.json.JSONException
 import org.json.JSONObject
-import kotlin.random.Random
 
 class MusicGameActivity : AppCompatActivity() {
 
@@ -662,8 +662,4 @@ class LyricApi {
 
 private fun <T> Collection<T>.prettyPrint(transform: (T) -> CharSequence) {
     Loged.i(joinToString(separator = "\n") { transform(it) })
-}
-
-private fun <T> MutableList<T>.randomRemove(): T {
-    return removeAt(Random.nextInt(0, size))
 }

@@ -53,7 +53,7 @@ import java.util.*
 
 
 class ShowListActivity : AppCompatActivity() {
-    var showingFavorites = false
+    private var showingFavorites = false
     private val listOfNameAndLink = arrayListOf<ShowInfo>()
     private val actionHit = object : LinkAction {
         override fun hit(name: String, url: String, vararg view: View) {

@@ -15,6 +15,10 @@ import kotlin.random.Random
 fun <T, U> List<T>.intersect(uList: List<U>, filterPredicate: (T, U) -> Boolean) =
         filter { m -> uList.any { filterPredicate(m, it) } }
 
+fun <T> MutableList<T>.randomRemove(): T {
+    return removeAt(Random.nextInt(0, size))
+}
+
 fun RecyclerView.smoothScrollAction(
         position: Int,
         delay: Long = if (adapter!!.itemCount / 10 < 250) 250 else adapter!!.itemCount / 10L,
