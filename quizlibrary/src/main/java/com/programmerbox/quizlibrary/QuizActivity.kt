@@ -190,7 +190,7 @@ abstract class QuizActivity : AppCompatActivity() {
         choices.addAll(s)
     }
 
-    private val client = HttpClient()
+    val client = HttpClient()
     private lateinit var quizQuestions: Array<QuizQuestions>
     private var counter = 0
         @SuppressLint("SetTextI18n")

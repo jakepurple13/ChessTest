@@ -145,8 +145,8 @@ class ChatActivity : AppCompatActivity() {
                     ) { text ->
                         if (!text.isNullOrBlank()) {
                             ClientHandler.host = text
-                            QuizActivity.hostAddress = text
                         }
+                        QuizActivity.hostAddress = ClientHandler.host
                         GlobalScope.launch {
                             clientHandler = ClientHandler(object : ClientUISetup {
                                 override suspend fun uiSetup(socket: DefaultClientWebSocketSession) {
