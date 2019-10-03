@@ -414,16 +414,16 @@ class ShowListActivity : AppCompatActivity() {
                 }
             }
         }*/
-        favorite_show.setImageDrawable(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_flash_off).sizeDp(24))
+        favorite_show.setImageDrawable(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_favorite).sizeDp(24))
         favorite_show.setOnClickListener {
             favorite_show.setImageDrawable(if (showingFavorites) {
                 showingFavorites = false
                 favShow(false, showDatabase)
-                IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_flash_off).sizeDp(24)
+                IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_favorite_border).sizeDp(24)
             } else {
                 showingFavorites = true
                 favShow(true, showDatabase)
-                IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_flash_on).sizeDp(24)
+                IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_favorite).sizeDp(24)
             })
         }
     }
