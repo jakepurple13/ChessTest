@@ -33,6 +33,7 @@ import com.crestron.aurora.utilities.*
 import com.google.android.material.snackbar.Snackbar
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.like.LikeButton
+import com.like.OnLikeListener
 import com.peekandpop.shalskar.peekandpop.PeekAndPop
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_show_list.*
@@ -302,7 +303,8 @@ class ShowListActivity : AppCompatActivity() {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 runOnUiThread {
                     val filtered = listOfNameAndLink.filter { it.name.contains(search_info.text.toString(), ignoreCase = true) }
-                    show_info.adapter = AListAdapter(filtered, this@ShowListActivity, showDatabase, actionHit)
+                    //show_info.adapter = AListAdapter(filtered, this@ShowListActivity, showDatabase, actionHit)
+                    show_info.swapAdapter(AListAdapter(filtered, this@ShowListActivity, showDatabase, actionHit), true)
                 }
             }
 
@@ -343,7 +345,47 @@ class ShowListActivity : AppCompatActivity() {
         search_info.isEnabled = false
         favorite_show.isEnabled = false
 
-        favorite_show.setOnCheckedChangeListener { _, b ->
+        favorite_show.setOnLikeListener(object : OnLikeListener {
+            override fun liked(likeButton: LikeButton?) {
+                favShow(likeButton?.isLiked ?: true)
+            }
+
+            override fun unLiked(likeButton: LikeButton?) {
+                favShow(likeButton?.isLiked ?: false)
+            }
+
+            private fun favShow(b: Boolean) {
+                GlobalScope.launch {
+                    val listToShow = if (b) {
+                        val showList = showDatabase.showDao().allShows
+                        val nnList = arrayListOf<NameAndLink>()
+                        for (i in showList) {
+                            nnList.add(NameAndLink(i.name, i.link))
+                        }
+
+                        fun checkItems(nn: ShowInfo): Boolean {
+                            for (s in showList) {
+                                if (nn.url == s.link) {
+                                    return true
+                                }
+                            }
+                            return false
+                        }
+
+                        listOfNameAndLink.filter { checkItems(it) }
+                    } else {
+                        listOfNameAndLink
+                    }.distinctBy { it.name }
+                    runOnUiThread {
+                        show_info.swapAdapter(AListAdapter(listToShow, this@ShowListActivity, showDatabase, actionHit), true)
+                        //show_info.adapter = AListAdapter(listToShow, this@ShowListActivity, showDatabase, actionHit)
+                    }
+                }
+            }
+
+        })
+
+        /*favorite_show.setOnCheckedChangeListener { _, b ->
             GlobalScope.launch {
                 val listToShow = if (b) {
                     val showList = showDatabase.showDao().allShows
@@ -369,8 +411,7 @@ class ShowListActivity : AppCompatActivity() {
                     show_info.adapter = AListAdapter(listToShow, this@ShowListActivity, showDatabase, actionHit)
                 }
             }
-        }
-
+        }*/
     }
 
     private fun errorHasOccurred(message: String) {

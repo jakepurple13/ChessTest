@@ -147,6 +147,12 @@ class VideoPlayerActivity : AppCompatActivity() {
     private lateinit var player: SimpleExoPlayer
 
     private var locked = false
+        set(value) {
+            field = value
+            runOnUiThread {
+                video_lock.text = if (locked) "Locked" else "Unlocked"
+            }
+        }
 
     private lateinit var gesture: GestureDetector
 
@@ -246,11 +252,13 @@ class VideoPlayerActivity : AppCompatActivity() {
         playerView.controllerShowTimeoutMs = 2000
         playerView.player!!.playWhenReady = true
 
-        video_lock.setImageDrawable(IconicsDrawable(this).icon(FontAwesome.Icon.faw_unlock).sizeDp(24))
+        video_lock.icon = IconicsDrawable(this).icon(FontAwesome.Icon.faw_unlock).sizeDp(24)
+        //video_lock.setImageDrawable(IconicsDrawable(this).icon(FontAwesome.Icon.faw_unlock).sizeDp(24))
         video_lock.setOnClickListener {
             locked = !locked
-            video_lock.setImageDrawable(IconicsDrawable(this).icon(if (locked) FontAwesome.Icon.faw_lock else FontAwesome.Icon.faw_unlock).sizeDp(24))
-            if(!locked)
+            //video_lock.setImageDrawable(IconicsDrawable(this).icon(if (locked) FontAwesome.Icon.faw_lock else FontAwesome.Icon.faw_unlock).sizeDp(24))
+            video_lock.icon = IconicsDrawable(this).icon(if (locked) FontAwesome.Icon.faw_lock else FontAwesome.Icon.faw_unlock).sizeDp(24)
+            if (!locked)
                 playerView.showController()
         }
         video_back.setOnClickListener {
@@ -516,7 +524,7 @@ class VideoPlayerActivity : AppCompatActivity() {
 
         playerView.useController = !locked
 
-        if(topShowing.get()) {
+        if (topShowing.get()) {
             lockTimer.action()
         } else {
             showLayout()

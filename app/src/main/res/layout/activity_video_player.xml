@@ -40,7 +40,7 @@
             android:id="@+id/video_back"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginStart="5dp"
+            android:paddingHorizontal="20dp"
             android:layout_marginTop="5dp"
             android:src="@drawable/mx_back"/>
 
@@ -50,17 +50,29 @@
             android:text="Title!"
             android:layout_weight="3"
             android:gravity="center_vertical"
-            android:layout_marginStart="5dp"
             android:layout_width="0dp"
             android:layout_height="match_parent" />
 
-        <ImageButton
+        <!--<ImageButton
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:id="@+id/video_lock"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginEnd="5dp"
             android:layout_marginTop="5dp"
-            app:srcCompat="@android:drawable/ic_lock_idle_lock" />
+            app:srcCompat="@android:drawable/ic_lock_idle_lock" />-->
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+            android:id="@+id/video_lock"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/white"
+            app:iconTint="@color/white"
+            android:text="Unlocked"
+            app:icon="@android:drawable/ic_lock_idle_lock" />
 
     </LinearLayout>
 
