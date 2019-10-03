@@ -108,6 +108,10 @@ abstract class QuizActivity : AppCompatActivity() {
                 .setDimAmount(0.5f)
                 .setCancellable(false)
 
+        answerSection.setOnCheckedChangeListener { _, _ ->
+            answerSet(false)
+        }
+
         getInfo()
 
         getHighScores()
@@ -317,7 +321,7 @@ abstract class QuizActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun answerSet() {
+    private fun answerSet(clearCheck: Boolean = true) {
         try {
             answerList[counter] = Pair(
                     answerSection.checkedRadioButtonId,
@@ -327,7 +331,8 @@ abstract class QuizActivity : AppCompatActivity() {
                             .removePrefix("C) ")
                             .removePrefix("D) ")
             )
-            answerSection.clearCheck()
+            if (clearCheck)
+                answerSection.clearCheck()
         } catch (e: IllegalStateException) {
 
         }

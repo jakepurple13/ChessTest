@@ -36,6 +36,7 @@ import com.crestron.aurora.cardgames.videopoker.VideoPokerActivity
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.*
 import com.crestron.aurora.server.ChatActivity
+import com.crestron.aurora.server.QuizShowActivity
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
@@ -109,7 +110,8 @@ class ChoiceActivity : AppCompatActivity() {
         RSS_FEED("rss_feed", "Schedule"),
         FEEDBACK("feedback", "Feedback"),
         VIEW_TESTING("view_testing", "View Test"),
-        CHAT("chat", "Chat")
+        CHAT("chat", "Chat"),
+        SHOW_QUIZ("show_quiz", "Show Quiz")
     }
 
     private fun drawableModel(id: Int, button: ChoiceButton, count: Int = 0): BookModel {
@@ -266,6 +268,10 @@ class ChoiceActivity : AppCompatActivity() {
                         ChoiceButton.CHAT -> {
                             //ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, CalculationActivity::class.java))
                             startActivity(Intent(this@ChoiceActivity, ChatActivity::class.java))
+                        }
+                        ChoiceButton.SHOW_QUIZ -> {
+                            //ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, CalculationActivity::class.java))
+                            startActivity(Intent(this@ChoiceActivity, QuizShowActivity::class.java))
                         }
                         ChoiceButton.VIDEO_POKER -> {
                             //startActivity(Intent(this@ChoiceActivity, VideoPokerActivity::class.java))
@@ -518,6 +524,7 @@ class ChoiceActivity : AppCompatActivity() {
         models.add(drawableModel(R.drawable.apk, ChoiceButton.PONG))
         models.add(drawableModel(R.drawable.matchinglogo, ChoiceButton.MATCHING))
         models.add(drawableModel(R.drawable.matchinglogo, ChoiceButton.MUSIC_MATCH))
+        models.add(drawableModel(R.drawable.b_normal, ChoiceButton.SHOW_QUIZ))
         models.add(drawableModel(R.drawable.a_normal, ChoiceButton.CHAT))
 
         models.add(drawableModel(android.R.drawable.ic_menu_today, ChoiceButton.RSS_FEED))

@@ -1,6 +1,8 @@
 package com.crestron.aurora.server
 
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.showapi.EpisodeApi
+import com.crestron.aurora.showapi.ShowInfo
 
 class ShowQuizActivity : QuizActivity() {
 
@@ -55,7 +57,7 @@ class TestQuizActivity : QuizActivity() {
     override suspend fun getQuestions(): Array<QuizQuestions> {
 
         var showList = ShowDatabase.getDatabase(this).showDao().allShows.shuffled()
-        showList = if(showList.size>=100) {
+        showList = if (showList.size >= 100) {
             showList.take(100)
         } else {
             showList
@@ -64,6 +66,36 @@ class TestQuizActivity : QuizActivity() {
         return quizMaker(showList.toMutableList(), {
             it.name
         }, {
+            it.name
+        })
+    }
+}
+
+class QuizShowActivity : QuizActivity() {
+
+    override val dialogHintText: String = "Test Name"
+    override val dialogMessage: String = "Test"
+    override var dialogTitle: String = "Test"
+
+    override fun onCreated() {
+        titleText = "Test Quiz"
+        type = QuizChoiceType.NONE
+    }
+
+    override fun getInfoLink(type: String): String = ""
+
+    override suspend fun getQuestions(): Array<QuizQuestions> {
+
+        var showList = ShowDatabase.getDatabase(this).showDao().allShows.shuffled()
+        showList = if (showList.size >= 100) {
+            showList.take(100)
+        } else {
+            showList
+        }
+
+        return quizMaker(showList.toMutableList(), question = {
+            EpisodeApi(ShowInfo(it.name, it.link)).description
+        }, answers = {
             it.name
         })
     }
