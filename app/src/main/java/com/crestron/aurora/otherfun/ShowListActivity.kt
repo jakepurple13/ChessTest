@@ -34,6 +34,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.like.LikeButton
 import com.like.OnLikeListener
+import com.mikepenz.fontawesome_typeface_library.FontAwesome
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import com.mikepenz.iconics.IconicsDrawable
 import com.peekandpop.shalskar.peekandpop.PeekAndPop
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_show_list.*
@@ -48,6 +51,7 @@ import java.util.*
 
 
 class ShowListActivity : AppCompatActivity() {
+    var showingFavorites = false
     private val listOfNameAndLink = arrayListOf<ShowInfo>()
     private val actionHit = object : LinkAction {
         override fun hit(name: String, url: String, vararg view: View) {
@@ -310,6 +314,26 @@ class ShowListActivity : AppCompatActivity() {
 
         })
 
+        /*search_layout.addOnEndIconChangedListener { textInputLayout, previousIcon ->
+            if(previousIcon==R.drawable.star_on) {
+                textInputLayout.endIconDrawable = getDrawable(R.drawable.star_off)
+                favShow(false, showDatabase)
+            } else {
+                textInputLayout.endIconDrawable = getDrawable(R.drawable.star_on)
+                favShow(true, showDatabase)
+            }
+        }*/
+
+        /*search_layout.setEndIconOnClickListener {
+            if(search_layout.endIconDrawable==getDrawable(R.drawable.star_on)) {
+                search_layout.endIconDrawable = getDrawable(R.drawable.star_off)
+                favShow(false, showDatabase)
+            } else {
+                search_layout.endIconDrawable = getDrawable(R.drawable.star_on)
+                favShow(true, showDatabase)
+            }
+        }*/
+
         toTop.setOnClickListener {
             show_info.smoothScrollAction(0) {
                 Snackbar.make(show_info, "At Top", Snackbar.LENGTH_SHORT).show()
@@ -345,45 +369,15 @@ class ShowListActivity : AppCompatActivity() {
         search_info.isEnabled = false
         favorite_show.isEnabled = false
 
-        favorite_show.setOnLikeListener(object : OnLikeListener {
+        /*favorite_show.setOnLikeListener(object : OnLikeListener {
             override fun liked(likeButton: LikeButton?) {
-                favShow(likeButton?.isLiked ?: true)
+                favShow(likeButton?.isLiked ?: true, showDatabase)
             }
 
             override fun unLiked(likeButton: LikeButton?) {
-                favShow(likeButton?.isLiked ?: false)
+                favShow(likeButton?.isLiked ?: false, showDatabase)
             }
-
-            private fun favShow(b: Boolean) {
-                GlobalScope.launch {
-                    val listToShow = if (b) {
-                        val showList = showDatabase.showDao().allShows
-                        val nnList = arrayListOf<NameAndLink>()
-                        for (i in showList) {
-                            nnList.add(NameAndLink(i.name, i.link))
-                        }
-
-                        fun checkItems(nn: ShowInfo): Boolean {
-                            for (s in showList) {
-                                if (nn.url == s.link) {
-                                    return true
-                                }
-                            }
-                            return false
-                        }
-
-                        listOfNameAndLink.filter { checkItems(it) }
-                    } else {
-                        listOfNameAndLink
-                    }.distinctBy { it.name }
-                    runOnUiThread {
-                        show_info.swapAdapter(AListAdapter(listToShow, this@ShowListActivity, showDatabase, actionHit), true)
-                        //show_info.adapter = AListAdapter(listToShow, this@ShowListActivity, showDatabase, actionHit)
-                    }
-                }
-            }
-
-        })
+        })*/
 
         /*favorite_show.setOnCheckedChangeListener { _, b ->
             GlobalScope.launch {
@@ -412,6 +406,47 @@ class ShowListActivity : AppCompatActivity() {
                 }
             }
         }*/
+        favorite_show.setImageDrawable(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_flash_off).sizeDp(24))
+        favorite_show.setOnClickListener {
+            favorite_show.setImageDrawable(if (showingFavorites) {
+                showingFavorites = false
+                favShow(false, showDatabase)
+                IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_flash_off).sizeDp(24)
+            } else {
+                showingFavorites = true
+                favShow(true, showDatabase)
+                IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_flash_on).sizeDp(24)
+            })
+        }
+    }
+
+    private fun favShow(b: Boolean, showDatabase: ShowDatabase) {
+        GlobalScope.launch {
+            val listToShow = if (b) {
+                val showList = showDatabase.showDao().allShows
+                val nnList = arrayListOf<NameAndLink>()
+                for (i in showList) {
+                    nnList.add(NameAndLink(i.name, i.link))
+                }
+
+                fun checkItems(nn: ShowInfo): Boolean {
+                    for (s in showList) {
+                        if (nn.url == s.link) {
+                            return true
+                        }
+                    }
+                    return false
+                }
+
+                listOfNameAndLink.filter { checkItems(it) }
+            } else {
+                listOfNameAndLink
+            }.distinctBy { it.name }
+            runOnUiThread {
+                show_info.swapAdapter(AListAdapter(listToShow, this@ShowListActivity, showDatabase, actionHit), true)
+                //show_info.adapter = AListAdapter(listToShow, this@ShowListActivity, showDatabase, actionHit)
+            }
+        }
     }
 
     private fun errorHasOccurred(message: String) {

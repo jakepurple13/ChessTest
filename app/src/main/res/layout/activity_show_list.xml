@@ -114,32 +114,11 @@
                 android:background="@color/cod_gray"
                 app:layout_collapseMode="pin">
 
-                <com.like.LikeButton
-                    android:id="@+id/favorite_show"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/search_layout"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginStart="5dp"
-                    app:icon_type="star" />
-
-                <!--<Switch
-                    android:id="@+id/favorite_show"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/search_layout"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginStart="5dp"
-                    android:drawableStart="@drawable/star_on" />-->
-
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/search_layout"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toStartOf="@id/favorite_show"
                     app:hintAnimationEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -151,6 +130,26 @@
                         tools:ignore="HardcodedText" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!--<Switch
+                    android:id="@+id/favorite_show"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/search_layout"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="5dp"
+                    android:drawableStart="@drawable/star_on" />-->
+
+                <!--<com.like.LikeButton
+                    android:id="@+id/favorite_show"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/search_layout"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="5dp"
+                    app:icon_type="star" />-->
+
             </RelativeLayout>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -161,6 +160,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:text="Random Show"
+        app:backgroundTint="@color/material_blue"
         app:icon="@drawable/random"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|right|end" />
@@ -172,6 +172,17 @@
         android:layout_gravity="bottom|start"
         android:layout_margin="5dp"
         android:clickable="true"
+        app:backgroundTint="@color/material_blue"
         app:srcCompat="@android:drawable/ic_menu_upload" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/favorite_show"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="5dp"
+        android:clickable="true"
+        app:backgroundTint="@color/material_blue"
+        app:srcCompat="@android:drawable/star_off" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
