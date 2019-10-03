@@ -1,100 +1,82 @@
 package com.crestron.aurora.server
 
+import android.os.Bundle
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.db.ShowSource
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 
 class ShowQuizActivity : QuizActivity() {
-
     override val dialogHintText: String = "Choose a Source"
     override val dialogMessage: String = "Choose from Gogoanime, Putlocker, or Animetoon"
-
-    override val postHighScoreLink: String? = null
-    override val highScoreLink: String? = null
-
     override var dialogTitle: String = "Pick a Source"
-
-    override fun onCreated() {
+    override fun getInfoLink(type: String): String = "/show/quiz/show_type=$type.json"
+    override fun onCreated(savedInstanceState: Bundle?) {
         titleText = "Show Quiz"
         type = QuizChoiceType.CHOICES
         setChoices("Gogoanime", "Putlocker", "Animetoon")
     }
-
-    override fun getInfoLink(type: String): String = "/show/quiz/show_type=$type.json"
-
 }
 
 class MusicQuizActivity : QuizActivity() {
-
     override val dialogHintText: String = "Artist Name"
     override val dialogMessage: String = "Choose What Songs Can Be Shown"
-
     override val postHighScoreLink: String? = "/music"
     override val highScoreLink: String? = "/music/mobileHighScores.json"
-
     override var dialogTitle: String = "Choose an Artist/Band"
-
-    override fun onCreated() {
-        titleText = "Music Quiz"
-    }
-
     override fun getInfoLink(type: String): String = "/music/music_get_quiz_from=$type.json"
+    override fun onCreated(savedInstanceState: Bundle?) {
+        titleText = "Music Quiz"
+        type = QuizChoiceType.TEXT
+    }
 }
 
 class TestQuizActivity : QuizActivity() {
-
     override val dialogHintText: String = "Test Name"
     override val dialogMessage: String = "Test"
     override var dialogTitle: String = "Test"
-
-    override fun onCreated() {
+    override fun getInfoLink(type: String): String = ""
+    override fun onCreated(savedInstanceState: Bundle?) {
         titleText = "Test Quiz"
         type = QuizChoiceType.NONE
     }
-
-    override fun getInfoLink(type: String): String = ""
-
-    override suspend fun getQuestions(): Array<QuizQuestions> {
-
-        var showList = ShowDatabase.getDatabase(this).showDao().allShows.shuffled()
-        showList = if (showList.size >= 100) {
-            showList.take(100)
-        } else {
-            showList
-        }
-
-        return quizMaker(showList.toMutableList(), {
-            it.name
-        }, {
-            it.name
-        })
+    override suspend fun getQuestions(chosen: String): Array<QuizQuestions> {
+        return quizMaker(mutableListOf("asdf", "zxcv", "qwer", "jkl;"))
     }
 }
 
 class QuizShowActivity : QuizActivity() {
-
-    override val dialogHintText: String = "Test Name"
-    override val dialogMessage: String = "Test"
-    override var dialogTitle: String = "Test"
-
-    override fun onCreated() {
-        titleText = "Test Quiz"
-        type = QuizChoiceType.NONE
-    }
-
+    override val dialogHintText: String = "Shows"
+    override val dialogMessage: String = "Pick a Show Source"
+    override var dialogTitle: String = "Show Source"
     override fun getInfoLink(type: String): String = ""
+    override fun onCreated(savedInstanceState: Bundle?) {
+        titleText = "Show Quiz"
+        type = QuizChoiceType.CHOICES
+        setChoices("All", "Putlocker", "Gogoanime", "Animetoon")
+    }
+    override suspend fun getQuestions(chosen: String): Array<QuizQuestions> {
+        val source = when (chosen) {
+            "Putlocker" -> ShowSource.PUTLOCKER
+            "Gogoanime" -> ShowSource.GOGOANIME
+            "Animetoon" -> ShowSource.ANIMETOON
+            "All" -> null
+            else -> null
+        }
 
-    override suspend fun getQuestions(): Array<QuizQuestions> {
-
-        var showList = ShowDatabase.getDatabase(this).showDao().allShows.shuffled()
-        showList = if (showList.size >= 100) {
+        val showList = if (source != null) {
+            ShowDatabase.getDatabase(this).showDao().getShowsFromSource(source).shuffled()
+        } else {
+            ShowDatabase.getDatabase(this).showDao().allShows.shuffled()
+        }
+        val shows = if (showList.size >= 100) {
             showList.take(100)
         } else {
             showList
-        }
+        }.map { ShowInfo(it.name, it.link) }
 
-        return quizMaker(showList.toMutableList(), question = {
-            EpisodeApi(ShowInfo(it.name, it.link)).description
+        return quizMaker(shows.toMutableList(), question = {
+            EpisodeApi(it).description
         }, answers = {
             it.name
         })

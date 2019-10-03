@@ -27,21 +27,32 @@ data class QuizQuestions(
         val question: String,
         val choices: List<String>,
         val correctAnswer: String
-)
+) {
+    companion object {
+        val freebie = QuizQuestions("Freebie", listOf("This One", "This One", "This One", "This One"), "This One")
+    }
+}
 
 data class UserInfo(val name: String, val artist: String, val score: String)
 
 @Suppress("unused")
-fun <T : QuizActivity, V> T.quizMaker(questionList: MutableList<V>, question: (V) -> String, answers: (V) -> String): Array<QuizQuestions> {
+fun <T : QuizActivity, V> T.quizMaker(questionList: MutableList<V>, question: (V) -> String = { it.toString() }, answers: (V) -> String = { it.toString() }): Array<QuizQuestions> {
     val qList = mutableListOf<QuizQuestions>()
+    if (questionList.size < 4) {
+        qList += QuizQuestions.freebie
+    }
     while (questionList.size >= 4) {
-        val answer = questionList.randomRemove()
-        qList += QuizQuestions(question(answer), listOf(
-                answers(answer),
-                answers(questionList.randomRemove()),
-                answers(questionList.randomRemove()),
-                answers(questionList.randomRemove())).shuffled(),
-                answers(answer))
+        qList += try {
+            val answer = questionList.randomRemove()
+            QuizQuestions(question(answer), listOf(
+                    answers(answer),
+                    answers(questionList.randomRemove()),
+                    answers(questionList.randomRemove()),
+                    answers(questionList.randomRemove())).shuffled(),
+                    answers(answer))
+        } catch (e: Exception) {
+            QuizQuestions.freebie
+        }
     }
     return qList.toTypedArray()
 }
@@ -60,11 +71,11 @@ abstract class QuizActivity : AppCompatActivity() {
                 title_text.text = titleText
             }
         }
-    var type = QuizChoiceType.TEXT
+    var type = QuizChoiceType.NONE
     private var choices = mutableListOf<String>()
 
     abstract fun getInfoLink(type: String): String
-    open fun onCreated() {}
+    open fun onCreated(savedInstanceState: Bundle?) {}
     open fun nextQuestionAction() {}
     open fun previousQuestionAction() {}
     open fun answerChecking() {}
@@ -98,7 +109,7 @@ abstract class QuizActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
-        onCreated()
+        onCreated(savedInstanceState)
 
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
@@ -150,8 +161,8 @@ abstract class QuizActivity : AppCompatActivity() {
         }
     }
 
-    open suspend fun getQuestions(): Array<QuizQuestions> {
-        val choice = getInfoLink(quizChoice)
+    open suspend fun getQuestions(chosen: String): Array<QuizQuestions> {
+        val choice = getInfoLink(chosen)
         val s = client.get<String>(choice) {
             method = HttpMethod.Get
             host = ClientHandler.host
@@ -226,7 +237,7 @@ abstract class QuizActivity : AppCompatActivity() {
                 QuizChoiceType.NONE -> ""
             }
             quizChoice = chosen
-            quizQuestions = getQuestions()
+            quizQuestions = getQuestions(chosen)
             answerList.clear()
             runOnUiThread {
                 finished = false

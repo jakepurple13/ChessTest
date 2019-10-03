@@ -1,13 +1,13 @@
 package com.crestron.aurora.db;
 
+import java.util.List;
+
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
-
-import java.util.List;
 
 @Dao
 public interface ShowDao {
@@ -21,6 +21,13 @@ public interface ShowDao {
 
     @Query("SELECT * FROM SHOW_TABLE")
     List<Show> getAllShows();
+
+    default List<Show> getShowsFromSource(ShowSource s) {
+        return getShowsFromSource("%" + s.s + "%");
+    }
+
+    @Query("SELECT * FROM show_table where show_link like (:s)")
+    List<Show> getShowsFromSource(String s);
 
     @Query("SELECT COUNT(show_name) FROM show_table where show_name==(:showName)")
     int isInDatabase(String showName);
@@ -56,5 +63,4 @@ public interface ShowDao {
             "show_table.show_name = episode_watched.showName" +
             " where show_name=:name order by episodeNumber")
     List<Episode> getEpisodeFromShow(String name);
-
 }
