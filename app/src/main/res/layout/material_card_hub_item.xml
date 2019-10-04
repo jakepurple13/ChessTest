@@ -23,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginEnd="8dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginStart="8dp"
                 android:layout_weight="1.0"
                 android:orientation="vertical">
 
@@ -55,7 +55,6 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="5dp"
                 android:background="@android:color/transparent"
-                app:backgroundTint="@color/material_on_surface_emphasis_medium"
                 app:srcCompat="@drawable/star_on"
                 tools:contentDescription="image" />
         </LinearLayout>
