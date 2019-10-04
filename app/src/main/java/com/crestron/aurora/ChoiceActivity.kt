@@ -518,8 +518,8 @@ class ChoiceActivity : AppCompatActivity() {
         material_rv.adapter = adapter
 
         val modelList = arrayListOf<MaterialItem>()
-
-        modelList += MaterialItem(ChoiceButton.VIEW_TESTING, "Some actions that are WIP", android.R.drawable.ic_menu_help)
+        //All testing stuff
+        //modelList += MaterialItem(ChoiceButton.VIEW_TESTING, "Some actions that are WIP", android.R.drawable.ic_menu_help)
         //All games here
         modelList += MaterialItem(ChoiceButton.BLACKJACK, "Play Blackjack", R.drawable.blackjacklogo, bgImage = R.drawable.drkgreen)
         modelList += MaterialItem(ChoiceButton.SOLITAIRE, "Play Solitaire", R.drawable.solitairelogo, bgImage = R.drawable.drkgreen,
