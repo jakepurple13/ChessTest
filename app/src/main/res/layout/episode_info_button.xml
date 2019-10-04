@@ -7,7 +7,8 @@
     android:layout_gravity="center_vertical"
     tools:ignore="HardcodedText">
 
-    <CheckBox
+    <com.google.android.material.checkbox.MaterialCheckBox
+        app:useMaterialThemeColors="true"
         android:id="@+id/watched_button"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

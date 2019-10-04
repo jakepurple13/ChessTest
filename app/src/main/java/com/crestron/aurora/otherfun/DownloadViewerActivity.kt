@@ -90,13 +90,11 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                             }
                         }) // the multi select model list with ids and name
                         .onSubmit(object : MultiSelectDialog.SubmitCallbackListener {
-                            override fun onSelected(selectedIds: java.util.ArrayList<Int>?, selectedNames: java.util.ArrayList<String>?, dataString: String?) {
-                                launch {
-                                    FetchingUtils.downloadCount -= selectedIds!!.size
-                                    fetch!!.cancel(selectedIds)
-                                    fetch!!.delete(selectedIds)
-                                    fetch!!.remove(selectedIds)
-                                }
+                            override fun onSelected(selectedIds: ArrayList<Int>?, selectedNames: ArrayList<String>?, dataString: String?) {
+                                FetchingUtils.downloadCount -= selectedIds!!.size
+                                fetch!!.cancel(selectedIds)
+                                        .delete(selectedIds)
+                                        .remove(selectedIds)
                             }
 
                             override fun onCancel() {

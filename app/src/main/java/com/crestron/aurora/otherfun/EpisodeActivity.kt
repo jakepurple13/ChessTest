@@ -565,7 +565,6 @@ class EpisodeActivity : AppCompatActivity() {
         })
 
         //share_button.visibility = View.GONE
-
         share_button.setOnClickListener {
             shareEmail()
         }

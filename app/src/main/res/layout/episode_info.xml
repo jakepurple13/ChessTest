@@ -9,7 +9,8 @@
     android:weightSum="2"
     tools:ignore="HardcodedText">
 
-    <CheckBox
+    <com.google.android.material.checkbox.MaterialCheckBox
+        app:useMaterialThemeColors="true"
         android:id="@+id/watched_button"
         android:layout_width="0dp"
         android:layout_weight="1"
