@@ -18,16 +18,6 @@
             android:layout_height="wrap_content"
             android:paddingVertical="16dp">
 
-            <ImageView
-                android:id="@+id/material_Image"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="8dp"
-                android:background="@android:color/transparent"
-                app:srcCompat="@drawable/star_on"
-                tools:contentDescription="image" />
-
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -42,8 +32,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:autoSizeTextType="uniform"
-                    android:ellipsize="end"
                     android:maxLines="2"
+                    android:ellipsize="end"
                     tools:contentDescription="title"
                     tools:text="Title Here" />
 
@@ -56,6 +46,16 @@
                     android:maxLines="5"
                     tools:text="Second Line" />
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/material_Image"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="5dp"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/star_on"
+                tools:contentDescription="image" />
         </LinearLayout>
 
         <LinearLayout
@@ -71,17 +71,17 @@
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 app:strokeColor="@color/colorAccent"
+                android:layout_marginEnd="8dp"
                 tools:text="Action 1" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/action_two"
                 style="?attr/materialButtonOutlinedStyle"
+                app:strokeColor="@color/colorAccent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                app:strokeColor="@color/colorAccent"
                 tools:text="Action 2" />
 
         </LinearLayout>

@@ -519,6 +519,8 @@ class ChoiceActivity : AppCompatActivity() {
 
         val modelList = arrayListOf<MaterialItem>()
 
+        modelList += MaterialItem(ChoiceButton.VIEW_TESTING, "Some actions that are WIP", android.R.drawable.ic_menu_help)
+        //All games here
         modelList += MaterialItem(ChoiceButton.BLACKJACK, "Play Blackjack", R.drawable.blackjacklogo, bgImage = R.drawable.drkgreen)
         modelList += MaterialItem(ChoiceButton.SOLITAIRE, "Play Solitaire", R.drawable.solitairelogo, bgImage = R.drawable.drkgreen,
                 buttonTextOne = "Draw 1", actionOne = {
@@ -538,10 +540,10 @@ class ChoiceActivity : AppCompatActivity() {
         modelList += MaterialItem(ChoiceButton.PONG, "Play Pong", R.drawable.apk, bgImage = R.drawable.drkgreen)
         modelList += MaterialItem(ChoiceButton.MATCHING, "Play a Matching Game", R.drawable.matchinglogo, bgImage = R.drawable.drkgreen)
         modelList += MaterialItem(ChoiceButton.MUSIC_MATCH, "Play a Music Quiz", R.drawable.matchinglogo, bgImage = R.drawable.drkgreen)
-
+        //All server kind of stuff here
         modelList += MaterialItem(ChoiceButton.SHOW_QUIZ, "Play a Quiz based off of your Favorites", R.drawable.b_normal)
         modelList += MaterialItem(ChoiceButton.CHAT, "Enter a Chat Server", R.drawable.a_normal)
-
+        //All video stuff here
         modelList += MaterialItem(ChoiceButton.RSS_FEED, "Look at upcoming Anime", android.R.drawable.ic_menu_today)
         modelList += MaterialItem(ChoiceButton.RECENT_ANIME, "View Recent Anime", R.drawable.recents)
         modelList += MaterialItem(ChoiceButton.ANIME, "View Anime", R.drawable.ten2)
