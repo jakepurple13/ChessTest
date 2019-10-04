@@ -182,7 +182,7 @@
         android:layout_below="@+id/foundation_1"
         android:text="TextView" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/back_button_solitaire"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -191,11 +191,10 @@
         android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginStart="5dp"
-        android:background="@drawable/dialog_bg"
-        android:backgroundTint="@color/emeraldGreen"
+        style="@style/CardButtonTheme"
         android:text="Back" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/new_game_solitaire"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -204,8 +203,7 @@
         android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
-        android:background="@drawable/dialog_bg"
-        android:backgroundTint="@color/emeraldGreen"
+        style="@style/CardButtonTheme"
         android:text="New Game" />
 
     <TextView
@@ -225,7 +223,8 @@
         android:layout_toEndOf="@id/foundation_4"
         android:text="TextView" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
+        style="@style/CardButtonTheme"
         android:id="@+id/auto_move"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -234,19 +233,16 @@
         android:layout_marginEnd="5dp"
         android:layout_above="@+id/back_button_solitaire"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/dialog_bg"
-        android:backgroundTint="@color/emeraldGreen"
         android:text="Auto Move" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/high_score_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="2dp"
         android:layout_marginTop="5dp"
         android:layout_marginStart="5dp"
-        android:background="@drawable/dialog_bg"
-        android:backgroundTint="@color/emeraldGreen"
+        style="@style/CardButtonTheme"
         android:layout_above="@id/back_button_solitaire"
         android:layout_alignParentStart="true"
         android:text="View High Scores" />

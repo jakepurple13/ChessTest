@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +22,7 @@ import com.crestron.aurora.views.BubbleEmitter
 import com.crestron.aurora.views.createBubbles
 import com.crestron.aurora.views.stopAllBubbles
 import com.github.jinatonic.confetti.CommonConfetti
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.plattysoft.leonids.ParticleSystem
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.CardNotFoundException
@@ -365,7 +365,7 @@ class SolitaireActivity : AppCompatActivity() {
 
         new_game_solitaire.setOnClickListener {
             time.cancel()
-            val builder = AlertDialog.Builder(this)
+            val builder = MaterialAlertDialogBuilder(this)
             builder.setTitle("Start a New Game?")
             builder.setMessage("Are you sure you want to end your current game?")
             // Add the buttons
@@ -388,7 +388,7 @@ class SolitaireActivity : AppCompatActivity() {
 
         back_button_solitaire.setOnClickListener {
             time.cancel()
-            val builder = AlertDialog.Builder(this)
+            val builder = MaterialAlertDialogBuilder(this)
             builder.setTitle("Done Playing?")
             builder.setMessage("Are you sure you want to stop?")
             // Add the buttons
@@ -434,7 +434,7 @@ class SolitaireActivity : AppCompatActivity() {
             val lastMove = this@SolitaireActivity.defaultSharedPreferences.getInt("solitaire_moves", 0)
             val lastTime = this@SolitaireActivity.defaultSharedPreferences.getLong("solitaire_time", 0)
             time.cancel()
-            val builder = AlertDialog.Builder(this)
+            val builder = MaterialAlertDialogBuilder(this)
             builder.setTitle("Your Current High Score")
             builder.setMessage("Highest Score: ${if (lastScore == 0) "N/A" else lastScore.toString()}\n" +
                     "Lowest Move Count: ${if (lastMove == 0) "N/A" else lastMove.toString()}\n" +
@@ -479,7 +479,7 @@ class SolitaireActivity : AppCompatActivity() {
         val lastTime = this@SolitaireActivity.defaultSharedPreferences.getLong("solitaire_time", 0)
 
         deck_of_cards.setOnClickListener(null)
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle("YOU WIN!")
         builder.setMessage("You won!" +
                 "\nIt took ${time.getTime()} seconds!" +

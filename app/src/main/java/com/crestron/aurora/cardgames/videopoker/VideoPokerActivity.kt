@@ -15,7 +15,6 @@ import android.view.animation.OvershootInterpolator
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.crestron.aurora.Loged
@@ -26,6 +25,7 @@ import com.crestron.aurora.views.BubbleEmitter
 import com.crestron.aurora.views.VideoPokerDialog
 import com.crestron.aurora.views.createBubbles
 import com.crestron.aurora.views.stopAllBubbles
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.programmerbox.dragswipe.Direction
 import com.programmerbox.dragswipe.DragSwipeActions
 import com.programmerbox.dragswipe.DragSwipeAdapter
@@ -365,7 +365,7 @@ class VideoPokerActivity : AppCompatActivity() {
                 newGame = true
                 bet_amount.visibility = View.VISIBLE
                 if (winning < 0) {
-                    val builder = AlertDialog.Builder(this)
+                    val builder = MaterialAlertDialogBuilder(this)
                     builder.setCancelable(false)
                     builder.setTitle("You're out of Money!")
                     builder.setMessage("Sorry")

@@ -11,7 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
+        style="@style/CardButtonTheme"
         android:id="@+id/dismiss_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

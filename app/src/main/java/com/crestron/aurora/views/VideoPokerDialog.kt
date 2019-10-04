@@ -33,6 +33,9 @@ class VideoPokerDialog(context: Context?, val currentCard: Card, val hand: Hand,
         val wheelView = wheelviews as WheelView<Card>
         wheelView.setWheelAdapter(MyWheelAdapter(context))
         wheelView.skin = WheelView.Skin.Common
+        val wheelStyle = WheelView.WheelViewStyle()
+        wheelStyle.backgroundColor = context.getColor(R.color.cardGreen)
+        wheelView.style = wheelStyle
         val d = Deck()
         for (c in hand.hand) {
             try {

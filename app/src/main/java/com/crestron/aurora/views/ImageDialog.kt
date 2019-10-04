@@ -6,8 +6,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Html
 import android.view.Window
+import com.bumptech.glide.Glide
 import com.crestron.aurora.R
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.image_dialog_layout.*
 import org.jetbrains.anko.runOnUiThread
 
@@ -29,7 +29,8 @@ class ImageDialog(context: Context?, val title: String, val description: String,
 
         context.runOnUiThread {
             try {
-                Picasso.get().load(imageLink).resize((600 * .6).toInt(), (800 * .6).toInt()).error(android.R.drawable.stat_notify_error).into(image_dialog)
+                Glide.with(context).load(imageLink).override((600 * .6).toInt(), (800 * .6).toInt()).error(android.R.drawable.stat_notify_error).into(image_dialog)
+                //Picasso.get().load(imageLink).resize((600 * .6).toInt(), (800 * .6).toInt()).error(android.R.drawable.stat_notify_error).into(image_dialog)
             } catch (ignored: IllegalArgumentException) {
             }
         }

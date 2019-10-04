@@ -8,13 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.crestron.aurora.R
 import com.crestron.aurora.utilities.TimerUtil
 import com.crestron.aurora.utilities.ViewUtil
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.programmerbox.dragswipe.Direction
 import com.programmerbox.dragswipe.DragSwipeAdapter
 import com.programmerbox.dragswipe.DragSwipeUtils
@@ -40,7 +40,7 @@ class MatchingActivityTwo : AppCompatActivity() {
 
             if (time == 0L || isWinning) {
                 util.cancel()
-                val builder = AlertDialog.Builder(this@MatchingActivityTwo)
+                val builder = MaterialAlertDialogBuilder(this@MatchingActivityTwo)
                 builder.setTitle("Time's Up!")
                 val msg = if (isWinning) {
                     "You won! You had ${util.getTime()} seconds left to finish!"
@@ -124,7 +124,7 @@ class MatchingActivityTwo : AppCompatActivity() {
 
         DragSwipeUtils.setDragSwipeUp(adapter, matching_rv, Direction.START + Direction.END + Direction.UP + Direction.DOWN)
 
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle("Matching!")
         builder.setMessage("Are you ready to play?")
         // Add the buttons

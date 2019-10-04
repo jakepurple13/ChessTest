@@ -24,6 +24,11 @@
         <item name="android:windowContentTransitions">true</item>
     </style>
 
+    <style name="CardButtonTheme" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textColor">@color/emeraldGreen</item>
+        <item name="strokeColor">@color/emeraldGreen</item>
+    </style>
+
     <style name="AppTheme.Transparent" parent="AppTheme">
         <!--<item name="android:windowIsTranslucent">true</item>-->
         <item name="android:windowBackground">@android:color/transparent</item>
