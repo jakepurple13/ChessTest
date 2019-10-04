@@ -104,9 +104,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
                         })
 
                 runOnUiThread {
-
                     multiSelectDialog.show(supportFragmentManager, "multiSelectDialog")
-
                 }
             }
         }

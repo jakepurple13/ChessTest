@@ -176,7 +176,8 @@ class ViewVideosActivity : AppCompatActivity() {
                                         runOnUiThread {
                                             val index = listOfFiles.indexOf(f)
                                             listOfFiles.remove(f)
-                                            adapter!!.remove(index)//notifyItemRemoved(index)
+                                            //adapter!!.remove(index)//notifyItemRemoved(index)
+                                            adapter!!.notifyItemRemoved(index)
                                         }
                                     }
                                 }
@@ -443,7 +444,7 @@ class ViewVideosActivity : AppCompatActivity() {
         }
 
         fun remove(position: Int) {
-            context.defaultSharedPreferences.edit().remove(list[position].path).apply()
+            //context.defaultSharedPreferences.edit().remove(list[position].path).apply()
             val f = list.removeAt(position)
             if (f.exists())
                 f.delete()
