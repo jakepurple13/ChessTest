@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/drkgreen"
     tools:context=".ChoiceActivity">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/material_rv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/choice_app_bar"
+        app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+        app:spanCount="2"
+        android:orientation="vertical"
+        tools:itemCount="20"
+        tools:listitem="@layout/material_card_hub_item" />
+
+    <!--<com.box.shelfview.ShelfView
+        android:id="@+id/shelfView"
+        android:layout_below="@id/choice_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/choice_app_bar"
@@ -14,8 +31,7 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@drawable/grid_rotated">
+            android:layout_height="?attr/actionBarSize">
 
             <!--<ImageView
                 android:onClick="onHamburger"
@@ -27,11 +43,5 @@
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
-
-    <com.box.shelfview.ShelfView
-        android:id="@+id/shelfView"
-        android:layout_below="@id/choice_app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
 </RelativeLayout>
