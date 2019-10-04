@@ -29,10 +29,12 @@
 
                 <TextView
                     android:id="@+id/material_title"
-                    style="?attr/textAppearanceHeadline5"
+                    style="?attr/textAppearanceHeadline6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:autoSizeTextType="uniform"
+                    android:maxLines="2"
+                    android:ellipsize="end"
                     tools:contentDescription="title"
                     tools:text="Title Here" />
 
@@ -42,7 +44,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:ellipsize="end"
-                    android:maxLines="2"
+                    android:maxLines="5"
                     tools:text="Second Line" />
             </LinearLayout>
 
@@ -54,15 +56,15 @@
                 android:layout_marginEnd="5dp"
                 android:background="@android:color/transparent"
                 app:backgroundTint="@color/material_on_surface_emphasis_medium"
-                app:backgroundTintMode="add"
                 app:srcCompat="@drawable/star_on"
                 tools:contentDescription="image" />
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/action_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:padding="8dp"
             android:paddingHorizontal="8dp">
 

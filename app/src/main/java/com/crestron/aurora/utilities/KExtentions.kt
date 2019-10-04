@@ -1,7 +1,9 @@
 package com.crestron.aurora.utilities
 
 import android.graphics.Color
+import android.widget.TextView
 import androidx.annotation.IntRange
+import androidx.core.view.doOnPreDraw
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -71,3 +73,8 @@ fun String.findRegex(string: String): String? {
 }
 
 fun String.isBlankOrEmpty(): Boolean = isBlank() || isEmpty()
+
+fun TextView.setMaxLinesToEllipsize() = doOnPreDraw {
+    val numberOfCompletelyVisibleLines = (measuredHeight - paddingTop - paddingBottom) / lineHeight
+    maxLines = numberOfCompletelyVisibleLines
+}

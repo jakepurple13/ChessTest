@@ -11,9 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/choice_app_bar"
+        android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
         app:spanCount="2"
-        android:orientation="vertical"
         tools:itemCount="20"
         tools:listitem="@layout/material_card_hub_item" />
 
