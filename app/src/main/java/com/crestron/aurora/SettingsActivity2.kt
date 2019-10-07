@@ -22,6 +22,7 @@ import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.FavoriteShowsActivity
 import com.crestron.aurora.otherfun.FetchingUtils
 import com.crestron.aurora.utilities.KUtility
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.Dispatchers
@@ -213,6 +214,21 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
 
             findPreference("pref_duration").isEnabled = defaultSharedPreferences.getBoolean("run_update_check", true)
 
+            findPreference("reset_home_screen_locations").setOnPreferenceClickListener {
+                MaterialAlertDialogBuilder(this@GeneralPreferenceFragment.context)
+                        .setTitle("Are you sure?")
+                        .setMessage("Positive you want to reset the locations?")
+                        .setPositiveButton("Yes") { _, _ ->
+                            (this@GeneralPreferenceFragment.activity as SettingsActivity2).shouldReset = true
+                            ChoiceActivity.resetChoice = true
+                            defaultSharedPreferences.edit().remove("home_screen_adapter_locations").apply()
+                            Toast.makeText(this@GeneralPreferenceFragment.context, "Resetting Home Screen", Toast.LENGTH_SHORT).show()
+                        }
+                        .setNegativeButton("No") { _, _ -> }
+                        .show()
+                true
+            }
+
             //findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString((1000 * 60 * 60 * KUtility.currentUpdateTime).toLong(), false)
             //findPreference(ConstantValues.UPDATE_CHECK + "s").summary = FetchingUtils.getETAString(KUtility.currentDurationTime, false)
 
@@ -329,16 +345,16 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                 // get path that the user has chosen
                 chooser.setOnSelectListener { path ->
                     //if (path.contains("fun.json")) {
-                        GlobalScope.launch {
-                            val show = ShowDatabase.getDatabase(this@GeneralPreferenceFragment.context).showDao()
-                            val g = Gson().fromJson(mReadJsonData(path), Array<Show>::class.java)
-                            for (i in g) {
-                                if (show.isInDatabase(i.name) <= 0) {
-                                    show.insert(i)
-                                }
+                    GlobalScope.launch {
+                        val show = ShowDatabase.getDatabase(this@GeneralPreferenceFragment.context).showDao()
+                        val g = Gson().fromJson(mReadJsonData(path), Array<Show>::class.java)
+                        for (i in g) {
+                            if (show.isInDatabase(i.name) <= 0) {
+                                show.insert(i)
                             }
-                            File(path).delete()
                         }
+                        File(path).delete()
+                    }
                     //}
                     GlobalScope.launch(Dispatchers.Main) {
                         Toast.makeText(this@GeneralPreferenceFragment.context, "Finished Importing", Toast.LENGTH_SHORT).show()

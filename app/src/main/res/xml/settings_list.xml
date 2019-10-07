@@ -15,6 +15,11 @@
             android:summary="Location"
             android:title="Folder Location" />
 
+        <Preference
+            android:key="reset_home_screen_locations"
+            android:summary="Reset the Home Screen Locations"
+            android:title="Reset Home Screen" />
+
         <!--<Preference
             android:key="wifiOnly"
             android:summary="Check for updates and downloads only on Wifi"

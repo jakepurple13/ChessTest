@@ -41,6 +41,7 @@ import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.otherfun.*
 import com.crestron.aurora.server.ChatActivity
 import com.crestron.aurora.server.QuizShowActivity
+import com.crestron.aurora.server.toJson
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
@@ -65,7 +66,11 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem
 import com.nabinbhandari.android.permissions.PermissionHandler
 import com.nabinbhandari.android.permissions.Permissions
+import com.programmerbox.dragswipe.Direction
+import com.programmerbox.dragswipe.DragSwipeActions
 import com.programmerbox.dragswipe.DragSwipeAdapter
+import com.programmerbox.dragswipe.DragSwipeUtils
+import com.programmerbox.dragswipeex.set
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
 import com.tonyodev.fetch2core.Downloader
@@ -606,6 +611,11 @@ class ChoiceActivity : AppCompatActivity() {
                 //models.add(drawableModel(android.R.drawable.ic_input_get, ChoiceButton.VIEW_FAVORITES))
                 modelList += MaterialItem(ChoiceButton.VIEW_FAVORITES, "View Favorited Shows", android.R.drawable.ic_input_get)
             }
+
+            runOnUiThread {
+                loadAdapterLocations()
+            }
+
             showList.shuffle()
 
             val list = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")
@@ -692,6 +702,17 @@ class ChoiceActivity : AppCompatActivity() {
                     }
                 }
         }
+
+        DragSwipeUtils.setDragSwipeUp(adapter, material_rv, Direction.START + Direction.END + Direction.UP.value + Direction.DOWN.value,
+                dragSwipeActions = object : DragSwipeActions<MaterialItem, ViewHolder> {
+                    override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder, dragSwipeAdapter: DragSwipeAdapter<MaterialItem, ViewHolder>) {
+                        Collections.swap(adapter.list, viewHolder.adapterPosition, target.adapterPosition)
+                        adapter.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
+                        material_rv.post { (material_rv.layoutManager as StaggeredGridLayoutManager).invalidateSpanAssignments() }
+                    }
+                }
+        )
+
         /*runOnUiThread {
             //Toast.makeText(this, "New task created", Toast.LENGTH_LONG).show()
             //getTodoList()
@@ -699,6 +720,30 @@ class ChoiceActivity : AppCompatActivity() {
             if (DownloadsWidget.isWidgetActive(this@ChoiceActivity))
                 DownloadsWidget.sendRefreshBroadcast(this@ChoiceActivity)
         }*/
+    }
+
+    private fun loadAdapterLocations() {
+        if (defaultSharedPreferences.contains("home_screen_adapter_locations")) {
+            val d = defaultSharedPreferences.getString("home_screen_adapter_locations", null)
+            if (d != null) {
+                val adapterList = arrayListOf<MaterialItem>()
+                val f = Gson().fromJson(d, Array<ChoiceButton>::class.java)
+                for (i in f) {
+                    adapter.list.find { it.hubType == i }?.let {
+                        adapterList += it
+                    }
+                }
+                for (a in adapterList.withIndex()) {
+                    adapter[a.index] = a.value
+                }
+            }
+        }
+    }
+
+    private fun saveAdapterLocations() {
+        val t = adapter.list.filter { it.hubType != ChoiceButton.QUICK_CHOICE }.map { it.hubType }
+        Loged.e(t)
+        defaultSharedPreferences.edit().putString("home_screen_adapter_locations", t.toJson()).apply()
     }
 
     data class MaterialItem(val hubType: ChoiceButton, val detail: String, val image: Any?,
@@ -766,6 +811,7 @@ class ChoiceActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        saveAdapterLocations()
         try {
             if (br != null)
                 unregisterReceiver(br)
@@ -928,6 +974,10 @@ class ChoiceActivity : AppCompatActivity() {
             result.updateItem(downloadCountItem)
         } catch (e: IndexOutOfBoundsException) {
 
+        }
+        if (resetChoice) {
+            resetChoice = false
+            recreate()
         }
     }
 
@@ -1212,7 +1262,7 @@ class ChoiceActivity : AppCompatActivity() {
                                 }
 
                         try {
-                            val downloaded = intent.getStringExtra("view_download_item_count").toInt()
+                            val downloaded = (intent.getStringExtra("view_download_item_count") ?: "0").toInt()
                             if (downloaded > 0) {
                                 viewDownloadsItemUpdate.withBadge("$downloaded")
                                         .withBadgeStyle(BadgeStyle(Color.RED, Color.RED))
@@ -1234,6 +1284,8 @@ class ChoiceActivity : AppCompatActivity() {
     }
 
     companion object BroadCastInfo {
+
+        var resetChoice = false
 
         interface DownloadBroadcast {
             fun onCall(intent: Intent)

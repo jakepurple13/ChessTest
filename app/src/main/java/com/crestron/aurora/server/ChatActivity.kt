@@ -200,6 +200,11 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        clientHandler?.close()
+        super.onDestroy()
+    }
+
     class UserAdapter(
             list: ArrayList<ChatUser>,
             private val context: Context,

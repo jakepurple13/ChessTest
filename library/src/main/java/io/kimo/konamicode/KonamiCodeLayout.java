@@ -2,9 +2,7 @@ package io.kimo.konamicode;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import androidx.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,6 +13,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 public class KonamiCodeLayout extends FrameLayout implements KonamiSequenceListener {
 
@@ -237,11 +237,11 @@ public class KonamiCodeLayout extends FrameLayout implements KonamiSequenceListe
 
     private void registerSwipe() {
         if(mLastSwipedDirection != Direction.NONE) {
-            Log.d(TAG, "registerSwipe: "+mLastSwipedDirection);
+            //Log.d(TAG, "registerSwipe: "+mLastSwipedDirection);
             mSwipes.add(mLastSwipedDirection);
 
             if(!validSwipeSequence()) {
-                Log.d(TAG, "Invalid swipe sequence");
+                //Log.d(TAG, "Invalid swipe sequence");
                 resetSwipeSequence();
             } else {
                 if(onSwipeSequenceAchieved()) {
@@ -262,7 +262,7 @@ public class KonamiCodeLayout extends FrameLayout implements KonamiSequenceListe
             mPressedButtons.add(mLastPressedButton);
 
             if(!validPressedSequence()) {
-                Log.d(TAG, "Invalid button sequence!");
+                //Log.d(TAG, "Invalid button sequence!");
                 resetPressedSequence();
                 buttonDialog.dismiss();
             } else {
