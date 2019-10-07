@@ -63,6 +63,9 @@ public interface ShowDao {
     @Query("DELETE FROM episode_watched where episodeNumber==(:episodeNumber)")
     void deleteEpisode(int episodeNumber);
 
+    @Query("DELETE FROM episode_watched where showUrl==(:url)")
+    void deleteEpisode(String url);
+
     @Transaction
     @Query("select show_name, episodeNumber, showName, showUrl " +
             "from show_table inner join episode_watched on " +

@@ -23,6 +23,7 @@ import com.crestron.aurora.ChoiceActivity
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
+import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeApi
@@ -31,6 +32,7 @@ import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.views.DownloadsWidget
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.like.LikeButton
@@ -467,6 +469,41 @@ class EpisodeActivity : AppCompatActivity() {
 
         goto_downloads.setOnClickListener {
             startActivity(Intent(this@EpisodeActivity, DownloadViewerActivity::class.java))
+        }
+
+        batch_download.setOnLongClickListener {
+            GlobalScope.launch {
+                val eList = show.showDao().getEpisodesByUrl(url).map { it.showUrl }
+                val b = BooleanArray(adapter.itemCount) {
+                    adapter.items[it].url in eList
+                }
+                val m = MaterialAlertDialogBuilder(this@EpisodeActivity)
+                        .setMultiChoiceItems(adapter.items.map { it.name }.toTypedArray(), b) { _, which, isChecked ->
+                            GlobalScope.launch {
+                                try {
+                                    if (isChecked) {
+                                        Loged.e("Inserted ${adapter.items[which]}")
+                                        show.showDao().insertEpisode(Episode(which, url, adapter.items[which].url))
+                                    } else {
+                                        Loged.e("Deleted")
+                                        show.showDao().deleteEpisode(adapter.items[which].url)
+                                    }
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                    runOnUiThread {
+                                        Toast.makeText(this@EpisodeActivity, "Please Favorite Show if you plan on Checking the Episodes", Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
+                        }
+                        .setTitle("Already Watched")
+                        .setPositiveButton("Done") { _, _ -> }
+
+                runOnUiThread {
+                    m.show()
+                }
+            }
+            true
         }
 
         batch_download.setOnClickListener {

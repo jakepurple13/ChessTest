@@ -108,7 +108,7 @@ class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String
                             show.insertEpisode(Episode(position, name, items[position].url))
                         } else {
                             Loged.e("Deleted")
-                            show.deleteEpisode(position)
+                            show.deleteEpisode(items[position].url)
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
