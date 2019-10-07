@@ -318,7 +318,7 @@ class EpisodeActivity : AppCompatActivity() {
                 val downloadOrStream = defaultSharedPreferences.getBoolean(ConstantValues.DOWNLOAD_OR_STREAM, true)
                 Loged.i("$downloadOrStream")
 
-                adapter = EpisodeAdapter(listOfEpisodes, name, context = this@EpisodeActivity, slideOrButton = slideOrButton, downloadOrStream = downloadOrStream, action = object : EpisodeAction {
+                adapter = EpisodeAdapter(listOfEpisodes, url, context = this@EpisodeActivity, slideOrButton = slideOrButton, downloadOrStream = downloadOrStream, action = object : EpisodeAction {
                     override fun hit(name: String, url: String) {
                         super.hit(name, url)
                         FetchingUtils.downloadCount++

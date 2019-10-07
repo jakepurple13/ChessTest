@@ -21,7 +21,8 @@ public abstract class ShowDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     // Create database here
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(), ShowDatabase.class, "show_database")
-                                   .addMigrations(MIGRATION_2_3)
+                                   //.addMigrations(MIGRATION_2_3)
+                                   //.addMigrations(MIGRATION_3_4)
                                    .build();
                 }
             }
@@ -55,7 +56,7 @@ public abstract class ShowDatabase extends RoomDatabase {
 
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            //database.execSQL("ALTER TABLE episode_watched ");
+            //database.execSQL("ALTER TABLE episode_watched ADD COLUMN showUrl TEXT Primary Key");
         }
     };
 }

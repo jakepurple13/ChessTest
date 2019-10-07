@@ -1,18 +1,19 @@
 package com.crestron.aurora.db;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import androidx.annotation.NonNull;
 
 @Entity(tableName = "show_table")
 public class Show {
 
+    @PrimaryKey
     @ColumnInfo(name = "show_link")
+    @NonNull
     private String link;
 
-    @PrimaryKey
     @ColumnInfo(name = "show_name")
     @NonNull
     private String name;
@@ -20,7 +21,7 @@ public class Show {
     @ColumnInfo(name = "number_of_shows")
     private int showNum = 0;
 
-    public Show(String link, @NonNull String name) {
+    public Show(@NonNull String link, @NonNull String name) {
         this.link = link;
         this.name = name;
     }

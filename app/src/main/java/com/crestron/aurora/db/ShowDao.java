@@ -17,7 +17,10 @@ public interface ShowDao {
 
     //Look at truncate
     @Query("DELETE FROM show_table")
-    void deleteAll();
+    void deleteAllShows();
+
+    @Query("DELETE FROM episode_watched")
+    void deleteAllEpisodes();
 
     @Query("SELECT * FROM SHOW_TABLE")
     List<Show> getAllShows();
@@ -49,6 +52,9 @@ public interface ShowDao {
 
     @Query("select * from episode_watched where showName=:name")
     List<Episode> getEpisodes(String name);
+
+    @Query("select * from episode_watched where showName=:url")
+    List<Episode> getEpisodesByUrl(String url);
 
     @Transaction
     @Insert(onConflict = OnConflictStrategy.REPLACE)

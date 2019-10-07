@@ -17,17 +17,15 @@ import android.text.TextUtils
 import android.view.MenuItem
 import android.widget.Toast
 import com.codekidlabs.storagechooser.StorageChooser
-import com.crestron.aurora.db.Show
-import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.db.getAllShowsAndEpisodesAsync
+import com.crestron.aurora.db.importAllShowsAndEpisodes
 import com.crestron.aurora.otherfun.FavoriteShowsActivity
 import com.crestron.aurora.otherfun.FetchingUtils
 import com.crestron.aurora.utilities.KUtility
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-
 import kotlinx.coroutines.launch
 import mobi.upod.timedurationpicker.TimeDurationPicker
 import mobi.upod.timedurationpicker.TimeDurationPickerPreference
@@ -37,6 +35,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.text.SimpleDateFormat
 
 
 /**
@@ -298,12 +297,13 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                 chooser.setOnSelectListener { path ->
                     //folder_location_info.text = FetchingUtils.folderLocation
                     GlobalScope.launch {
-                        val show = ShowDatabase.getDatabase(this@GeneralPreferenceFragment.context).showDao().allShows
-                        val string = Gson().toJson(show)
-
+                        /*val show = ShowDatabase.getDatabase(this@GeneralPreferenceFragment.context).showDao().allShows
+                        val string = Gson().toJson(show)*/
+                        val string = this@GeneralPreferenceFragment.context.getAllShowsAndEpisodesAsync().await()
                         Loged.wtf("$path and $string")
 
-                        val file = File("$path/fun_${show.size}.json")
+                        val file = File("$path/fun_${SimpleDateFormat("MM_dd_HH:mm").format(System.currentTimeMillis())!!}.json")
+                        Loged.d(file.path)
                         if (!file.exists())
                             file.createNewFile()
 
@@ -345,7 +345,7 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                 // get path that the user has chosen
                 chooser.setOnSelectListener { path ->
                     //if (path.contains("fun.json")) {
-                    GlobalScope.launch {
+                    /*GlobalScope.launch {
                         val show = ShowDatabase.getDatabase(this@GeneralPreferenceFragment.context).showDao()
                         val g = Gson().fromJson(mReadJsonData(path), Array<Show>::class.java)
                         for (i in g) {
@@ -354,7 +354,8 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                             }
                         }
                         File(path).delete()
-                    }
+                    }*/
+                    this@GeneralPreferenceFragment.context.importAllShowsAndEpisodes(mReadJsonData(path)!!)
                     //}
                     GlobalScope.launch(Dispatchers.Main) {
                         Toast.makeText(this@GeneralPreferenceFragment.context, "Finished Importing", Toast.LENGTH_SHORT).show()

@@ -7,10 +7,10 @@ import androidx.room.Ignore;
 import androidx.room.Index;
 
 @Entity(tableName = "episode_watched",
-        primaryKeys = {"showName", "episodeNumber"},
+        primaryKeys = {"showName", "showUrl"},
         foreignKeys = {
                 @ForeignKey(entity = Show.class,
-                        parentColumns = "show_name",
+                        parentColumns = "show_link",
                         childColumns = "showName",
                         onDelete = ForeignKey.CASCADE)
         },
@@ -26,9 +26,10 @@ public class Episode {
     @NonNull
     public String showName;
 
+    @NonNull
     public String showUrl;
 
-    public Episode(int episodeNumber, String showName, String showUrl) {
+    public Episode(int episodeNumber, @NonNull String showName, @NonNull String showUrl) {
         this.episodeNumber = episodeNumber;
         this.showName = showName;
         this.showUrl = showUrl;

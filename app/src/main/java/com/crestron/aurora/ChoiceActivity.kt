@@ -150,6 +150,12 @@ class ChoiceActivity : AppCompatActivity() {
         //setSupportActionBar(toolbar)
         FirebaseApp.initializeApp(this)
 
+        /*GlobalScope.launch {
+            val s = getAllShowsAndEpisodesAsync().await()
+            importAllShowsAndEpisodes(s)
+        }*/
+
+
         setUpDrawer(savedInstanceState)
 
         if (!packageManager.canRequestPackageInstalls()) {
@@ -185,8 +191,8 @@ class ChoiceActivity : AppCompatActivity() {
                         builder.setOnDismissListener {
                             SharedPrefVariables.hasShownForLatest = true
                         }
-                        val dialog = builder.create()
                         runOnUiThread {
+                            val dialog = builder.create()
                             dialog.show()
                         }
                     }
