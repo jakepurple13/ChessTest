@@ -14,7 +14,6 @@ import com.crestron.aurora.showapi.EpisodeInfo
 import com.ncorti.slidetoact.SlideToActView
 import kotlinx.android.synthetic.main.episode_info.view.*
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.runOnUiThread
@@ -99,16 +98,14 @@ class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String
 
             holder.watched.setOnCheckedChangeListener(null)
 
-            holder.watched.isChecked = episodes.any {
-                it.episodeNumber == position
-            }
+            holder.watched.isChecked = items[position].url in episodes.map { it.showUrl }
 
             holder.watched.setOnCheckedChangeListener { _, b ->
-                GlobalScope.async {
+                GlobalScope.launch {
                     try {
                         if (b) {
                             Loged.e("Inserted ${items[position]}")
-                            show.insertEpisode(Episode(position, name))
+                            show.insertEpisode(Episode(position, name, items[position].url))
                         } else {
                             Loged.e("Deleted")
                             show.deleteEpisode(position)

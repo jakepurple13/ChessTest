@@ -1,11 +1,10 @@
 package com.crestron.aurora.db;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.Index;
-import androidx.room.PrimaryKey;
-import androidx.annotation.NonNull;
 
 @Entity(tableName = "episode_watched",
         primaryKeys = {"showName", "episodeNumber"},
@@ -27,13 +26,16 @@ public class Episode {
     @NonNull
     public String showName;
 
-    public Episode(int episodeNumber, String showName) {
+    public String showUrl;
+
+    public Episode(int episodeNumber, String showName, String showUrl) {
         this.episodeNumber = episodeNumber;
         this.showName = showName;
+        this.showUrl = showUrl;
     }
 
     @Ignore
     public String toString() {
-        return showName + ": " + episodeNumber;
+        return showName + ": " + episodeNumber + ": " + showUrl;
     }
 }

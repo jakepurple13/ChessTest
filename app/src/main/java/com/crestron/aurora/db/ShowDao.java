@@ -58,7 +58,7 @@ public interface ShowDao {
     void deleteEpisode(int episodeNumber);
 
     @Transaction
-    @Query("select show_name, episodeNumber, showName " +
+    @Query("select show_name, episodeNumber, showName, showUrl " +
             "from show_table inner join episode_watched on " +
             "show_table.show_name = episode_watched.showName" +
             " where show_name=:name order by episodeNumber")
