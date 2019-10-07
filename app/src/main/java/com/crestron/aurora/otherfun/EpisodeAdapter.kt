@@ -13,9 +13,7 @@ import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.showapi.EpisodeInfo
 import com.ncorti.slidetoact.SlideToActView
 import kotlinx.android.synthetic.main.episode_info.view.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
@@ -74,12 +72,12 @@ class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String
             }
         }
 
-        holder.episodeDownload.text = if(downloadOrStream) "Download" else "Stream"
+        holder.episodeDownload.text = if (downloadOrStream) "Download" else "Stream"
 
         //holder.slideToDownload.setText(if(downloadOrStream) "Download" else "Stream")
-        holder.slideToDownload.text = if(downloadOrStream) "Download" else "Stream"
+        holder.slideToDownload.text = if (downloadOrStream) "Download" else "Stream"
 
-        if(casting)
+        if (casting)
             holder.slideToDownload.text = "Cast"
 
         val show = ShowDatabase.getDatabase(this@EpisodeAdapter.context).showDao()
@@ -98,7 +96,13 @@ class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String
 
             holder.watched.setOnCheckedChangeListener(null)
 
-            holder.watched.isChecked = items[position].url in episodes.map { it.showUrl }
+            withContext(Dispatchers.Main) {
+                holder.watched.isChecked = try {
+                    items[position].url in episodes.map { it.showUrl }
+                } catch (e: Exception) {
+                    false
+                }
+            }
 
             holder.watched.setOnCheckedChangeListener { _, b ->
                 GlobalScope.launch {

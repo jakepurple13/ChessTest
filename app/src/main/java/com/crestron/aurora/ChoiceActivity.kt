@@ -185,9 +185,7 @@ class ChoiceActivity : AppCompatActivity() {
                         val builder = AlertDialog.Builder(this@ChoiceActivity)
                         builder.setTitle("New Version Notes!")
                         builder.setMessage("Version: ${info.version}\n${info.devNotes}")
-                        builder.setNeutralButton("Cool!") { _, _ ->
-
-                        }
+                        builder.setNeutralButton("Cool!") { _, _ -> }
                         builder.setOnDismissListener {
                             SharedPrefVariables.hasShownForLatest = true
                         }
@@ -988,7 +986,6 @@ class ChoiceActivity : AppCompatActivity() {
     }
 
     private fun setUpDrawer(savedInstanceState: Bundle?) {
-
         //if you want to update the items at a later time it is recommended to keep it in a variable
         val downloadCountItem = PrimaryDrawerItem()
                 .withIcon(GoogleMaterial.Icon.gmd_cloud_download)
