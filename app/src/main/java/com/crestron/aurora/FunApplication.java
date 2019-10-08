@@ -181,18 +181,6 @@ public class FunApplication extends Application {
 
         scl.add(recentCartoon);
 
-            /*intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, SolitaireActivity.class);
-            intent.putExtra(ConstantValues.DRAW_AMOUNT, KUtility.Util.getSharedPref(this).getInt(ConstantValues.DRAW_AMOUNT, 1));
-
-            ShortcutInfo solitaireSC = new ShortcutInfo.Builder(context, "id3")
-                    .setShortLabel("Solitaire")
-                    .setLongLabel("Solitaire")
-                    .setIcon(Icon.createWithResource(context, R.drawable.solitairelogo))
-                    .setIntent(intent)
-                    .build();
-
-            scl.add(solitaireSC);*/
-
         intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, ViewVideosActivity.class);
 
         try {
@@ -254,7 +242,7 @@ public class FunApplication extends Application {
 
             long t1 = System.nanoTime();
             Loged.INSTANCE.i(String.format("Sending request %s on %s%n%s",
-                                  request.url(), chain.connection(), request.headers()), "TAG", true, true);
+                                           request.url(), chain.connection(), request.headers()), "TAG", true, true);
 
             Response response = chain.proceed(request);
 

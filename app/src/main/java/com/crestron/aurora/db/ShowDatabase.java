@@ -56,7 +56,13 @@ public abstract class ShowDatabase extends RoomDatabase {
 
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            //database.execSQL("ALTER TABLE episode_watched ADD COLUMN showUrl TEXT Primary Key");
+            database.execSQL("CREATE TABLE new_shows (show_link TEXT NOT NULL, show_name TEXT NOT NULL, number_of_shows INTEGER, PRIMARY KEY(show_link))");
+            // Copy the data
+            database.execSQL("INSERT INTO new_shows (show_link, show_name, number_of_shows) SELECT show_link, show_name, number_of_shows FROM show_table");
+            // Remove the old table
+            database.execSQL("DROP TABLE show_table");
+            // Change the table name to the correct one
+            database.execSQL("ALTER TABLE new_shows RENAME TO show_table");
         }
     };
 }

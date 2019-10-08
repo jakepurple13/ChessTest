@@ -8,7 +8,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.pm.ShortcutInfo
+import android.content.pm.ShortcutManager
 import android.graphics.Color
+import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -1052,6 +1055,166 @@ class ChoiceActivity : AppCompatActivity() {
                     permissionCheck(view = toolbar, clazz = ViewVideosActivity::class.java)
                     true
                 }
+        val shortCutItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_router)
+                .withSelectable(false)
+                .withIdentifier(13)
+                .withName("Add A Shortcut")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    var choice: ChoiceButton? = null
+                    val items = ChoiceButton.values()
+                            .filter {
+                                it !in arrayOf(ChoiceButton.QUICK_CHOICE,
+                                        ChoiceButton.VIEW_TESTING,
+                                        ChoiceButton.SETTINGS,
+                                        ChoiceButton.RECENT_ANIME,
+                                        ChoiceButton.RECENT_CARTOON,
+                                        ChoiceButton.UPDATE_APP,
+                                        ChoiceButton.UPDATE_NOTES,
+                                        ChoiceButton.DOWNLOAD_APK,
+                                        ChoiceButton.DELETE_OLD_FILE,
+                                        ChoiceButton.VIEW_DOWNLOADS,
+                                        ChoiceButton.VIEW_VIDEOS,
+                                        ChoiceButton.QUICK_CHOICE,
+                                        ChoiceButton.FEEDBACK,
+                                        ChoiceButton.VIEW_TESTING,
+                                        ChoiceButton.CHAT)
+                            }
+                            .map { it.title }
+                            .toTypedArray()
+                    MaterialAlertDialogBuilder(this)
+                            .setTitle("Choose an item to add a shortcut")
+                            .setSingleChoiceItems(items, -1) { di, num ->
+                                choice = try {
+                                    ChoiceButton.values()[num]
+                                } catch (e: Exception) {
+                                    null
+                                }
+                            }
+                            .setPositiveButton("Ok!") { _, _ ->
+                                if (choice != null) {
+                                    val shortcut = ShortcutInfo.Builder(this, choice!!.id)
+                                            .setShortLabel(choice!!.title)
+                                            .setLongLabel(choice!!.title)
+                                    val intent = when (choice) {
+                                        ChoiceButton.BLACKJACK -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.blackjacklogo))
+                                            Intent(this, BlackJackActivity::class.java)
+                                        }
+                                        ChoiceButton.SOLITAIRE -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.solitairelogo))
+                                            Intent(this, SolitaireActivity::class.java).apply {
+                                                putExtra(ConstantValues.DRAW_AMOUNT, KUtility.getSharedPref(this@ChoiceActivity).getInt(ConstantValues.DRAW_AMOUNT, 1))
+                                            }
+                                        }
+                                        ChoiceButton.CALCULATION -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.calculationlogo))
+                                            Intent(this, CalculationActivity::class.java)
+                                        }
+                                        ChoiceButton.VIDEO_POKER -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.pokerlogo))
+                                            Intent(this, VideoPokerActivity::class.java)
+                                        }
+                                        ChoiceButton.MATCHING -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.matchinglogo))
+                                            Intent(this, MatchingActivityTwo::class.java)
+                                        }
+                                        ChoiceButton.HILO -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.hilologo))
+                                            Intent(this, HiLoActivity::class.java)
+                                        }
+                                        ChoiceButton.CHESS -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.black_chess_knight))
+                                            Intent(this, MainActivity::class.java)
+                                        }
+                                        ChoiceButton.YAHTZEE -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.yahtzeelogo))
+                                            Intent(this, YahtzeeActivity::class.java)
+                                        }
+                                        ChoiceButton.PONG -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.apk))
+                                            Intent(this, PongActivity::class.java)
+                                        }
+                                        ChoiceButton.MUSIC_MATCH -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.matchinglogo))
+                                            Intent(this, MusicGameActivity::class.java)
+                                        }
+                                        ChoiceButton.ANIME -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.ten2))
+                                            Intent(this, ShowListActivity::class.java).apply {
+                                                putExtra(ConstantValues.SHOW_LINK, Source.ANIME.link)
+                                            }
+                                        }
+                                        ChoiceButton.CARTOON -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.cartoon_cover))
+                                            Intent(this, ShowListActivity::class.java).apply {
+                                                putExtra(ConstantValues.SHOW_LINK, Source.CARTOON.link)
+                                            }
+                                        }
+                                        ChoiceButton.DUBBED -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.ten4))
+                                            Intent(this, ShowListActivity::class.java).apply {
+                                                putExtra(ConstantValues.SHOW_LINK, Source.DUBBED.link)
+                                            }
+                                        }
+                                        ChoiceButton.ANIME_MOVIES -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.mov))
+                                            Intent(this, ShowListActivity::class.java).apply {
+                                                putExtra(ConstantValues.SHOW_LINK, Source.ANIME_MOVIES.link)
+                                                putExtra(ConstantValues.SHOW_MOVIE, true)
+                                            }
+                                        }
+                                        ChoiceButton.CARTOON_MOVIES -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.cartoon_movies_cover))
+                                            Intent(this, ShowListActivity::class.java).apply {
+                                                putExtra(ConstantValues.SHOW_LINK, Source.CARTOON_MOVIES.link)
+                                                putExtra(ConstantValues.SHOW_MOVIE, true)
+                                            }
+                                        }
+                                        ChoiceButton.LIVE_ACTION -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.mov))
+                                            Intent(this, ShowListActivity::class.java).apply {
+                                                putExtra(ConstantValues.SHOW_LINK, Source.LIVE_ACTION.link)
+                                            }
+                                        }
+                                        ChoiceButton.RECENT_LIVE_ACTION -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.recents))
+                                            Intent(this, ShowListActivity::class.java).apply {
+                                                putExtra(ConstantValues.SHOW_LINK, Source.RECENT_LIVE_ACTION.link)
+                                                putExtra(ConstantValues.RECENT_OR_NOT, true)
+                                            }
+                                        }
+                                        ChoiceButton.VIEW_FAVORITES -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, android.R.drawable.ic_input_get))
+                                            Intent(this, FavoriteShowsActivity::class.java)
+                                        }
+                                        ChoiceButton.RSS_FEED -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, android.R.drawable.ic_menu_today))
+                                            Intent(this, RssActivity::class.java)
+                                        }
+                                        ChoiceButton.SHOW_QUIZ -> {
+                                            shortcut.setIcon(Icon.createWithResource(this, R.drawable.b_normal))
+                                            Intent(this, QuizShowActivity::class.java)
+                                        }
+                                        else -> null
+                                    }
+                                    if (intent != null) {
+                                        intent.action = Intent.ACTION_VIEW
+                                        shortcut.setIntent(intent)
+                                        val shortcutManager = this.getSystemService<ShortcutManager>(ShortcutManager::class.java)
+                                        if(shortcutManager?.isRequestPinShortcutSupported == true) {
+                                            val short = shortcut.build()
+                                            shortcutManager?.requestPinShortcut(short, null)
+                                        } else {
+                                            Toast.makeText(this, "Pinned shortcuts are not supported!", Toast.LENGTH_SHORT).show();
+
+                                        }
+                                    }
+                                }
+                            }
+                            .show()
+                    true
+                }
         val settingsItem = PrimaryDrawerItem()
                 .withIcon(GoogleMaterial.Icon.gmd_settings)
                 .withSelectable(false)
@@ -1183,6 +1346,7 @@ class ChoiceActivity : AppCompatActivity() {
                         checkForUpdateItem,
                         DividerDrawerItem(),
                         feedbackItem,
+                        shortCutItem,
                         DividerDrawerItem(),
                         clearNotiItem,
                         DividerDrawerItem(),
