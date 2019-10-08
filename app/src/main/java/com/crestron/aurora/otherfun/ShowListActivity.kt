@@ -337,13 +337,17 @@ class ShowListActivity : AppCompatActivity() {
         }*/
 
         toTop.setOnClickListener {
-            show_info.smoothScrollAction(0) {
-                Snackbar.make(show_info, "At Top", Snackbar.LENGTH_SHORT)
-                        .setBackgroundTint("#323232".toColorInt())
-                        .setTextColor(Color.WHITE)
-                        .show()
-                runOnUiThread {
-                    app_bar.setExpanded(true, true)
+            if ((show_info.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition() == 0) {
+                app_bar.setExpanded((app_bar.height - app_bar.bottom) != 0, true)
+            } else {
+                show_info.smoothScrollAction(0) {
+                    Snackbar.make(show_info, "At Top", Snackbar.LENGTH_SHORT)
+                            .setBackgroundTint("#323232".toColorInt())
+                            .setTextColor(Color.WHITE)
+                            .show()
+                    runOnUiThread {
+                        app_bar.setExpanded(true, true)
+                    }
                 }
             }
         }
