@@ -41,8 +41,14 @@ public interface ShowDao {
     @Query("DELETE FROM show_table where show_name==(:name)")
     void deleteShow(String name);
 
-    @Update
+    @Query("DELETE FROM show_table where show_link==(:url)")
+    void deleteShowByUrl(String url);
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateShow(Show show);
+
+    @Query("UPDATE show_table set show_link=:newUrl where show_link=:prevUrl")
+    void updateShows(String prevUrl, String newUrl);
 
     @Query("select * from show_table where show_name=:name")
     Show getShow(String name);

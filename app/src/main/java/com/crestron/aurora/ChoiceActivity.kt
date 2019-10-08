@@ -86,7 +86,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.File
-import java.net.SocketTimeoutException
 import java.net.URL
 import java.util.*
 
@@ -130,8 +129,8 @@ class ChoiceActivity : AppCompatActivity() {
 
         companion object {
             fun getChoiceFromTitle(title: String): ChoiceButton? {
-                for(i in values()) {
-                    if(i.title==title) {
+                for (i in values()) {
+                    if (i.title == title) {
                         return i
                     }
                 }
@@ -541,8 +540,6 @@ class ChoiceActivity : AppCompatActivity() {
         material_rv.adapter = adapter
 
         val modelList = arrayListOf<MaterialItem>()
-        //All testing stuff
-        //modelList += MaterialItem(ChoiceButton.VIEW_TESTING, "Some actions that are WIP", android.R.drawable.ic_menu_help)
         //All games here
         modelList += MaterialItem(ChoiceButton.BLACKJACK, "Play Blackjack", R.drawable.blackjacklogo, bgImage = R.drawable.drkgreen)
         modelList += MaterialItem(ChoiceButton.SOLITAIRE, "Play Solitaire", R.drawable.solitairelogo, bgImage = R.drawable.drkgreen,
@@ -668,8 +665,8 @@ class ChoiceActivity : AppCompatActivity() {
                             //adapter.setListNotify(modelList)
                         }
                     }
-                } catch (e: SocketTimeoutException) {
-
+                } catch (e: Exception) {
+                    continue
                 }
             }
 
@@ -702,6 +699,10 @@ class ChoiceActivity : AppCompatActivity() {
                         }
                     }
                 }
+            }
+            runOnUiThread {
+                //All testing stuff/
+                //adapter.addItem(MaterialItem(ChoiceButton.VIEW_TESTING, "Some actions that are WIP", android.R.drawable.ic_menu_help))
             }
         }
 
@@ -759,7 +760,7 @@ class ChoiceActivity : AppCompatActivity() {
     }
 
     private fun saveAdapterLocations() {
-        val t = adapter.list.filter { it.hubType != ChoiceButton.QUICK_CHOICE }.map { it.hubType }
+        val t = adapter.list.filter { it.hubType !in arrayOf(ChoiceButton.QUICK_CHOICE, ChoiceButton.VIEW_TESTING) }.map { it.hubType }
         Loged.e(t)
         defaultSharedPreferences.edit().putString("home_screen_adapter_locations", t.toJson()).apply()
     }
@@ -1213,7 +1214,7 @@ class ChoiceActivity : AppCompatActivity() {
                                         intent.action = Intent.ACTION_VIEW
                                         shortcut.setIntent(intent)
                                         val shortcutManager = this.getSystemService<ShortcutManager>(ShortcutManager::class.java)
-                                        if(shortcutManager?.isRequestPinShortcutSupported == true) {
+                                        if (shortcutManager?.isRequestPinShortcutSupported == true) {
                                             val short = shortcut.build()
                                             shortcutManager?.requestPinShortcut(short, null)
                                         } else {

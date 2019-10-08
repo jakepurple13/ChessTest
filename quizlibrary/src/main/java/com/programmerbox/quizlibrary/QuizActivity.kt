@@ -353,10 +353,7 @@ abstract class QuizActivity : AppCompatActivity() {
         )
 
         val scoreView = ListView(this)
-        scoreView.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                300
-        )
+        scoreView.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 500)
         scoreView.adapter = ArrayAdapter<String>(
                 this,
                 android.R.layout.simple_list_item_1,
@@ -376,12 +373,11 @@ abstract class QuizActivity : AppCompatActivity() {
 
         val builder = MaterialAlertDialogBuilder(this)
         builder.setView(linearLayout)
-        builder.setTitle("Score")
-        builder.setMessage("You got $count/${quizQuestions.size}")
+        builder.setTitle("You got $count/${quizQuestions.size}")
         builder.setCancelable(false)
         // Add the buttons
         if (!postHighScoreLink.isNullOrBlank()) {
-            builder.setPositiveButton("Submit Score") { _, _ ->
+            builder.setPositiveButton("Submit") { _, _ ->
                 hud.setLabel("Posting")
                 hud.setDetailsLabel("Posting Score")
                 hud.show()
@@ -399,7 +395,7 @@ abstract class QuizActivity : AppCompatActivity() {
                 getInfo()
             }
         }
-        builder.setNeutralButton("Stop Playing") { _, _ ->
+        builder.setNeutralButton("Stop") { _, _ ->
             finish()
         }
         builder.setNegativeButton("Play Again!") { _, _ ->

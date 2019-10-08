@@ -5,10 +5,7 @@ import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.db.ShowSource
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
-import com.programmerbox.quizlibrary.QuizActivity
-import com.programmerbox.quizlibrary.QuizChoiceType
-import com.programmerbox.quizlibrary.QuizQuestions
-import com.programmerbox.quizlibrary.quizMaker
+import com.programmerbox.quizlibrary.*
 
 class ShowQuizActivity : QuizActivity() {
     override val dialogHintText: String = "Choose a Source"
@@ -32,6 +29,14 @@ class MusicQuizActivity : QuizActivity() {
     override fun onCreated(savedInstanceState: Bundle?) {
         titleText = "Music Quiz"
         type = QuizChoiceType.TEXT
+    }
+
+    override suspend fun postHighScore(userInfo: UserInfo) {
+        try {
+            super.postHighScore(userInfo)
+        } catch (e: Exception) {
+
+        }
     }
 }
 

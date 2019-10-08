@@ -1,11 +1,11 @@
 package com.crestron.aurora.otherfun
 
 import android.content.Context
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SectionIndexer
+import androidx.recyclerview.widget.RecyclerView
 import com.crestron.aurora.R
 import kotlinx.android.synthetic.main.favorites_show_layout.view.*
 
@@ -82,6 +82,13 @@ class FavoriteShowsAdapter(private var stuff: List<ShowListActivity.NameAndLink>
         holder.favorite.setOnCheckedChangeListener { _, isChecked ->
             action.longClick(stuff[position].name, stuff[position].url, isChecked)
         }
+
+        if(stuff[position].url.contains("animeplus.tv", true)) {
+            holder.itemView.alpha = .5f
+        } else {
+            holder.itemView.alpha = 1f
+        }
+
     }
 
 }

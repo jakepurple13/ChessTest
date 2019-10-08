@@ -17,10 +17,13 @@ import android.text.TextUtils
 import android.view.MenuItem
 import android.widget.Toast
 import com.codekidlabs.storagechooser.StorageChooser
+import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.db.getAllShowsAndEpisodesAsync
 import com.crestron.aurora.db.importAllShowsAndEpisodes
 import com.crestron.aurora.otherfun.FavoriteShowsActivity
 import com.crestron.aurora.otherfun.FetchingUtils
+import com.crestron.aurora.showapi.ShowApi
+import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.KUtility
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.annotations.SerializedName
@@ -225,6 +228,23 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                         }
                         .setNegativeButton("No") { _, _ -> }
                         .show()
+                true
+            }
+
+            findPreference("fix_database").setOnPreferenceClickListener {
+                GlobalScope.launch {
+                    val db = ShowDatabase.getDatabase(context).showDao()
+                    val dbShows = db.allShows
+                    val shows = ShowApi(Source.ANIME).showInfoList
+                    for(i in dbShows) {
+                       if(i.link.contains("animeplus.tv", true)) {
+                           val findShow = shows.find { i.name==it.name }
+                           if(findShow!=null) {
+                               db.updateShows(i.link, findShow.url)
+                           }
+                       }
+                    }
+                }
                 true
             }
 

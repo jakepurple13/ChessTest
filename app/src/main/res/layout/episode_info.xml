@@ -10,13 +10,13 @@
     tools:ignore="HardcodedText">
 
     <com.google.android.material.checkbox.MaterialCheckBox
-        app:useMaterialThemeColors="true"
         android:id="@+id/watched_button"
         android:layout_width="0dp"
-        android:layout_weight="1"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:gravity="center_vertical"
-        android:text="Episode Name" />
+        android:text="Episode Name"
+        app:useMaterialThemeColors="true" />
 
     <Button
         android:id="@+id/download_episode"
@@ -42,13 +42,13 @@
         android:id="@+id/okay_to_download"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:visibility="visible"
-        app:outer_color="@color/emeraldGreen"
         android:layout_weight="1"
+        android:visibility="visible"
         app:animate_completion="true"
         app:area_margin="10dp"
-        app:text="Download"
-        app:slider_icon_color="@color/emeraldGreen" />
+        app:outer_color="@color/emeraldGreen"
+        app:slider_icon_color="@color/emeraldGreen"
+        app:text="Download" />
 
 </LinearLayout>
 

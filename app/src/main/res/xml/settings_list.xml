@@ -20,6 +20,11 @@
             android:summary="Reset the Home Screen Locations"
             android:title="Reset Home Screen" />
 
+        <Preference
+            android:key="fix_database"
+            android:summary="Fix the database with shows that don't exist"
+            android:title="Fix Database" />
+
         <!--<Preference
             android:key="wifiOnly"
             android:summary="Check for updates and downloads only on Wifi"
