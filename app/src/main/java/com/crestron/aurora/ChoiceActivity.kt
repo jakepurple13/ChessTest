@@ -1216,7 +1216,7 @@ class ChoiceActivity : AppCompatActivity() {
                                         val shortcutManager = this.getSystemService<ShortcutManager>(ShortcutManager::class.java)
                                         if (shortcutManager?.isRequestPinShortcutSupported == true) {
                                             val short = shortcut.build()
-                                            shortcutManager?.requestPinShortcut(short, null)
+                                            shortcutManager.requestPinShortcut(short, null)
                                         } else {
                                             Toast.makeText(this, "Pinned shortcuts are not supported!", Toast.LENGTH_SHORT).show();
 

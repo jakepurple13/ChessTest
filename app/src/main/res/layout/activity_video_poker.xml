@@ -16,7 +16,7 @@
         android:layout_alignParentStart="true"
         android:layout_marginBottom="5dp"
         android:layout_marginStart="5dp"
-        style="@style/CardButtonTheme"
+        android:backgroundTint="@color/emeraldGreen"
         android:text="Play Cards" />
 
     <com.google.android.material.button.MaterialButton
@@ -27,7 +27,7 @@
         android:layout_alignTop="@+id/play_again"
         android:layout_marginBottom="5dp"
         android:layout_marginEnd="5dp"
-        style="@style/CardButtonTheme"
+        android:backgroundTint="@color/emeraldGreen"
         android:text="Discard" />
 
     <Button
@@ -243,7 +243,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/shuffle_hand"
-        style="@style/CardButtonTheme"
+        android:backgroundTint="@color/emeraldGreen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/play_again"
