@@ -163,12 +163,6 @@ class ChoiceActivity : AppCompatActivity() {
         //setSupportActionBar(toolbar)
         FirebaseApp.initializeApp(this)
 
-        /*GlobalScope.launch {
-            val s = getAllShowsAndEpisodesAsync().await()
-            importAllShowsAndEpisodes(s)
-        }*/
-
-
         setUpDrawer(savedInstanceState)
 
         if (!packageManager.canRequestPackageInstalls()) {
