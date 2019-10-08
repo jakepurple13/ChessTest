@@ -126,7 +126,18 @@ class ChoiceActivity : AppCompatActivity() {
         FEEDBACK("feedback", "Feedback"),
         VIEW_TESTING("view_testing", "View Test"),
         CHAT("chat", "Chat"),
-        SHOW_QUIZ("show_quiz", "Show Quiz")
+        SHOW_QUIZ("show_quiz", "Show Quiz");
+
+        companion object {
+            fun getChoiceFromTitle(title: String): ChoiceButton? {
+                for(i in values()) {
+                    if(i.title==title) {
+                        return i
+                    }
+                }
+                return null
+            }
+        }
     }
 
     private fun drawableModel(id: Int, button: ChoiceButton, count: Int = 0): BookModel {
@@ -1084,9 +1095,9 @@ class ChoiceActivity : AppCompatActivity() {
                             .toTypedArray()
                     MaterialAlertDialogBuilder(this)
                             .setTitle("Choose an item to add a shortcut")
-                            .setSingleChoiceItems(items, -1) { di, num ->
+                            .setSingleChoiceItems(items, -1) { _, num ->
                                 choice = try {
-                                    ChoiceButton.values()[num]
+                                    ChoiceButton.getChoiceFromTitle(items[num])
                                 } catch (e: Exception) {
                                     null
                                 }
