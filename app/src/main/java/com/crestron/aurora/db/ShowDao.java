@@ -26,7 +26,7 @@ public interface ShowDao {
     List<Show> getAllShows();
 
     default List<Show> getShowsFromSource(ShowSource s) {
-        return getShowsFromSource("%" + s.s + "%");
+        return getShowsFromSource("%" + s.getSourceName() + "%");
     }
 
     @Query("SELECT * FROM show_table where show_link like (:s)")
