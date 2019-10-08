@@ -74,6 +74,14 @@ class ShowApi(private val source: Source) {
             val cm = ShowApi(Source.RECENT_LIVE_ACTION).showInfoList.toList()
             return a + c + cm
         }
+
+        fun getSources(vararg source: Source): List<ShowInfo> {
+            val list = arrayListOf<ShowInfo>()
+            source.forEach {
+                list += ShowApi(it).showInfoList
+            }
+            return list.toList()
+        }
     }
 
     private var doc: Document = Jsoup.connect(source.link).get()
