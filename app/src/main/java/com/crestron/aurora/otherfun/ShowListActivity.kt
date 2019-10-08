@@ -414,7 +414,7 @@ class ShowListActivity : AppCompatActivity() {
                 }
             }
         }*/
-        favorite_show.setImageDrawable(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_favorite).sizeDp(24))
+        favorite_show.setImageDrawable(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_favorite_border).sizeDp(24))
         favorite_show.setOnClickListener {
             favorite_show.setImageDrawable(if (showingFavorites) {
                 showingFavorites = false
