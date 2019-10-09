@@ -60,7 +60,7 @@ class FirebaseDB(val context: Context) {
                         }
 
                         val both = mutableMapOf<String, MutableList<Episode>>()
-                        both.putAll(data)
+                        both.putAll(data ?: emptyMap())
                         both.putAll(showAndEpisode)
 
                         val allShows = ShowApi.getAll()
