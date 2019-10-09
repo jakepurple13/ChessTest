@@ -159,7 +159,7 @@ public class FunApplication extends Application {
         intent.putExtra(ConstantValues.RECENT_OR_NOT, true);
         intent.putExtra(ConstantValues.SHOW_LINK, Source.RECENT_ANIME.getLink());
 
-        ShortcutInfo recentAnime = new ShortcutInfo.Builder(context, "id1")
+        ShortcutInfo recentAnime = new ShortcutInfo.Builder(context, "recent_anime")
                 .setShortLabel("Recent Anime")
                 .setLongLabel("Recent Anime")
                 .setIcon(Icon.createWithResource(context, R.drawable.apk))
@@ -172,7 +172,7 @@ public class FunApplication extends Application {
         intent.putExtra(ConstantValues.RECENT_OR_NOT, true);
         intent.putExtra(ConstantValues.SHOW_LINK, Source.RECENT_CARTOON.getLink());
 
-        ShortcutInfo recentCartoon = new ShortcutInfo.Builder(context, "id2")
+        ShortcutInfo recentCartoon = new ShortcutInfo.Builder(context, "recent_cartoon")
                 .setShortLabel("Recent Cartoon")
                 .setLongLabel("Recent Cartoon")
                 .setIcon(Icon.createWithResource(context, R.drawable.cartoon_recent_cover))
@@ -221,6 +221,26 @@ public class FunApplication extends Application {
             scl.add(downloadViewer);
         } catch (SecurityException e) {
             Loged.INSTANCE.wtf(Objects.requireNonNull(e.getMessage()), Loged.INSTANCE.getTAG(), true, true);
+
+            ShortcutInfo videoView = new ShortcutInfo.Builder(context, "view_videos")
+                    .setShortLabel("View Videos")
+                    .setLongLabel("View Videos")
+                    .setIcon(Icon.createWithResource(context, R.drawable.mov))
+                    .setIntent(intent)
+                    .build();
+
+            scl.add(videoView);
+
+            intent = new Intent(Intent.ACTION_MAIN, Uri.EMPTY, this, DownloadViewerActivity.class);
+
+            ShortcutInfo downloadViewer = new ShortcutInfo.Builder(context, "view_downloads")
+                    .setShortLabel("View Downloads")
+                    .setLongLabel("View Downloads")
+                    .setIcon(Icon.createWithResource(context, R.drawable.mov))
+                    .setIntent(intent)
+                    .build();
+
+            scl.add(downloadViewer);
         }
 
         if (shortcutManager != null) {

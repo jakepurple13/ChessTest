@@ -1067,6 +1067,7 @@ class ChoiceActivity : AppCompatActivity() {
                 .withIdentifier(13)
                 .withName("Add A Shortcut")
                 .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
                     var choice: ChoiceButton? = null
                     val items = ChoiceButton.values()
                             .filter {
@@ -1100,7 +1101,7 @@ class ChoiceActivity : AppCompatActivity() {
                             .setPositiveButton("Ok!") { _, _ ->
                                 if (choice != null) {
                                     val shortcut = ShortcutInfo.Builder(this, choice!!.id)
-                                            .setShortLabel(choice!!.title)
+                                            .setShortLabel(choice!!.title.take(9))
                                             .setLongLabel(choice!!.title)
                                     val intent = when (choice) {
                                         ChoiceButton.BLACKJACK -> {
@@ -1202,19 +1203,17 @@ class ChoiceActivity : AppCompatActivity() {
                                             shortcut.setIcon(Icon.createWithResource(this, R.drawable.b_normal))
                                             Intent(this, QuizShowActivity::class.java)
                                         }
-                                        else -> null
+                                        else -> Intent(this, ChoiceActivity::class.java)
+                                    }.apply {
+                                        action = Intent.ACTION_VIEW
                                     }
-                                    if (intent != null) {
-                                        intent.action = Intent.ACTION_VIEW
-                                        shortcut.setIntent(intent)
-                                        val shortcutManager = this.getSystemService<ShortcutManager>(ShortcutManager::class.java)
-                                        if (shortcutManager?.isRequestPinShortcutSupported == true) {
-                                            val short = shortcut.build()
-                                            shortcutManager.requestPinShortcut(short, null)
-                                        } else {
-                                            Toast.makeText(this, "Pinned shortcuts are not supported!", Toast.LENGTH_SHORT).show();
-
-                                        }
+                                    shortcut.setIntent(intent)
+                                    val short = shortcut.build()
+                                    val shortcutManager = getSystemService(ShortcutManager::class.java)!!
+                                    if (shortcutManager.isRequestPinShortcutSupported) {
+                                        shortcutManager.requestPinShortcut(short, null)
+                                    } else {
+                                        Toast.makeText(this, "Pinned shortcuts are not supported!", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             }
