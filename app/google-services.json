@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "139228686141-efa9jruurc0cjlggqif6dn8vh3fhno69.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.crestron.aurora",
+            "certificate_hash": "45a5d44796f3bca66ae96b261ebb74345160a990"
+          }
+        },
+        {
           "client_id": "139228686141-7ekeisou356mare528a5s5ip85u4s5ga.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -33,20 +41,50 @@
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 2,
           "other_platform_oauth_client": [
             {
               "client_id": "139228686141-pd371mvf9951hjn1vkdgpaa5c3pf69j3.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:139228686141:android:e3df16db70bdd505",
+        "android_client_info": {
+          "package_name": "com.programmersbox.acatemy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "139228686141-fcptdj26b9g15k579244nkmmmi36r7f3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.programmersbox.acatemy",
+            "certificate_hash": "a723611fcd7d95933816fd67600a907388bfcab3"
+          }
         },
-        "ads_service": {
-          "status": 2
+        {
+          "client_id": "139228686141-pd371mvf9951hjn1vkdgpaa5c3pf69j3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKrkenNJJcyO-je1JLRNwYxSkT6OHcA6s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "139228686141-pd371mvf9951hjn1vkdgpaa5c3pf69j3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

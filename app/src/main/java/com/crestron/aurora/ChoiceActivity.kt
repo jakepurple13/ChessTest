@@ -41,6 +41,7 @@ import com.crestron.aurora.cardgames.matching.MatchingActivityTwo
 import com.crestron.aurora.cardgames.solitaire.SolitaireActivity
 import com.crestron.aurora.cardgames.videopoker.VideoPokerActivity
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.firebaseserver.FirebaseDB
 import com.crestron.aurora.otherfun.*
 import com.crestron.aurora.server.ChatActivity
 import com.crestron.aurora.server.QuizShowActivity
@@ -54,10 +55,20 @@ import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.viewtesting.ViewTesting
 import com.github.florent37.inlineactivityresult.kotlin.startForResult
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.gson.Gson
+import com.kaopiz.kprogresshud.KProgressHUD
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
@@ -162,6 +173,22 @@ class ChoiceActivity : AppCompatActivity() {
         setContentView(R.layout.activity_choice)
         //setSupportActionBar(toolbar)
         FirebaseApp.initializeApp(this)
+
+        mAuth = FirebaseAuth.getInstance()
+
+        hud = KProgressHUD.create(this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setLabel("Loading")
+                .setDetailsLabel("Loading Questions")
+                .setAnimationSpeed(2)
+                .setDimAmount(0.5f)
+                .setCancellable(false)
+
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build()
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         setUpDrawer(savedInstanceState)
 
@@ -994,6 +1021,81 @@ class ChoiceActivity : AppCompatActivity() {
         }
     }
 
+    private lateinit var mAuth: FirebaseAuth
+
+    private lateinit var googleSignInClient: GoogleSignInClient
+
+    private fun updateUI(user: FirebaseUser?) {
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val currentUser = mAuth?.currentUser;
+        updateUI(currentUser);
+    }
+
+    lateinit var hud: KProgressHUD
+
+    private fun signIn() {
+        val signInIntent = googleSignInClient.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
+
+    private fun signOut() {
+        mAuth.signOut()
+
+        googleSignInClient.signOut().addOnCompleteListener(this) {
+            updateUI(null)
+        }
+    }
+
+    val RC_SIGN_IN = 34
+
+    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
+        Loged.d("firebaseAuthWithGoogle:" + acct.id!!)
+        // [START_EXCLUDE silent]
+        hud.show()
+        // [END_EXCLUDE]
+
+        val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Loged.d("signInWithCredential:success")
+                        val user = mAuth.currentUser
+                        updateUI(user)
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Loged.w("signInWithCredential:failure ${task.exception}")
+                        Snackbar.make(material_rv, "Authentication Failed.", Snackbar.LENGTH_SHORT).show()
+                        updateUI(null)
+                    }
+
+                    // [START_EXCLUDE]
+                    hud.dismiss()
+                    // [END_EXCLUDE]
+                }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                val account = task.getResult(ApiException::class.java)
+                firebaseAuthWithGoogle(account!!)
+            } catch (e: ApiException) {
+                // Google Sign In failed, update UI appropriately
+                Loged.w("Google sign in failed $e")
+                // ...
+            }
+        }
+    }
+
     private fun setUpDrawer(savedInstanceState: Bundle?) {
         //if you want to update the items at a later time it is recommended to keep it in a variable
         val downloadCountItem = PrimaryDrawerItem()
@@ -1319,6 +1421,39 @@ class ChoiceActivity : AppCompatActivity() {
                 }
             true
         }
+        val loginOutItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_local_gas_station)
+                .withSelectable(false)
+                .withIdentifier(23)
+                .withName(if (mAuth.currentUser != null) "Logout" else "Login")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    if (mAuth.currentUser != null) {
+                        MaterialAlertDialogBuilder(this@ChoiceActivity)
+                                .setTitle("Sign Out")
+                                .setMessage("Are you sure?")
+                                .setPositiveButton("Yes") { _, _ ->
+                                    signOut()
+                                }
+                                .setNegativeButton("No") { _, _ ->
+
+                                }
+                                .show()
+                    } else {
+                        signIn()
+                    }
+                    true
+                }
+        val syncDataItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_save)
+                .withSelectable(false)
+                .withIdentifier(25)
+                .withName("Sync Data")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
+                    FirebaseDB(this).getAndStore()
+                    true
+                }
 
         // Create the AccountHeader
         val headerResult = AccountHeaderBuilder()
@@ -1357,7 +1492,9 @@ class ChoiceActivity : AppCompatActivity() {
                         DividerDrawerItem(),
                         updateNotesItem,
                         DividerDrawerItem(),
-                        updateAppItem
+                        updateAppItem,
+                        loginOutItem,
+                        syncDataItem
                 )
                 .withDisplayBelowStatusBar(true)
                 .withTranslucentStatusBar(true)
