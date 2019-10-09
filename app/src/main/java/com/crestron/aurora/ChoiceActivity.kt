@@ -1027,7 +1027,7 @@ class ChoiceActivity : AppCompatActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
 
     private val loginOutItem: PrimaryDrawerItem = PrimaryDrawerItem()
-            .withIcon(GoogleMaterial.Icon.gmd_local_gas_station)
+            .withIcon(GoogleMaterial.Icon.gmd_perm_identity)
             .withSelectable(false)
             .withIdentifier(23)
 
@@ -1469,14 +1469,32 @@ class ChoiceActivity : AppCompatActivity() {
                     true
                 }
         val syncDataItem = PrimaryDrawerItem()
-                .withIcon(GoogleMaterial.Icon.gmd_save)
+                .withIcon(GoogleMaterial.Icon.gmd_sync)
                 .withSelectable(false)
                 .withIdentifier(25)
                 .withName("Sync Data")
                 .withOnDrawerItemClickListener { _, _, _ ->
                     result.closeDrawer()
                     FirebaseDB(this).getAndStore()
+                    true
+                }
+        val storeSettingsItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_cloud_upload)
+                .withSelectable(false)
+                .withIdentifier(26)
+                .withName("Store Settings")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
                     FirebaseDB(this).storeAllSettings()
+                    true
+                }
+        val loadSettingsItem = PrimaryDrawerItem()
+                .withIcon(GoogleMaterial.Icon.gmd_cloud_download)
+                .withSelectable(false)
+                .withIdentifier(27)
+                .withName("Load Settings")
+                .withOnDrawerItemClickListener { _, _, _ ->
+                    result.closeDrawer()
                     FirebaseDB(this).loadAllSettings()
                     true
                 }
@@ -1521,7 +1539,9 @@ class ChoiceActivity : AppCompatActivity() {
                         DividerDrawerItem(),
                         updateAppItem,
                         loginOutItem,
-                        syncDataItem
+                        syncDataItem,
+                        storeSettingsItem,
+                        loadSettingsItem
                 )
                 .withDisplayBelowStatusBar(true)
                 .withTranslucentStatusBar(true)
