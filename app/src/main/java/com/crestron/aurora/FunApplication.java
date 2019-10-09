@@ -71,6 +71,8 @@ public class FunApplication extends Application {
         FirebaseApp.initializeApp(this);
         JobManager.create(this).addJobCreator(new JobCreation());
 
+        ApplicationExtenstions.INSTANCE.initDrawerImageLoader();
+
         Loged.INSTANCE.setFILTER_BY_CLASS_NAME("crestron");
 
         context = this;

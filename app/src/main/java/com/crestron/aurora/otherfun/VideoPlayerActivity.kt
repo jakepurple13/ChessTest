@@ -26,7 +26,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -37,7 +39,6 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_video_player.*
 import kotlinx.coroutines.Runnable
-import org.jetbrains.anko.defaultSharedPreferences
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.collections.ArrayList
@@ -231,6 +232,15 @@ class VideoPlayerActivity : AppCompatActivity() {
 
         player = ExoPlayerFactory.newSimpleInstance(this)
 
+        player.addListener(object : Player.EventListener {
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                if (playbackState == ExoPlayer.STATE_ENDED){
+                    //player back ended
+                    finish()
+                }
+            }
+        })
+
         playerView.player = player
 
         val dOrS = intent.getBooleanExtra("download_or_stream", true)
@@ -270,7 +280,7 @@ class VideoPlayerActivity : AppCompatActivity() {
         //mpw_video_player.hideFullScreenButton = true
         //mpw_video_player.autoStartPlay(path, MxVideoPlayer.SCREEN_WINDOW_FULLSCREEN, name)
 
-        val pos = defaultSharedPreferences.getLong(path, 0)
+        val pos = getSharedPreferences("videos", Context.MODE_PRIVATE).getLong(path, 0)
         Loged.wtf("$path at $pos")
         playerView.player!!.seekTo(pos)
         //mpw_video_player.seekToPosition(pos)
@@ -347,7 +357,7 @@ class VideoPlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         val position = currentPos
         Loged.wtf("$path at $position")
-        defaultSharedPreferences.edit().putLong(path, position).apply()
+        getSharedPreferences("videos", Context.MODE_PRIVATE).edit().putLong(path, position).apply()
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audio.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0)
         //MxVideoPlayer.backPress()

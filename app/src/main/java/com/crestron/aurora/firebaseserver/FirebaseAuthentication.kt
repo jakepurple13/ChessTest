@@ -17,6 +17,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.defaultSharedPreferences
 
 
 class FirebaseDB(val context: Context) {
@@ -40,18 +41,64 @@ class FirebaseDB(val context: Context) {
         }
     }
 
+    fun storeAllSettings() {
+        FirebaseAuth.getInstance().currentUser?.let {
+            val database = FirebaseDatabase.getInstance()
+            val ref = database.getReference(it.uid).child("/settings")
+            Loged.r(context.defaultSharedPreferences.all)
+            ref.setValue(context.defaultSharedPreferences.all.toJson())
+        }
+    }
+
+    fun loadAllSettings() {
+        FirebaseAuth.getInstance().currentUser?.let {
+            val database = FirebaseDatabase.getInstance()
+            val ref = database.getReference(it.uid).child("/settings")
+            ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(p0: DataSnapshot) {
+                    try {
+                        val value = p0.getValue(String::class.java)
+                        Loged.d("Value is: $value")
+                        val loadedSettings = Gson().fromJson<Map<String, *>>(value, object : TypeToken<Map<String, *>>() {}.type)
+                        val edit = context.defaultSharedPreferences.edit()
+                        for (i in loadedSettings) {
+                            when (i.value) {
+                                is String -> edit.putString(i.key, i.value as String)
+                                is Int -> edit.putInt(i.key, i.value as Int)
+                                is Float -> edit.putFloat(i.key, i.value as Float)
+                                is Long -> edit.putLong(i.key, i.value as Long)
+                                is Boolean -> edit.putBoolean(i.key, i.value as Boolean)
+                            }
+                        }
+                        edit.apply()
+                    } catch(e: Exception) {
+                    }
+                }
+
+                override fun onCancelled(p0: DatabaseError) {
+
+                }
+            })
+        }
+    }
+
     fun getAndStore() {
         FirebaseAuth.getInstance().currentUser?.let {
             val database = FirebaseDatabase.getInstance()
-            val ref = database.getReference(it.uid)
-            //ref.setValue()
-            ref.addValueEventListener(object : ValueEventListener {
+            val ref = database.getReference(it.uid).child("/shows")
+            ref.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(p0: DataSnapshot) {
                     GlobalScope.launch {
-                        val value = p0.getValue(String::class.java)
-                        Loged.d("Value is: $value")
-                        val data = Gson().fromJson<MutableMap<String, MutableList<Episode>>>(value, object : TypeToken<MutableMap<String, MutableList<Episode>>>() {}.type)
-
+                        val both = mutableMapOf<String, MutableList<Episode>>()
+                        try {
+                            if (p0.exists()) {
+                                val value = p0.getValue(String::class.java)
+                                Loged.d("Value is: $value")
+                                val data = Gson().fromJson<MutableMap<String, MutableList<Episode>>>(value, object : TypeToken<MutableMap<String, MutableList<Episode>>>() {}.type)
+                                both.putAll(data ?: emptyMap())
+                            }
+                        } catch (ignored: Exception) {
+                        }
                         val showAndEpisode = mutableMapOf<String, MutableList<Episode>>()
                         val db = ShowDatabase.getDatabase(context).showDao()
                         val shows = db.allShows
@@ -59,8 +106,6 @@ class FirebaseDB(val context: Context) {
                             showAndEpisode[i.link] = ShowDatabase.getDatabase(context).showDao().getEpisodesByUrl(i.link)
                         }
 
-                        val both = mutableMapOf<String, MutableList<Episode>>()
-                        both.putAll(data ?: emptyMap())
                         both.putAll(showAndEpisode)
 
                         val allShows = ShowApi.getAll()

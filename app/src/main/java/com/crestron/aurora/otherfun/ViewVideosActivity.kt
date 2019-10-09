@@ -94,14 +94,14 @@ class ViewVideosActivity : AppCompatActivity() {
                 Loged.i(i.name)
             }
             //to get rid of any preferences of any videos that have been deleted else where
-            val prefs = defaultSharedPreferences.all.keys
+            val prefs = getSharedPreferences("videos", Context.MODE_PRIVATE).all.keys
             val fileRegex = "(\\/[^*|\"<>?\\n]*)|(\\\\\\\\.*?\\\\.*)".toRegex()
             val filePrefs = prefs.filter { fileRegex.containsMatchIn(it) }
             for (p in filePrefs) {
                 Loged.i(p)
                 if (!listOfFiles.any { it.path == p }) {
                     Loged.d(p)
-                    defaultSharedPreferences.edit().remove(p).apply()
+                    getSharedPreferences("videos", Context.MODE_PRIVATE).edit().remove(p).apply()
                 }
             }
             if (adapter == null)
@@ -171,7 +171,7 @@ class ViewVideosActivity : AppCompatActivity() {
                             GlobalScope.launch {
                                 for (f in listOfFiles) {
                                     if (selectedNames!!.any { it == f.name }) {
-                                        defaultSharedPreferences.edit().remove(f.path).apply()
+                                        getSharedPreferences("videos", Context.MODE_PRIVATE).edit().remove(f.path).apply()
                                         f.delete()
                                         runOnUiThread {
                                             val index = listOfFiles.indexOf(f)
@@ -410,7 +410,6 @@ class ViewVideosActivity : AppCompatActivity() {
                        val picasso: Picasso) : DragSwipeAdapter<File, ViewHolder>(list) {
 
 
-
         /*override fun onItemDismiss(position: Int, direction: Int) {
             if (stuff.isNotEmpty())
                 DeleteDialog(context, stuff[position].name, listener = listener(position)).show()
@@ -461,7 +460,7 @@ class ViewVideosActivity : AppCompatActivity() {
         // Binds each animal in the ArrayList to a view
         @SuppressLint("SetTextI18n")
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.videoName.text = "${list[position].name} ${if (context.defaultSharedPreferences.contains(list[position].path)) "\nat ${Utility.stringForTime(context.defaultSharedPreferences.getLong(list[position].path, 0))}" else ""}"
+            holder.videoName.text = "${list[position].name} ${if (context.getSharedPreferences("videos", Context.MODE_PRIVATE).contains(list[position].path)) "\nat ${Utility.stringForTime(context.getSharedPreferences("videos", Context.MODE_PRIVATE).getLong(list[position].path, 0))}" else ""}"
 
             try {
                 //Video runtime text
@@ -475,7 +474,7 @@ class ViewVideosActivity : AppCompatActivity() {
                     val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                     retriever.release()
                     time.toLong()
-                } catch(e: Exception) {
+                } catch (e: Exception) {
                     val mp = MediaPlayer.create(context, Uri.parse(list[position].path))
                     mp.duration.toLong()
                 }

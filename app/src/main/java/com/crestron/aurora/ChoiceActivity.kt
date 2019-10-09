@@ -70,6 +70,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.gson.Gson
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
@@ -178,8 +179,8 @@ class ChoiceActivity : AppCompatActivity() {
 
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                .setLabel("Loading")
-                .setDetailsLabel("Loading Questions")
+                .setLabel("Signing")
+                .setDetailsLabel("Logging In/Out")
                 .setAnimationSpeed(2)
                 .setDimAmount(0.5f)
                 .setCancellable(false)
@@ -1025,14 +1026,39 @@ class ChoiceActivity : AppCompatActivity() {
 
     private lateinit var googleSignInClient: GoogleSignInClient
 
-    private fun updateUI(user: FirebaseUser?) {
+    private val loginOutItem: PrimaryDrawerItem = PrimaryDrawerItem()
+            .withIcon(GoogleMaterial.Icon.gmd_local_gas_station)
+            .withSelectable(false)
+            .withIdentifier(23)
 
+
+    lateinit var headerResult: AccountHeader
+
+    private fun updateUI(user: FirebaseUser?) {
+        val pInfo = packageManager.getPackageInfo(packageName, 0)
+        val version = pInfo.versionName
+        loginOutItem.withName(if (user != null) "Logout" else "Login")
+        val profile = ProfileDrawerItem()
+                .withName("For Us Nerds")
+                .withEmail("App Version: $version")
+                .withIdentifier(32)
+        if (user != null) {
+            if(user.photoUrl==null) {
+                profile.withIcon(GoogleMaterial.Icon.gmd_android)
+            } else {
+                profile.withIcon(user.photoUrl)
+            }
+        } else {
+            profile.withIcon(GoogleMaterial.Icon.gmd_android)
+        }
+        headerResult.updateProfile(profile)
+        result.updateItem(loginOutItem)
     }
 
     override fun onStart() {
         super.onStart()
-        val currentUser = mAuth?.currentUser;
-        updateUI(currentUser);
+        val currentUser = mAuth.currentUser
+        updateUI(currentUser)
     }
 
     lateinit var hud: KProgressHUD
@@ -1055,6 +1081,7 @@ class ChoiceActivity : AppCompatActivity() {
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
         Loged.d("firebaseAuthWithGoogle:" + acct.id!!)
         // [START_EXCLUDE silent]
+        hud.setDetailsLabel("Logging In")
         hud.show()
         // [END_EXCLUDE]
 
@@ -1421,10 +1448,7 @@ class ChoiceActivity : AppCompatActivity() {
                 }
             true
         }
-        val loginOutItem = PrimaryDrawerItem()
-                .withIcon(GoogleMaterial.Icon.gmd_local_gas_station)
-                .withSelectable(false)
-                .withIdentifier(23)
+        loginOutItem
                 .withName(if (mAuth.currentUser != null) "Logout" else "Login")
                 .withOnDrawerItemClickListener { _, _, _ ->
                     result.closeDrawer()
@@ -1452,11 +1476,13 @@ class ChoiceActivity : AppCompatActivity() {
                 .withOnDrawerItemClickListener { _, _, _ ->
                     result.closeDrawer()
                     FirebaseDB(this).getAndStore()
+                    FirebaseDB(this).storeAllSettings()
+                    FirebaseDB(this).loadAllSettings()
                     true
                 }
 
         // Create the AccountHeader
-        val headerResult = AccountHeaderBuilder()
+        headerResult = AccountHeaderBuilder()
                 .withActivity(this)
                 .withDividerBelowHeader(true)
                 .withCurrentProfileHiddenInList(true)
@@ -1466,6 +1492,7 @@ class ChoiceActivity : AppCompatActivity() {
                                 .withName("For Us Nerds")
                                 .withEmail("App Version: $version")
                                 .withIcon(GoogleMaterial.Icon.gmd_android)
+                                .withIdentifier(32)
                 ).build()
 
         //create the drawer and remember the `Drawer` result object
