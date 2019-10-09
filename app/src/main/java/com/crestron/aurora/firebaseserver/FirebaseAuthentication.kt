@@ -5,7 +5,6 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
-import com.crestron.aurora.db.getAllShowsAndEpisodesAsync
 import com.crestron.aurora.server.toJson
 import com.crestron.aurora.showapi.ShowApi
 import com.google.firebase.auth.FirebaseAuth
@@ -21,25 +20,6 @@ import org.jetbrains.anko.defaultSharedPreferences
 
 
 class FirebaseDB(val context: Context) {
-    fun storeData() {
-        GlobalScope.launch {
-            FirebaseAuth.getInstance().currentUser?.let {
-                val database = FirebaseDatabase.getInstance()
-                val ref = database.getReference(it.uid)
-                ref.setValue(context.getAllShowsAndEpisodesAsync().await())
-                ref.addValueEventListener(object : ValueEventListener {
-                    override fun onDataChange(p0: DataSnapshot) {
-                        val value = p0.getValue(String::class.java)
-                        Loged.d("Value is: $value")
-                    }
-
-                    override fun onCancelled(p0: DatabaseError) {
-                        Loged.w("Failed to read value. ${p0.toException()}");
-                    }
-                })
-            }
-        }
-    }
 
     fun storeAllSettings() {
         FirebaseAuth.getInstance().currentUser?.let {
