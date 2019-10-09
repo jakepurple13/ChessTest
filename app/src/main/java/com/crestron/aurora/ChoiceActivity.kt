@@ -1475,7 +1475,7 @@ class ChoiceActivity : AppCompatActivity() {
                 .withName("Sync Data")
                 .withOnDrawerItemClickListener { _, _, _ ->
                     result.closeDrawer()
-                    FirebaseDB(this).getAndStore()
+                    //FirebaseDB(this).getAndStore()
                     true
                 }
         val storeSettingsItem = PrimaryDrawerItem()
