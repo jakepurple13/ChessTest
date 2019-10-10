@@ -1,7 +1,6 @@
 package com.crestron.aurora.firebaseserver
 
 import android.content.Context
-import android.widget.Toast
 import com.crestron.aurora.Loged
 import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.Show
@@ -231,9 +230,6 @@ class FirebaseDB(val context: Context) {
             Loged.d("Success!")
         }.addOnFailureListener {
             Loged.wtf("Failure!")
-        }.addOnCompleteListener {
-            Loged.d("All done!")
-            Toast.makeText(context, "Finished syncing", Toast.LENGTH_SHORT).show()
         }
     }
 
