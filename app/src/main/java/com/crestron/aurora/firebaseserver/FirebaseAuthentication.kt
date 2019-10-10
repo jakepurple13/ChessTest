@@ -12,6 +12,8 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.GlobalScope
@@ -51,7 +53,7 @@ class FirebaseDB(val context: Context) {
                             }
                         }
                         edit.apply()
-                    } catch(e: Exception) {
+                    } catch (e: Exception) {
                     }
                 }
 
@@ -60,6 +62,86 @@ class FirebaseDB(val context: Context) {
                 }
             })
         }
+    }
+
+    companion object {
+        fun firebaseSetup() {
+            //val user = FirebaseAuth.getInstance()
+            //FirebaseFirestore.getInstance().
+            val settings = FirebaseFirestoreSettings.Builder()
+                    .setPersistenceEnabled(true)
+                    .build()
+            FirebaseFirestore.getInstance().firestoreSettings = settings
+        }
+    }
+
+    fun storeDb() {
+        GlobalScope.launch {
+            val showAndEpisode = mutableMapOf<Show, MutableList<Episode>>()
+            val db = ShowDatabase.getDatabase(context).showDao()
+            val shows = db.allShows.take(5)
+            for (i in shows) {
+                showAndEpisode[i] = ShowDatabase.getDatabase(context).showDao().getEpisodesByUrl(i.link)
+            }
+            for (i in showAndEpisode) {
+                storeShow(Pair(i.key, i.value))
+            }
+        }
+    }
+
+    data class FirebaseEpisode(
+            val name: String? = null,
+            val url: String? = null
+    )
+
+    data class FirebaseShow(
+            val name: String? = null,
+            val url: String? = null,
+            val episodes: List<FirebaseEpisode>? = null
+    )
+
+    fun storeShow(showInfo: Pair<Show, MutableList<Episode>>) {
+        val data2 = FirebaseShow(showInfo.first.name, showInfo.first.link, showInfo.second.map { FirebaseEpisode(it.showName, it.showUrl) })
+
+        val user = FirebaseAuth.getInstance()
+        val store = FirebaseFirestore.getInstance()
+                .collection(user.uid!!)
+                .document(showInfo.first.link.replace("/", "<"))
+                .set(data2)
+
+        store.addOnSuccessListener {
+            Loged.d("Success!")
+        }.addOnFailureListener {
+            Loged.wtf("Failure!")
+        }
+    }
+
+    fun getAllShows(updateUI: (List<FirebaseShow>) -> Unit = {}) {
+        val user = FirebaseAuth.getInstance()
+
+        FirebaseFirestore.getInstance()
+                .collection(user.uid!!)
+                .get()
+                .addOnSuccessListener { document ->
+                    Loged.d("Success!")
+                    val showList = mutableListOf<FirebaseShow>()
+                    for (info in document) {
+                        Loged.d("${info.id} => ${info.data}")
+                        val url = info.id.replace("<", "/")
+                        val data = info.data
+                        val data2 = try {
+                            info.toObject(FirebaseShow::class.java)
+                        } catch(e: Exception) {
+                            continue
+                        }
+                        Loged.r("$url\n$data\n$data2")
+                        showList+=data2
+                    }
+                    updateUI(showList)
+                }
+                .addOnFailureListener { exception ->
+                    Loged.d("get failed with $exception")
+                }
     }
 
     fun getAndStore() {

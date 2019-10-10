@@ -1475,6 +1475,16 @@ class ChoiceActivity : AppCompatActivity() {
                 .withName("Sync Data")
                 .withOnDrawerItemClickListener { _, _, _ ->
                     result.closeDrawer()
+                    MaterialAlertDialogBuilder(this@ChoiceActivity)
+                            .setTitle("Choose")
+                            .setMessage("One")
+                            .setPositiveButton("Store") { _, _ ->
+                                FirebaseDB(this).storeDb()
+                            }
+                            .setNegativeButton("Get") { _, _ ->
+                                FirebaseDB(this).getAllShows()
+                            }
+                            .show()
                     //FirebaseDB(this).getAndStore()
                     true
                 }

@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Environment;
 
 import com.crashlytics.android.Crashlytics;
+import com.crestron.aurora.firebaseserver.FirebaseDB;
 import com.crestron.aurora.otherfun.DownloadViewerActivity;
 import com.crestron.aurora.otherfun.FetchingUtils;
 import com.crestron.aurora.otherfun.ShowListActivity;
@@ -72,6 +73,7 @@ public class FunApplication extends Application {
         JobManager.create(this).addJobCreator(new JobCreation());
 
         ApplicationExtenstions.INSTANCE.initDrawerImageLoader();
+        FirebaseDB.Companion.firebaseSetup();
 
         Loged.INSTANCE.setFILTER_BY_CLASS_NAME("crestron");
 
