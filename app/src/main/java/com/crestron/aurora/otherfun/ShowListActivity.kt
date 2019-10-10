@@ -26,6 +26,7 @@ import com.crestron.aurora.FormActivity
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.firebaseserver.FirebaseDB
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.ShowInfo
@@ -210,6 +211,8 @@ class ShowListActivity : AppCompatActivity() {
         }
     }
 
+    lateinit var firebaseStuff: List<FirebaseDB.FirebaseShow>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_show_list)
@@ -244,6 +247,9 @@ class ShowListActivity : AppCompatActivity() {
                 source.movie = movie
                 val showApi = ShowApi(source)
 
+                firebaseStuff = FirebaseDB(this@ShowListActivity).getAllShowsSync()
+                Loged.r(firebaseStuff)
+
                 listOfNameAndLink.addAll(showApi.showInfoList)
 
                 if (!recentChoice)
@@ -252,7 +258,7 @@ class ShowListActivity : AppCompatActivity() {
                     defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT, 0).apply()
 
                 runOnUiThread {
-                    show_info.adapter = AListAdapter(listOfNameAndLink, this@ShowListActivity, showDatabase, actionHit, recentChoice)
+                    show_info.adapter = AListAdapter(listOfNameAndLink, this@ShowListActivity, showDatabase, actionHit, recentChoice, firebaseShows = firebaseStuff)
                     favorite_show.isEnabled = true//!recentChoice
                     search_info.isEnabled = true
                     Loged.d("${(show_info.adapter!! as AListAdapter).itemCount}")
@@ -310,7 +316,7 @@ class ShowListActivity : AppCompatActivity() {
                 runOnUiThread {
                     val filtered = listOfNameAndLink.filter { it.name.contains(search_info.text.toString(), ignoreCase = true) }
                     //show_info.adapter = AListAdapter(filtered, this@ShowListActivity, showDatabase, actionHit)
-                    show_info.swapAdapter(AListAdapter(filtered, this@ShowListActivity, showDatabase, actionHit), true)
+                    show_info.swapAdapter(AListAdapter(filtered, this@ShowListActivity, showDatabase, actionHit, firebaseShows = firebaseStuff), true)
                 }
             }
 
@@ -455,7 +461,7 @@ class ShowListActivity : AppCompatActivity() {
                 listOfNameAndLink
             }.distinctBy { it.name }
             runOnUiThread {
-                show_info.swapAdapter(AListAdapter(listToShow, this@ShowListActivity, showDatabase, actionHit), true)
+                show_info.swapAdapter(AListAdapter(listToShow, this@ShowListActivity, showDatabase, actionHit, firebaseShows = firebaseStuff), true)
                 //show_info.adapter = AListAdapter(listToShow, this@ShowListActivity, showDatabase, actionHit)
             }
         }

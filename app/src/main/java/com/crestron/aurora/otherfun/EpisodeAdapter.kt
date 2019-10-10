@@ -4,12 +4,14 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.firebaseserver.FirebaseDB
 import com.crestron.aurora.showapi.EpisodeInfo
 import com.ncorti.slidetoact.SlideToActView
 import kotlinx.android.synthetic.main.episode_info.view.*
@@ -18,7 +20,7 @@ import org.jetbrains.anko.runOnUiThread
 import java.util.*
 
 //class EpisodeAdapter(private val items: ArrayList<String>, private val links: ArrayList<String>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
-class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, val downloadOrStream: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}) : RecyclerView.Adapter<ViewHolderEpisode>() {
+class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String, val reverse: Boolean = false, val context: Context, val slideOrButton: Boolean, val downloadOrStream: Boolean, private val action: EpisodeActivity.EpisodeAction = object : EpisodeActivity.EpisodeAction {}, val firebaseEps: FirebaseDB.FirebaseShow? = null) : RecyclerView.Adapter<ViewHolderEpisode>() {
 
     var casting = false
 
@@ -82,65 +84,49 @@ class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String
 
         val show = ShowDatabase.getDatabase(this@EpisodeAdapter.context).showDao()
 
-        GlobalScope.launch {
-            val episodes = show.getEpisodes(name)//show.getEpisodeFromShow(name)
-            //Loged.wtf("$episodes")
-
-            /*holder.watched.isChecked = episodes.any {
-                "${name
-                        .replace("(", "\\(")
-                        .replace(")", "\\)")
-                        .replace("\"", "\\\"")
-                        .replace(".", "\\.")} (.*) ${it.episodeNumber + 1}".toRegex().matches(items[position].name) || "$name (.*) ${it.episodeNumber + 1} (.*)".toRegex().matches(items[position].name)
-            }*/
-
-            holder.watched.setOnCheckedChangeListener(null)
-
-            withContext(Dispatchers.Main) {
-                holder.watched.isChecked = try {
-                    items[position].url in episodes.map { it.showUrl }
-                } catch (e: Exception) {
-                    false
-                }
-            }
-
-            holder.watched.setOnCheckedChangeListener { _, b ->
-                GlobalScope.launch {
-                    try {
-                        if (b) {
-                            Loged.e("Inserted ${items[position]}")
-                            show.insertEpisode(Episode(position, name, items[position].url))
-                        } else {
-                            Loged.e("Deleted")
-                            show.deleteEpisode(items[position].url)
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        this@EpisodeAdapter.context.runOnUiThread {
-                            Toast.makeText(this@EpisodeAdapter.context, "Please Favorite Show if you plan on Checking the Episodes", Toast.LENGTH_LONG).show()
-                        }
-                        holder.watched.isChecked = false
+        val checkedListener: (CompoundButton, Boolean) -> Unit = { _: CompoundButton, b: Boolean ->
+            GlobalScope.launch {
+                try {
+                    if (b) {
+                        Loged.e("Inserted ${items[position]}")
+                        show.insertEpisode(Episode(position, name, items[position].url))
+                        FirebaseDB(context).addEpisode(name, Episode(position, name, items[position].url))
+                    } else {
+                        Loged.e("Deleted")
+                        show.deleteEpisode(items[position].url)
+                        FirebaseDB(context).removeEpisode(name, Episode(position, name, items[position].url))
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    this@EpisodeAdapter.context.runOnUiThread {
+                        Toast.makeText(this@EpisodeAdapter.context, "Please Favorite Show if you plan on Checking the Episodes", Toast.LENGTH_LONG).show()
+                    }
+                    holder.watched.isChecked = false
                 }
             }
+        }
 
-            /*for (i in episodes) {
+        holder.watched.setOnCheckedChangeListener(null)
 
-                val check = if (reverse)
-                    position
-                else
-                    items.size - position - 1
+        try {
+            Loged.r(firebaseEps)
+            if(firebaseEps!=null) {
+                holder.watched.isChecked = items[position].url in (firebaseEps.episodeInfo?.map { it.url } ?: emptyList())
+            }
+            holder.watched.setOnCheckedChangeListener(checkedListener)
+        } catch(e: Exception) {
+            GlobalScope.launch {
+                val episodes = show.getEpisodes(name)
 
-                if (check == i.episodeNumber) {
-                    holder.watched.isChecked = true
+                withContext(Dispatchers.Main) {
+                    holder.watched.isChecked = try {
+                        items[position].url in episodes.map { it.showUrl }
+                    } catch (e: Exception) {
+                        false
+                    }
+                    holder.watched.setOnCheckedChangeListener(checkedListener)
                 }
-
-                Loged.i("$name is the name and ${items[position]} and the matching is ${"$name (.*) ${i.episodeNumber}".toRegex().matches(items[position])}")
-
-                //this@EpisodeAdapter.context.runOnUiThread {
-                //holder.watched.isChecked = "$name (.*) ${i.episodeNumber}".toRegex().matches(items[position])
-                //}
-            }*/
+            }
         }
     }
 }

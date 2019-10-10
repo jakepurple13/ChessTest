@@ -26,6 +26,7 @@ import com.crestron.aurora.R
 import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.firebaseserver.FirebaseDB
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.EpisodeInfo
 import com.crestron.aurora.showapi.ShowInfo
@@ -316,74 +317,81 @@ class EpisodeActivity : AppCompatActivity() {
                     Picasso.get().load(android.R.drawable.stat_notify_error).resize((600 * .6).toInt(), (800 * .6).toInt()).into(cover_image)
                 }
 
-                val slideOrButton = defaultSharedPreferences.getBoolean(ConstantValues.SLIDE_OR_BUTTON, true)
-                val downloadOrStream = defaultSharedPreferences.getBoolean(ConstantValues.DOWNLOAD_OR_STREAM, true)
-                Loged.i("$downloadOrStream")
+                GlobalScope.launch {
+                    val slideOrButton = defaultSharedPreferences.getBoolean(ConstantValues.SLIDE_OR_BUTTON, true)
+                    val downloadOrStream = defaultSharedPreferences.getBoolean(ConstantValues.DOWNLOAD_OR_STREAM, true)
+                    Loged.i("$downloadOrStream")
 
-                adapter = EpisodeAdapter(listOfEpisodes, url, context = this@EpisodeActivity, slideOrButton = slideOrButton, downloadOrStream = downloadOrStream, action = object : EpisodeAction {
-                    override fun hit(name: String, url: String) {
-                        super.hit(name, url)
-                        FetchingUtils.downloadCount++
-                        GlobalScope.launch {
-                            if (downloadOrStream) {
-                                runOnUiThread {
-                                    Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
-                                }
-                                fetching.getVideo(EpisodeInfo(name, url), if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
-                                        KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
-                                        KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
-                            } else {
-                                val epInfo = EpisodeInfo(name, url)
-                                startActivity(Intent(this@EpisodeActivity, VideoPlayerActivity::class.java).apply {
-                                    putExtra("video_path", epInfo.getVideoLink())
-                                    putExtra("video_name", name)
-                                    putExtra("download_or_stream", false)
-                                })
-                            }
-                        }
-                    }
+                    val fire = FirebaseDB(this@EpisodeActivity).getShowSync(url)
+                    Loged.r(fire)
 
-                    override fun hit(info: EpisodeInfo) {
-                        super.hit(name, url)
-                        /*FetchingUtils.downloadCount++
-                        Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
-                        GlobalScope.launch {
-                            fetching.getVideo(info, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
-                                    KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
-                                    KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
-                        }*/
-                        GlobalScope.launch {
-                            if (reverse_order.isChecked) {
-                                runOnUiThread {
-                                    Toast.makeText(this@EpisodeActivity, "Getting Info...", Toast.LENGTH_SHORT).show()
-                                }
-                                startActivity(Intent(this@EpisodeActivity, CastingActivity::class.java).apply {
-                                    putExtra("cast_info", Gson().toJson(CastVideoInfo(video_name = name, video_url = info.getVideoLink(), video_image = epApi!!.image, video_des = epApi.description)))
-                                })
-                            } else {
+                    adapter = EpisodeAdapter(listOfEpisodes, url, context = this@EpisodeActivity, slideOrButton = slideOrButton, downloadOrStream = downloadOrStream, action = object : EpisodeAction {
+                        override fun hit(name: String, url: String) {
+                            super.hit(name, url)
+                            FetchingUtils.downloadCount++
+                            GlobalScope.launch {
                                 if (downloadOrStream) {
                                     runOnUiThread {
                                         Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
                                     }
-                                    fetching.getVideo(info, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
+                                    fetching.getVideo(EpisodeInfo(name, url), if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
                                             KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
                                             KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
                                 } else {
-                                    runOnUiThread {
-                                        Toast.makeText(this@EpisodeActivity, "Getting Info...", Toast.LENGTH_SHORT).show()
-                                    }
+                                    val epInfo = EpisodeInfo(name, url)
                                     startActivity(Intent(this@EpisodeActivity, VideoPlayerActivity::class.java).apply {
-                                        putExtra("video_path", info.getVideoLink())
+                                        putExtra("video_path", epInfo.getVideoLink())
                                         putExtra("video_name", name)
                                         putExtra("download_or_stream", false)
                                     })
                                 }
                             }
                         }
+
+                        override fun hit(info: EpisodeInfo) {
+                            super.hit(name, url)
+                            /*FetchingUtils.downloadCount++
+                            Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
+                            GlobalScope.launch {
+                                fetching.getVideo(info, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
+                                        KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
+                                        KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
+                            }*/
+                            GlobalScope.launch {
+                                if (reverse_order.isChecked) {
+                                    runOnUiThread {
+                                        Toast.makeText(this@EpisodeActivity, "Getting Info...", Toast.LENGTH_SHORT).show()
+                                    }
+                                    startActivity(Intent(this@EpisodeActivity, CastingActivity::class.java).apply {
+                                        putExtra("cast_info", Gson().toJson(CastVideoInfo(video_name = name, video_url = info.getVideoLink(), video_image = epApi!!.image, video_des = epApi.description)))
+                                    })
+                                } else {
+                                    if (downloadOrStream) {
+                                        runOnUiThread {
+                                            Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
+                                        }
+                                        fetching.getVideo(info, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
+                                                KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
+                                                KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
+                                    } else {
+                                        runOnUiThread {
+                                            Toast.makeText(this@EpisodeActivity, "Getting Info...", Toast.LENGTH_SHORT).show()
+                                        }
+                                        startActivity(Intent(this@EpisodeActivity, VideoPlayerActivity::class.java).apply {
+                                            putExtra("video_path", info.getVideoLink())
+                                            putExtra("video_name", name)
+                                            putExtra("download_or_stream", false)
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                    }, firebaseEps = fire)
+                    runOnUiThread {
+                        episode_list.adapter = adapter
+                        Loged.d("${(episode_list.adapter!! as EpisodeAdapter).itemCount}")
                     }
-                })
-                episode_list.adapter = adapter
-                Loged.d("${(episode_list.adapter!! as EpisodeAdapter).itemCount}")
+                }
             }
             runOnUiThread {
                 episode_refresh.isRefreshing = false
@@ -423,50 +431,6 @@ class EpisodeActivity : AppCompatActivity() {
             adapter.notifyDataSetChanged()
         }
 
-        /*reverse_order.setOnCheckedChangeListener { _, b ->
-            if (b) {
-                //Toast.makeText(this@EpisodeActivity, "Will only download on Wifi", Toast.LENGTH_LONG).show()
-            } else {
-                //Toast.makeText(this@EpisodeActivity, "Will download using Mobile Data or Wifi", Toast.LENGTH_LONG).show()
-            }
-
-            listOfNames.reverse()
-            listOfUrls.reverse()
-            listOfEpisodes.reverse()
-
-            runOnUiThread {
-                //val slideOrButton = defaultSharedPreferences.getBoolean(ConstantValues.SLIDE_OR_BUTTON, true)
-                (episode_list.adapter as EpisodeAdapter).items.reverse()
-                (episode_list.adapter as EpisodeAdapter).notifyItemRangeChanged(0, episode_list.adapter!!.itemCount)
-
-                *//*= EpisodeAdapter(listOfEpisodes, name, reverse = b, context = this@EpisodeActivity, slideOrButton = slideOrButton, downloadOrStream = true, action = object : EpisodeAction {
-                    override fun hit(name: String, url: String) {
-                        super.hit(name, url)
-                        FetchingUtils.downloadCount++
-                        Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
-                        GlobalScope.launch {
-                            fetching.getVideo(EpisodeInfo(name, url), if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
-                                    KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
-                                    KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
-                        }
-                    }
-
-                    override fun hit(info: EpisodeInfo) {
-                        super.hit(name, url)
-                        FetchingUtils.downloadCount++
-                        Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
-                        GlobalScope.launch {
-                            fetching.getVideo(info, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
-                                    KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
-                                    KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
-                        }
-                    }
-                })*//*
-                Loged.d("${(episode_list.adapter!! as EpisodeAdapter).itemCount}")
-            }
-
-        }*/
-
         goto_downloads.setOnClickListener {
             startActivity(Intent(this@EpisodeActivity, DownloadViewerActivity::class.java))
         }
@@ -484,9 +448,11 @@ class EpisodeActivity : AppCompatActivity() {
                                     if (isChecked) {
                                         Loged.e("Inserted ${adapter.items[which]}")
                                         show.showDao().insertEpisode(Episode(which, url, adapter.items[which].url))
+                                        FirebaseDB(this@EpisodeActivity).addEpisode(url, Episode(which, url, adapter.items[which].url))
                                     } else {
                                         Loged.e("Deleted")
                                         show.showDao().deleteEpisode(adapter.items[which].url)
+                                        FirebaseDB(this@EpisodeActivity).removeEpisode(url, Episode(which, url, adapter.items[which].url))
                                     }
                                 } catch (e: Exception) {
                                     e.printStackTrace()
@@ -593,8 +559,10 @@ class EpisodeActivity : AppCompatActivity() {
                 GlobalScope.launch {
                     if (like) {
                         show.showDao().insert(Show(url, name, listOfEpisodes.size))
+                        FirebaseDB(this@EpisodeActivity).addShow(Show(url, name))
                     } else {
-                        show.showDao().deleteShow(name)
+                        show.showDao().deleteShowByUrl(url)
+                        FirebaseDB(this@EpisodeActivity).removeShow(Show(url, name))
                     }
                 }
             }

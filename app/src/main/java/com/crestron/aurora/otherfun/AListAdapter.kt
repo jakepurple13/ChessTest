@@ -2,32 +2,24 @@ package com.crestron.aurora.otherfun
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
 import android.widget.SectionIndexer
+import androidx.recyclerview.widget.RecyclerView
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.firebaseserver.FirebaseDB
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
-import com.crestron.aurora.utilities.Flash
-import com.crestron.aurora.utilities.backgroundColor
-import com.crestron.aurora.utilities.flash
-import com.crestron.aurora.utilities.flashScreen
 import com.like.LikeButton
 import com.like.OnLikeListener
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.text_layout.view.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.*
 
 class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
 
@@ -64,20 +56,23 @@ class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
     lateinit var stuff: List<ShowInfo>
     lateinit var show: ShowDatabase
     var isRecent = false
+    lateinit var firebaseShows: List<FirebaseDB.FirebaseShow>
 
-    constructor(stuff: List<ShowInfo>, context: Context, showDatabase: ShowDatabase, action: ShowListActivity.LinkAction = object : ShowListActivity.LinkAction {}) {
+    constructor(stuff: List<ShowInfo>, context: Context, showDatabase: ShowDatabase, action: ShowListActivity.LinkAction = object : ShowListActivity.LinkAction {}, firebaseShows: List<FirebaseDB.FirebaseShow> = emptyList()) {
         this.stuff = stuff
         this.context = context
         this.action = action
         this.show = showDatabase
+        this.firebaseShows = firebaseShows
     }
 
-    constructor(stuff: List<ShowInfo>, context: Context, showDatabase: ShowDatabase, action: ShowListActivity.LinkAction = object : ShowListActivity.LinkAction {}, isRecent: Boolean) {
+    constructor(stuff: List<ShowInfo>, context: Context, showDatabase: ShowDatabase, action: ShowListActivity.LinkAction = object : ShowListActivity.LinkAction {}, isRecent: Boolean, firebaseShows: List<FirebaseDB.FirebaseShow> = emptyList()) {
         this.stuff = stuff
         this.context = context
         this.action = action
         this.show = showDatabase
         this.isRecent = isRecent
+        this.firebaseShows = firebaseShows
     }
 
     constructor(items: ArrayList<String>, links: ArrayList<String>, context: Context, action: ShowListActivity.LinkAction = object : ShowListActivity.LinkAction {}) {
@@ -152,7 +147,12 @@ class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
                 holder.favorite.apply {
 
                     setOnLikeListener(null)
-                    isLiked = show.showDao().isUrlInDatabase(stuff[position].url) > 0
+                    isLiked = try {
+                        stuff[position].url in firebaseShows.map { it.url } ||
+                                show.showDao().isUrlInDatabase(stuff[position].url) > 0
+                    } catch (e: Exception) {
+                        show.showDao().isUrlInDatabase(stuff[position].url) > 0
+                    }
                     setOnLikeListener(object : OnLikeListener {
                         override fun liked(p0: LikeButton?) {
                             liked(p0!!.isLiked)
@@ -166,8 +166,10 @@ class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
                             GlobalScope.launch {
                                 if (like) {
                                     show.showDao().insert(Show(stuff[position].url, stuff[position].name))
+                                    FirebaseDB(context).addShow(Show(stuff[position].url, stuff[position].name))
                                 } else {
                                     show.showDao().deleteShow(stuff[position].name)
+                                    FirebaseDB(context).removeShow(Show(stuff[position].url, stuff[position].name))
                                 }
                             }
                         }

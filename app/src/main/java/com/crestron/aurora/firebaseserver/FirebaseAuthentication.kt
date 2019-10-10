@@ -8,11 +8,13 @@ import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.server.toJson
 import com.crestron.aurora.showapi.ShowApi
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.gson.Gson
@@ -80,7 +82,7 @@ class FirebaseDB(val context: Context) {
         GlobalScope.launch {
             val showAndEpisode = mutableMapOf<Show, MutableList<Episode>>()
             val db = ShowDatabase.getDatabase(context).showDao()
-            val shows = db.allShows.take(5)
+            val shows = db.allShows
             for (i in shows) {
                 showAndEpisode[i] = ShowDatabase.getDatabase(context).showDao().getEpisodesByUrl(i.link)
             }
@@ -98,8 +100,123 @@ class FirebaseDB(val context: Context) {
     data class FirebaseShow(
             val name: String? = null,
             val url: String? = null,
-            val episodes: List<FirebaseEpisode>? = null
+            val episodeInfo: List<FirebaseEpisode>? = null
     )
+
+    fun addShow(show: Show) {
+        val data2 = FirebaseShow(show.name, show.link)
+
+        val user = FirebaseAuth.getInstance()
+        val store = FirebaseFirestore.getInstance()
+                .collection(user.uid!!)
+                .document(show.link.replace("/", "<"))
+                .set(data2)
+
+        store.addOnSuccessListener {
+            Loged.d("Success!")
+        }.addOnFailureListener {
+            Loged.wtf("Failure!")
+        }.addOnCompleteListener {
+            Loged.d("All done!")
+        }
+    }
+
+    fun removeShow(show: Show) {
+        val user = FirebaseAuth.getInstance()
+        val store = FirebaseFirestore.getInstance()
+                .collection(user.uid!!)
+                .document(show.link.replace("/", "<"))
+                .delete()
+
+        store.addOnSuccessListener {
+            Loged.d("Success!")
+        }.addOnFailureListener {
+            Loged.wtf("Failure!")
+        }.addOnCompleteListener {
+            Loged.d("All done!")
+        }
+    }
+
+    fun addEpisode(url: String, episode: Episode) {
+        val user = FirebaseAuth.getInstance()
+        val store = FirebaseFirestore.getInstance()
+                .collection(user.uid!!)
+                .document(url.replace("/", "<"))
+                .update("episodeInfo", FieldValue.arrayUnion(FirebaseEpisode(episode.showName, episode.showUrl)))
+
+
+        store.addOnSuccessListener {
+            Loged.d("Success!")
+        }.addOnFailureListener {
+            Loged.wtf("Failure!")
+        }.addOnCompleteListener {
+            Loged.d("All done!")
+        }
+    }
+
+    fun removeEpisode(url: String, episode: Episode) {
+        val user = FirebaseAuth.getInstance()
+        val store = FirebaseFirestore.getInstance()
+                .collection(user.uid!!)
+                .document(url.replace("/", "<"))
+                .update("episodeInfo", FieldValue.arrayRemove(FirebaseEpisode(episode.showName, episode.showUrl)))
+
+        store.addOnSuccessListener {
+            Loged.d("Success!")
+        }.addOnFailureListener {
+            Loged.wtf("Failure!")
+        }.addOnCompleteListener {
+            Loged.d("All done!")
+        }
+    }
+
+    fun getShow(url: String, updateUI: (FirebaseShow?) -> Unit = {}) {
+        val user = FirebaseAuth.getInstance()
+
+        FirebaseFirestore.getInstance()
+                .collection(user.uid!!)
+                .document(url.replace("/", "<"))
+                .get()
+                .addOnSuccessListener { document ->
+                    Loged.d("Success!")
+                    updateUI(try {
+                        if (document.exists()) {
+                            document.toObject(FirebaseShow::class.java)
+                        } else {
+                            null
+                        }
+                    } catch (e: Exception) {
+                        null
+                    })
+                }
+                .addOnFailureListener { exception ->
+                    Loged.d("get failed with $exception")
+                }
+    }
+
+    fun getShowSync(url: String): FirebaseShow? {
+        val user = FirebaseAuth.getInstance()
+        return try {
+            Tasks.await(FirebaseFirestore.getInstance()
+                    .collection(user.uid!!)
+                    .document(url.replace("/", "<"))
+                    .get()).toObject(FirebaseShow::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    fun getAllShowsSync(): List<FirebaseShow> {
+        val user = FirebaseAuth.getInstance()
+        return try {
+            Tasks.await(FirebaseFirestore.getInstance()
+                    .collection(user.uid!!)
+                    .get()).toObjects(FirebaseShow::class.java)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
 
     fun storeShow(showInfo: Pair<Show, MutableList<Episode>>) {
         val data2 = FirebaseShow(showInfo.first.name, showInfo.first.link, showInfo.second.map { FirebaseEpisode(it.showName, it.showUrl) })
