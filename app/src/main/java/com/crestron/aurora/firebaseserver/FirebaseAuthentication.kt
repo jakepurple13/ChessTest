@@ -1,6 +1,7 @@
 package com.crestron.aurora.firebaseserver
 
 import android.content.Context
+import android.widget.Toast
 import com.crestron.aurora.Loged
 import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.Show
@@ -113,6 +114,9 @@ class FirebaseDB(val context: Context) {
             Loged.d("Success!")
         }.addOnFailureListener {
             Loged.wtf("Failure!")
+        }.addOnCompleteListener {
+            Loged.d("All done!")
+            Toast.makeText(context, "Finished syncing", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -124,20 +128,11 @@ class FirebaseDB(val context: Context) {
                 .get()
                 .addOnSuccessListener { document ->
                     Loged.d("Success!")
-                    val showList = mutableListOf<FirebaseShow>()
-                    for (info in document) {
-                        Loged.d("${info.id} => ${info.data}")
-                        val url = info.id.replace("<", "/")
-                        val data = info.data
-                        val data2 = try {
-                            info.toObject(FirebaseShow::class.java)
-                        } catch(e: Exception) {
-                            continue
-                        }
-                        Loged.r("$url\n$data\n$data2")
-                        showList+=data2
-                    }
-                    updateUI(showList)
+                    updateUI(try {
+                        if (!document.isEmpty) document.toObjects(FirebaseShow::class.java) else emptyList()
+                    } catch (e: Exception) {
+                        emptyList<FirebaseShow>()
+                    })
                 }
                 .addOnFailureListener { exception ->
                     Loged.d("get failed with $exception")
