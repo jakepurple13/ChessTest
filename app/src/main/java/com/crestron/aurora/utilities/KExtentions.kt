@@ -31,6 +31,9 @@ fun joinWith(vararg args: String, separator: String = " "): String = String.form
 fun <T> joinWith(vararg args: T, separator: String = " ", transform: (T) -> String = { it.toString() }): String =
         String.format("%s$separator".repeat(args.size).removeSuffix(separator).trimEnd(), *args.map(transform).toTypedArray())
 
+fun <T> Collection<T>.joinWith(separator: String = " ", transform: (T) -> String = { it.toString() }): String =
+        String.format("%s$separator".repeat(size).removeSuffix(separator).trimEnd(), *map(transform).toTypedArray())
+
 fun RecyclerView.smoothScrollAction(
         position: Int,
         delay: Long = if (adapter!!.itemCount / 10 < 250) 250 else adapter!!.itemCount / 10L,
