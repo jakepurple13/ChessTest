@@ -68,8 +68,6 @@ class FirebaseDB(val context: Context) {
 
     companion object {
         fun firebaseSetup() {
-            //val user = FirebaseAuth.getInstance()
-            //FirebaseFirestore.getInstance().
             val settings = FirebaseFirestoreSettings.Builder()
                     .setPersistenceEnabled(true)
                     .build()

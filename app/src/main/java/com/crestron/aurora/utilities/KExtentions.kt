@@ -26,6 +26,8 @@ fun <T> MutableList<T>.randomRemove(): T {
     return removeAt(Random.nextInt(0, size))
 }
 
+fun joinWith(vararg args: String, separator: String = " "): String = String.format("%s$separator".repeat(args.size).removeSuffix(separator).trimEnd(), *args)
+
 fun RecyclerView.smoothScrollAction(
         position: Int,
         delay: Long = if (adapter!!.itemCount / 10 < 250) 250 else adapter!!.itemCount / 10L,
@@ -100,6 +102,7 @@ fun <T> recyclerDeleteItemWithUndo(adapterList: MutableList<T>, adapter: Recycle
 fun Context.dp2px(dpValue: Float): Int {
     return (dpValue * resources.displayMetrics.density + 0.5f).toInt()
 }
+
 fun Context.dp2px(dpValue: Int): Int {
     return (dpValue * resources.displayMetrics.density + 0.5f).toInt()
 }
@@ -107,6 +110,7 @@ fun Context.dp2px(dpValue: Int): Int {
 fun View.dp2px(dpValue: Float): Int? {
     return context?.dp2px(dpValue)
 }
+
 fun View.dp2px(dpValue: Int): Int? {
     return context?.dp2px(dpValue)
 }
