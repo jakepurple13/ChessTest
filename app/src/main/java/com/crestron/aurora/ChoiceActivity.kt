@@ -644,7 +644,8 @@ class ChoiceActivity : AppCompatActivity() {
         GlobalScope.launch {
             val show = ShowDatabase.getDatabase(this@ChoiceActivity).showDao()
             val showList = show.allShows
-            if (showList.size > 0) {
+            val fireShow = FirebaseDB(this@ChoiceActivity).getAllShowsSync()
+            if (showList.isNotEmpty() || fireShow.isNotEmpty()) {
                 //models.add(drawableModel(android.R.drawable.ic_input_get, ChoiceButton.VIEW_FAVORITES))
                 modelList += MaterialItem(ChoiceButton.VIEW_FAVORITES, "View Favorited Shows", android.R.drawable.ic_input_get)
             }
@@ -1476,16 +1477,15 @@ class ChoiceActivity : AppCompatActivity() {
                 .withOnDrawerItemClickListener { _, _, _ ->
                     result.closeDrawer()
                     MaterialAlertDialogBuilder(this@ChoiceActivity)
-                            .setTitle("Choose")
-                            .setMessage("One")
+                            .setTitle("Store Your Data in our cloud!")
+                            .setMessage("Store it so that you can retrieve it on other devices")
                             .setPositiveButton("Store") { _, _ ->
                                 FirebaseDB(this).storeDb()
                             }
-                            .setNegativeButton("Get") { _, _ ->
-                                FirebaseDB(this).getAllShows()
+                            .setNegativeButton("Nope") { _, _ ->
+
                             }
                             .show()
-                    //FirebaseDB(this).getAndStore()
                     true
                 }
         val storeSettingsItem = PrimaryDrawerItem()
@@ -1505,7 +1505,9 @@ class ChoiceActivity : AppCompatActivity() {
                 .withName("Load Settings")
                 .withOnDrawerItemClickListener { _, _, _ ->
                     result.closeDrawer()
-                    FirebaseDB(this).loadAllSettings()
+                    FirebaseDB(this).loadAllSettings {
+                        recreate()
+                    }
                     true
                 }
 

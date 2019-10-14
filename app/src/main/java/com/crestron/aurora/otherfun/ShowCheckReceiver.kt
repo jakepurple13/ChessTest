@@ -16,6 +16,7 @@ import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.firebaseserver.FirebaseDB
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.ShowInfo
@@ -45,6 +46,7 @@ class ShowCheckReceiver : BroadcastReceiver() {
         }
     }
 }
+
 //TODO: GET BUBBLE NOTIFICATION WORKING CORRECTLY!!!
 class BootUpReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -75,6 +77,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
 
     @SuppressLint("SimpleDateFormat")
     override fun onHandleIntent(intent: Intent?) {
+        Loged.d("Starting check")
         val rec = intent!!.getBooleanExtra("received", false)
         val check = if (rec)
             KUtility.canShowUpdateCheck(this)
@@ -89,6 +92,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
             //mNotificationManager.activeNotifications.filter { it.id == 1 }[0].notification.
             GlobalScope.launch {
                 val showDatabase = ShowDatabase.getDatabase(this@ShowCheckIntentService)
+                val fireDB = FirebaseDB(this@ShowCheckIntentService).getAllShowsSync()
                 var count = 0
                 //gets the list from the source
                 val showApi = ShowApi.getAllRecent()/*ShowApi(Source.RECENT_ANIME).showInfoList as ArrayList<ShowInfo>
@@ -100,9 +104,25 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 //val aColIds = shows.asSequence().map { it.link }.toSet()
                 //val bColIds = filteredList.filter { it.url in aColIds }
 
-                val filtered = filteredList.intersect(shows) { one, two ->
+                val showsAndFire = (shows.map { ShowInfo(it.name, it.link) } + fireDB.map {
+                    ShowInfo(it.name ?: "N/A", it.url ?: "N/A")
+                }.toMutableList().filter { it.name != "N/A" }).distinctBy { it.url }
+
+                /*val filtered = filteredList.intersect(shows) { one, two ->
                     one.url == two.link
+                }.intersect(fireDB) { one, two ->
+                    if (two.url.isNullOrBlank() || two.url.contains("animeplus")) {
+                        one.url == one.url
+                    } else {
+                        one.url == two.url
+                    }
+                }*/
+
+                val filtered = filteredList.intersect(showsAndFire) { one, two ->
+                    one.url == two.url
                 }
+
+                Loged.r("$filtered\n$fireDB")
 
                 val updateList = arrayListOf<ShowInfos>()
 
@@ -115,16 +135,35 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                         Loged.i("Checking ${i.name}")
                         val showList = EpisodeApi(i).episodeList.size
                         //if (showDatabase.showDao().getShow(i.name).showNum < showList) {
+                        var newShow: ShowInfos? = null
                         val show = showDatabase.showDao().getShowByURL(i.url)
-                        if (show.showNum < showList) {
-                            Loged.i("Checking ${i.name} with size ${show.showNum}")
-                            val timeOfUpdate = SimpleDateFormat("MM/dd hh:mm a").format(System.currentTimeMillis())
-                            val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
-                            Loged.wtf(infoToShow)
-                            updateList.add(ShowInfos(i.name, showList, timeOfUpdate, i.url))
-                            show.showNum = showList
-                            showDatabase.showDao().updateShow(show)
-                            count++
+                        if (show != null) {
+                            if (show.showNum < showList) {
+                                Loged.i("Checking ${i.name} with size ${show.showNum}")
+                                val timeOfUpdate = SimpleDateFormat("MM/dd hh:mm a").format(System.currentTimeMillis())
+                                val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
+                                Loged.wtf(infoToShow)
+                                newShow = ShowInfos(i.name, showList, timeOfUpdate, i.url)
+                                show.showNum = showList
+                                showDatabase.showDao().updateShow(show)
+                                count++
+                            }
+                        }
+                        val fireShow = FirebaseDB(this@ShowCheckIntentService).getShowSync(i.url)
+                        if(fireShow != null) {
+                            if (fireShow.showNum < showList) {
+                                Loged.i("Checking ${i.name} with size ${fireShow.showNum}")
+                                val timeOfUpdate = SimpleDateFormat("MM/dd hh:mm a").format(System.currentTimeMillis())
+                                val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
+                                Loged.wtf(infoToShow)
+                                newShow = ShowInfos(i.name, showList, timeOfUpdate, i.url)
+                                fireShow.showNum = showList
+                                FirebaseDB(this@ShowCheckIntentService).updateShowNum(fireShow)
+                                count++
+                            }
+                        }
+                        if (newShow != null) {
+                            updateList.add(newShow)
                         }
                         Loged.wtf("${i.name} and size is $showList")
                     } catch (e: SocketTimeoutException) {
@@ -180,7 +219,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                         j + 3 + (Math.random() * 50).toInt(),
                                         NameWithUrl(i.name, i.url))
                             } else {*/
-                            if(list.size==1) {
+                            if (list.size == 1) {
                                 Loged.i("We came here")
                                 sendBubbleNotification(this@ShowCheckIntentService,
                                         android.R.mipmap.sym_def_app_icon,

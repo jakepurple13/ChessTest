@@ -20,6 +20,7 @@ import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.ShowDatabase
+import com.crestron.aurora.firebaseserver.FirebaseDB
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.google.gson.Gson
@@ -79,13 +80,19 @@ class FavoriteShowsActivity : AppCompatActivity() {
         val stuff = arrayListOf<ShowListActivity.NameAndLink>()
 
         GlobalScope.launch {
+            val s2 = FirebaseDB(this@FavoriteShowsActivity).getAllShowsSync().toMutableList()
             val s = ShowDatabase.getDatabase(this@FavoriteShowsActivity).showDao()
             val showList = s.allShows
 
-            showList.sortBy { it.name }
+            s2.toMutableList().removeAll { it.name.isNullOrBlank() }
 
-            for (s1 in showList)
-                stuff.add(ShowListActivity.NameAndLink(s1.name, s1.link))
+            if (s2.isEmpty()) {
+                showList.sortBy { it.name }
+                stuff.addAll(showList.map { ShowListActivity.NameAndLink(it.name, it.link) })
+            } else {
+                s2.sortBy { it.name }
+                stuff.addAll(s2.map { ShowListActivity.NameAndLink(it.name ?: "N/A", it.url ?: "N/A") }.toMutableList().filter { it.name != "N/A" })
+            }
 
             runOnUiThread {
                 val listScreen = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")

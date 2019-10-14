@@ -34,7 +34,7 @@ class FirebaseDB(val context: Context) {
         }
     }
 
-    fun loadAllSettings() {
+    fun loadAllSettings(afterLoad: () -> Unit = {}) {
         FirebaseAuth.getInstance().currentUser?.let {
             val database = FirebaseDatabase.getInstance()
             val ref = database.getReference(it.uid).child("/settings")
@@ -52,11 +52,13 @@ class FirebaseDB(val context: Context) {
                                 is Float -> edit.putFloat(i.key, i.value as Float)
                                 is Long -> edit.putLong(i.key, i.value as Long)
                                 is Boolean -> edit.putBoolean(i.key, i.value as Boolean)
-                            }
+                                else -> null
+                            }?.apply()
                         }
                         edit.apply()
                     } catch (e: Exception) {
                     }
+                    afterLoad()
                 }
 
                 override fun onCancelled(p0: DatabaseError) {
@@ -97,6 +99,7 @@ class FirebaseDB(val context: Context) {
     data class FirebaseShow(
             val name: String? = null,
             val url: String? = null,
+            var showNum: Int = 0,
             val episodeInfo: List<FirebaseEpisode>? = null
     )
 
@@ -216,13 +219,27 @@ class FirebaseDB(val context: Context) {
     }
 
     fun storeShow(showInfo: Pair<Show, MutableList<Episode>>) {
-        val data2 = FirebaseShow(showInfo.first.name, showInfo.first.link, showInfo.second.map { FirebaseEpisode(it.showName, it.showUrl) })
+        val data2 = FirebaseShow(showInfo.first.name, showInfo.first.link, showInfo.first.showNum, showInfo.second.map { FirebaseEpisode(it.showName, it.showUrl) })
 
         val user = FirebaseAuth.getInstance()
         val store = FirebaseFirestore.getInstance()
                 .collection(user.uid!!)
                 .document(showInfo.first.link.replace("/", "<"))
                 .set(data2)
+
+        store.addOnSuccessListener {
+            Loged.d("Success!")
+        }.addOnFailureListener {
+            Loged.wtf("Failure!")
+        }
+    }
+
+    fun updateShowNum(showInfo: FirebaseShow) {
+        val user = FirebaseAuth.getInstance()
+        val store = FirebaseFirestore.getInstance()
+                .collection(user.uid!!)
+                .document(showInfo.url!!.replace("/", "<"))
+                .update("showNum", showInfo.showNum)
 
         store.addOnSuccessListener {
             Loged.d("Success!")
