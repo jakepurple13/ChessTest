@@ -208,10 +208,9 @@ class FirebaseDB(val context: Context) {
     }
 
     fun getAllShowsSync(): List<FirebaseShow> {
-        val user = FirebaseAuth.getInstance()
         return try {
             Tasks.await(FirebaseFirestore.getInstance()
-                    .collection(user.uid!!)
+                    .collection(FirebaseAuth.getInstance().uid!!)
                     .get()).toObjects(FirebaseShow::class.java)
         } catch (e: Exception) {
             emptyList()

@@ -23,8 +23,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.net.HttpURLConnection
-import java.net.InetAddress
-import java.net.Socket
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
@@ -1077,6 +1075,24 @@ class ExampleUnitTest {
         }
         request.join() // wait for completion of the request, including all its children
         println("Now processing of the request is complete")
+    }
+
+    @Test
+    fun strangeTest() {
+
+        fun joinWithSpace(vararg args: String): String = String.format("%s ".repeat(args.size).trimEnd(), *args)
+
+        fun joinWith(vararg args: String, separator: String = " "): String = String.format("%s$separator".repeat(args.size).removeSuffix(separator).trimEnd(), *args)
+
+        fun <T> joinWith(vararg args: T, separator: String = " ", block: (T) -> String = { it.toString() }): String =
+                String.format("%s$separator".repeat(args.size).removeSuffix(separator).trimEnd(), *args.map(block).toTypedArray())
+
+        prettyLog(joinWith(" ", "asdf", "asdf"))
+        prettyLog(joinWith(" ", "asdf", "asdf", separator = "ertw"))
+
+        prettyLog(joinWith(Card.RandomCard, Card.RandomCard, Card.RandomCard, separator = "ertw") { "$it |" })
+        prettyLog(joinWith(Card.RandomCard, Card.RandomCard, Card.RandomCard, separator = "ertw"))
+
     }
 
 }

@@ -220,16 +220,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                         NameWithUrl(i.name, i.url))
                             } else {*/
                             if (list.size == 1) {
-                                Loged.i("We came here")
-                                sendBubbleNotification(this@ShowCheckIntentService,
-                                        android.R.mipmap.sym_def_app_icon,
-                                        i.name,
-                                        i.toString(),
-                                        "episodeUpdate",
-                                        EpisodeActivity::class.java,
-                                        j + 3 + (Math.random() * 50).toInt(),
-                                        NameWithUrl(i.name, i.url))
-                            } else {
                                 sendNotification(this@ShowCheckIntentService,
                                         android.R.mipmap.sym_def_app_icon,
                                         i.name,
@@ -238,6 +228,15 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                         EpisodeActivity::class.java,
                                         j + 3 + (Math.random() * 50).toInt(),
                                         NameWithUrl(i.name, i.url))
+                                Loged.i("We came here")
+                                /*sendBubbleNotification(this@ShowCheckIntentService,
+                                        android.R.mipmap.sym_def_app_icon,
+                                        i.name,
+                                        i.toString(),
+                                        "episodeUpdate",
+                                        EpisodeActivity::class.java,
+                                        j + 3 + (Math.random() * 50).toInt(),
+                                        NameWithUrl(i.name, i.url))*/
                             }
                         }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -245,7 +244,13 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                         } else {
                             (nStyle as NotificationCompat.InboxStyle).addLine("${list.size} show${if (list.size == 1) "" else "s"} had updates!")
                         }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        sendGroupNotification(this@ShowCheckIntentService,
+                                android.R.mipmap.sym_def_app_icon,
+                                "${list.size} show${if (list.size == 1) "" else "s"} had updates!",
+                                nStyle as NotificationCompat.InboxStyle,
+                                "episodeUpdate",
+                                ShowListActivity::class.java)
+                        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             sendBubbleGroupNotification(this@ShowCheckIntentService,
                                     android.R.mipmap.sym_def_app_icon,
                                     "${list.size} show${if (list.size == 1) "" else "s"} had updates!",
@@ -259,7 +264,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                     nStyle as NotificationCompat.InboxStyle,
                                     "episodeUpdate",
                                     ShowListActivity::class.java)
-                        }
+                        }*/
                     }
                 }
                 sendFinishedCheckingNotification(this@ShowCheckIntentService,
