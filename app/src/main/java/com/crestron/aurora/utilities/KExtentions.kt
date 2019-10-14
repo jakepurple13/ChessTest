@@ -1,6 +1,7 @@
 package com.crestron.aurora.utilities
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.GradientDrawable.RECTANGLE
@@ -10,6 +11,7 @@ import androidx.annotation.IntRange
 import androidx.core.view.doOnPreDraw
 import androidx.recyclerview.widget.*
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -144,3 +146,17 @@ inline val RecyclerView.orientation
             else -> -1
         }
     }
+
+fun <T> SharedPreferences.Editor.putObject(key: String, value: T): SharedPreferences.Editor = putString(key, Gson().toJson(value))
+
+inline fun <reified T> SharedPreferences.getObject(key: String): T? = try {
+    Gson().fromJson(getString(key, null), T::class.java)
+} catch (e: Exception) {
+    null
+}
+
+inline fun <reified T> SharedPreferences.getObject(key: String, defaultValue: T): T = try {
+    Gson().fromJson(getString(key, null), T::class.java)
+} catch (e: Exception) {
+    defaultValue
+}
