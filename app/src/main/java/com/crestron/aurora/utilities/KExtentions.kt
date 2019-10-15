@@ -5,7 +5,10 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.GradientDrawable.RECTANGLE
+import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.IntRange
 import androidx.core.view.doOnPreDraw
@@ -21,20 +24,17 @@ import kotlin.random.Random
 /**
  * Finds similarities between two lists based on a predicate
  */
-fun <T, U> List<T>.intersect(uList: List<U>, filterPredicate: (T, U) -> Boolean) =
-        filter { m -> uList.any { filterPredicate(m, it) } }
+fun <T, U> List<T>.intersect(uList: List<U>, filterPredicate: (T, U) -> Boolean) = filter { m -> uList.any { filterPredicate(m, it) } }
 
-fun <T> MutableList<T>.randomRemove(): T {
-    return removeAt(Random.nextInt(0, size))
-}
+fun <T> MutableList<T>.randomRemove(): T = removeAt(Random.nextInt(size))
 
-fun joinWith(vararg args: String, separator: String = " "): String = String.format("%s$separator".repeat(args.size).removeSuffix(separator).trimEnd(), *args)
+fun joinWith(vararg args: String, separator: String = " "): String = String.format("%s$separator".repeat(args.size).removeSuffix(separator), *args)
 
 fun <T> joinWith(vararg args: T, separator: String = " ", transform: (T) -> String = { it.toString() }): String =
-        String.format("%s$separator".repeat(args.size).removeSuffix(separator).trimEnd(), *args.map(transform).toTypedArray())
+        String.format("%s$separator".repeat(args.size).removeSuffix(separator), *args.map(transform).toTypedArray())
 
 fun <T> Collection<T>.joinWith(separator: String = " ", transform: (T) -> String = { it.toString() }): String =
-        String.format("%s$separator".repeat(size).removeSuffix(separator).trimEnd(), *map(transform).toTypedArray())
+        String.format("%s$separator".repeat(size).removeSuffix(separator), *map(transform).toTypedArray())
 
 fun RecyclerView.smoothScrollAction(
         position: Int,
@@ -149,14 +149,77 @@ inline val RecyclerView.orientation
 
 fun <T> SharedPreferences.Editor.putObject(key: String, value: T): SharedPreferences.Editor = putString(key, Gson().toJson(value))
 
-inline fun <reified T> SharedPreferences.getObject(key: String): T? = try {
-    Gson().fromJson(getString(key, null), T::class.java)
-} catch (e: Exception) {
-    null
-}
-
-inline fun <reified T> SharedPreferences.getObject(key: String, defaultValue: T): T = try {
+inline fun <reified T> SharedPreferences.getObject(key: String, defaultValue: T? = null): T? = try {
     Gson().fromJson(getString(key, null), T::class.java)
 } catch (e: Exception) {
     defaultValue
 }
+
+/**
+ * Close keyboard when ENTER ic clicked, clears focus from view and calls [InputMethodManager.hideSoftInputFromWindow]
+ */
+fun EditText.closeKeyboardOnEnter() {
+    setOnKeyListener { _, keyCode, event ->
+        if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
+            hideKeyboard()
+            return@setOnKeyListener true
+        }
+        false
+    }
+}
+
+/**
+ * Clears focus from view and calls [InputMethodManager.hideSoftInputFromWindow]
+ */
+fun View.hideKeyboard() {
+    clearFocus()
+    (context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(windowToken, 0)
+}
+
+fun View.showKeyboard() {
+    requestFocus()
+    (context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(this, InputMethodManager.SHOW_FORCED)
+}
+
+internal val romanValues = listOf(
+        Pair("M", 1000),
+        Pair("CM", 900),
+        Pair("D", 500),
+        Pair("CD", 400),
+        Pair("C", 100),
+        Pair("XC", 90),
+        Pair("L", 50),
+        Pair("XL", 40),
+        Pair("X", 10),
+        Pair("IX", 9),
+        Pair("V", 5),
+        Pair("IV", 4),
+        Pair("I", 1)
+)
+
+/** Returns the Roman Numeral representation of this integer. Returns null for non-positive numbers */
+val Int.romanNumeral: String?
+    get() {
+        var romanValue: String? = null
+        // this calculation is only valid for positive numbers
+        if (this > 0) {
+            romanValue = ""
+            var startingValue = this
+            romanValues.forEach {
+                val (romanChar, arabicValue) = it
+                val div = startingValue / arabicValue
+                if (div > 0) {
+                    for (i in 1..div) {
+                        romanValue += romanChar
+                    }
+                    startingValue -= arabicValue * div
+                }
+            }
+        }
+        return romanValue
+    }
+
+inline fun <T> T?.otherWise(nullBlock: () -> T) = this ?: nullBlock()
+
+
+
