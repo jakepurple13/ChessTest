@@ -86,11 +86,9 @@ class FavoriteShowsActivity : AppCompatActivity() {
 
             s2.toMutableList().removeAll { it.name.isNullOrBlank() }
 
-            val f = (showList.map { ShowListActivity.NameAndLink(it.name, it.link) } + s2.map {
+            stuff.addAll((showList.map { ShowListActivity.NameAndLink(it.name, it.link) } + s2.map {
                 ShowListActivity.NameAndLink(it.name ?: "N/A", it.url ?: "N/A")
-            }.toMutableList().filter { it.name != "N/A" }).sortedBy { it.name }.distinctBy { it.url }
-
-            stuff.addAll(f)
+            }.filter { it.name != "N/A" }).sortedBy { it.name }.distinctBy { it.url })
 
             runOnUiThread {
                 val listScreen = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")
