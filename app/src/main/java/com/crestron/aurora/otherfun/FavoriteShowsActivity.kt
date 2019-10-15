@@ -80,19 +80,17 @@ class FavoriteShowsActivity : AppCompatActivity() {
         val stuff = arrayListOf<ShowListActivity.NameAndLink>()
 
         GlobalScope.launch {
-            val s2 = FirebaseDB(this@FavoriteShowsActivity).getAllShowsSync().toMutableList()
+            val s2 = FirebaseDB(this@FavoriteShowsActivity).getAllShowsSync()
             val s = ShowDatabase.getDatabase(this@FavoriteShowsActivity).showDao()
             val showList = s.allShows
 
             s2.toMutableList().removeAll { it.name.isNullOrBlank() }
 
-            if (s2.isEmpty()) {
-                showList.sortBy { it.name }
-                stuff.addAll(showList.map { ShowListActivity.NameAndLink(it.name, it.link) })
-            } else {
-                s2.sortBy { it.name }
-                stuff.addAll(s2.map { ShowListActivity.NameAndLink(it.name ?: "N/A", it.url ?: "N/A") }.toMutableList().filter { it.name != "N/A" })
-            }
+            val f = (showList.map { ShowListActivity.NameAndLink(it.name, it.link) } + s2.map {
+                ShowListActivity.NameAndLink(it.name ?: "N/A", it.url ?: "N/A")
+            }.toMutableList().filter { it.name != "N/A" }).sortedBy { it.name }.distinctBy { it.url }
+
+            stuff.addAll(f)
 
             runOnUiThread {
                 val listScreen = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")
@@ -206,7 +204,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
         if (addOrRemove)
             showList.list.add(NameUrl(name, url))
         else {
-            showList.list.removeIf { it.name == name }
+            showList.list.removeIf { it.url == url }
         }
         showList.list = showList.list.distinctBy { it.url } as ArrayList<NameUrl>
         defaultSharedPreferences.edit().putString("homeScreenAdding", Gson().toJson(showList)).apply()
