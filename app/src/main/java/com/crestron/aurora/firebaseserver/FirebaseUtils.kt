@@ -6,7 +6,7 @@ import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.server.toJson
-import com.crestron.aurora.showapi.ShowApi
+import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -24,6 +24,8 @@ import org.jetbrains.anko.defaultSharedPreferences
 
 
 class FirebaseDB(val context: Context) {
+
+    private fun <TResult> Task<TResult>.await(): TResult = Tasks.await(this)
 
     fun storeAllSettings() {
         FirebaseAuth.getInstance().currentUser?.let {
@@ -144,7 +146,6 @@ class FirebaseDB(val context: Context) {
                 .document(url.replace("/", "<"))
                 .update("episodeInfo", FieldValue.arrayUnion(FirebaseEpisode(episode.showName, episode.showUrl)))
 
-
         store.addOnSuccessListener {
             Loged.d("Success!")
         }.addOnFailureListener {
@@ -170,54 +171,25 @@ class FirebaseDB(val context: Context) {
         }
     }
 
-    fun getShow(url: String, updateUI: (FirebaseShow?) -> Unit = {}) {
-        val user = FirebaseAuth.getInstance()
-
-        FirebaseFirestore.getInstance()
-                .collection(user.uid!!)
+    fun getShowSync(url: String): FirebaseShow? = try {
+        Tasks.await(FirebaseFirestore.getInstance()
+                .collection(FirebaseAuth.getInstance().uid!!)
                 .document(url.replace("/", "<"))
-                .get()
-                .addOnSuccessListener { document ->
-                    Loged.d("Success!")
-                    updateUI(try {
-                        if (document.exists()) {
-                            document.toObject(FirebaseShow::class.java)
-                        } else {
-                            null
-                        }
-                    } catch (e: Exception) {
-                        null
-                    })
-                }
-                .addOnFailureListener { exception ->
-                    Loged.d("get failed with $exception")
-                }
+                .get()).toObject(FirebaseShow::class.java)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
     }
 
-    fun getShowSync(url: String): FirebaseShow? {
-        val user = FirebaseAuth.getInstance()
-        return try {
-            Tasks.await(FirebaseFirestore.getInstance()
-                    .collection(user.uid!!)
-                    .document(url.replace("/", "<"))
-                    .get()).toObject(FirebaseShow::class.java)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
+    fun getAllShowsSync(): List<FirebaseShow> = try {
+        Tasks.await(FirebaseFirestore.getInstance()
+                .collection(FirebaseAuth.getInstance().uid!!)
+                .get()).toObjects(FirebaseShow::class.java)
+    } catch (e: Exception) {
+        emptyList()
     }
 
-    fun getAllShowsSync(): List<FirebaseShow> {
-        return try {
-            Tasks.await(FirebaseFirestore.getInstance()
-                    .collection(FirebaseAuth.getInstance().uid!!)
-                    .get()).toObjects(FirebaseShow::class.java)
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
-
-    fun storeShow(showInfo: Pair<Show, MutableList<Episode>>) {
+    private fun storeShow(showInfo: Pair<Show, MutableList<Episode>>) {
         val data2 = FirebaseShow(showInfo.first.name, showInfo.first.link, showInfo.first.showNum, showInfo.second.map { FirebaseEpisode(it.showName, it.showUrl) })
 
         val user = FirebaseAuth.getInstance()
@@ -247,68 +219,4 @@ class FirebaseDB(val context: Context) {
         }
     }
 
-    fun getAllShows(updateUI: (List<FirebaseShow>) -> Unit = {}) {
-        val user = FirebaseAuth.getInstance()
-
-        FirebaseFirestore.getInstance()
-                .collection(user.uid!!)
-                .get()
-                .addOnSuccessListener { document ->
-                    Loged.d("Success!")
-                    updateUI(try {
-                        if (!document.isEmpty) document.toObjects(FirebaseShow::class.java) else emptyList()
-                    } catch (e: Exception) {
-                        emptyList<FirebaseShow>()
-                    })
-                }
-                .addOnFailureListener { exception ->
-                    Loged.d("get failed with $exception")
-                }
-    }
-
-    fun getAndStore() {
-        FirebaseAuth.getInstance().currentUser?.let {
-            val database = FirebaseDatabase.getInstance()
-            val ref = database.getReference(it.uid).child("/shows")
-            ref.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(p0: DataSnapshot) {
-                    GlobalScope.launch {
-                        val both = mutableMapOf<String, MutableList<Episode>>()
-                        try {
-                            if (p0.exists()) {
-                                val value = p0.getValue(String::class.java)
-                                Loged.d("Value is: $value")
-                                val data = Gson().fromJson<MutableMap<String, MutableList<Episode>>>(value, object : TypeToken<MutableMap<String, MutableList<Episode>>>() {}.type)
-                                both.putAll(data ?: emptyMap())
-                            }
-                        } catch (ignored: Exception) {
-                        }
-                        val showAndEpisode = mutableMapOf<String, MutableList<Episode>>()
-                        val db = ShowDatabase.getDatabase(context).showDao()
-                        val shows = db.allShows
-                        for (i in shows) {
-                            showAndEpisode[i.link] = ShowDatabase.getDatabase(context).showDao().getEpisodesByUrl(i.link)
-                        }
-
-                        both.putAll(showAndEpisode)
-
-                        val allShows = ShowApi.getAll()
-
-                        for (i in both) {
-                            val s = Show(i.key, allShows.find { it.url == i.key }?.name ?: "N/A")
-                            db.insert(s)
-                            for (e in i.value) {
-                                db.insertEpisode(e)
-                            }
-                        }
-                        ref.setValue(both.toJson())
-                    }
-                }
-
-                override fun onCancelled(p0: DatabaseError) {
-                    Loged.w("Failed to read value. ${p0.toException()}");
-                }
-            })
-        }
-    }
 }
