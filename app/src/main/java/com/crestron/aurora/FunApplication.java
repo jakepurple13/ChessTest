@@ -34,6 +34,7 @@ import com.facebook.stetho.Stetho;
 import com.google.firebase.FirebaseApp;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.programmerbox.quizlibrary.Quiz;
 import com.tonyodev.fetch2.DefaultFetchNotificationManager;
 import com.tonyodev.fetch2.Fetch;
 import com.tonyodev.fetch2.FetchConfiguration;
@@ -74,6 +75,7 @@ public class FunApplication extends Application {
 
         ApplicationExtenstions.INSTANCE.initDrawerImageLoader();
         FirebaseDB.Companion.firebaseSetup();
+        Quiz.INSTANCE.initializeQuiz(this);
 
         Loged.INSTANCE.setFILTER_BY_CLASS_NAME("crestron");
 

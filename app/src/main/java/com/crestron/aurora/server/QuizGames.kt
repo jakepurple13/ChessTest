@@ -32,9 +32,9 @@ class MusicQuizActivity : QuizActivity() {
         type = QuizChoiceType.TEXT
     }
 
-    override suspend fun postHighScore(userInfo: UserInfo) {
+    override suspend fun postHighScore(userInfo: UserInfo, questionList: Array<QuizQuestions>) {
         try {
-            super.postHighScore(userInfo)
+            super.postHighScore(userInfo, questionList)
         } catch (e: Exception) {
 
         }

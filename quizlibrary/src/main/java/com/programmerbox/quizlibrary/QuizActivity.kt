@@ -1,9 +1,7 @@
-@file:Suppress("unused")
-
 package com.programmerbox.quizlibrary
 
-
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -20,11 +18,22 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-
 internal fun <T> MutableList<T>.randomRemove(): T = removeAt(Random.nextInt(0, size))
 
 enum class QuizChoiceType {
     TEXT, CHOICES, NONE
+}
+
+@SuppressLint("StaticFieldLeak")
+object Quiz {
+    internal lateinit var context: Context
+
+    /**
+     * Use this if you want to change what the [QuizQuestions.freebie] Question shows
+     */
+    fun initializeQuiz(context: Context) {
+        this.context = context
+    }
 }
 
 /**
@@ -40,10 +49,21 @@ data class QuizQuestions(
         val correctAnswer: String
 ) {
     companion object {
-        val freebie = QuizQuestions("Freebie", listOf("This One", "This One", "This One", "This One"), "This One")
+        /**
+         * A Freebie question that will show up if you don't have enough questions or something goes wrong in the question maker process
+         */
+        val freebie = try {
+            QuizQuestions(Quiz.context.getString(R.string.freebie), listOf(Quiz.context.getString(R.string.thisOne), Quiz.context.getString(R.string.thisOne), Quiz.context.getString(R.string.thisOne), Quiz.context.getString(R.string.thisOne)), Quiz.context.getString(R.string.thisOne))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            QuizQuestions("Freebie", listOf("This One", "This One", "This One", "This One"), "This One")
+        }
     }
 }
 
+/**
+ * User info for posting the score
+ */
 data class UserInfo(val name: String, val quizChoice: String, val score: String)
 
 /**
@@ -54,7 +74,7 @@ data class UserInfo(val name: String, val quizChoice: String, val score: String)
  * @param answers modifying the way the answers are displayed
  * @return an array of [QuizQuestions]
  */
-fun <T : QuizActivity, V> T.quizMaker(questionList: MutableList<V>, question: (V) -> String = { it.toString() }, answers: (V) -> String = { it.toString() }): Array<QuizQuestions> {
+fun <V> quizMaker(questionList: MutableList<V>, question: (V) -> String = { it.toString() }, answers: (V) -> String = { it.toString() }): Array<QuizQuestions> {
     val qList = mutableListOf<QuizQuestions>()
     if (questionList.size < 4) {
         qList += QuizQuestions.freebie
@@ -79,7 +99,9 @@ abstract class QuizActivity : AppCompatActivity() {
 
     companion object {
         var hostAddress = ""
+        internal val resource = QuizActivity::getBaseContext
     }
+
     /**
      * The title of the dialog
      */
@@ -158,7 +180,7 @@ abstract class QuizActivity : AppCompatActivity() {
     /**
      * override this if you want to customize where you are posting the score to
      */
-    open suspend fun postHighScore(userInfo: UserInfo) {
+    open suspend fun postHighScore(userInfo: UserInfo, questionList: Array<QuizQuestions>) {
         client.post<String>(postHighScoreLink!!) {
             method = HttpMethod.Post
             host = hostAddress
@@ -307,8 +329,8 @@ abstract class QuizActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun quizSetup(choiceInput: View? = null) {
         hud.setLabel(getString(R.string.loading))
-            .setDetailsLabel(getString(R.string.loadingQuestions))
-            .show()
+                .setDetailsLabel(getString(R.string.loadingQuestions))
+                .show()
         GlobalScope.launch {
             val chosen = when (type) {
                 QuizChoiceType.TEXT -> (choiceInput as EditText).text.toString()
@@ -385,7 +407,7 @@ abstract class QuizActivity : AppCompatActivity() {
                             userInput.text.toString(),
                             quizChoice,
                             "$count/${quizQuestions.size}"
-                    ))
+                    ), quizQuestions)
                     runOnUiThread {
                         hud.dismiss()
                     }
