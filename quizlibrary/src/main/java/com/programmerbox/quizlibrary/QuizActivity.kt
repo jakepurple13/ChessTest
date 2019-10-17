@@ -21,9 +21,7 @@ import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 
-fun <T> MutableList<T>.randomRemove(): T {
-    return removeAt(Random.nextInt(0, size))
-}
+internal fun <T> MutableList<T>.randomRemove(): T = removeAt(Random.nextInt(0, size))
 
 enum class QuizChoiceType {
     TEXT, CHOICES, NONE
@@ -223,8 +221,8 @@ abstract class QuizActivity : AppCompatActivity() {
 
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                .setLabel("Loading")
-                .setDetailsLabel("Loading Questions")
+                .setLabel(getString(R.string.loading))
+                .setDetailsLabel(getString(R.string.loadingQuestions))
                 .setAnimationSpeed(2)
                 .setDimAmount(0.5f)
                 .setCancellable(false)
@@ -295,10 +293,10 @@ abstract class QuizActivity : AppCompatActivity() {
             builder.setMessage(dialogMessage)
             builder.setCancelable(false)
             // Add the buttons
-            builder.setPositiveButton("Okay!") { _, _ ->
+            builder.setPositiveButton(getString(R.string.startQuiz)) { _, _ ->
                 quizSetup(choiceInput)
             }
-            builder.setNegativeButton("Never Mind") { _, _ ->
+            builder.setNegativeButton(getString(R.string.stopQuiz)) { _, _ ->
                 finish()
             }
             val dialog = builder.create()
@@ -308,9 +306,9 @@ abstract class QuizActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun quizSetup(choiceInput: View? = null) {
-        hud.setLabel("Loading")
-        hud.setDetailsLabel("Loading Questions")
-        hud.show()
+        hud.setLabel(getString(R.string.loading))
+            .setDetailsLabel(getString(R.string.loadingQuestions))
+            .show()
         GlobalScope.launch {
             val chosen = when (type) {
                 QuizChoiceType.TEXT -> (choiceInput as EditText).text.toString()
@@ -342,7 +340,8 @@ abstract class QuizActivity : AppCompatActivity() {
             if (q.value.correctAnswer == answerList[q.index]?.second) {
                 count++
             }
-            infoList += "${q.index}) Your Pick: ${answerList[q.index]?.second} | Correct Answer: ${q.value.correctAnswer}"
+            //"${q.index}) Your Pick: ${answerList[q.index]?.second} | Correct Answer: ${q.value.correctAnswer}"
+            infoList += getString(R.string.answerString, q.index, answerList[q.index]?.second, q.value.correctAnswer)
         }
 
         val linearLayout = LinearLayout(this)
@@ -366,20 +365,20 @@ abstract class QuizActivity : AppCompatActivity() {
 
         if (!postHighScoreLink.isNullOrBlank()) {
             userInput.layoutParams = lp
-            userInput.hint = "Your Name (for the high score list)"
+            userInput.hint = getString(R.string.nameHighScore)
             userInput.imeOptions = EditorInfo.IME_ACTION_NEXT
             linearLayout.addView(userInput)
         }
 
         val builder = MaterialAlertDialogBuilder(this)
         builder.setView(linearLayout)
-        builder.setTitle("You got $count/${quizQuestions.size}")
+        builder.setTitle(getString(R.string.highScoreTitle, "$count/${quizQuestions.size}"))
         builder.setCancelable(false)
         // Add the buttons
         if (!postHighScoreLink.isNullOrBlank()) {
-            builder.setPositiveButton("Submit") { _, _ ->
-                hud.setLabel("Posting")
-                hud.setDetailsLabel("Posting Score")
+            builder.setPositiveButton(getString(R.string.submit)) { _, _ ->
+                hud.setLabel(getString(R.string.posting))
+                hud.setDetailsLabel(getString(R.string.postingScore))
                 hud.show()
                 GlobalScope.launch {
                     postHighScore(UserInfo(
@@ -395,10 +394,10 @@ abstract class QuizActivity : AppCompatActivity() {
                 getInfo()
             }
         }
-        builder.setNeutralButton("Stop") { _, _ ->
+        builder.setNeutralButton(getString(R.string.stopQuiz)) { _, _ ->
             finish()
         }
-        builder.setNegativeButton("Play Again!") { _, _ ->
+        builder.setNegativeButton(getString(R.string.playAgain)) { _, _ ->
             getInfo()
         }
         val dialog = builder.create()

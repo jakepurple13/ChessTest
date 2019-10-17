@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:override="true">
+    <string name="doneButton">Done</string>
+    <string name="prevButton">Prev</string>
+    <string name="nextButton">Next</string>
+    <string name="freebie">Freebie</string>
+    <string name="thisOne">This One</string>
+    <string name="loading">Loading</string>
+    <string name="loadingQuestions">Loading Questions</string>
+    <string name="answerString">%d) Your Pick: %s | Correct Answer: %s</string>
+    <string name="nameHighScore">Your Name (for the high score list)</string>
+    <string name="startQuiz">Okay!</string>
+    <string name="stopQuiz">Stop Playing</string>
+    <string name="highScoreTitle">You got %s</string>
+    <string name="playAgain">Play Again!</string>
+    <string name="submit">Submit</string>
+    <string name="posting">Posting</string>
+    <string name="postingScore">Posting Score</string>
+</resources>
