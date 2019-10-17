@@ -1095,5 +1095,16 @@ class ExampleUnitTest {
 
     }
 
+    @Test
+    fun listTest() {
+        val d = Deck().getDeck().toMutableList()
+        removeHearts(d)
+        prettyLog(d.toString())
+    }
+
+    private fun removeHearts(deck: MutableList<Card>) {
+        deck.removeAll { it.suit == Suit.HEARTS }
+    }
+
 }
 

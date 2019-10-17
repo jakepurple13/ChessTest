@@ -241,7 +241,6 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                             .filter { it.replacedBy != null }
                             .map { it.replacedBy!! }
                             .toTypedArray())
-                    //val shows = ShowApi(Source.ANIME).showInfoList
                     for (i in dbShows) {
                         if (notWorking.any { i.link.contains(it.url, true) }) {
                             val findShow = shows.find { i.name == it.name }
@@ -249,12 +248,6 @@ class SettingsActivity2 : AppCompatPreferenceActivity() {
                                 db.updateShows(i.link, findShow.url)
                             }
                         }
-                        /*if (i.link.contains("animeplus.tv", true)) {
-                            val findShow = shows.find { i.name == it.name }
-                            if (findShow != null) {
-                                db.updateShows(i.link, findShow.url)
-                            }
-                        }*/
                     }
                 }
                 true

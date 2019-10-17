@@ -23,7 +23,9 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 
 
-class FirebaseDB(val context: Context) {
+fun Context.getFirebase() = FirebaseDB(this)
+
+class FirebaseDB(private val context: Context) {
 
     private fun <TResult> Task<TResult>.await(): TResult = Tasks.await(this)
 

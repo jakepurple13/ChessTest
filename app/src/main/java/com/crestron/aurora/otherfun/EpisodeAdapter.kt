@@ -109,7 +109,7 @@ class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String
         holder.watched.setOnCheckedChangeListener(null)
 
         try {
-            Loged.r(firebaseEps)
+            //Loged.r(firebaseEps)
             if(firebaseEps!=null) {
                 holder.watched.isChecked = items[position].url in (firebaseEps.episodeInfo?.map { it.url } ?: emptyList())
             }

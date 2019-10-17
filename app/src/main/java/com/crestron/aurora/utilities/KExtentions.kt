@@ -15,6 +15,7 @@ import androidx.core.view.doOnPreDraw
 import androidx.recyclerview.widget.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -100,10 +101,8 @@ fun <T> recyclerDeleteItemWithUndo(adapterList: MutableList<T>, adapter: Recycle
     adapter.notifyItemRangeChanged(positionForDeletion, adapter.itemCount)
     Snackbar.make(rootLayout, "Item removed!", Snackbar.LENGTH_LONG)
             .setAction("Undo") {
-
                 adapterList.add(positionForDeletion, deleted)
                 adapter.notifyItemInserted(positionForDeletion)
-
             }.show()
 }
 
@@ -151,6 +150,12 @@ fun <T> SharedPreferences.Editor.putObject(key: String, value: T): SharedPrefere
 
 inline fun <reified T> SharedPreferences.getObject(key: String, defaultValue: T? = null): T? = try {
     Gson().fromJson(getString(key, null), T::class.java)
+} catch (e: Exception) {
+    defaultValue
+}
+
+inline fun <reified T> SharedPreferences.getCollection(key: String, defaultValue: T? = null): T? = try {
+    Gson().fromJson(getString(key, null), object : TypeToken<T>() {}.type)
 } catch (e: Exception) {
     defaultValue
 }
@@ -220,6 +225,5 @@ val Int.romanNumeral: String?
     }
 
 inline fun <T> T?.otherWise(nullBlock: () -> T) = this ?: nullBlock()
-
 
 

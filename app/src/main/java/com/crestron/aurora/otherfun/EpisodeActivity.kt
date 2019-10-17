@@ -32,6 +32,8 @@ import com.crestron.aurora.showapi.EpisodeInfo
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.Utility
+import com.crestron.aurora.utilities.intersect
+import com.crestron.aurora.utilities.otherWise
 import com.crestron.aurora.views.DownloadsWidget
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
@@ -77,6 +79,156 @@ class EpisodeActivity : AppCompatActivity() {
 
     lateinit var adapter: EpisodeAdapter
 
+    val fetching = FetchingUtils(this, object : FetchingUtils.FetchAction {
+
+        override fun onStarted(download: Download, downloadBlocks: List<DownloadBlock>, totalBlocks: Int) {
+            super.onStarted(download, downloadBlocks, totalBlocks)
+            //mNotificationManager.cancelAll()
+            progressBar2.max = 100
+            if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+        }
+
+        override fun onQueued(download: Download, waitingOnNetwork: Boolean) {
+            super.onQueued(download, waitingOnNetwork)
+            if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+        }
+
+        override fun onProgress(download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
+            super.onProgress(download, etaInMilliSeconds, downloadedBytesPerSecond)
+            /*val progress = "%.2f".format(FetchingUtils.getProgress(download.downloaded, download.total))
+            val info = "$progress% " +
+                    "at ${FetchingUtils.getDownloadSpeedString(downloadedBytesPerSecond)} " +
+                    "with ${FetchingUtils.getETAString(etaInMilliSeconds)}"*/
+            runOnUiThread {
+                progressBar2.setProgress(download.progress, true)
+                //download_info.text = nameUrl(info)
+            }
+
+            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
+                    info,
+                    download.progress,
+                    this@EpisodeActivity,
+                    DownloadViewerActivity::class.java,
+                    download.id)*/
+            //}
+            if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+        }
+
+        override fun onCancelled(download: Download) {
+            super.onCancelled(download)
+            mNotificationManager.cancel(download.id)
+            try {
+                deleteFile(download.file)
+            } catch (e: IllegalArgumentException) {
+                Loged.w(e.message!!)//e.printStackTrace()
+            } catch (e: java.lang.NullPointerException) {
+                Loged.w(e.message!!)//e.printStackTrace()
+            }
+            progressBar2.progress = 0
+            //download_info.text = nameUrl("0% at 0 b/s with 0 secs left")
+            if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+        }
+
+        override fun onPaused(download: Download) {
+            super.onPaused(download)
+            stats = StatusPlay.PAUSE
+            /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
+                    "Paused",
+                    download.progress,
+                    this@EpisodeActivity,
+                    DownloadViewerActivity::class.java,
+                    download.id)*/
+            if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+        }
+
+        override fun onResumed(download: Download) {
+            super.onResumed(download)
+            stats = StatusPlay.PLAY
+            /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
+                    "Resumed",
+                    download.progress,
+                    this@EpisodeActivity,
+                    DownloadViewerActivity::class.java,
+                    download.id)*/
+            if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+        }
+
+        override fun onDeleted(download: Download) {
+            super.onDeleted(download)
+            mNotificationManager.cancel(download.id)
+            try {
+                deleteFile(download.file)
+            } catch (e: IllegalArgumentException) {
+                Loged.w(e.message!!)//e.printStackTrace()
+            } catch (e: java.lang.NullPointerException) {
+                Loged.w(e.message!!)////e.printStackTrace()
+            }
+            if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+        }
+
+        override fun onError(download: Download, error: Error, throwable: Throwable?) {
+            super.onError(download, error, throwable)
+            Crashlytics.log("${error.throwable?.message}")
+            if (defaultSharedPreferences.getBoolean(ConstantValues.AUTO_RETRY, false))
+                FetchingUtils.retry(download)
+            /*else
+                sendRetryNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
+                        "An error has occurred",
+                        download.progress,
+                        this@EpisodeActivity,
+                        DownloadViewerActivity::class.java,
+                        download.id)*/
+            if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+        }
+
+        override fun onCompleted(download: Download) {
+            super.onCompleted(download)
+            Toast.makeText(this@EpisodeActivity, "Finished Downloading", Toast.LENGTH_LONG).show()
+            progressBar2.progress = 0
+            ChoiceActivity.downloadCast(this@EpisodeActivity, ChoiceActivity.BroadCastInfo.KVObject("view_download_item_count", "1"))
+            ViewVideosActivity.videoCast(this@EpisodeActivity)
+            if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
+                DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
+            FetchingUtils.retryAll()
+            mNotificationManager.cancel(download.id)
+            //UtilNotification.sendNotification(this@EpisodeActivity, android.R.mipmap.sym_def_app_icon, download.file.substring(download.file.lastIndexOf("/") + 1), "All Finished!", "showDownload", ChooseActivity::class.java, download.id)
+            /*sendNotification(this@EpisodeActivity,
+                    android.R.mipmap.sym_def_app_icon,
+                    download.file.substring(download.file.lastIndexOf("/") + 1),
+                    "All Finished!",
+                    ConstantValues.CHANNEL_ID,
+                    EpisodeActivity::class.java,
+                    download.id,
+                    KeyAndValue(ConstantValues.URL_INTENT, url),
+                    KeyAndValue(ConstantValues.NAME_INTENT, name))*/
+            if (defaultSharedPreferences.getBoolean("useNotifications", true)) {
+                sendNotification(this@EpisodeActivity,
+                        android.R.mipmap.sym_def_app_icon,
+                        download.file.substring(download.file.lastIndexOf("/") + 1),
+                        "All Finished!",
+                        ConstantValues.CHANNEL_ID,
+                        StartVideoFromNotificationActivity::class.java,
+                        download.id,
+                        KeyAndValue("video_path", download.file),
+                        KeyAndValue("video_name", name))
+                sendGroupNotification(this@EpisodeActivity,
+                        android.R.mipmap.sym_def_app_icon,
+                        "Finished Downloads",
+                        ConstantValues.CHANNEL_ID,
+                        ViewVideosActivity::class.java)
+            }
+        }
+    })
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,10 +246,8 @@ class EpisodeActivity : AppCompatActivity() {
 
         mNotificationManager = this@EpisodeActivity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         UtilNotification.createNotificationChannel(this@EpisodeActivity, ConstantValues.CHANNEL_NAME, ConstantValues.CHANNEL_DES, ConstantValues.CHANNEL_ID)
         UtilNotification.createNotificationGroup(this@EpisodeActivity, ConstantValues.GROUP_ID, ConstantValues.GROUP_NAME)
-        //}
 
         handleIntent(intent)
 
@@ -108,160 +258,10 @@ class EpisodeActivity : AppCompatActivity() {
                 if (intent.hasExtra("is_favorited")) {
                     fav_episode.isLiked = intent.getBooleanExtra("is_favorited", false)
                 } else {
-                    fav_episode.isLiked = show.showDao().isUrlInDatabase(url) > 0
+                    fav_episode.isLiked = show.showDao().isUrlInDatabase(url) > 0 || FirebaseDB(this@EpisodeActivity).getShowSync(url) != null
                 }
             }
         }
-
-        val fetching = FetchingUtils(this, object : FetchingUtils.FetchAction {
-
-            override fun onStarted(download: Download, downloadBlocks: List<DownloadBlock>, totalBlocks: Int) {
-                super.onStarted(download, downloadBlocks, totalBlocks)
-                //mNotificationManager.cancelAll()
-                progressBar2.max = 100
-                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
-                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
-            }
-
-            override fun onQueued(download: Download, waitingOnNetwork: Boolean) {
-                super.onQueued(download, waitingOnNetwork)
-                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
-                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
-            }
-
-            override fun onProgress(download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
-                super.onProgress(download, etaInMilliSeconds, downloadedBytesPerSecond)
-                /*val progress = "%.2f".format(FetchingUtils.getProgress(download.downloaded, download.total))
-                val info = "$progress% " +
-                        "at ${FetchingUtils.getDownloadSpeedString(downloadedBytesPerSecond)} " +
-                        "with ${FetchingUtils.getETAString(etaInMilliSeconds)}"*/
-                runOnUiThread {
-                    progressBar2.setProgress(download.progress, true)
-                    //download_info.text = nameUrl(info)
-                }
-
-                //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
-                        info,
-                        download.progress,
-                        this@EpisodeActivity,
-                        DownloadViewerActivity::class.java,
-                        download.id)*/
-                //}
-                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
-                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
-            }
-
-            override fun onCancelled(download: Download) {
-                super.onCancelled(download)
-                mNotificationManager.cancel(download.id)
-                try {
-                    deleteFile(download.file)
-                } catch (e: IllegalArgumentException) {
-                    Loged.w(e.message!!)//e.printStackTrace()
-                } catch (e: java.lang.NullPointerException) {
-                    Loged.w(e.message!!)//e.printStackTrace()
-                }
-                progressBar2.progress = 0
-                //download_info.text = nameUrl("0% at 0 b/s with 0 secs left")
-                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
-                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
-            }
-
-            override fun onPaused(download: Download) {
-                super.onPaused(download)
-                stats = StatusPlay.PAUSE
-                /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
-                        "Paused",
-                        download.progress,
-                        this@EpisodeActivity,
-                        DownloadViewerActivity::class.java,
-                        download.id)*/
-                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
-                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
-            }
-
-            override fun onResumed(download: Download) {
-                super.onResumed(download)
-                stats = StatusPlay.PLAY
-                /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
-                        "Resumed",
-                        download.progress,
-                        this@EpisodeActivity,
-                        DownloadViewerActivity::class.java,
-                        download.id)*/
-                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
-                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
-            }
-
-            override fun onDeleted(download: Download) {
-                super.onDeleted(download)
-                mNotificationManager.cancel(download.id)
-                try {
-                    deleteFile(download.file)
-                } catch (e: IllegalArgumentException) {
-                    Loged.w(e.message!!)//e.printStackTrace()
-                } catch (e: java.lang.NullPointerException) {
-                    Loged.w(e.message!!)////e.printStackTrace()
-                }
-                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
-                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
-            }
-
-            override fun onError(download: Download, error: Error, throwable: Throwable?) {
-                super.onError(download, error, throwable)
-                Crashlytics.log("${error.throwable?.message}")
-                if (defaultSharedPreferences.getBoolean(ConstantValues.AUTO_RETRY, false))
-                    FetchingUtils.retry(download)
-                /*else
-                    sendRetryNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
-                            "An error has occurred",
-                            download.progress,
-                            this@EpisodeActivity,
-                            DownloadViewerActivity::class.java,
-                            download.id)*/
-                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
-                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
-            }
-
-            override fun onCompleted(download: Download) {
-                super.onCompleted(download)
-                Toast.makeText(this@EpisodeActivity, "Finished Downloading", Toast.LENGTH_LONG).show()
-                progressBar2.progress = 0
-                ChoiceActivity.downloadCast(this@EpisodeActivity, ChoiceActivity.BroadCastInfo.KVObject("view_download_item_count", "1"))
-                ViewVideosActivity.videoCast(this@EpisodeActivity)
-                if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
-                    DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
-                FetchingUtils.retryAll()
-                mNotificationManager.cancel(download.id)
-                //UtilNotification.sendNotification(this@EpisodeActivity, android.R.mipmap.sym_def_app_icon, download.file.substring(download.file.lastIndexOf("/") + 1), "All Finished!", "showDownload", ChooseActivity::class.java, download.id)
-                /*sendNotification(this@EpisodeActivity,
-                        android.R.mipmap.sym_def_app_icon,
-                        download.file.substring(download.file.lastIndexOf("/") + 1),
-                        "All Finished!",
-                        ConstantValues.CHANNEL_ID,
-                        EpisodeActivity::class.java,
-                        download.id,
-                        KeyAndValue(ConstantValues.URL_INTENT, url),
-                        KeyAndValue(ConstantValues.NAME_INTENT, name))*/
-                if (defaultSharedPreferences.getBoolean("useNotifications", true)) {
-                    sendNotification(this@EpisodeActivity,
-                            android.R.mipmap.sym_def_app_icon,
-                            download.file.substring(download.file.lastIndexOf("/") + 1),
-                            "All Finished!",
-                            ConstantValues.CHANNEL_ID,
-                            StartVideoFromNotificationActivity::class.java,
-                            download.id,
-                            KeyAndValue("video_path", download.file),
-                            KeyAndValue("video_name", name))
-                    sendGroupNotification(this@EpisodeActivity,
-                            android.R.mipmap.sym_def_app_icon,
-                            "Finished Downloads",
-                            ConstantValues.CHANNEL_ID,
-                            ViewVideosActivity::class.java)
-                }
-            }
-        })
 
         episode_list.layoutManager = LinearLayoutManager(this)
         class ItemOffsetDecoration(private val mItemOffset: Int) : RecyclerView.ItemDecoration() {
@@ -438,9 +438,10 @@ class EpisodeActivity : AppCompatActivity() {
         batch_download.setOnLongClickListener {
             GlobalScope.launch {
                 val eList = show.showDao().getEpisodesByUrl(url).map { it.showUrl }
-                val b = BooleanArray(adapter.itemCount) {
-                    adapter.items[it].url in eList
+                        .intersect(FirebaseDB(this@EpisodeActivity).getShowSync(url)?.episodeInfo?.map { it.url } ?: emptyList()) { one, two ->
+                    one == two.otherWise { one }
                 }
+                val b = BooleanArray(adapter.itemCount) { adapter.items[it].url in eList }
                 val m = MaterialAlertDialogBuilder(this@EpisodeActivity)
                         .setMultiChoiceItems(adapter.items.map { it.name }.toTypedArray(), b) { _, which, isChecked ->
                             GlobalScope.launch {
