@@ -20,9 +20,9 @@ class ShowQuizActivity : QuizActivity() {
     override val dialogHintText: String = "Choose a Source"
     override val dialogMessage: String = "Choose from Gogoanime, Putlocker, or Animetoon"
     override var dialogTitle: String = "Pick a Source"
+    override val type: QuizChoiceType = QuizChoiceType.CHOICES
     override fun onCreated(savedInstanceState: Bundle?) {
         titleText = "Show Quiz"
-        type = QuizChoiceType.CHOICES
         setChoices("Gogoanime", "Putlocker", "Animetoon")
     }
 
@@ -44,9 +44,9 @@ class MusicQuizActivity : QuizActivity() {
     override val postHighScoreLink: String? = "/music"
     override val highScoreLink: String? = "/music/mobileHighScores.json"
     override var dialogTitle: String = "Choose an Artist/Band"
+    override val type: QuizChoiceType = QuizChoiceType.TEXT
     override fun onCreated(savedInstanceState: Bundle?) {
         titleText = "Music Quiz"
-        type = QuizChoiceType.TEXT
     }
 
     override suspend fun getHighScore(): String {
@@ -82,6 +82,7 @@ class TestQuizActivity : QuizActivity() {
     override val dialogHintText: String = "Test Name"
     override val dialogMessage: String = "Test"
     override var dialogTitle: String = "Test"
+    override val type: QuizChoiceType = QuizChoiceType.NONE
     override fun onCreated(savedInstanceState: Bundle?) {
         titleText = "Test Quiz"
     }
@@ -104,9 +105,9 @@ class QuizShowActivity : QuizActivity() {
     override val dialogHintText: String = "Shows"
     override val dialogMessage: String = "Pick a Show Source"
     override var dialogTitle: String = "Show Source"
+    override val type: QuizChoiceType = QuizChoiceType.CHOICES
     override fun onCreated(savedInstanceState: Bundle?) {
         titleText = "Show Quiz"
-        type = QuizChoiceType.CHOICES
         setChoices("All", "Putlocker", "Gogoanime", "Animetoon")
         showHighScore = false
     }

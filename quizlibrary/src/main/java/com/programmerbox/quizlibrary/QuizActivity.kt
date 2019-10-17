@@ -138,9 +138,9 @@ abstract class QuizActivity : AppCompatActivity() {
      * [QuizChoiceType.CHOICES] - Give the user choices to choose from
      * [QuizChoiceType.NONE] - Do not give them any choices
      */
-    var type = QuizChoiceType.NONE
-    private var choices = mutableListOf<String>()
+    abstract val type: QuizChoiceType
 
+    private var choices = mutableListOf<String>()
     /**
      * If you want to add anything into the [onCreate]
      */
@@ -256,43 +256,33 @@ abstract class QuizActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams.WRAP_CONTENT
             )
 
-            val choiceInput: View
-
-            when (type) {
-                QuizChoiceType.TEXT -> {
-                    choiceInput = EditText(this)
-                    choiceInput.hint = dialogHintText
-                    choiceInput.imeOptions = EditorInfo.IME_ACTION_NEXT
+            val choiceInput: View = when (type) {
+                QuizChoiceType.TEXT -> EditText(this).apply {
+                    hint = dialogHintText
+                    imeOptions = EditorInfo.IME_ACTION_NEXT
                 }
-                QuizChoiceType.CHOICES -> {
+                QuizChoiceType.CHOICES -> Spinner(this).apply {
                     if (choices.isEmpty())
                         throw Exception("You don't have any choices!")
-                    choiceInput = Spinner(this)
-                    choiceInput.adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, choices)
+                    adapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, choices)
                 }
-                QuizChoiceType.NONE -> {
-                    choiceInput = View(this)
-                }
+                QuizChoiceType.NONE -> View(this)
             }
 
             choiceInput.layoutParams = lp
 
             linearLayout.addView(choiceInput)
 
-            val builder = MaterialAlertDialogBuilder(this)
-            builder.setView(linearLayout)
-            builder.setTitle(dialogTitle)
-            builder.setMessage(dialogMessage)
-            builder.setCancelable(false)
-            // Add the buttons
-            builder.setPositiveButton(getString(R.string.startQuiz)) { _, _ ->
-                quizSetup(choiceInput)
-            }
-            builder.setNegativeButton(getString(R.string.stopQuiz)) { _, _ ->
-                finish()
-            }
-            val dialog = builder.create()
-            dialog.show()
+            MaterialAlertDialogBuilder(this)
+                    .setView(linearLayout)
+                    .setTitle(dialogTitle)
+                    .setMessage(dialogMessage)
+                    .setCancelable(false)
+                    // Add the buttons
+                    .setPositiveButton(getString(R.string.startQuiz)) { _, _ -> quizSetup(choiceInput) }
+                    .setNegativeButton(getString(R.string.stopQuiz)) { _, _ -> finish() }
+                    .create()
+                    .show()
         }
     }
 
@@ -302,10 +292,10 @@ abstract class QuizActivity : AppCompatActivity() {
                 .setDetailsLabel(getString(R.string.loadingQuestions))
                 .show()
         GlobalScope.launch {
-            val chosen = when (type) {
-                QuizChoiceType.TEXT -> (choiceInput as EditText).text.toString()
-                QuizChoiceType.CHOICES -> (choiceInput as Spinner).adapter.getItem(choiceInput.selectedItemPosition)!!.toString()
-                QuizChoiceType.NONE -> ""
+            val chosen = when (choiceInput) {
+                is EditText -> choiceInput.text.toString()
+                is Spinner -> choiceInput.adapter.getItem(choiceInput.selectedItemPosition)!!.toString()
+                else -> ""
             }
             quizChoice = chosen
             quizQuestions = getQuestions(chosen)
@@ -332,24 +322,17 @@ abstract class QuizActivity : AppCompatActivity() {
             if (q.value.correctAnswer == answerList[q.index]?.second) {
                 count++
             }
-            //"${q.index}) Your Pick: ${answerList[q.index]?.second} | Correct Answer: ${q.value.correctAnswer}"
             infoList += getString(R.string.answerString, q.index, answerList[q.index]?.second, q.value.correctAnswer)
         }
 
         val linearLayout = LinearLayout(this)
         linearLayout.orientation = LinearLayout.VERTICAL
-        val lp = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        )
+        val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+
 
         val scoreView = ListView(this)
         scoreView.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 500)
-        scoreView.adapter = ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_list_item_1,
-                infoList
-        )
+        scoreView.adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, infoList)
 
         linearLayout.addView(scoreView)
 
@@ -392,8 +375,7 @@ abstract class QuizActivity : AppCompatActivity() {
         builder.setNegativeButton(getString(R.string.playAgain)) { _, _ ->
             getInfo()
         }
-        val dialog = builder.create()
-        dialog.show()
+        builder.create().show()
     }
 
     private fun answerSet(clearCheck: Boolean = true) {
