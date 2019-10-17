@@ -151,13 +151,13 @@ inline val RecyclerView.orientation
 fun <T> SharedPreferences.Editor.putObject(key: String, value: T): SharedPreferences.Editor = putString(key, Gson().toJson(value))
 
 inline fun <reified T> SharedPreferences.getObject(key: String, defaultValue: T? = null): T? = try {
-    Gson().fromJson(getString(key, null), T::class.java)
+    Gson().fromJson(getString(key, null), T::class.java) ?: defaultValue
 } catch (e: Exception) {
     defaultValue
 }
 
 inline fun <reified T> SharedPreferences.getCollection(key: String, defaultValue: T? = null): T? = try {
-    Gson().fromJson(getString(key, null), object : TypeToken<T>() {}.type)
+    Gson().fromJson(getString(key, null), object : TypeToken<T>() {}.type) ?: defaultValue
 } catch (e: Exception) {
     defaultValue
 }
@@ -165,13 +165,13 @@ inline fun <reified T> SharedPreferences.getCollection(key: String, defaultValue
 fun <T> Intent.putExtra(key: String, value: T): Intent = putExtra(key, Gson().toJson(value))
 
 inline fun <reified T> Intent.getObjectExtra(key: String, defaultValue: T): T = try {
-    Gson().fromJson(getStringExtra(key), T::class.java)
+    Gson().fromJson(getStringExtra(key), T::class.java) ?: defaultValue
 } catch (e: Exception) {
     defaultValue
 }
 
 inline fun <reified T> Intent.getCollectionExtra(key: String, defaultValue: T): T = try {
-    Gson().fromJson(getStringExtra(key), object : TypeToken<T>() {}.type)
+    Gson().fromJson(getStringExtra(key), object : TypeToken<T>() {}.type) ?: defaultValue
 } catch (e: Exception) {
     defaultValue
 }

@@ -326,6 +326,7 @@ class ChoiceActivity : AppCompatActivity() {
                     ChoiceButton.SHOW_QUIZ -> {
                         //ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, CalculationActivity::class.java))
                         startActivity(Intent(this@ChoiceActivity, QuizShowActivity::class.java))
+                        //startActivity(Intent(this@ChoiceActivity, TestQuizActivity::class.java))
                     }
                     ChoiceButton.VIDEO_POKER -> {
                         startActivity(Intent(this@ChoiceActivity, VideoPokerActivity::class.java))

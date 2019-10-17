@@ -8,11 +8,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.gson.Gson
 import com.kaopiz.kprogresshud.KProgressHUD
-import io.ktor.client.HttpClient
-import io.ktor.client.request.*
-import io.ktor.http.HttpMethod
 import kotlinx.android.synthetic.main.activity_quiz.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -123,6 +119,10 @@ abstract class QuizActivity : AppCompatActivity() {
      */
     open val highScoreLink: String? = null
     /**
+     * if you want high scores to be entered
+     */
+    var showHighScore: Boolean = true
+    /**
      * This describes what kind of quiz this is
      */
     var titleText: String = "Quiz"
@@ -140,11 +140,6 @@ abstract class QuizActivity : AppCompatActivity() {
      */
     var type = QuizChoiceType.NONE
     private var choices = mutableListOf<String>()
-
-    /**
-     * This is a url to get information from
-     */
-    abstract fun getInfoLink(type: String): String
 
     /**
      * If you want to add anything into the [onCreate]
@@ -169,39 +164,17 @@ abstract class QuizActivity : AppCompatActivity() {
     /**
      * override this if you want to customize where you are getting high scores from
      */
-    open suspend fun getHighScore(): String {
-        return client.get(highScoreLink!!) {
-            method = HttpMethod.Get
-            host = hostAddress
-            port = 8080
-        }
-    }
+    open suspend fun getHighScore(): String = ""
 
     /**
      * override this if you want to customize where you are posting the score to
      */
-    open suspend fun postHighScore(userInfo: UserInfo, questionList: Array<QuizQuestions>) {
-        client.post<String>(postHighScoreLink!!) {
-            method = HttpMethod.Post
-            host = hostAddress
-            port = 8080
-            header("Content-type", "application/json")
-            body = userInfo.toJson()
-        }
-    }
+    open suspend fun postHighScore(userInfo: UserInfo, questionList: Array<QuizQuestions>) {}
 
     /**
      * override this if you want to customize where/how you are getting questions
      */
-    open suspend fun getQuestions(chosen: String): Array<QuizQuestions> {
-        val choice = getInfoLink(chosen)
-        val s = client.get<String>(choice) {
-            method = HttpMethod.Get
-            host = hostAddress
-            port = 8080
-        }
-        return Gson().fromJson(s, Array<QuizQuestions>::class.java)
-    }
+    abstract suspend fun getQuestions(chosen: String): Array<QuizQuestions>
 
     /**
      * If you are doing choices, this allows you to set the choices
@@ -210,7 +183,6 @@ abstract class QuizActivity : AppCompatActivity() {
         choices.addAll(s)
     }
 
-    val client = HttpClient()
     private lateinit var quizQuestions: Array<QuizQuestions>
     private var counter = 0
         @SuppressLint("SetTextI18n")
@@ -263,12 +235,10 @@ abstract class QuizActivity : AppCompatActivity() {
     }
 
     private fun getHighScores() {
-        if (!highScoreLink.isNullOrBlank()) {
-            GlobalScope.launch {
-                val s = getHighScore()
-                runOnUiThread {
-                    highScoreTable.text = s
-                }
+        GlobalScope.launch {
+            val s = getHighScore()
+            runOnUiThread {
+                highScoreTable.text = s
             }
         }
     }
@@ -385,7 +355,7 @@ abstract class QuizActivity : AppCompatActivity() {
 
         val userInput = EditText(this)
 
-        if (!postHighScoreLink.isNullOrBlank()) {
+        if (showHighScore) {
             userInput.layoutParams = lp
             userInput.hint = getString(R.string.nameHighScore)
             userInput.imeOptions = EditorInfo.IME_ACTION_NEXT
@@ -397,7 +367,7 @@ abstract class QuizActivity : AppCompatActivity() {
         builder.setTitle(getString(R.string.highScoreTitle, "$count/${quizQuestions.size}"))
         builder.setCancelable(false)
         // Add the buttons
-        if (!postHighScoreLink.isNullOrBlank()) {
+        if (showHighScore) {
             builder.setPositiveButton(getString(R.string.submit)) { _, _ ->
                 hud.setLabel(getString(R.string.posting))
                 hud.setDetailsLabel(getString(R.string.postingScore))
@@ -410,10 +380,10 @@ abstract class QuizActivity : AppCompatActivity() {
                     ), quizQuestions)
                     runOnUiThread {
                         hud.dismiss()
+                        getInfo()
                     }
                     getHighScores()
                 }
-                getInfo()
             }
         }
         builder.setNeutralButton(getString(R.string.stopQuiz)) { _, _ ->
@@ -485,7 +455,5 @@ abstract class QuizActivity : AppCompatActivity() {
         answerC.isEnabled = false
         answerD.isEnabled = false
     }
-
-    fun Any.toJson(): String = Gson().toJson(this)
 
 }
