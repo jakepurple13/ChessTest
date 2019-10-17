@@ -98,6 +98,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.File
+import java.net.SocketTimeoutException
 import java.net.URL
 import java.util.*
 
@@ -669,8 +670,12 @@ class ChoiceActivity : AppCompatActivity() {
                 try {
                     if (KUtility.canShowCovers(this@ChoiceActivity)) {
                         val link = async {
-                            val episodeApi = EpisodeApi(ShowInfo(i.name, i.url))
-                            episodeApi.image
+                            try {
+                                val episodeApi = EpisodeApi(ShowInfo(i.name, i.url))
+                                episodeApi.image
+                            } catch(e: SocketTimeoutException) {
+                                ""
+                            }
                         }
                         val s1 = link.await()
                         //models.add(BookModel.urlBookModel(s1, i.url, i.name))

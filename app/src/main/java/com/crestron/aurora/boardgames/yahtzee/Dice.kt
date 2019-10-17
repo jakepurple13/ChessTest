@@ -12,5 +12,4 @@ class Dice(val num: Int) {
         6 -> R.drawable.six_dice
         else -> 0
     }
-
 }

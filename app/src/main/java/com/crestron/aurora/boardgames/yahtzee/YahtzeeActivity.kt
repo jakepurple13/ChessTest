@@ -36,7 +36,6 @@ class YahtzeeActivity : AppCompatActivity() {
         var dice = dices
             set(value) {
                 field = value
-                //imageView.setImageResource(field.getImage())
                 imageView.setImageLevel(field.num)
             }
         var hold = false
@@ -458,7 +457,6 @@ class YahtzeeActivity : AppCompatActivity() {
                 resetStuff()
             }
         }
-
     }
 
     private fun winDialog() {
