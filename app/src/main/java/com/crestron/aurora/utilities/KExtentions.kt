@@ -1,6 +1,7 @@
 package com.crestron.aurora.utilities
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -15,6 +16,7 @@ import androidx.core.view.doOnPreDraw
 import androidx.recyclerview.widget.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -160,6 +162,20 @@ inline fun <reified T> SharedPreferences.getCollection(key: String, defaultValue
     defaultValue
 }
 
+fun <T> Intent.putExtra(key: String, value: T): Intent = putExtra(key, Gson().toJson(value))
+
+inline fun <reified T> Intent.getObjectExtra(key: String, defaultValue: T): T = try {
+    Gson().fromJson(getStringExtra(key), T::class.java)
+} catch (e: Exception) {
+    defaultValue
+}
+
+inline fun <reified T> Intent.getCollectionExtra(key: String, defaultValue: T): T = try {
+    Gson().fromJson(getStringExtra(key), object : TypeToken<T>() {}.type)
+} catch (e: Exception) {
+    defaultValue
+}
+
 /**
  * Close keyboard when ENTER ic clicked, clears focus from view and calls [InputMethodManager.hideSoftInputFromWindow]
  */
@@ -226,4 +242,12 @@ val Int.romanNumeral: String?
 
 inline fun <T> T?.otherWise(nullBlock: () -> T) = this ?: nullBlock()
 
+fun Any.toJson(): String = Gson().toJson(this)
 
+fun Any.toPrettyJson(): String = GsonBuilder().setPrettyPrinting().create().toJson(this)
+
+inline fun <reified T> String.fromJson(): T? = try {
+    Gson().fromJson(this, object : TypeToken<T>() {}.type)
+} catch (e: Exception) {
+    null
+}

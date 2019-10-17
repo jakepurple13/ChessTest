@@ -1595,7 +1595,7 @@ class ChoiceActivity : AppCompatActivity() {
                             .withOnDrawerItemClickListener { _, _, _ ->
                                 Loged.w("$info")
                                 runOnUiThread {
-                                    val builder = AlertDialog.Builder(this@ChoiceActivity)
+                                    val builder = MaterialAlertDialogBuilder(this@ChoiceActivity)
                                     builder.setTitle("Notes for version ${appVersion.version}")
                                     builder.setMessage(appVersion.devNotes)
                                     builder.setNeutralButton("Cool!") { _, _ ->

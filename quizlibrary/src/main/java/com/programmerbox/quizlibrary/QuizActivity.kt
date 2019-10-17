@@ -208,7 +208,7 @@ abstract class QuizActivity : AppCompatActivity() {
         set(value) {
             field = value
             runOnUiThread {
-                doneButton.visibility = if (field) View.VISIBLE else View.GONE
+                doneButton.visibility = if (field) View.VISIBLE else View.INVISIBLE
             }
         }
     private var quizChoice = ""

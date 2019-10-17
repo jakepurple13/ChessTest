@@ -3,6 +3,7 @@ package com.crestron.aurora.server
 import android.os.Bundle
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.db.ShowSource
+import com.crestron.aurora.firebaseserver.getFirebase
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.programmerbox.quizlibrary.*
@@ -74,16 +75,24 @@ class QuizShowActivity : QuizActivity() {
             else -> null
         }
 
-        val showList = if (source != null) {
+        var fire = getFirebase().getAllShowsSync().filter { !it.name.isNullOrBlank() && !it.url.isNullOrBlank() }.map { ShowInfo(it.name!!, it.url!!) }
+        fire = if (source != null) {
+            fire.filter { it.url.contains(source.sourceName, true) }
+        } else {
+            fire
+        }
+
+        val showList = (if (source != null) {
             ShowDatabase.getDatabase(this).showDao().getShowsFromSource(source).shuffled()
         } else {
             ShowDatabase.getDatabase(this).showDao().allShows.shuffled()
-        }
+        }.map { ShowInfo(it.name, it.link) } + fire).distinctBy { it.url }
+
         val shows = if (showList.size >= 100) {
             showList.take(100)
         } else {
             showList
-        }.map { ShowInfo(it.name, it.link) }
+        }
 
         return quizMaker(shows.toMutableList(), question = {
             EpisodeApi(it).description

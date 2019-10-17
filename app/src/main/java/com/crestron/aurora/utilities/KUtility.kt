@@ -11,7 +11,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
-import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.FunApplication
 import com.crestron.aurora.Loged
 import com.crestron.aurora.otherfun.FetchingUtils
@@ -331,8 +330,19 @@ class KUtility {
             for (i in context.filesDir.list())
                 Loged.wtf(i)
         } catch (e: IOException) {
-            Loged.e(tag = "Exception", msg = "File write failed: " + e.toString())
+            Loged.e(tag = "Exception", msg = "File write failed: $e")
         }
 
     }
+
+    val loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed turpis elit, dictum vel bibendum vitae, auctor pharetra sem. Nullam fermentum lacus et mollis mollis. Integer elementum placerat nulla non pharetra. In est quam, mollis eget metus ac, laoreet ornare nisi. In facilisis elit et turpis dictum, eu suscipit lorem ultrices. Nullam tempus aliquam neque, in accumsan ligula luctus a. Cras pretium neque non justo gravida dignissim. Proin congue blandit tempor. Sed accumsan leo eu malesuada vestibulum. Cras molestie porta lacus, eget posuere leo consequat in. Maecenas faucibus vulputate sem, eget venenatis erat lobortis sed. Nullam purus mi, feugiat at lorem non, ultricies rhoncus lorem. Vivamus erat urna, lacinia at porttitor pretium, tristique in ex. Ut pulvinar, ligula id fermentum sagittis, sem diam mollis sapien, vel pretium enim diam convallis erat. Morbi finibus turpis vitae vestibulum vulputate.\n" +
+            "\n" +
+            "Suspendisse potenti. Nam ultrices odio id magna ultrices rutrum non non nisi. Etiam eget magna fermentum, dignissim ligula sed, venenatis mi. Nam id lacus nec tortor efficitur gravida vitae id nulla. Fusce non mauris a tellus eleifend sagittis. Nam sed consectetur libero, ut finibus lacus. Donec iaculis varius nisi, a sagittis augue pellentesque quis. Integer semper dapibus odio euismod interdum. Donec porttitor dolor nec nisi tempor, ac fringilla nisl facilisis. Nulla luctus massa arcu. Proin ut diam auctor, aliquam odio ac, rhoncus enim. Vivamus vestibulum nunc sed mauris cursus viverra. Suspendisse egestas malesuada est posuere cursus. Vestibulum ac augue eget augue volutpat tincidunt eget tempor arcu. Vivamus id nisi tempus, sagittis metus sed, tempor leo. Mauris fermentum iaculis mi, id viverra est ullamcorper in.\n" +
+            "\n" +
+            "Proin vulputate, dui at viverra imperdiet, tellus ex ultrices eros, vel congue nibh dolor ornare nunc. Suspendisse tempor libero risus, nec mattis elit tincidunt nec. Ut in malesuada nisi. Proin blandit ornare lorem. Mauris a augue et leo vestibulum tincidunt. Sed ut felis et nulla ultricies porta. Morbi eu leo felis. Praesent volutpat ac metus iaculis congue. In vestibulum hendrerit dui at fermentum. Suspendisse eu faucibus magna. Morbi dapibus consectetur lacus, in scelerisque felis fringilla gravida. Proin vel magna posuere, egestas sapien eu, gravida erat. Nullam sed auctor sem. Nullam a dapibus massa.\n" +
+            "\n" +
+            "Donec lacinia elementum arcu, efficitur ornare nibh. Donec ac erat ante. Duis lobortis mauris vitae ligula feugiat, et vehicula dolor elementum. Sed semper ipsum ipsum, at elementum neque euismod eget. In eget fringilla nulla. Nam nec massa vestibulum, dapibus leo vel, iaculis ante. Integer nec maximus erat. Morbi eget sapien sed enim volutpat suscipit. Sed commodo nibh sit amet nisi tempus tempor. Proin convallis justo enim, eu elementum orci imperdiet sit amet. Quisque lacinia sapien nibh, in vestibulum orci rutrum vel. Proin sit amet egestas neque. Curabitur egestas dolor ligula, at aliquam sem tempus eget. Aenean maximus metus diam, nec finibus ante varius vitae. Suspendisse maximus aliquam arcu nec pellentesque.\n" +
+            "\n" +
+            "Maecenas nec metus pellentesque felis mattis euismod tincidunt sed urna. In placerat dolor nec convallis eleifend. Mauris gravida porta rutrum. Morbi risus arcu, fermentum pellentesque sapien nec, varius ultricies mi. Aenean neque metus, lobortis ut consectetur sit amet, bibendum fermentum urna. Donec non velit in ante convallis lacinia. Donec placerat justo in libero luctus congue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nam quis urna faucibus nunc egestas semper. Vivamus aliquam turpis orci, vel laoreet nunc ultricies lobortis. Ut imperdiet turpis in mauris dictum, et mollis lacus porta."
+
 }

@@ -439,8 +439,8 @@ class EpisodeActivity : AppCompatActivity() {
             GlobalScope.launch {
                 val eList = show.showDao().getEpisodesByUrl(url).map { it.showUrl }
                         .intersect(FirebaseDB(this@EpisodeActivity).getShowSync(url)?.episodeInfo?.map { it.url } ?: emptyList()) { one, two ->
-                    one == two.otherWise { one }
-                }
+                            one == two.otherWise { one }
+                        }
                 val b = BooleanArray(adapter.itemCount) { adapter.items[it].url in eList }
                 val m = MaterialAlertDialogBuilder(this@EpisodeActivity)
                         .setMultiChoiceItems(adapter.items.map { it.name }.toTypedArray(), b) { _, which, isChecked ->
