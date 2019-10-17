@@ -2,7 +2,6 @@ package com.crestron.aurora.otherfun
 
 import android.annotation.SuppressLint
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
@@ -11,8 +10,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
-import androidx.core.app.TaskStackBuilder
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -83,7 +80,6 @@ class EpisodeActivity : AppCompatActivity() {
 
         override fun onStarted(download: Download, downloadBlocks: List<DownloadBlock>, totalBlocks: Int) {
             super.onStarted(download, downloadBlocks, totalBlocks)
-            //mNotificationManager.cancelAll()
             progressBar2.max = 100
             if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
                 DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
@@ -97,23 +93,9 @@ class EpisodeActivity : AppCompatActivity() {
 
         override fun onProgress(download: Download, etaInMilliSeconds: Long, downloadedBytesPerSecond: Long) {
             super.onProgress(download, etaInMilliSeconds, downloadedBytesPerSecond)
-            /*val progress = "%.2f".format(FetchingUtils.getProgress(download.downloaded, download.total))
-            val info = "$progress% " +
-                    "at ${FetchingUtils.getDownloadSpeedString(downloadedBytesPerSecond)} " +
-                    "with ${FetchingUtils.getETAString(etaInMilliSeconds)}"*/
             runOnUiThread {
                 progressBar2.setProgress(download.progress, true)
-                //download_info.text = nameUrl(info)
             }
-
-            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
-                    info,
-                    download.progress,
-                    this@EpisodeActivity,
-                    DownloadViewerActivity::class.java,
-                    download.id)*/
-            //}
             if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
                 DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
         }
@@ -124,12 +106,11 @@ class EpisodeActivity : AppCompatActivity() {
             try {
                 deleteFile(download.file)
             } catch (e: IllegalArgumentException) {
-                Loged.w(e.message!!)//e.printStackTrace()
+                Loged.w(e.message!!)
             } catch (e: java.lang.NullPointerException) {
-                Loged.w(e.message!!)//e.printStackTrace()
+                Loged.w(e.message!!)
             }
             progressBar2.progress = 0
-            //download_info.text = nameUrl("0% at 0 b/s with 0 secs left")
             if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
                 DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
         }
@@ -137,12 +118,6 @@ class EpisodeActivity : AppCompatActivity() {
         override fun onPaused(download: Download) {
             super.onPaused(download)
             stats = StatusPlay.PAUSE
-            /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
-                    "Paused",
-                    download.progress,
-                    this@EpisodeActivity,
-                    DownloadViewerActivity::class.java,
-                    download.id)*/
             if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
                 DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
         }
@@ -150,12 +125,6 @@ class EpisodeActivity : AppCompatActivity() {
         override fun onResumed(download: Download) {
             super.onResumed(download)
             stats = StatusPlay.PLAY
-            /*sendProgressNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
-                    "Resumed",
-                    download.progress,
-                    this@EpisodeActivity,
-                    DownloadViewerActivity::class.java,
-                    download.id)*/
             if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
                 DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
         }
@@ -166,9 +135,9 @@ class EpisodeActivity : AppCompatActivity() {
             try {
                 deleteFile(download.file)
             } catch (e: IllegalArgumentException) {
-                Loged.w(e.message!!)//e.printStackTrace()
+                Loged.w(e.message!!)
             } catch (e: java.lang.NullPointerException) {
-                Loged.w(e.message!!)////e.printStackTrace()
+                Loged.w(e.message!!)
             }
             if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
                 DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
@@ -179,13 +148,6 @@ class EpisodeActivity : AppCompatActivity() {
             Crashlytics.log("${error.throwable?.message}")
             if (defaultSharedPreferences.getBoolean(ConstantValues.AUTO_RETRY, false))
                 FetchingUtils.retry(download)
-            /*else
-                sendRetryNotification(download.file.substring(download.file.lastIndexOf("/") + 1),
-                        "An error has occurred",
-                        download.progress,
-                        this@EpisodeActivity,
-                        DownloadViewerActivity::class.java,
-                        download.id)*/
             if (DownloadsWidget.isWidgetActive(this@EpisodeActivity))
                 DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
         }
@@ -200,32 +162,6 @@ class EpisodeActivity : AppCompatActivity() {
                 DownloadsWidget.sendRefreshBroadcast(this@EpisodeActivity)
             FetchingUtils.retryAll()
             mNotificationManager.cancel(download.id)
-            //UtilNotification.sendNotification(this@EpisodeActivity, android.R.mipmap.sym_def_app_icon, download.file.substring(download.file.lastIndexOf("/") + 1), "All Finished!", "showDownload", ChooseActivity::class.java, download.id)
-            /*sendNotification(this@EpisodeActivity,
-                    android.R.mipmap.sym_def_app_icon,
-                    download.file.substring(download.file.lastIndexOf("/") + 1),
-                    "All Finished!",
-                    ConstantValues.CHANNEL_ID,
-                    EpisodeActivity::class.java,
-                    download.id,
-                    KeyAndValue(ConstantValues.URL_INTENT, url),
-                    KeyAndValue(ConstantValues.NAME_INTENT, name))*/
-            if (defaultSharedPreferences.getBoolean("useNotifications", true)) {
-                sendNotification(this@EpisodeActivity,
-                        android.R.mipmap.sym_def_app_icon,
-                        download.file.substring(download.file.lastIndexOf("/") + 1),
-                        "All Finished!",
-                        ConstantValues.CHANNEL_ID,
-                        StartVideoFromNotificationActivity::class.java,
-                        download.id,
-                        KeyAndValue("video_path", download.file),
-                        KeyAndValue("video_name", name))
-                sendGroupNotification(this@EpisodeActivity,
-                        android.R.mipmap.sym_def_app_icon,
-                        "Finished Downloads",
-                        ConstantValues.CHANNEL_ID,
-                        ViewVideosActivity::class.java)
-            }
         }
     })
 
@@ -520,33 +456,6 @@ class EpisodeActivity : AppCompatActivity() {
             multiSelectDialog.show(supportFragmentManager, "multiSelectDialog")
         }
 
-        /*fav_episode.setOnCheckedChangeListener { _, b ->
-
-            fun getEpisodeList(url: String) = async {
-                val doc1 = Jsoup.connect(url).get()
-                val stuffList = doc1.allElements.select("div#videos").select("a[href^=http]")
-                stuffList.size
-            }
-
-            async {
-                if (b) {
-                    show.showDao().insert(Show(url, name))
-
-                    async {
-                        val s = show.showDao().getShow(name)
-                        val showList = getEpisodeList(url).await()
-                        if (s.showNum < showList) {
-                            s.showNum = showList
-                            show.showDao().updateShow(s)
-                        }
-                        Loged.wtf("${s.name} and size is $showList")
-                    }
-
-                } else {
-                    show.showDao().deleteShow(name)
-                }
-            }
-        }*/
         fav_episode.setOnLikeListener(object : OnLikeListener {
             override fun liked(p0: LikeButton?) {
                 liked(p0!!.isLiked)
@@ -570,7 +479,6 @@ class EpisodeActivity : AppCompatActivity() {
 
         })
 
-        //share_button.visibility = View.GONE
         share_button.setOnClickListener {
             shareEmail()
         }
@@ -578,21 +486,7 @@ class EpisodeActivity : AppCompatActivity() {
     }
 
     private fun shareEmail() {
-
         val links = url.replace("www.", "fun.")
-
-        /*val text = "<a href=\"$links\">Check out $name</a>"
-
-        val thisApp = ""
-
-        val shareIntent = ShareCompat.IntentBuilder.from(this@EpisodeActivity)
-                .setType("text/html")
-                .setHtmlText("$text<br><br>$links<br><br>$thisApp")
-                .setSubject("Definitely watch $name")
-                .setChooserTitle("Share $name")
-                .intent
-
-        startActivity(shareIntent)*/
 
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
@@ -600,7 +494,6 @@ class EpisodeActivity : AppCompatActivity() {
             type = "text/plain"
         }
         startActivity(Intent.createChooser(sendIntent, "Share $name"))
-
     }
 
     override fun onBackPressed() {
@@ -613,7 +506,6 @@ class EpisodeActivity : AppCompatActivity() {
         } else {
             val intent = Intent(this@EpisodeActivity, ChoiceActivity::class.java)
             startActivity(intent)
-            //finish()
             supportFinishAfterTransition()
         }
     }
@@ -624,7 +516,6 @@ class EpisodeActivity : AppCompatActivity() {
     }
 
     private fun handleIntent(intent: Intent) {
-
         val action = intent.action
         val data = intent.data
 
@@ -646,84 +537,6 @@ class EpisodeActivity : AppCompatActivity() {
             name = intent.getStringExtra(ConstantValues.NAME_INTENT)!!
         }
         KUtility.removeItemFromNotiJsonList(url)
-    }
-
-    fun sendNotification(context: Context, smallIconId: Int, title: String, message: String, channel_id: String, gotoActivity: Class<*>, notification_id: Int, vararg dataToPass: KeyAndValue) {
-        // The id of the channel.
-        val mBuilder = NotificationCompat.Builder(context, channel_id)
-                .setSmallIcon(smallIconId)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setChannelId(channel_id)
-                .setGroup("downloaded_group")
-                .setAutoCancel(true)
-        // Creates an explicit intent for an Activity in your app
-
-        //val resultIntent = Intent(Intent.ACTION_VIEW)
-
-        //intent.setDataAndType(Uri.parse(dataToPass.filter { it.key=="url" }[0].value), "video/*")
-
-        val resultIntent = Intent(context, gotoActivity)
-
-        for (i in dataToPass) {
-            resultIntent.putExtra(i.key, i.value)
-        }
-
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your app to the Home screen.
-        val stackBuilder = TaskStackBuilder.create(context)
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(gotoActivity)
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent)
-        //stackBuilder.addNextIntent(Intent.createChooser(resultIntent, "Complete action using"))
-        val resultPendingIntent = stackBuilder.getPendingIntent(
-                notification_id * 2,
-                PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        mBuilder.setContentIntent(resultPendingIntent)
-        val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        // mNotificationId is a unique integer your app uses to identify the
-        // notification. For example, to cancel the notification, you can pass its ID
-        // number to NotificationManager.cancel().
-        mNotificationManager.notify(notification_id * 2, mBuilder.build())
-    }
-
-    private fun sendGroupNotification(context: Context, smallIconId: Int, title: String, channel_id: String, gotoActivity: Class<*>) {
-
-        // The id of the channel.
-        val mBuilder = NotificationCompat.Builder(context, channel_id)
-                .setSmallIcon(smallIconId)
-                .setContentTitle(title)
-                .setChannelId(channel_id)
-                .setGroupSummary(true)
-                .setGroup("downloaded_group")
-                .setAutoCancel(true)
-        // Creates an explicit intent for an Activity in your app
-        val resultIntent = Intent(context, gotoActivity)
-
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your app to the Home screen.
-        val stackBuilder = TaskStackBuilder.create(context)
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(gotoActivity)
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent)
-        val resultPendingIntent = stackBuilder.getPendingIntent(
-                0,
-                PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        mBuilder.setContentIntent(resultPendingIntent)
-        val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        // mNotificationId is a unique integer your app uses to identify the
-        // notification. For example, to cancel the notification, you can pass its ID
-        // number to NotificationManager.cancel().
-        mNotificationManager.notify(99, mBuilder.build())
     }
 
     data class KeyAndValue(val key: String, val value: String)

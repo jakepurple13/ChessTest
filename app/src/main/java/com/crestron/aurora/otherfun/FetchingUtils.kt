@@ -337,7 +337,6 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         override fun onCompleted(download: Download) {
             Loged.d("Completed ${download.file}")
             Fetch.getDefaultInstance().removeAllWithStatus(Status.COMPLETED)
-            //downloadCount++
         }
 
         override fun onDeleted(download: Download) {
