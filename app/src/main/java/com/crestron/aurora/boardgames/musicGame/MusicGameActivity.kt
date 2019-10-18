@@ -576,11 +576,7 @@ class TrackApi {
 
         fun getTopTracks(chartName: ChartName = ChartName.TOP, @IntRange(from = 1, to = 100) amount: Int = 5): List<Track> {
             val s = GetAPI.getInfo<SnippetMessage>("chart.tracks.get?chart_name=${chartName.value}&page=1&page_size=$amount&f_has_lyrics=1").trackList
-            val list = arrayListOf<Track>()
-            s.forEach {
-                list += it.track
-            }
-            return list
+            return s.map { it.track }
         }
 
         fun getTrackByInfo(trackName: String? = null, artistName: String? = null, anyLyrics: String? = null, amount: Int = 100): List<Track> {
@@ -588,11 +584,7 @@ class TrackApi {
             val aName = if (artistName != null && !artistName.isBlankOrEmpty()) "${if (tName.isBlankOrEmpty()) "" else "&"}q_artist=$artistName" else ""
             val lyric = if (anyLyrics != null && !anyLyrics.isBlankOrEmpty()) "${if (tName.isBlankOrEmpty() && aName.isBlankOrEmpty()) "" else "&"}q_lyrics=$anyLyrics" else ""
             val s = GetAPI.getInfo<SnippetMessage>("track.search?$tName$aName$lyric&page_size=$amount&page=1&f_has_lyrics=1").trackList
-            val list = arrayListOf<Track>()
-            s.forEach {
-                list += it.track
-            }
-            return list
+            return s.map { it.track }
         }
     }
 
@@ -602,20 +594,12 @@ class ArtistApi {
     companion object {
         fun getArtistAlbums(track: Track): List<Album> {
             val s = GetAPI.getInfo<AlbumMessage>("artist.albums.get?artist_id=${track.artistId}&s_release_date=desc&g_album_name=1").albumList
-            val list = arrayListOf<Album>()
-            s.forEach {
-                list += it.album
-            }
-            return list
+            return s.map { it.album }
         }
 
         fun getArtistAlbums(id: Int): List<Album> {
             val s = GetAPI.getInfo<AlbumMessage>("artist.albums.get?artist_id=$id&s_release_date=desc&g_album_name=1").albumList
-            val list = arrayListOf<Album>()
-            s.forEach {
-                list += it.album
-            }
-            return list
+            return s.map { it.album }
         }
     }
 }
@@ -624,29 +608,17 @@ class AlbumApi {
     companion object {
         fun getAlbum(album: Album): List<Track> {
             val s = GetAPI.getInfo<SnippetMessage>("album.tracks.get?album_id=${album.albumId}&f_has_lyrics=1").trackList
-            val list = arrayListOf<Track>()
-            s.forEach {
-                list += it.track
-            }
-            return list
+            return s.map { it.track }
         }
 
         fun getAlbum(id: Int): List<Track> {
             val s = GetAPI.getInfo<SnippetMessage>("album.tracks.get?album_id=$id&f_has_lyrics=1").trackList
-            val list = arrayListOf<Track>()
-            s.forEach {
-                list += it.track
-            }
-            return list
+            return s.map { it.track }
         }
 
         fun getAlbum(track: Track): List<Track> {
             val s = GetAPI.getInfo<SnippetMessage>("album.tracks.get?album_id=${track.albumId}&f_has_lyrics=1").trackList
-            val list = arrayListOf<Track>()
-            s.forEach {
-                list += it.track
-            }
-            return list
+            return s.map { it.track }
         }
     }
 }

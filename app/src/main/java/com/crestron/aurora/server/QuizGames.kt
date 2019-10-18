@@ -89,13 +89,10 @@ class NewMusicGameActivity : QuizActivity() {
     override val titleText: String = "Music Quiz"
     override val type: QuizChoiceType = QuizChoiceType.TEXT
 
-    override suspend fun getQuestions(chosen: String): Array<QuizQuestions> {
-        val list = TrackApi.getTrackByInfo(artistName = chosen).toMutableList()
-        return quizMaker(list, {
-            LyricApi.getLyricSnippet(it).snippet_body
-        }) {
-            it.trackName
-        }
+    override suspend fun getQuestions(chosen: String): Array<QuizQuestions> = quizMaker(TrackApi.getTrackByInfo(artistName = chosen), {
+        LyricApi.getLyricSnippet(it).snippet_body
+    }) {
+        it.trackName
     }
 }
 
@@ -112,7 +109,7 @@ class TestQuizActivity : QuizActivity() {
 
     override suspend fun postHighScore(userInfo: UserInfo, questionList: Array<QuizQuestions>) {
         val currentInfo = defaultSharedPreferences.getCollection<List<UserInfo>>("testScore", emptyList())!!.toMutableList()
-        currentInfo+=userInfo
+        currentInfo += userInfo
         defaultSharedPreferences.edit().putObject("testScore", currentInfo).apply()
     }
 
@@ -152,13 +149,7 @@ class QuizShowActivity : QuizActivity() {
             ShowDatabase.getDatabase(this).showDao().allShows.shuffled()
         }.map { ShowInfo(it.name, it.link) } + fire).distinctBy { it.url }
 
-        val shows = if (showList.size >= 100) {
-            showList.take(100)
-        } else {
-            showList
-        }
-
-        return quizMaker(shows.toMutableList(), question = {
+        return quizMaker(showList, question = {
             EpisodeApi(it).description
         }, answers = {
             it.name

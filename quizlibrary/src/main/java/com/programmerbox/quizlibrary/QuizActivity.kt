@@ -70,23 +70,29 @@ data class UserInfo(val name: String, val quizChoice: String, val score: String)
  * @param answers modifying the way the answers are displayed
  * @return an array of [QuizQuestions]
  */
-fun <V> quizMaker(questionList: MutableList<V>, question: (V) -> String = { it.toString() }, answers: (V) -> String = { it.toString() }): Array<QuizQuestions> {
+fun <V> quizMaker(questionList: Collection<V>, question: (V) -> String = { it.toString() }, answers: (V) -> String = { it.toString() }): Array<QuizQuestions> {
+    val list = if (questionList.size >= 100) {
+        questionList.take(100)
+    } else {
+        questionList
+    }.toMutableList()
     val qList = mutableListOf<QuizQuestions>()
-    if (questionList.size < 4) {
+    if (list.size < 4) {
         qList += QuizQuestions.freebie
     }
-    while (questionList.size >= 4) {
+    while (list.size >= 4) {
         qList += try {
-            val answer = questionList.randomRemove()
+            val answer = list.randomRemove()
             QuizQuestions(question(answer), listOf(
                     answers(answer),
-                    answers(questionList.randomRemove()),
-                    answers(questionList.randomRemove()),
-                    answers(questionList.randomRemove())).shuffled(),
+                    answers(list.randomRemove()),
+                    answers(list.randomRemove()),
+                    answers(list.randomRemove())).shuffled(),
                     answers(answer))
         } catch (e: Exception) {
             QuizQuestions.freebie
         }
+        println("${qList.size}/${questionList.size/4}")
     }
     return qList.toTypedArray()
 }

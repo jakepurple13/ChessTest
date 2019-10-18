@@ -91,6 +91,8 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         GlobalScope.launch {
             delay(300000L)
             if(isMyServiceRunning(ShowCheckReceiver::class.java)) {
+                val mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                mNotificationManager.cancel(2)
                 stopSelf()
             }
         }
