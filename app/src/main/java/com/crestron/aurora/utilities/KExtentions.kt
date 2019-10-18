@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.GradientDrawable.RECTANGLE
+import android.os.Build
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -251,3 +252,13 @@ inline fun <reified T> String.fromJson(): T? = try {
 } catch (e: Exception) {
     null
 }
+
+data class DeviceInfo(val board: String = Build.BOARD,
+                      val brand: String = Build.BRAND,
+                      val device: String = Build.DEVICE,
+                      val manufacturer: String = Build.MANUFACTURER,
+                      val model: String = Build.MODEL,
+                      val product: String = Build.PRODUCT,
+                      val sdkInt: Int = Build.VERSION.SDK_INT,
+                      val versionCode: String = Build.VERSION_CODES::class.java.fields[Build.VERSION.SDK_INT].name,
+                      val versionNumber: String = Build.VERSION.RELEASE)

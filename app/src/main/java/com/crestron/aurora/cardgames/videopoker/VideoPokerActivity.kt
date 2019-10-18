@@ -45,6 +45,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import nl.dionsegijn.steppertouch.OnStepCallback
+import org.jetbrains.anko.defaultSharedPreferences
 import kotlin.math.abs
 
 class VideoPokerActivity : AppCompatActivity() {
@@ -138,7 +139,7 @@ class VideoPokerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_poker)
-
+        winning = defaultSharedPreferences.getInt("video_poker_money", 20)
         debugged = false
 
         ViewUtil.revealing(findViewById(android.R.id.content), intent)
@@ -483,6 +484,11 @@ class VideoPokerActivity : AppCompatActivity() {
     override fun onBackPressed() {
         //super.onBackPressed()
         back_button_videopoker.performClick()
+    }
+
+    override fun onDestroy() {
+        defaultSharedPreferences.edit().putInt("video_poker_money", if (winning <= 0) 20 else winning).apply()
+        super.onDestroy()
     }
 
     interface VideoPokerListeners {

@@ -49,10 +49,7 @@ import com.crestron.aurora.server.toJson
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
-import com.crestron.aurora.utilities.KUtility
-import com.crestron.aurora.utilities.SharedPrefVariables
-import com.crestron.aurora.utilities.Utility
-import com.crestron.aurora.utilities.ViewUtil
+import com.crestron.aurora.utilities.*
 import com.crestron.aurora.viewtesting.ViewTesting
 import com.github.florent37.inlineactivityresult.kotlin.startForResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -175,6 +172,8 @@ class ChoiceActivity : AppCompatActivity() {
         setContentView(R.layout.activity_choice)
         //setSupportActionBar(toolbar)
         FirebaseApp.initializeApp(this)
+
+        Loged.r(DeviceInfo())
 
         mAuth = FirebaseAuth.getInstance()
 

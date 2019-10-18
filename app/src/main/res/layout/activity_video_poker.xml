@@ -1,4 +1,295 @@
 <?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/video_poker_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/drkgreen"
+    tools:context=".cardgames.videopoker.VideoPokerActivity">
+
+    <Button
+        android:id="@+id/play_cards"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/play_again"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="5dp"
+        android:background="@drawable/dialog_bg"
+        android:backgroundTint="@color/emeraldGreen"
+        android:text="Submit"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/rv_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/video_poker_rv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="5"
+            tools:listitem="@layout/video_poker_card_button" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/card_layout_poker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:id="@+id/card_one"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/b1fv" />
+
+        <ImageView
+            android:id="@+id/card_two"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toEndOf="@+id/card_one"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/b1fv" />
+
+        <ImageView
+            android:id="@+id/card_three"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/b1fv" />
+
+        <ImageView
+            android:id="@+id/card_four"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toStartOf="@+id/card_five"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/b1fv" />
+
+        <ImageView
+            android:id="@+id/card_five"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/b1fv" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/hold_button_layout_poker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/card_layout_poker"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/hold_one"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/card_one"
+            android:layout_alignParentStart="true"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_corner"
+            android:backgroundTint="@color/emeraldGreen"
+            android:text="Hold" />
+
+        <Button
+            android:id="@+id/hold_two"
+            android:layout_width="69dp"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/card_one"
+            android:layout_toEndOf="@+id/card_one"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_corner"
+            android:backgroundTint="@color/emeraldGreen"
+            android:text="Hold" />
+
+        <Button
+            android:id="@+id/hold_three"
+            android:layout_width="72dp"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/card_one"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_corner"
+            android:backgroundTint="@color/emeraldGreen"
+            android:text="Hold" />
+
+        <Button
+            android:id="@+id/hold_four"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/card_one"
+            android:layout_alignStart="@+id/card_four"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_corner"
+            android:backgroundTint="@color/emeraldGreen"
+            android:text="Hold" />
+
+        <Button
+            android:id="@+id/hold_five"
+            android:layout_width="68dp"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/card_one"
+            android:layout_alignParentEnd="true"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_corner"
+            android:backgroundTint="@color/emeraldGreen"
+            android:text="Hold" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/score_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="5dp"
+        android:gravity="end"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@id/bet_amount"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/jack_or_better"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/winnings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/jack_or_better"
+        android:text="Winnings"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/jack_or_better" />
+
+    <TextView
+        android:id="@+id/cards_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/back_button_videopoker"
+        android:text="Cards Left"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/back_button_videopoker" />
+
+    <TextView
+        android:id="@+id/current_hand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/play_again"
+        android:layout_toStartOf="@id/discard_button"
+        android:gravity="center"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="@id/discard_button"
+        app:layout_constraintBottom_toTopOf="@id/rv_layout"
+        app:layout_constraintEnd_toStartOf="@id/discard_button"
+        app:layout_constraintStart_toEndOf="@id/play_again"
+        app:layout_constraintTop_toTopOf="@id/play_again" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/play_again"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/rv_layout"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="5dp"
+        android:backgroundTint="@color/emeraldGreen"
+        android:text="Play Cards"
+        app:layout_constraintBottom_toTopOf="@id/rv_layout"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/discard_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/play_again"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="5dp"
+        android:backgroundTint="@color/emeraldGreen"
+        android:text="Discard"
+        app:layout_constraintBottom_toTopOf="@id/rv_layout"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/back_button_videopoker"
+        style="@style/CardButtonTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:text="Back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/shuffle_hand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/play_again"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="5dp"
+        android:backgroundTint="@color/emeraldGreen"
+        android:text="Shuffle Hand"
+        app:layout_constraintBottom_toTopOf="@id/play_again"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/jack_or_better"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/cards_left"
+        android:text="Jacks or Better"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cards_left"
+        app:useMaterialThemeColors="true" />
+
+    <nl.dionsegijn.steppertouch.StepperTouch
+        android:id="@+id/bet_amount"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_above="@+id/play_again"
+        android:layout_centerHorizontal="true"
+        app:layout_constraintBottom_toBottomOf="@id/discard_button"
+        app:layout_constraintBottom_toTopOf="@id/current_hand"
+        app:layout_constraintEnd_toStartOf="@id/discard_button"
+        app:layout_constraintStart_toEndOf="@id/play_again"
+        app:layout_constraintTop_toTopOf="@id/shuffle_hand"
+        app:stepperBackgroundColor="@color/inactiveGradientColor"
+        app:stepperTextColor="@color/inactiveGradientColor" />
+
+</androidx.constraintlayout.widget.ConstraintLayout><!--
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout android:id="@+id/video_poker_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -261,4 +552,4 @@
         app:stepperBackgroundColor="@color/inactiveGradientColor"
         app:stepperTextColor="@color/inactiveGradientColor" />
 
-</RelativeLayout>
+</RelativeLayout>-->
