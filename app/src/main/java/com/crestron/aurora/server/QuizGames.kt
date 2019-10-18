@@ -6,6 +6,7 @@ import com.crestron.aurora.boardgames.musicGame.TrackApi
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.db.ShowSource
 import com.crestron.aurora.firebaseserver.getFirebase
+import com.crestron.aurora.server.QuizGames.hostAddress
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.utilities.getCollection
@@ -16,6 +17,11 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.*
 import io.ktor.http.HttpMethod
 import org.jetbrains.anko.defaultSharedPreferences
+
+
+object QuizGames {
+    var hostAddress = ""
+}
 
 class ShowQuizActivity : QuizActivity() {
     val client = HttpClient()

@@ -92,18 +92,12 @@ fun <V> quizMaker(questionList: Collection<V>, question: (V) -> String = { it.to
         } catch (e: Exception) {
             QuizQuestions.freebie
         }
-        println("${qList.size}/${questionList.size/4}")
+        println("${qList.size}/${questionList.size / 4}")
     }
     return qList.toTypedArray()
 }
 
 abstract class QuizActivity : AppCompatActivity() {
-
-    companion object {
-        var hostAddress = ""
-        internal val resource = QuizActivity::getBaseContext
-    }
-
     /**
      * The title of the dialog
      */
