@@ -1,6 +1,8 @@
 package com.crestron.aurora.server
 
 import android.os.Bundle
+import com.crestron.aurora.boardgames.musicGame.LyricApi
+import com.crestron.aurora.boardgames.musicGame.TrackApi
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.db.ShowSource
 import com.crestron.aurora.firebaseserver.getFirebase
@@ -21,8 +23,8 @@ class ShowQuizActivity : QuizActivity() {
     override val dialogMessage: String = "Choose from Gogoanime, Putlocker, or Animetoon"
     override var dialogTitle: String = "Pick a Source"
     override val type: QuizChoiceType = QuizChoiceType.CHOICES
+    override val titleText: String = "Show Quiz"
     override fun onCreated(savedInstanceState: Bundle?) {
-        titleText = "Show Quiz"
         setChoices("Gogoanime", "Putlocker", "Animetoon")
     }
 
@@ -45,8 +47,10 @@ class MusicQuizActivity : QuizActivity() {
     override val highScoreLink: String? = "/music/mobileHighScores.json"
     override var dialogTitle: String = "Choose an Artist/Band"
     override val type: QuizChoiceType = QuizChoiceType.TEXT
+    override val titleText: String = "Music Quiz"
+
     override fun onCreated(savedInstanceState: Bundle?) {
-        titleText = "Music Quiz"
+        showHighScore = true
     }
 
     override suspend fun getHighScore(): String {
@@ -78,14 +82,29 @@ class MusicQuizActivity : QuizActivity() {
     }
 }
 
+class NewMusicGameActivity : QuizActivity() {
+    override val dialogTitle: String = "Music Game"
+    override val dialogHintText: String = "Artist Name"
+    override val dialogMessage: String = "Pick an Artist"
+    override val titleText: String = "Music Quiz"
+    override val type: QuizChoiceType = QuizChoiceType.TEXT
+
+    override suspend fun getQuestions(chosen: String): Array<QuizQuestions> {
+        val list = TrackApi.getTrackByInfo(artistName = chosen).toMutableList()
+        return quizMaker(list, {
+            LyricApi.getLyricSnippet(it).snippet_body
+        }) {
+            it.trackName
+        }
+    }
+}
+
 class TestQuizActivity : QuizActivity() {
     override val dialogHintText: String = "Test Name"
     override val dialogMessage: String = "Test"
     override var dialogTitle: String = "Test"
     override val type: QuizChoiceType = QuizChoiceType.NONE
-    override fun onCreated(savedInstanceState: Bundle?) {
-        titleText = "Test Quiz"
-    }
+    override var titleText: String = "Test Quiz"
 
     override suspend fun getQuestions(chosen: String): Array<QuizQuestions> {
         return quizMaker(mutableListOf("asdf", "zxcv", "qwer", "jkl;"))
@@ -106,10 +125,9 @@ class QuizShowActivity : QuizActivity() {
     override val dialogMessage: String = "Pick a Show Source"
     override var dialogTitle: String = "Show Source"
     override val type: QuizChoiceType = QuizChoiceType.CHOICES
+    override var titleText: String = "Show Quiz"
     override fun onCreated(savedInstanceState: Bundle?) {
-        titleText = "Show Quiz"
         setChoices("All", "Putlocker", "Gogoanime", "Animetoon")
-        showHighScore = false
     }
 
     override suspend fun getQuestions(chosen: String): Array<QuizQuestions> {

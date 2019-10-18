@@ -121,17 +121,12 @@ abstract class QuizActivity : AppCompatActivity() {
     /**
      * if you want high scores to be entered
      */
-    var showHighScore: Boolean = true
+    var showHighScore: Boolean = false
     /**
      * This describes what kind of quiz this is
      */
-    var titleText: String = "Quiz"
-        set(value) {
-            field = value
-            runOnUiThread {
-                title_text.text = titleText
-            }
-        }
+    open val titleText: String = "Quiz"
+
     /**
      * This allows you to let the user:
      * [QuizChoiceType.TEXT] - Type in their choice
@@ -212,6 +207,8 @@ abstract class QuizActivity : AppCompatActivity() {
         setContentView(R.layout.activity_quiz)
 
         onCreated(savedInstanceState)
+
+        title_text.text = titleText
 
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
@@ -301,11 +298,11 @@ abstract class QuizActivity : AppCompatActivity() {
             quizQuestions = getQuestions(chosen)
             answerList.clear()
             runOnUiThread {
+                hud.dismiss()
                 finished = false
                 counter = 0
                 counterText.text = "${counter + 1}/${quizQuestions.size}"
                 setQuestionUp()
-                hud.dismiss()
                 answerA.isEnabled = true
                 answerB.isEnabled = true
                 answerC.isEnabled = true
@@ -436,6 +433,11 @@ abstract class QuizActivity : AppCompatActivity() {
         answerB.isEnabled = false
         answerC.isEnabled = false
         answerD.isEnabled = false
+    }
+
+    override fun onDestroy() {
+        hud.dismiss()
+        super.onDestroy()
     }
 
 }

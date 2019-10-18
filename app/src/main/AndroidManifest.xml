@@ -16,6 +16,7 @@
         <activity android:name=".server.MusicQuizActivity" />
         <activity android:name=".server.ShowQuizActivity" />
         <activity android:name=".server.TestQuizActivity" />
+        <activity android:name=".server.NewMusicGameActivity" />
         <activity android:name=".server.QuizShowActivity" />
         <activity android:name=".server.ChatActivity" />
         <activity android:name=".boardgames.musicGame.MusicGameActivity" />

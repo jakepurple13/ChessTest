@@ -44,6 +44,7 @@ import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.firebaseserver.FirebaseDB
 import com.crestron.aurora.otherfun.*
 import com.crestron.aurora.server.ChatActivity
+import com.crestron.aurora.server.NewMusicGameActivity
 import com.crestron.aurora.server.QuizShowActivity
 import com.crestron.aurora.server.toJson
 import com.crestron.aurora.showapi.EpisodeApi
@@ -135,7 +136,8 @@ class ChoiceActivity : AppCompatActivity() {
         FEEDBACK("feedback", "Feedback"),
         VIEW_TESTING("view_testing", "View Test"),
         CHAT("chat", "Chat"),
-        SHOW_QUIZ("show_quiz", "Show Quiz");
+        SHOW_QUIZ("show_quiz", "Show Quiz"),
+        MUSIC_QUIZ("music_quiz", "Music Quiz");
 
         companion object {
             fun getChoiceFromTitle(title: String): ChoiceButton? {
@@ -270,10 +272,7 @@ class ChoiceActivity : AppCompatActivity() {
         adapter = MaterialAdapter(arrayListOf(), this) {
             try {
                 when (this.hubType) {
-                    ChoiceButton.BLACKJACK -> {
-                        startActivity(Intent(this@ChoiceActivity, BlackJackActivity::class.java))
-                        //ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, BlackJackActivity::class.java))
-                    }
+                    ChoiceButton.BLACKJACK -> startActivity(Intent(this@ChoiceActivity, BlackJackActivity::class.java))
                     ChoiceButton.SOLITAIRE -> {
                         val intent = Intent(this@ChoiceActivity, SolitaireActivity::class.java)
 
@@ -313,74 +312,27 @@ class ChoiceActivity : AppCompatActivity() {
                         }
                         val dialog = builder.create()
                         dialog.show()
-
                     }
-                    ChoiceButton.CALCULATION -> {
-                        //ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, CalculationActivity::class.java))
-                        startActivity(Intent(this@ChoiceActivity, CalculationActivity::class.java))
-                    }
-                    ChoiceButton.CHAT -> {
-                        //ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, CalculationActivity::class.java))
-                        startActivity(Intent(this@ChoiceActivity, ChatActivity::class.java))
-                    }
-                    ChoiceButton.SHOW_QUIZ -> {
-                        //ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, CalculationActivity::class.java))
-                        startActivity(Intent(this@ChoiceActivity, QuizShowActivity::class.java))
-                        //startActivity(Intent(this@ChoiceActivity, TestQuizActivity::class.java))
-                    }
-                    ChoiceButton.VIDEO_POKER -> {
-                        startActivity(Intent(this@ChoiceActivity, VideoPokerActivity::class.java))
-                        //ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, VideoPokerActivity::class.java))
-                    }
-                    ChoiceButton.MATCHING -> {
-                        startActivity(Intent(this@ChoiceActivity, MatchingActivityTwo::class.java))
-                    }
-                    ChoiceButton.HILO -> {
-                        startActivity(Intent(this@ChoiceActivity, HiLoActivity::class.java))
-                        //ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, HiLoActivity::class.java))
-                    }
-                    ChoiceButton.CHESS -> {
-                        startActivity(Intent(this@ChoiceActivity, MainActivity::class.java))
-                        //ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, MainActivity::class.java))
-                    }
-                    ChoiceButton.YAHTZEE -> {
-                        startActivity(Intent(this@ChoiceActivity, YahtzeeActivity::class.java))
-                        //ViewUtil.presentActivity(view, this@ChoiceActivity, Intent(this@ChoiceActivity, YahtzeeActivity::class.java))
-                    }
-                    ChoiceButton.MUSIC_MATCH -> {
-                        startActivity(Intent(this@ChoiceActivity, MusicGameActivity::class.java))
-                    }
-                    ChoiceButton.SETTINGS -> {
-                        permissionCheck(SettingsActivity2::class.java, shouldFinish = true)
-                    }
-                    ChoiceButton.ANIME -> {
-                        permissionCheck(ShowListActivity::class.java, url = Source.ANIME.link)
-                    }
-                    ChoiceButton.CARTOON -> {
-                        permissionCheck(ShowListActivity::class.java, url = Source.CARTOON.link)
-                    }
-                    ChoiceButton.DUBBED -> {
-                        permissionCheck(ShowListActivity::class.java, url = Source.DUBBED.link)
-                    }
-                    ChoiceButton.ANIME_MOVIES -> {
-                        permissionCheck(ShowListActivity::class.java, url = Source.ANIME_MOVIES.link, movie = true)
-                    }
-                    ChoiceButton.CARTOON_MOVIES -> {
-                        permissionCheck(ShowListActivity::class.java, url = Source.CARTOON_MOVIES.link, movie = true)
-                    }
-                    ChoiceButton.LIVE_ACTION -> {
-                        permissionCheck(ShowListActivity::class.java, url = Source.LIVE_ACTION.link)
-                    }
-                    ChoiceButton.RECENT_ANIME -> {
-                        permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_ANIME.link)
-                    }
-                    ChoiceButton.RECENT_LIVE_ACTION -> {
-                        permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_LIVE_ACTION.link)
-                    }
-                    ChoiceButton.RECENT_CARTOON -> {
-                        //defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT, 0).apply()
-                        permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_CARTOON.link)
-                    }
+                    ChoiceButton.CALCULATION -> startActivity(Intent(this@ChoiceActivity, CalculationActivity::class.java))
+                    ChoiceButton.CHAT -> startActivity(Intent(this@ChoiceActivity, ChatActivity::class.java))
+                    ChoiceButton.SHOW_QUIZ -> startActivity(Intent(this@ChoiceActivity, QuizShowActivity::class.java))
+                    ChoiceButton.MUSIC_QUIZ -> startActivity(Intent(this@ChoiceActivity, NewMusicGameActivity::class.java))
+                    ChoiceButton.VIDEO_POKER -> startActivity(Intent(this@ChoiceActivity, VideoPokerActivity::class.java))
+                    ChoiceButton.MATCHING -> startActivity(Intent(this@ChoiceActivity, MatchingActivityTwo::class.java))
+                    ChoiceButton.HILO -> startActivity(Intent(this@ChoiceActivity, HiLoActivity::class.java))
+                    ChoiceButton.CHESS -> startActivity(Intent(this@ChoiceActivity, MainActivity::class.java))
+                    ChoiceButton.YAHTZEE -> startActivity(Intent(this@ChoiceActivity, YahtzeeActivity::class.java))
+                    ChoiceButton.MUSIC_MATCH -> startActivity(Intent(this@ChoiceActivity, MusicGameActivity::class.java))
+                    ChoiceButton.SETTINGS -> permissionCheck(SettingsActivity2::class.java, shouldFinish = true)
+                    ChoiceButton.ANIME -> permissionCheck(ShowListActivity::class.java, url = Source.ANIME.link)
+                    ChoiceButton.CARTOON -> permissionCheck(ShowListActivity::class.java, url = Source.CARTOON.link)
+                    ChoiceButton.DUBBED -> permissionCheck(ShowListActivity::class.java, url = Source.DUBBED.link)
+                    ChoiceButton.ANIME_MOVIES -> permissionCheck(ShowListActivity::class.java, url = Source.ANIME_MOVIES.link, movie = true)
+                    ChoiceButton.CARTOON_MOVIES -> permissionCheck(ShowListActivity::class.java, url = Source.CARTOON_MOVIES.link, movie = true)
+                    ChoiceButton.LIVE_ACTION -> permissionCheck(ShowListActivity::class.java, url = Source.LIVE_ACTION.link)
+                    ChoiceButton.RECENT_ANIME -> permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_ANIME.link)
+                    ChoiceButton.RECENT_LIVE_ACTION -> permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_LIVE_ACTION.link)
+                    ChoiceButton.RECENT_CARTOON -> permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_CARTOON.link)
                     ChoiceButton.UPDATE_APP -> {
                         if (Utility.isNetwork(this@ChoiceActivity))
                             GlobalScope.launch {
@@ -411,17 +363,10 @@ class ChoiceActivity : AppCompatActivity() {
 
                             }
                     }
-                    ChoiceButton.VIEW_DOWNLOADS -> {
-                        val intent = Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
-                        intent.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
-                        //ViewUtil.presentActivity(view, this@ChoiceActivity, intent)
-                        startActivity(intent)
-                    }
-                    ChoiceButton.VIEW_VIDEOS -> {
-                        val intent = Intent(this@ChoiceActivity, ViewVideosActivity::class.java)
-                        //ViewUtil.presentActivity(view, this@ChoiceActivity, intent)
-                        startActivity(intent)
-                    }
+                    ChoiceButton.VIEW_DOWNLOADS -> startActivity(Intent(this@ChoiceActivity, DownloadViewerActivity::class.java).apply {
+                        putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
+                    })
+                    ChoiceButton.VIEW_VIDEOS -> startActivity(Intent(this@ChoiceActivity, ViewVideosActivity::class.java))
                     ChoiceButton.UPDATE_NOTES -> {
                         if (Utility.isNetwork(this@ChoiceActivity))
                             GlobalScope.launch {
@@ -496,7 +441,6 @@ class ChoiceActivity : AppCompatActivity() {
 
                                 })
                             }
-
                     }
                     ChoiceButton.DELETE_OLD_FILE -> {
                         if (Utility.isNetwork(this@ChoiceActivity))
@@ -517,13 +461,10 @@ class ChoiceActivity : AppCompatActivity() {
                                 }
                             }
                     }
-                    ChoiceButton.QUICK_CHOICE -> {
-                        //Loged.wtf(bookTitle!!)
-                        val intented = Intent(this@ChoiceActivity, EpisodeActivity::class.java)
-                        intented.putExtra(ConstantValues.URL_INTENT, this.detail)
-                        intented.putExtra(ConstantValues.NAME_INTENT, this.title)
-                        startActivity(intented)
-                    }
+                    ChoiceButton.QUICK_CHOICE -> startActivity(Intent(this@ChoiceActivity, EpisodeActivity::class.java).apply {
+                        putExtra(ConstantValues.URL_INTENT, this@MaterialAdapter.detail)
+                        putExtra(ConstantValues.NAME_INTENT, this@MaterialAdapter.title)
+                    })
                     ChoiceButton.VIEW_FAVORITES -> {
                         val intented = Intent(this@ChoiceActivity, FavoriteShowsActivity::class.java)
                         intented.putExtra("displayText", "Your Favorites")
@@ -533,30 +474,16 @@ class ChoiceActivity : AppCompatActivity() {
                                 this@ChoiceActivity.recreate()
                         }
                     }
-                    ChoiceButton.RSS_FEED -> {
-                        val intented = Intent(this@ChoiceActivity, RssActivity::class.java)
-                        startActivity(intented)
-                        //ViewUtil.presentActivity(view, this@ChoiceActivity, intented)
-                    }
-                    ChoiceButton.FEEDBACK -> {
-                        val intented = Intent(this@ChoiceActivity, FormActivity::class.java)
-                        startActivity(intented)
-                        //ViewUtil.presentActivity(view, this@ChoiceActivity, intented)
-                    }
-                    ChoiceButton.VIEW_TESTING -> {
-                        val intented = Intent(this@ChoiceActivity, ViewTesting::class.java)
-                        startActivity(intented)
-                    }
-                    ChoiceButton.PONG -> {
-                        val intented = Intent(this@ChoiceActivity, PongActivity::class.java)
-                        startActivity(intented)
-                    }
+                    ChoiceButton.RSS_FEED -> startActivity(Intent(this@ChoiceActivity, RssActivity::class.java))
+                    ChoiceButton.FEEDBACK -> startActivity(Intent(this@ChoiceActivity, FormActivity::class.java))
+                    ChoiceButton.VIEW_TESTING -> startActivity(Intent(this@ChoiceActivity, ViewTesting::class.java))
+                    ChoiceButton.PONG -> startActivity(Intent(this@ChoiceActivity, PongActivity::class.java))
                 }
             } catch (e: IllegalArgumentException) {
-                val intented = Intent(this@ChoiceActivity, EpisodeActivity::class.java)
-                intented.putExtra(ConstantValues.URL_INTENT, this.detail)
-                intented.putExtra(ConstantValues.NAME_INTENT, this.title)
-                startActivity(intented)
+                startActivity(Intent(this@ChoiceActivity, EpisodeActivity::class.java).apply {
+                    putExtra(ConstantValues.URL_INTENT, this@MaterialAdapter.detail)
+                    putExtra(ConstantValues.NAME_INTENT, this@MaterialAdapter.title)
+                })
             }
         }
 
@@ -585,6 +512,7 @@ class ChoiceActivity : AppCompatActivity() {
         modelList += MaterialItem(ChoiceButton.MUSIC_MATCH, "Play a Music Quiz", R.drawable.matchinglogo, bgImage = R.drawable.drkgreen)
         //All server kind of stuff here
         modelList += MaterialItem(ChoiceButton.SHOW_QUIZ, "Play a Quiz based off of your Favorites", R.drawable.b_normal)
+        modelList += MaterialItem(ChoiceButton.MUSIC_QUIZ, "Play a Music Quiz", R.drawable.start_normal)
         modelList += MaterialItem(ChoiceButton.CHAT, "Enter a Chat Server", R.drawable.a_normal)
         //All video stuff here
         modelList += MaterialItem(ChoiceButton.RSS_FEED, "Look at upcoming Anime", android.R.drawable.ic_menu_today)
@@ -672,7 +600,7 @@ class ChoiceActivity : AppCompatActivity() {
                             try {
                                 val episodeApi = EpisodeApi(ShowInfo(i.name, i.url))
                                 episodeApi.image
-                            } catch(e: SocketTimeoutException) {
+                            } catch (e: SocketTimeoutException) {
                                 ""
                             }
                         }
@@ -780,6 +708,7 @@ class ChoiceActivity : AppCompatActivity() {
                         adapterList += it
                     }
                 }
+                adapterList.addAll(adapter.list.filter { it !in adapterList })
                 for (a in adapterList.withIndex()) {
                     adapter[a.index] = a.value
                 }
@@ -1049,7 +978,7 @@ class ChoiceActivity : AppCompatActivity() {
                 .withEmail("App Version: $version")
                 .withIdentifier(32)
         if (user != null) {
-            if(user.photoUrl==null) {
+            if (user.photoUrl == null) {
                 profile.withIcon(GoogleMaterial.Icon.gmd_android)
             } else {
                 profile.withIcon(user.photoUrl)
