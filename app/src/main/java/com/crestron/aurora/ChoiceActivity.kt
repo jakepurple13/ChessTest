@@ -967,7 +967,7 @@ class ChoiceActivity : AppCompatActivity() {
             .withIdentifier(23)
 
 
-    lateinit var headerResult: AccountHeader
+    private lateinit var headerResult: AccountHeader
 
     private fun updateUI(user: FirebaseUser?) {
         val pInfo = packageManager.getPackageInfo(packageName, 0)
@@ -996,7 +996,7 @@ class ChoiceActivity : AppCompatActivity() {
         updateUI(currentUser)
     }
 
-    lateinit var hud: KProgressHUD
+    private lateinit var hud: KProgressHUD
 
     private fun signIn() {
         val signInIntent = googleSignInClient.signInIntent
@@ -1277,7 +1277,7 @@ class ChoiceActivity : AppCompatActivity() {
                                     if (shortcutManager.isRequestPinShortcutSupported) {
                                         shortcutManager.requestPinShortcut(short, null)
                                     } else {
-                                        Toast.makeText(this, "Pinned shortcuts are not supported!", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(this, "Pinned shortcuts are not supported!", Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             }
@@ -1642,7 +1642,7 @@ class ChoiceActivity : AppCompatActivity() {
         }
     }
 
-    fun permissionCheck(clazz: Class<out Any>, rec: Boolean = false, url: String? = null, movie: Boolean? = null, shouldFinish: Boolean = false, view: View? = null) {
+    private fun permissionCheck(clazz: Class<out Any>, rec: Boolean = false, url: String? = null, movie: Boolean? = null, shouldFinish: Boolean = false, view: View? = null) {
         Permissions.check(this@ChoiceActivity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
                 "Storage permissions are required because so we can download videos",
                 Permissions.Options().setSettingsDialogTitle("Warning!").setRationaleDialogTitle("Info"),

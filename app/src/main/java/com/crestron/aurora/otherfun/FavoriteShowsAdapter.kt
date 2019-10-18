@@ -7,12 +7,15 @@ import android.view.ViewGroup
 import android.widget.SectionIndexer
 import androidx.recyclerview.widget.RecyclerView
 import com.crestron.aurora.R
+import com.programmerbox.dragswipe.DragSwipeAdapter
 import kotlinx.android.synthetic.main.favorites_show_layout.view.*
+import java.util.*
+import kotlin.collections.ArrayList
 
-class FavoriteShowsAdapter(private var stuff: List<ShowListActivity.NameAndLink>,
+class FavoriteShowsAdapter(var stuff: ArrayList<ShowListActivity.NameAndLink>,
                            var context: Context,
                            var toBeChecked: List<FavoriteShowsActivity.NameUrl>,
-                           var action: FavoriteShowsActivity.ShowHit = object : FavoriteShowsActivity.ShowHit {}) : RecyclerView.Adapter<ViewHolder>(), SectionIndexer {
+                           var action: FavoriteShowsActivity.ShowHit = object : FavoriteShowsActivity.ShowHit {}) : DragSwipeAdapter<ShowListActivity.NameAndLink, ViewHolder>(stuff), SectionIndexer {
 
     private var mSectionPositions: ArrayList<Int>? = null
 
@@ -20,9 +23,9 @@ class FavoriteShowsAdapter(private var stuff: List<ShowListActivity.NameAndLink>
         val sections = ArrayList<String>(26)
         mSectionPositions = ArrayList(26)
         var i = 0
-        val size = stuff.size
+        val size = list.size
         while (i < size) {
-            val section = stuff[i].name[0].toString().toUpperCase()
+            val section = list[i].name[0].toString().toUpperCase(Locale.getDefault())
             if (!sections.contains(section)) {
                 sections.add(section)
                 mSectionPositions!!.add(i)
@@ -38,11 +41,6 @@ class FavoriteShowsAdapter(private var stuff: List<ShowListActivity.NameAndLink>
 
     override fun getPositionForSection(sectionIndex: Int): Int {
         return mSectionPositions!![sectionIndex]
-    }
-
-    // Gets the number of animals in the list
-    override fun getItemCount(): Int {
-        return stuff.size
     }
 
     /*fun getView(position: Int, convertView: View, parent: ViewGroup) {
@@ -62,13 +60,13 @@ class FavoriteShowsAdapter(private var stuff: List<ShowListActivity.NameAndLink>
 
     // Binds each animal in the ArrayList to a view
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.linkType.text = stuff[position].name
+        holder.linkType.text = list[position].name
 
         holder.linkType.setOnClickListener {
-            action.click(stuff[position].name, stuff[position].url, it)
+            action.click(list[position].name, list[position].url, it)
         }
 
-        action.longhit(stuff[position], holder.layout, holder.linkType)
+        action.longhit(list[position], holder.layout, holder.linkType)
 
         //Picasso.get().setIndicatorsEnabled(true)
         holder.imageView.visibility = View.GONE
@@ -78,12 +76,12 @@ class FavoriteShowsAdapter(private var stuff: List<ShowListActivity.NameAndLink>
         }
 
         holder.favorite.setOnCheckedChangeListener(null)
-        holder.favorite.isChecked = toBeChecked.any { it.url == stuff[position].url }
+        holder.favorite.isChecked = toBeChecked.any { it.url == list[position].url }
         holder.favorite.setOnCheckedChangeListener { _, isChecked ->
-            action.longClick(stuff[position].name, stuff[position].url, isChecked)
+            action.longClick(list[position].name, list[position].url, isChecked)
         }
 
-        if(stuff[position].url.contains("animeplus.tv", true)) {
+        if(list[position].url.contains("animeplus.tv", true)) {
             holder.itemView.alpha = .5f
         } else {
             holder.itemView.alpha = 1f

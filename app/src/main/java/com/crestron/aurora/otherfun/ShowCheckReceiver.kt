@@ -25,6 +25,7 @@ import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.intersect
 import com.google.gson.Gson
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.net.SocketTimeoutException
@@ -47,7 +48,6 @@ class ShowCheckReceiver : BroadcastReceiver() {
     }
 }
 
-//TODO: GET BUBBLE NOTIFICATION WORKING CORRECTLY!!!
 class BootUpReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent!!.action == "android.intent.action.BOOT_COMPLETED") {
@@ -75,9 +75,25 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         val updateNotiList = arrayListOf<ShowInfos>()
     }
 
+    private fun isMyServiceRunning(serviceClass: Class<*>): Boolean {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
+    }
+
     @SuppressLint("SimpleDateFormat")
     override fun onHandleIntent(intent: Intent?) {
         Loged.d("Starting check")
+        GlobalScope.launch {
+            delay(300000L)
+            if(isMyServiceRunning(ShowCheckReceiver::class.java)) {
+                stopSelf()
+            }
+        }
         val rec = intent!!.getBooleanExtra("received", false)
         val check = if (rec)
             KUtility.canShowUpdateCheck(this)
@@ -121,8 +137,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 val filtered = filteredList.intersect(showsAndFire) { one, two ->
                     one.url == two.url
                 }
-
-                Loged.r("$filtered\n$fireDB")
 
                 val updateList = arrayListOf<ShowInfos>()
 
@@ -178,7 +192,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 //updateNotiList.add(ShowInfos("This is the name", 4, "01:30 AM", "http://www.animetoon.org/watch-archer"))
                 //updateNotiList.add(ShowInfos("Soccer One", 4, "02:30 AM", "http://www.animeplus.tv/captain-tsubasa-2018-online"))
                 //updateNotiList.add(ShowInfos("Cute One With a really really long name", 4, "03:30 AM", "http://www.animeplus.tv/jingai-san-no-yome-episode-9-online"))
-                //val list = updateNotiMap.distinctBy { it }
                 val list = updateList.distinctBy { it.url }
                 if (list.isNotEmpty()) {
                     defaultSharedPreferences.edit().putInt(ConstantValues.UPDATE_COUNT,
@@ -191,7 +204,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
 
                     //KUtility.commitNotiList(updateNotiMap.toMutableSet())
                     //KUtility.commitNotiJsonList(ShowInfosList(updateList))
-
                     if (defaultSharedPreferences.getBoolean("useNotifications", true)) {
                         val links = arrayListOf<String>()
                         val names = arrayListOf<String>()
@@ -270,6 +282,8 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                 sendFinishedCheckingNotification(this@ShowCheckIntentService,
                         android.R.mipmap.sym_def_app_icon,
                         "updateCheckRun", 2)
+
+                stopSelf()
             }
         }
     }

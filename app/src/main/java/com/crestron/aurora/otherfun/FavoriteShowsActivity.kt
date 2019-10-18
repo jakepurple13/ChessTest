@@ -60,6 +60,12 @@ class FavoriteShowsActivity : AppCompatActivity() {
     var currentData: ArrayList<ShowListActivity.NameAndLink> = arrayListOf()
     var allData: ArrayList<ShowListActivity.NameAndLink> = arrayListOf()
 
+    var showPutlocker = true
+    var showGogoanime = true
+    var showAnimetoon = true
+
+    lateinit var adapter: FavoriteShowsAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_favorites_show)
@@ -83,6 +89,17 @@ class FavoriteShowsActivity : AppCompatActivity() {
         list_to_choose.addItemDecoration(dividerItemDecoration)
         list_to_choose.addItemDecoration(ItemOffsetDecoration(20))
 
+        val chipCheck: (ShowListActivity.NameAndLink) -> Boolean = {
+            it.name.contains(search_info.text.toString(), ignoreCase = true) &&
+                    ((if (showPutlocker) it.url.contains("putlocker", true) else false)
+                    || (if (showGogoanime) it.url.contains("gogoanime", true) else false)
+                    || (if (showAnimetoon) it.url.contains("animetoon", true) else false))
+        }
+
+        fun checkFilter() = runOnUiThread {
+            adapter.setListNotify(allData.filter(chipCheck) as ArrayList<ShowListActivity.NameAndLink>)
+        }
+
         search_info.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
 
@@ -93,15 +110,24 @@ class FavoriteShowsActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                runOnUiThread {
-                    val listScreen = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")
-                    val showListsForScreen = Gson().fromJson(listScreen, NameList::class.java)
-                    list_to_choose.swapAdapter(FavoriteShowsAdapter(allData.filter { it.name.contains(search_info.text.toString(), ignoreCase = true) },
-                            this@FavoriteShowsActivity, showListsForScreen.list, hitShow), true)
-                }
+                checkFilter()
             }
-
         })
+
+        putlocker.setOnCheckedChangeListener { _, isChecked ->
+            showPutlocker = isChecked
+            checkFilter()
+        }
+
+        gogoanime.setOnCheckedChangeListener { _, isChecked ->
+            showGogoanime = isChecked
+            checkFilter()
+        }
+
+        animetoon.setOnCheckedChangeListener { _, isChecked ->
+            showAnimetoon = isChecked
+            checkFilter()
+        }
 
         GlobalScope.launch {
             val s2 = FirebaseDB(this@FavoriteShowsActivity).getAllShowsSync()
@@ -123,7 +149,8 @@ class FavoriteShowsActivity : AppCompatActivity() {
                 val showListsForScreen = Gson().fromJson(listScreen, NameList::class.java)
                 //favorite_text.append("\nFavorite Count: ${showList.size}")
                 search_layout.helperText = "Favorite Count: ${allData.size}"
-                list_to_choose.adapter = FavoriteShowsAdapter(currentData, this@FavoriteShowsActivity, showListsForScreen.list, hitShow)
+                adapter = FavoriteShowsAdapter(currentData, this@FavoriteShowsActivity, showListsForScreen.list, hitShow)
+                list_to_choose.adapter = adapter
             }
         }
     }

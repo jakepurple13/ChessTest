@@ -125,11 +125,11 @@ class KUtility {
             //val length = context.defaultSharedPreferences.getFloat(ConstantValues.UPDATE_CHECK, 1f)
             val length = context.defaultSharedPreferences.getLong("pref_duration", 3_600_000)
             //FunApplication.checkUpdater(this, length)
-            Loged.d("length: $length and currentTime: ${KUtility.currentDurationTime}")
+            Loged.d("length: $length and currentTime: $currentDurationTime")
             //PendingIntent.getBroadcast(this, 1, Intent(this@ChoiceActivity, ShowCheckReceiver::class.java), PendingIntent.FLAG_NO_CREATE) != null
             val alarmUp = AlarmUtils.hasAlarm(context, Intent(context, ShowCheckReceiver::class.java), 90)
             Loged.i("Alarm up: $alarmUp")
-            if (!alarmUp || KUtility.currentDurationTime != length) {
+            if (!alarmUp || currentDurationTime != length) {
                 Loged.i("Setting")
                 scheduleAlarm(context, length)
                 //FunApplication.seeNextAlarm(this@ChoiceActivity)
@@ -169,7 +169,7 @@ class KUtility {
                     wantedTime, pIntent)
 
             KUtility.currentUpdateTime = time.toFloat()
-            KUtility.currentDurationTime = time.toLong()
+            currentDurationTime = time.toLong()
             KUtility.nextCheckTime = firstMillis
             Loged.d(SimpleDateFormat("MM/dd/yyyy E hh:mm:ss a").format(KUtility.nextCheckTime))
 

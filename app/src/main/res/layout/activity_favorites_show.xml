@@ -24,23 +24,68 @@
             app:expandedTitleTextAppearance="?attr/textAppearanceHeadline5"
             app:layout_scrollFlags="scroll|enterAlways|snap">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/search_layout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/cod_gray"
-                app:helperText="Favorite Count: 0/0"
-                app:hintAnimationEnabled="true">
+                android:background="@color/cod_gray">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/search_info"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/search_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:hint="Search"
-                    tools:ignore="HardcodedText" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    app:helperText="Favorite Count: 0/0"
+                    app:hintAnimationEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/search_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:hint="Search"
+                        tools:ignore="HardcodedText" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/showChips"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:ignore="HardcodedText">
+
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:id="@+id/putlocker"
+                        app:checkedIconEnabled="true"
+                        android:checkable="true"
+                        android:checked="true"
+                        android:text="TV Shows"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:id="@+id/gogoanime"
+                        app:checkedIconEnabled="true"
+                        android:checkable="true"
+                        android:checked="true"
+                        android:text="Anime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:id="@+id/animetoon"
+                        app:checkedIconEnabled="true"
+                        android:checkable="true"
+                        android:checked="true"
+                        android:text="Cartoon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </com.google.android.material.chip.ChipGroup>
+
+            </LinearLayout>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 

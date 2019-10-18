@@ -6,6 +6,7 @@ import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.server.toJson
+import com.crestron.aurora.utilities.KUtility
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
@@ -62,6 +63,10 @@ class FirebaseDB(private val context: Context) {
                         edit.apply()
                     } catch (e: Exception) {
                     }
+                    val newValue = context.defaultSharedPreferences.getLong("pref_duration", 3_600_000)
+                    KUtility.currentDurationTime = newValue
+                    KUtility.cancelAlarm(context)
+                    KUtility.scheduleAlarm(context, newValue)
                     afterLoad()
                 }
 

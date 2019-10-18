@@ -403,6 +403,7 @@
             android:exported="true" />
         <service
             android:name=".otherfun.ShowCheckIntentService"
+            android:process=":service"
             android:exported="false" />
         <service
             android:name=".otherfun.ShowCheckTile"

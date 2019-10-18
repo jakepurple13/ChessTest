@@ -32,8 +32,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:autoSizeTextType="uniform"
-                    android:maxLines="2"
                     android:ellipsize="end"
+                    android:maxLines="2"
                     tools:contentDescription="title"
                     tools:text="Title Here" />
 
@@ -45,6 +45,7 @@
                     android:ellipsize="end"
                     android:maxLines="5"
                     tools:text="Second Line" />
+
             </LinearLayout>
 
             <ImageView
@@ -71,17 +72,17 @@
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:strokeColor="@color/colorAccent"
                 android:layout_marginEnd="8dp"
+                app:strokeColor="@color/colorAccent"
                 tools:text="Action 1" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/action_two"
                 style="?attr/materialButtonOutlinedStyle"
-                app:strokeColor="@color/colorAccent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
+                app:strokeColor="@color/colorAccent"
                 tools:text="Action 2" />
 
         </LinearLayout>
