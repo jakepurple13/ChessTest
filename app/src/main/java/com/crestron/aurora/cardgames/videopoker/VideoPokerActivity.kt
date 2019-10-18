@@ -45,6 +45,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import nl.dionsegijn.steppertouch.OnStepCallback
+import org.jetbrains.anko.defaultSharedPreferences
 import kotlin.math.abs
 
 class VideoPokerActivity : AppCompatActivity() {
@@ -483,6 +484,11 @@ class VideoPokerActivity : AppCompatActivity() {
     override fun onBackPressed() {
         //super.onBackPressed()
         back_button_videopoker.performClick()
+    }
+
+    override fun onDestroy() {
+        defaultSharedPreferences.edit().putInt("video_poker_money", if(winning==0) 20 else winning).apply()
+        super.onDestroy()
     }
 
     interface VideoPokerListeners {

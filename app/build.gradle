@@ -76,8 +76,8 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'com.google.firebase:firebase-auth:19.1.0'
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
-    implementation 'com.google.firebase:firebase-database:19.1.0'
-    implementation 'com.google.firebase:firebase-firestore:21.1.1'
+    implementation 'com.google.firebase:firebase-database:19.2.0'
+    implementation 'com.google.firebase:firebase-firestore:21.2.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.google.firebase:firebase-core:17.2.0'
@@ -109,15 +109,15 @@ dependencies {
     implementation "androidx.tonyodev.fetch2fileserver:xfetch2fileserver:3.1.4"
     implementation 'org.jsoup:jsoup:1.12.1'
     // Room components
-    implementation 'androidx.room:room-runtime:2.1.0'
-    annotationProcessor 'androidx.room:room-compiler:2.1.0'
-    androidTestImplementation 'androidx.room:room-testing:2.1.0'
+    implementation 'androidx.room:room-runtime:2.2.0'
+    annotationProcessor 'androidx.room:room-compiler:2.2.0'
+    androidTestImplementation 'androidx.room:room-testing:2.2.0'
     // Lifecycle components
     implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
     annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.1.0'
     implementation 'com.facebook.stetho:stetho:1.5.0'
     implementation 'com.nabinbhandari.android:permissions:3.8'
-    implementation 'com.google.android.material:material:+'
+    implementation 'com.google.android.material:material:1.1.0-beta01'
     implementation 'com.obsez.android.lib.filechooser:filechooser:1.1.10'
     implementation 'com.github.codekidX:storage-chooser:2.0.4.2'
     implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
@@ -125,7 +125,6 @@ dependencies {
     }
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.github.DanielMartinus:Stepper-Touch:1.0.1'
-    implementation 'com.jaredrummler:android-device-names:1.1.7'
     implementation 'com.github.antonKozyriatskyi:DevDrawer:1.0'
     implementation 'com.github.kittinunf.fuel:fuel-android:1.15.0'
     implementation 'com.evernote:android-job:1.2.6'
@@ -157,7 +156,7 @@ dependencies {
     implementation 'com.kaopiz:kprogresshud:1.2.0'
     implementation 'mobi.upod:time-duration-picker:1.1.3'
     implementation 'jp.wasabeef:picasso-transformations:2.2.1'
-    implementation 'androidx.navigation:navigation-fragment:2.2.0-alpha03'
+    implementation 'androidx.navigation:navigation-fragment:2.2.0-beta01'
     implementation 'androidx.palette:palette:1.0.0'
     implementation 'com.github.jakepurple13.DragSwipeApp:dragswipe:v1.6'
     implementation 'com.github.jakepurple13.DragSwipeApp:dragswipeex:v1.6'
@@ -180,8 +179,8 @@ dependencies {
     implementation "io.ktor:ktor-client-js:+"
     implementation "io.ktor:ktor-client-okhttp:+"
     implementation 'com.yarolegovich:lovely-dialog:1.1.0'
-    implementation 'com.github.bumptech.glide:glide:4.9.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+    implementation 'com.github.bumptech.glide:glide:4.10.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0'
     implementation 'com.github.Kennyc1012:BottomSheetMenu:3.0.1'
     implementation 'com.bitvale:switcher:1.0.5'
 }
