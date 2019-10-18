@@ -25,7 +25,6 @@ import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.intersect
 import com.google.gson.Gson
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.net.SocketTimeoutException
@@ -88,14 +87,14 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
     @SuppressLint("SimpleDateFormat")
     override fun onHandleIntent(intent: Intent?) {
         Loged.d("Starting check")
-        GlobalScope.launch {
+        /*GlobalScope.launch {
             delay(300000L)
             if(isMyServiceRunning(ShowCheckReceiver::class.java)) {
                 val mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 mNotificationManager.cancel(2)
                 stopSelf()
             }
-        }
+        }*/
         val rec = intent!!.getBooleanExtra("received", false)
         val check = if (rec)
             KUtility.canShowUpdateCheck(this)
