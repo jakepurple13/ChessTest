@@ -20,7 +20,8 @@
         <TextView
             android:id="@+id/counterText"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
             android:layout_weight="1"
             android:text="0/0"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -34,6 +35,7 @@
             android:layout_weight="1"
             android:text="@string/doneButton"
             android:visibility="invisible"
+            tools:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/prevButton" />
 
