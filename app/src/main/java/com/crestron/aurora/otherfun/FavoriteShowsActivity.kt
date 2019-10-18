@@ -57,12 +57,11 @@ class FavoriteShowsActivity : AppCompatActivity() {
     private var homeScreen = false
     var shouldReset = false
 
-    var currentData: ArrayList<ShowListActivity.NameAndLink> = arrayListOf()
-    var allData: ArrayList<ShowListActivity.NameAndLink> = arrayListOf()
+    private var allData: ArrayList<ShowListActivity.NameAndLink> = arrayListOf()
 
-    var showPutlocker = true
-    var showGogoanime = true
-    var showAnimetoon = true
+    private var showPutlocker = true
+    private var showGogoanime = true
+    private var showAnimetoon = true
 
     lateinit var adapter: FavoriteShowsAdapter
 
@@ -136,10 +135,6 @@ class FavoriteShowsActivity : AppCompatActivity() {
 
             s2.toMutableList().removeAll { it.name.isNullOrBlank() }
 
-            currentData.addAll((showList.map { ShowListActivity.NameAndLink(it.name, it.link) } + s2.map {
-                ShowListActivity.NameAndLink(it.name ?: "N/A", it.url ?: "N/A")
-            }.filter { it.name != "N/A" }).sortedBy { it.name }.distinctBy { it.url })
-
             allData.addAll((showList.map { ShowListActivity.NameAndLink(it.name, it.link) } + s2.map {
                 ShowListActivity.NameAndLink(it.name ?: "N/A", it.url ?: "N/A")
             }.filter { it.name != "N/A" }).sortedBy { it.name }.distinctBy { it.url })
@@ -149,13 +144,13 @@ class FavoriteShowsActivity : AppCompatActivity() {
                 val showListsForScreen = Gson().fromJson(listScreen, NameList::class.java)
                 //favorite_text.append("\nFavorite Count: ${showList.size}")
                 search_layout.helperText = "Favorite Count: ${allData.size}"
-                adapter = FavoriteShowsAdapter(currentData, this@FavoriteShowsActivity, showListsForScreen.list, hitShow)
+                adapter = FavoriteShowsAdapter(allData, this@FavoriteShowsActivity, showListsForScreen.list, hitShow)
                 list_to_choose.adapter = adapter
             }
         }
     }
 
-    val hitShow = object : ShowHit {
+    private val hitShow = object : ShowHit {
         override fun longClick(name: String, url: String, checked: Boolean) {
             super.longClick(name, url, checked)
             shouldReset = true
@@ -180,11 +175,6 @@ class FavoriteShowsActivity : AppCompatActivity() {
         override fun longhit(info: ShowListActivity.NameAndLink, vararg view: View) {
             val peekAndPop = PeekAndPop.Builder(this@FavoriteShowsActivity)
                     .peekLayout(R.layout.image_dialog_layout)
-                    /*.apply {
-                        for (v in view) {
-                            longClickViews(v)
-                        }
-                    }*/
                     .flingTypes(true, true)
                     .longClickViews(*view)
                     .build()
@@ -230,8 +220,6 @@ class FavoriteShowsActivity : AppCompatActivity() {
                 }
 
             })
-            //val dialog = ImageDialog(this@RssAdapter.context, information.title, information.description, information.episodeNumber, information.imageLink)
-            //dialog.show()
             peekAndPop.isEnabled = true
         }
 
