@@ -74,7 +74,7 @@ public class FunApplication extends Application {
         JobManager.create(this).addJobCreator(new JobCreation());
 
         ApplicationExtenstions.INSTANCE.initDrawerImageLoader();
-        FirebaseDB.Companion.firebaseSetup();
+        FirebaseDB.Companion.firebaseSetup(true);
         Quiz.INSTANCE.initializeQuiz(this);
 
         Loged.INSTANCE.setFILTER_BY_CLASS_NAME("crestron");

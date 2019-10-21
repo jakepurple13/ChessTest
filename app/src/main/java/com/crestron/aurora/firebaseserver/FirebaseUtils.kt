@@ -24,9 +24,18 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 
 
-fun Context.getFirebase() = FirebaseDB(this)
+fun Context.getFirebase(persistence: Boolean = true) = FirebaseDB(this, persistence)
 
-class FirebaseDB(private val context: Context) {
+class FirebaseDB(private val context: Context, persistence: Boolean = true) {
+
+    private val firebaseInstance: FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    init {
+        firebaseInstance.firestoreSettings = FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(persistence)
+                .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+                .build()
+    }
 
     private fun <TResult> Task<TResult>.await(): TResult = Tasks.await(this)
 
@@ -78,9 +87,11 @@ class FirebaseDB(private val context: Context) {
     }
 
     companion object {
-        fun firebaseSetup() {
+        fun firebaseSetup(persistence: Boolean = true) {
+            FirebaseFirestore.setLoggingEnabled(true)
             val settings = FirebaseFirestoreSettings.Builder()
-                    .setPersistenceEnabled(true)
+                    .setPersistenceEnabled(persistence)
+                    .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
                     .build()
             FirebaseFirestore.getInstance().firestoreSettings = settings
         }
@@ -116,7 +127,7 @@ class FirebaseDB(private val context: Context) {
         val data2 = FirebaseShow(show.name, show.link)
 
         val user = FirebaseAuth.getInstance()
-        val store = FirebaseFirestore.getInstance()
+        val store = firebaseInstance
                 .collection(user.uid!!)
                 .document(show.link.replace("/", "<"))
                 .set(data2)
@@ -132,7 +143,7 @@ class FirebaseDB(private val context: Context) {
 
     fun removeShow(show: Show) {
         val user = FirebaseAuth.getInstance()
-        val store = FirebaseFirestore.getInstance()
+        val store = firebaseInstance
                 .collection(user.uid!!)
                 .document(show.link.replace("/", "<"))
                 .delete()
@@ -148,7 +159,7 @@ class FirebaseDB(private val context: Context) {
 
     fun addEpisode(url: String, episode: Episode) {
         val user = FirebaseAuth.getInstance()
-        val store = FirebaseFirestore.getInstance()
+        val store = firebaseInstance
                 .collection(user.uid!!)
                 .document(url.replace("/", "<"))
                 .update("episodeInfo", FieldValue.arrayUnion(FirebaseEpisode(episode.showName, episode.showUrl)))
@@ -164,7 +175,7 @@ class FirebaseDB(private val context: Context) {
 
     fun removeEpisode(url: String, episode: Episode) {
         val user = FirebaseAuth.getInstance()
-        val store = FirebaseFirestore.getInstance()
+        val store = firebaseInstance
                 .collection(user.uid!!)
                 .document(url.replace("/", "<"))
                 .update("episodeInfo", FieldValue.arrayRemove(FirebaseEpisode(episode.showName, episode.showUrl)))
@@ -179,7 +190,7 @@ class FirebaseDB(private val context: Context) {
     }
 
     fun getShowSync(url: String): FirebaseShow? = try {
-        Tasks.await(FirebaseFirestore.getInstance()
+        Tasks.await(firebaseInstance
                 .collection(FirebaseAuth.getInstance().uid!!)
                 .document(url.replace("/", "<"))
                 .get()).toObject(FirebaseShow::class.java)
@@ -189,7 +200,7 @@ class FirebaseDB(private val context: Context) {
     }
 
     fun getAllShowsSync(): List<FirebaseShow> = try {
-        Tasks.await(FirebaseFirestore.getInstance()
+        Tasks.await(firebaseInstance
                 .collection(FirebaseAuth.getInstance().uid!!)
                 .get()).toObjects(FirebaseShow::class.java)
     } catch (e: Exception) {
@@ -200,7 +211,7 @@ class FirebaseDB(private val context: Context) {
         val data2 = FirebaseShow(showInfo.first.name, showInfo.first.link, showInfo.first.showNum, showInfo.second.map { FirebaseEpisode(it.showName, it.showUrl) })
 
         val user = FirebaseAuth.getInstance()
-        val store = FirebaseFirestore.getInstance()
+        val store = firebaseInstance
                 .collection(user.uid!!)
                 .document(showInfo.first.link.replace("/", "<"))
                 .set(data2)
@@ -214,7 +225,7 @@ class FirebaseDB(private val context: Context) {
 
     fun updateShowNum(showInfo: FirebaseShow) {
         val user = FirebaseAuth.getInstance()
-        val store = FirebaseFirestore.getInstance()
+        val store = firebaseInstance
                 .collection(user.uid!!)
                 .document(showInfo.url!!.replace("/", "<"))
                 .update("showNum", showInfo.showNum)

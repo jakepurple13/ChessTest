@@ -16,7 +16,7 @@ import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
 import com.crestron.aurora.db.ShowDatabase
-import com.crestron.aurora.firebaseserver.FirebaseDB
+import com.crestron.aurora.firebaseserver.getFirebase
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.ShowInfo
@@ -25,6 +25,7 @@ import com.crestron.aurora.utilities.KUtility
 import com.crestron.aurora.utilities.intersect
 import com.google.gson.Gson
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 import java.net.SocketTimeoutException
@@ -84,17 +85,29 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
         return false
     }
 
+    override fun onUnbind(intent: Intent?): Boolean {
+        val mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        mNotificationManager.cancel(2)
+        return super.onUnbind(intent)
+    }
+
+    override fun onDestroy() {
+        val mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        mNotificationManager.cancel(2)
+        super.onDestroy()
+    }
+
     @SuppressLint("SimpleDateFormat")
     override fun onHandleIntent(intent: Intent?) {
         Loged.d("Starting check")
-        /*GlobalScope.launch {
+        GlobalScope.launch {
             delay(300000L)
             if(isMyServiceRunning(ShowCheckReceiver::class.java)) {
                 val mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 mNotificationManager.cancel(2)
                 stopSelf()
             }
-        }*/
+        }
         val rec = intent!!.getBooleanExtra("received", false)
         val check = if (rec)
             KUtility.canShowUpdateCheck(this)
@@ -104,16 +117,18 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
             sendRunningNotification(this@ShowCheckIntentService,
                     android.R.mipmap.sym_def_app_icon,
                     "updateCheckRun", 2)
+
+            //FirebaseDB.firebaseSetup(false)
             //if(wifiOnly()) {
             //val mNotificationManager = this@ShowCheckService.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             //mNotificationManager.activeNotifications.filter { it.id == 1 }[0].notification.
             GlobalScope.launch {
+                val firebase = getFirebase(false)
                 val showDatabase = ShowDatabase.getDatabase(this@ShowCheckIntentService)
-                val fireDB = FirebaseDB(this@ShowCheckIntentService).getAllShowsSync()
+                val fireDB = firebase.getAllShowsSync()
                 var count = 0
                 //gets the list from the source
-                val showApi = ShowApi.getAllRecent()/*ShowApi(Source.RECENT_ANIME).showInfoList as ArrayList<ShowInfo>
-                showApi.addAll(ShowApi(Source.RECENT_CARTOON).showInfoList)*/
+                val showApi = ShowApi.getAllRecent()
                 //this part filters the two lists with the list in the database
                 val filteredList = showApi.distinctBy { it.url }
                 val shows = showDatabase.showDao().allShows
@@ -164,7 +179,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                 count++
                             }
                         }
-                        val fireShow = FirebaseDB(this@ShowCheckIntentService).getShowSync(i.url)
+                        val fireShow = fireDB.find { it.url == i.url }
                         if(fireShow != null) {
                             if (fireShow.showNum < showList) {
                                 Loged.i("Checking ${i.name} with size ${fireShow.showNum}")
@@ -173,7 +188,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                 Loged.wtf(infoToShow)
                                 newShow = ShowInfos(i.name, showList, timeOfUpdate, i.url)
                                 fireShow.showNum = showList
-                                FirebaseDB(this@ShowCheckIntentService).updateShowNum(fireShow)
+                                firebase.updateShowNum(fireShow)
                                 count++
                             }
                         }
@@ -183,6 +198,9 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                         Loged.wtf("${i.name} and size is $showList")
                     } catch (e: SocketTimeoutException) {
                         Loged.i("${i.name} Took too long")
+                        continue
+                    } catch(e: Exception) {
+                        Loged.e(e.message)
                         continue
                     }
                 }
