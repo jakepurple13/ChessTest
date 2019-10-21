@@ -123,7 +123,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
             //val mNotificationManager = this@ShowCheckService.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             //mNotificationManager.activeNotifications.filter { it.id == 1 }[0].notification.
             GlobalScope.launch {
-                val firebase = getFirebase(false)
+                val firebase = getFirebase(true)
                 val showDatabase = ShowDatabase.getDatabase(this@ShowCheckIntentService)
                 val fireDB = firebase.getAllShowsSync()
                 var count = 0
