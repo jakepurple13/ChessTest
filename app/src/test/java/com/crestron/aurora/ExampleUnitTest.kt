@@ -17,6 +17,7 @@ import kotlinx.html.stream.appendHTML
 import kotlinx.html.stream.createHTML
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import org.apache.tools.ant.util.DateUtils
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.junit.Assert.assertEquals
@@ -26,6 +27,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.system.measureTimeMillis
 
 
 /**
@@ -52,6 +54,23 @@ class ExampleUnitTest {
         Loged.FILTER_BY_CLASS_NAME = "crestron"
         Loged.WITH_THREAD_NAME = true
     }
+
+    @Test
+    fun searchTesting() = runBlocking {
+        val c = Card.RandomCard
+        prettyLog(c)
+        val d = Deck().getDeck()
+        val cNum = measureTimeMillis {
+            delay(1000L)
+            val c1 = d.binarySearch(c)
+            prettyLog(c1)
+        }
+        prettyLog("$cNum milliseconds")
+        prettyLog(cNum.toElapsed())
+
+    }
+
+    private fun Long.toElapsed(): String = DateUtils.formatElapsedTime(this)
 
     @Test
     fun handleTest() {
@@ -594,9 +613,9 @@ class ExampleUnitTest {
         println(logged)
     }
 
-    private fun prettyLog(msg: String) {
+    fun prettyLog(msg: Any?) {
         //the main message to be logged
-        var logged = msg
+        var logged = msg.toString()
         //the arrow for the stack trace
         val arrow = "${9552.toChar()}${9655.toChar()}\t"
         //the stack trace
