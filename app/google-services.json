@@ -87,6 +87,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:139228686141:android:d19cd4e7ea8073bdeb4754",
+        "android_client_info": {
+          "package_name": "com.programmersbox.fun"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "139228686141-pd371mvf9951hjn1vkdgpaa5c3pf69j3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKrkenNJJcyO-je1JLRNwYxSkT6OHcA6s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "139228686141-pd371mvf9951hjn1vkdgpaa5c3pf69j3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

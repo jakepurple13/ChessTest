@@ -26,6 +26,19 @@ buildscript {
     }
 }
 
+
+/*configure(subprojects.findAll { it.name }) {
+    apply plugin: 'com.android.library'
+
+    android {
+        buildTypes {
+            definitive {
+                versionNameSuffix "s"
+            }
+        }
+    }
+}*/
+
 allprojects {
     apply plugin: 'com.jfrog.artifactory'
     apply plugin: 'maven-publish'

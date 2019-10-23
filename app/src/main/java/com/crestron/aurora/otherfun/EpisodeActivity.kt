@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -27,10 +28,7 @@ import com.crestron.aurora.firebaseserver.FirebaseDB
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.EpisodeInfo
 import com.crestron.aurora.showapi.ShowInfo
-import com.crestron.aurora.utilities.KUtility
-import com.crestron.aurora.utilities.Utility
-import com.crestron.aurora.utilities.intersect
-import com.crestron.aurora.utilities.otherWise
+import com.crestron.aurora.utilities.*
 import com.crestron.aurora.views.DownloadsWidget
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
@@ -264,62 +262,63 @@ class EpisodeActivity : AppCompatActivity() {
                     adapter = EpisodeAdapter(listOfEpisodes, url, context = this@EpisodeActivity, slideOrButton = slideOrButton, downloadOrStream = downloadOrStream, action = object : EpisodeAction {
                         override fun hit(name: String, url: String) {
                             super.hit(name, url)
-                            FetchingUtils.downloadCount++
-                            GlobalScope.launch {
-                                if (downloadOrStream) {
-                                    runOnUiThread {
-                                        Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
-                                    }
-                                    fetching.getVideo(EpisodeInfo(name, url), if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
-                                            KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
-                                            KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
-                                } else {
-                                    val epInfo = EpisodeInfo(name, url)
-                                    startActivity(Intent(this@EpisodeActivity, VideoPlayerActivity::class.java).apply {
-                                        putExtra("video_path", epInfo.getVideoLink())
-                                        putExtra("video_name", name)
-                                        putExtra("download_or_stream", false)
-                                    })
-                                }
-                            }
-                        }
-
-                        override fun hit(info: EpisodeInfo) {
-                            super.hit(name, url)
-                            /*FetchingUtils.downloadCount++
-                            Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
-                            GlobalScope.launch {
-                                fetching.getVideo(info, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
-                                        KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
-                                        KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
-                            }*/
-                            GlobalScope.launch {
-                                if (reverse_order.isChecked) {
-                                    runOnUiThread {
-                                        Toast.makeText(this@EpisodeActivity, "Getting Info...", Toast.LENGTH_SHORT).show()
-                                    }
-                                    startActivity(Intent(this@EpisodeActivity, CastingActivity::class.java).apply {
-                                        putExtra("cast_info", Gson().toJson(CastVideoInfo(video_name = name, video_url = info.getVideoLink(), video_image = epApi!!.image, video_des = epApi.description)))
-                                    })
-                                } else {
+                            if(BuildType.isDefinitiveOrDebug()) {
+                                FetchingUtils.downloadCount++
+                                GlobalScope.launch {
                                     if (downloadOrStream) {
                                         runOnUiThread {
                                             Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
                                         }
-                                        fetching.getVideo(info, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
+                                        fetching.getVideo(EpisodeInfo(name, url), if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
                                                 KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
                                                 KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
                                     } else {
-                                        runOnUiThread {
-                                            Toast.makeText(this@EpisodeActivity, "Getting Info...", Toast.LENGTH_SHORT).show()
-                                        }
+                                        val epInfo = EpisodeInfo(name, url)
                                         startActivity(Intent(this@EpisodeActivity, VideoPlayerActivity::class.java).apply {
-                                            putExtra("video_path", info.getVideoLink())
+                                            putExtra("video_path", epInfo.getVideoLink())
                                             putExtra("video_name", name)
                                             putExtra("download_or_stream", false)
                                         })
                                     }
                                 }
+                            } else {
+                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                            }
+                        }
+
+                        override fun hit(info: EpisodeInfo) {
+                            super.hit(name, url)
+                            if(BuildType.isDefinitiveOrDebug()) {
+                                GlobalScope.launch {
+                                    if (reverse_order.isChecked) {
+                                        runOnUiThread {
+                                            Toast.makeText(this@EpisodeActivity, "Getting Info...", Toast.LENGTH_SHORT).show()
+                                        }
+                                        startActivity(Intent(this@EpisodeActivity, CastingActivity::class.java).apply {
+                                            putExtra("cast_info", Gson().toJson(CastVideoInfo(video_name = name, video_url = info.getVideoLink(), video_image = epApi!!.image, video_des = epApi.description)))
+                                        })
+                                    } else {
+                                        if (downloadOrStream) {
+                                            runOnUiThread {
+                                                Toast.makeText(this@EpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show()
+                                            }
+                                            fetching.getVideo(info, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
+                                                    KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
+                                                    KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
+                                        } else {
+                                            runOnUiThread {
+                                                Toast.makeText(this@EpisodeActivity, "Getting Info...", Toast.LENGTH_SHORT).show()
+                                            }
+                                            startActivity(Intent(this@EpisodeActivity, VideoPlayerActivity::class.java).apply {
+                                                putExtra("video_path", info.getVideoLink())
+                                                putExtra("video_name", name)
+                                                putExtra("download_or_stream", false)
+                                            })
+                                        }
+                                    }
+                                }
+                            } else {
+                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(info.url)))
                             }
                         }
                     }, firebaseEps = fire)
@@ -371,89 +370,23 @@ class EpisodeActivity : AppCompatActivity() {
             startActivity(Intent(this@EpisodeActivity, DownloadViewerActivity::class.java))
         }
 
-        batch_download.setOnLongClickListener {
-            GlobalScope.launch {
-                val eList = show.showDao().getEpisodesByUrl(url).map { it.showUrl }
-                        .intersect(FirebaseDB(this@EpisodeActivity).getShowSync(url)?.episodeInfo?.map { it.url } ?: emptyList()) { one, two ->
-                            one == two.otherWise { one }
-                        }
-                val b = BooleanArray(adapter.itemCount) { adapter.items[it].url in eList }
-                val m = MaterialAlertDialogBuilder(this@EpisodeActivity)
-                        .setMultiChoiceItems(adapter.items.map { it.name }.toTypedArray(), b) { _, which, isChecked ->
-                            GlobalScope.launch {
-                                try {
-                                    if (isChecked) {
-                                        Loged.e("Inserted ${adapter.items[which]}")
-                                        show.showDao().insertEpisode(Episode(which, url, adapter.items[which].url))
-                                        FirebaseDB(this@EpisodeActivity).addEpisode(url, Episode(which, url, adapter.items[which].url))
-                                    } else {
-                                        Loged.e("Deleted")
-                                        show.showDao().deleteEpisode(adapter.items[which].url)
-                                        FirebaseDB(this@EpisodeActivity).removeEpisode(url, Episode(which, url, adapter.items[which].url))
-                                    }
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                    runOnUiThread {
-                                        Toast.makeText(this@EpisodeActivity, "Please Favorite Show if you plan on Checking the Episodes", Toast.LENGTH_LONG).show()
-                                    }
-                                }
-                            }
-                        }
-                        .setTitle("Already Watched")
-                        .setPositiveButton("Done") { _, _ -> }
-
-                runOnUiThread {
-                    m.show()
-                }
+        if(BuildType.isDefinitiveOrDebug()) {
+            batch_download.setOnLongClickListener {
+                markWatched(show)
+                true
             }
-            true
+            batch_download.text = "Download Multiple/Mark Watched"
+        } else {
+            batch_download.text = "Mark Watched"
+            reverse_order.visibility = View.INVISIBLE
         }
 
         batch_download.setOnClickListener {
-            val multiSelectDialog = MultiSelectDialog()
-                    .title("Select the Episodes to download") //setting title for dialog
-                    .titleSize(25f)
-                    .positiveText("Done")
-                    .negativeText("Cancel")
-                    .setMinSelectionLimit(0) //you can set minimum checkbox selection limit (Optional)
-                    .setMaxSelectionLimit(listOfEpisodes.size) //you can set maximum checkbox selection limit (Optional)
-                    .multiSelectList(ArrayList<MultiSelectModel>().apply {
-                        for (i in 0 until listOfEpisodes.size) {
-                            add(MultiSelectModel(i, listOfEpisodes[i].name))
-                        }
-                    }) // the multi select model list with ids and name
-                    .onSubmit(object : MultiSelectDialog.SubmitCallbackListener {
-                        override fun onSelected(selectedIds: ArrayList<Int>?, selectedNames: ArrayList<String>?, dataString: String?) {
-
-                            val urlList = arrayListOf<EpisodeInfo>().apply {
-                                for (i in 0 until selectedIds!!.size) {
-                                    /*Toast.makeText(this@EpisodeActivity, "Selected Ids : " + selectedIds[i] + "\n" +
-                                            "Selected Names : " + selectedNames!![i] + "\n" +
-                                            "DataString : " + dataString, Toast.LENGTH_SHORT).show()*/
-                                    Loged.e("Selected Ids : " + selectedIds[i] + "\n" +
-                                            "Selected Names : " + selectedNames!![i] + "\n" +
-                                            "DataString : " + dataString)
-                                    add(listOfEpisodes[selectedIds[i]])
-                                }
-                            }
-
-                            FetchingUtils.downloadCount += urlList.size
-
-                            GlobalScope.launch {
-                                fetching.getVideo(urlList, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
-                                        KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
-                                        KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
-                            }
-
-                        }
-
-                        override fun onCancel() {
-                            Loged.e("cancelled")
-                        }
-
-                    })
-
-            multiSelectDialog.show(supportFragmentManager, "multiSelectDialog")
+            if(BuildType.isDefinitiveOrDebug()) {
+                downloadMultiple()
+            } else {
+                markWatched(show)
+            }
         }
 
         fav_episode.setOnLikeListener(object : OnLikeListener {
@@ -483,6 +416,90 @@ class EpisodeActivity : AppCompatActivity() {
             shareEmail()
         }
 
+    }
+
+    private fun markWatched(show: ShowDatabase) {
+        GlobalScope.launch {
+            val eList = show.showDao().getEpisodesByUrl(url).map { it.showUrl }
+                    .intersect(FirebaseDB(this@EpisodeActivity).getShowSync(url)?.episodeInfo?.map { it.url } ?: emptyList()) { one, two ->
+                        one == two.otherWise { one }
+                    }
+            val b = BooleanArray(adapter.itemCount) { adapter.items[it].url in eList }
+            val m = MaterialAlertDialogBuilder(this@EpisodeActivity)
+                    .setMultiChoiceItems(adapter.items.map { it.name }.toTypedArray(), b) { _, which, isChecked ->
+                        GlobalScope.launch {
+                            try {
+                                if (isChecked) {
+                                    Loged.e("Inserted ${adapter.items[which]}")
+                                    show.showDao().insertEpisode(Episode(which, url, adapter.items[which].url))
+                                    FirebaseDB(this@EpisodeActivity).addEpisode(url, Episode(which, url, adapter.items[which].url))
+                                } else {
+                                    Loged.e("Deleted")
+                                    show.showDao().deleteEpisode(adapter.items[which].url)
+                                    FirebaseDB(this@EpisodeActivity).removeEpisode(url, Episode(which, url, adapter.items[which].url))
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                runOnUiThread {
+                                    Toast.makeText(this@EpisodeActivity, "Please Favorite Show if you plan on Checking the Episodes", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
+                    }
+                    .setTitle("Already Watched")
+                    .setPositiveButton("Done") { _, _ -> }
+
+            runOnUiThread {
+                m.show()
+            }
+        }
+    }
+
+    private fun downloadMultiple() {
+        val multiSelectDialog = MultiSelectDialog()
+                .title("Select the Episodes to download") //setting title for dialog
+                .titleSize(25f)
+                .positiveText("Done")
+                .negativeText("Cancel")
+                .setMinSelectionLimit(0) //you can set minimum checkbox selection limit (Optional)
+                .setMaxSelectionLimit(listOfEpisodes.size) //you can set maximum checkbox selection limit (Optional)
+                .multiSelectList(ArrayList<MultiSelectModel>().apply {
+                    for (i in 0 until listOfEpisodes.size) {
+                        add(MultiSelectModel(i, listOfEpisodes[i].name))
+                    }
+                }) // the multi select model list with ids and name
+                .onSubmit(object : MultiSelectDialog.SubmitCallbackListener {
+                    override fun onSelected(selectedIds: ArrayList<Int>?, selectedNames: ArrayList<String>?, dataString: String?) {
+
+                        val urlList = arrayListOf<EpisodeInfo>().apply {
+                            for (i in 0 until selectedIds!!.size) {
+                                /*Toast.makeText(this@EpisodeActivity, "Selected Ids : " + selectedIds[i] + "\n" +
+                                        "Selected Names : " + selectedNames!![i] + "\n" +
+                                        "DataString : " + dataString, Toast.LENGTH_SHORT).show()*/
+                                Loged.e("Selected Ids : " + selectedIds[i] + "\n" +
+                                        "Selected Names : " + selectedNames!![i] + "\n" +
+                                        "DataString : " + dataString)
+                                add(listOfEpisodes[selectedIds[i]])
+                            }
+                        }
+
+                        FetchingUtils.downloadCount += urlList.size
+
+                        GlobalScope.launch {
+                            fetching.getVideo(urlList, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL,
+                                    KeyAndValue(ConstantValues.URL_INTENT, this@EpisodeActivity.url),
+                                    KeyAndValue(ConstantValues.NAME_INTENT, this@EpisodeActivity.name))
+                        }
+
+                    }
+
+                    override fun onCancel() {
+                        Loged.e("cancelled")
+                    }
+
+                })
+
+        multiSelectDialog.show(supportFragmentManager, "multiSelectDialog")
     }
 
     private fun shareEmail() {

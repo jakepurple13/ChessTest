@@ -28,7 +28,8 @@ def libraryVersion = '1.0.0'
 android {
     compileSdkVersion 29
     defaultConfig {
-        applicationId "com.crestron.aurora"
+        //applicationId "com.crestron.aurora"
+        applicationId "com.programmersbox.fun"
         minSdkVersion 27
         targetSdkVersion 29
         versionCode 1
@@ -41,8 +42,13 @@ android {
     }
     buildTypes {
         release {
+            versionNameSuffix "r"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            versionNameSuffix "d"
         }
     }
     packagingOptions {

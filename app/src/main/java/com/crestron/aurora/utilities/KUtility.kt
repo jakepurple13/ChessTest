@@ -11,6 +11,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
+import com.crestron.aurora.BuildConfig
 import com.crestron.aurora.FunApplication
 import com.crestron.aurora.Loged
 import com.crestron.aurora.otherfun.FetchingUtils
@@ -345,4 +346,17 @@ class KUtility {
             "\n" +
             "Maecenas nec metus pellentesque felis mattis euismod tincidunt sed urna. In placerat dolor nec convallis eleifend. Mauris gravida porta rutrum. Morbi risus arcu, fermentum pellentesque sapien nec, varius ultricies mi. Aenean neque metus, lobortis ut consectetur sit amet, bibendum fermentum urna. Donec non velit in ante convallis lacinia. Donec placerat justo in libero luctus congue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nam quis urna faucibus nunc egestas semper. Vivamus aliquam turpis orci, vel laoreet nunc ultricies lobortis. Ut imperdiet turpis in mauris dictum, et mollis lacus porta."
 
+}
+
+enum class BuildType(private val type: String) {
+    RELEASE("release"),
+    DEFINITIVE("definitive"),
+    DEBUG("debug");
+
+    companion object {
+        fun isRelease(): Boolean = BuildConfig.BUILD_TYPE == RELEASE.type
+        fun isDefinitive(): Boolean = BuildConfig.BUILD_TYPE == DEFINITIVE.type
+        fun isDebug(): Boolean = BuildConfig.BUILD_TYPE == DEBUG.type
+        fun isDefinitiveOrDebug(): Boolean = isDefinitive() || isDebug()
+    }
 }

@@ -169,6 +169,8 @@ class ChoiceActivity : AppCompatActivity() {
     var br: BroadcastReceiverDownload? = null
     lateinit var adapter: MaterialAdapter
 
+    private val isDorD = BuildType.isDefinitiveOrDebug()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_choice)
@@ -200,7 +202,7 @@ class ChoiceActivity : AppCompatActivity() {
             builder.setTitle("Some Permissions Needed")
             builder.setMessage("Please Allow Install from Unknown Sources so you can stay up to date!")
             builder.setPositiveButton("Take me there!") { _, _ ->
-                startActivity(Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:com.crestron.aurora")))
+                startActivity(Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:com.programmersbox.fun")))
             }
             builder.setNegativeButton("Nah") { _, _ ->
                 Toast.makeText(this, "Please Allow Install from Unknown Sources so you can stay up to date!", Toast.LENGTH_SHORT).show()
@@ -235,7 +237,7 @@ class ChoiceActivity : AppCompatActivity() {
             }
 
         //Loged.d(FirebaseInstanceId.getInstance().token!!)
-        if (KUtility.canAppUpdate(this) && KUtility.shouldGetUpdate)
+        if (KUtility.canAppUpdate(this) && KUtility.shouldGetUpdate && isDorD)
         //if (!defaultSharedPreferences.getBoolean(ConstantValues.WIFI_ONLY, false)) {
             GlobalScope.launch {
                 val url = URL(ConstantValues.VERSION_URL).readText()
@@ -662,7 +664,7 @@ class ChoiceActivity : AppCompatActivity() {
             }
         }
 
-        if (defaultSharedPreferences.getBoolean("delete_file", false)) {
+        if (defaultSharedPreferences.getBoolean("delete_file", false) && isDorD) {
             if (Utility.isNetwork(this@ChoiceActivity))
                 GlobalScope.launch {
                     val url = URL(ConstantValues.VERSION_URL).readText()
@@ -1643,44 +1645,52 @@ class ChoiceActivity : AppCompatActivity() {
     }
 
     private fun permissionCheck(clazz: Class<out Any>, rec: Boolean = false, url: String? = null, movie: Boolean? = null, shouldFinish: Boolean = false, view: View? = null) {
-        Permissions.check(this@ChoiceActivity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
-                "Storage permissions are required because so we can download videos",
-                Permissions.Options().setSettingsDialogTitle("Warning!").setRationaleDialogTitle("Info"),
-                object : PermissionHandler() {
-                    override fun onGranted() {
-                        //do your task
-                        val intent = Intent(this@ChoiceActivity, clazz)
-                        intent.putExtra(ConstantValues.RECENT_OR_NOT, rec)
-                        if (url != null)
-                            intent.putExtra(ConstantValues.SHOW_LINK, url)
-                        if (movie != null)
-                            intent.putExtra(ConstantValues.SHOW_MOVIE, movie)
-                        if (shouldFinish) {
-                            startForResult(intent) {
-                                val shouldReset = it.data?.extras?.getBoolean("restart")
-                                        ?: false
-                                if (shouldReset)
-                                    this@ChoiceActivity.recreate()
-                            }.onFailed {
+        fun goIntoActivity() {
+            val intent = Intent(this@ChoiceActivity, clazz)
+            intent.putExtra(ConstantValues.RECENT_OR_NOT, rec)
+            if (url != null)
+                intent.putExtra(ConstantValues.SHOW_LINK, url)
+            if (movie != null)
+                intent.putExtra(ConstantValues.SHOW_MOVIE, movie)
+            if (shouldFinish) {
+                startForResult(intent) {
+                    val shouldReset = it.data?.extras?.getBoolean("restart")
+                            ?: false
+                    if (shouldReset)
+                        this@ChoiceActivity.recreate()
+                }.onFailed {
 
-                            }
-                        } else {
-                            if (view == null)
-                                startActivity(intent)
-                            else
-                                ViewUtil.presentActivity(view, this@ChoiceActivity, intent)
+                }
+            } else {
+                if (view == null)
+                    startActivity(intent)
+                else
+                    ViewUtil.presentActivity(view, this@ChoiceActivity, intent)
+            }
+        }
+        if (isDorD) {
+            Permissions.check(this@ChoiceActivity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
+                    "Storage permissions are required because so we can download videos",
+                    Permissions.Options().setSettingsDialogTitle("Warning!").setRationaleDialogTitle("Info"),
+                    object : PermissionHandler() {
+                        override fun onGranted() {
+                            //do your task
+                            goIntoActivity()
                         }
-                    }
 
-                    override fun onDenied(context: Context?, deniedPermissions: ArrayList<String>?) {
-                        super.onDenied(context, deniedPermissions)
-                        val permArray = deniedPermissions!!.toTypedArray()
-                        Permissions.check(this@ChoiceActivity, permArray,
-                                "Storage permissions are required because so we can download videos",
-                                Permissions.Options().setSettingsDialogTitle("Warning!").setRationaleDialogTitle("Info"),
-                                this)
-                    }
-                })
+                        override fun onDenied(context: Context?, deniedPermissions: ArrayList<String>?) {
+                            super.onDenied(context, deniedPermissions)
+                            val permArray = deniedPermissions!!.toTypedArray()
+                            Permissions.check(this@ChoiceActivity, permArray,
+                                    "Storage permissions are required because so we can download videos",
+                                    Permissions.Options().setSettingsDialogTitle("Warning!").setRationaleDialogTitle("Info"),
+                                    this)
+                        }
+                    })
+
+        } else {
+            goIntoActivity()
+        }
     }
 
 }
