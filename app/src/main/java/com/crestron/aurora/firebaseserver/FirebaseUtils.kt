@@ -5,8 +5,10 @@ import com.crestron.aurora.Loged
 import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
-import com.crestron.aurora.server.toJson
+import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.utilities.KUtility
+import com.crestron.aurora.utilities.fromJson
+import com.crestron.aurora.utilities.toJson
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
@@ -17,9 +19,9 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
 
@@ -57,17 +59,19 @@ class FirebaseDB(private val context: Context, persistence: Boolean = true) {
                     try {
                         val value = p0.getValue(String::class.java)
                         Loged.d("Value is: $value")
-                        val loadedSettings = Gson().fromJson<Map<String, *>>(value, object : TypeToken<Map<String, *>>() {}.type)
+                        val loadedSettings = value?.fromJson<Map<String, *>>()
                         val edit = context.defaultSharedPreferences.edit()
-                        for (i in loadedSettings) {
-                            when (i.value) {
-                                is String -> edit.putString(i.key, i.value as String)
-                                is Int -> edit.putInt(i.key, i.value as Int)
-                                is Float -> edit.putFloat(i.key, i.value as Float)
-                                is Long -> edit.putLong(i.key, i.value as Long)
-                                is Boolean -> edit.putBoolean(i.key, i.value as Boolean)
-                                else -> null
-                            }?.apply()
+                        if (loadedSettings != null) {
+                            for (i in loadedSettings) {
+                                when (i.value) {
+                                    is String -> edit.putString(i.key, i.value as String)
+                                    is Int -> edit.putInt(i.key, i.value as Int)
+                                    is Float -> edit.putFloat(i.key, i.value as Float)
+                                    is Long -> edit.putLong(i.key, i.value as Long)
+                                    is Boolean -> edit.putBoolean(i.key, i.value as Boolean)
+                                    else -> null
+                                }?.apply()
+                            }
                         }
                         edit.apply()
                     } catch (e: Exception) {
@@ -88,13 +92,39 @@ class FirebaseDB(private val context: Context, persistence: Boolean = true) {
 
     companion object {
         fun firebaseSetup(persistence: Boolean = true) {
-            FirebaseFirestore.setLoggingEnabled(true)
+            //FirebaseFirestore.setLoggingEnabled(true)
             val settings = FirebaseFirestoreSettings.Builder()
                     .setPersistenceEnabled(persistence)
                     .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
                     .build()
             FirebaseFirestore.getInstance().firestoreSettings = settings
         }
+
+        suspend fun getAllShows(context: Context): List<ShowInfo> = GlobalScope.async {
+            val shows = ShowDatabase.getDatabase(context).showDao().allShows
+            val fireShow = try {
+                Tasks.await(FirebaseFirestore.getInstance()
+                        .collection(FirebaseAuth.getInstance().uid!!)
+                        .get()).toObjects(FirebaseShow::class.java)
+            } catch (e: Exception) {
+                emptyList<FirebaseShow>()
+            }
+            return@async (shows.map { ShowInfo(it.name, it.link) } + fireShow.map {
+                ShowInfo(it.name ?: "N/A", it.url ?: "N/A")
+            }.toMutableList().filter { it.name != "N/A" }).distinctBy { it.url }
+        }.await()
+
+        suspend fun getAllFireShows(context: Context, source: Source = Source.DEFAULT): List<FirebaseShow> = GlobalScope.async {
+            val shows = ShowDatabase.getDatabase(context).showDao().allShows
+            val fireShow = try {
+                Tasks.await(FirebaseFirestore.getInstance()
+                        .collection(FirebaseAuth.getInstance().uid!!)
+                        .get(source)).toObjects(FirebaseShow::class.java)
+            } catch (e: Exception) {
+                emptyList<FirebaseShow>()
+            }
+            return@async (shows.map { FirebaseShow(it.name, it.link, it.showNum) } + fireShow.toMutableList().filter { it.name != "N/A" }).distinctBy { it.url }
+        }.await()
     }
 
     fun storeDb() {
@@ -190,19 +220,19 @@ class FirebaseDB(private val context: Context, persistence: Boolean = true) {
     }
 
     fun getShowSync(url: String): FirebaseShow? = try {
-        Tasks.await(firebaseInstance
+        firebaseInstance
                 .collection(FirebaseAuth.getInstance().uid!!)
                 .document(url.replace("/", "<"))
-                .get()).toObject(FirebaseShow::class.java)
+                .get().await().toObject(FirebaseShow::class.java)
     } catch (e: Exception) {
         e.printStackTrace()
         null
     }
 
     fun getAllShowsSync(): List<FirebaseShow> = try {
-        Tasks.await(firebaseInstance
+        firebaseInstance
                 .collection(FirebaseAuth.getInstance().uid!!)
-                .get()).toObjects(FirebaseShow::class.java)
+                .get().await().toObjects(FirebaseShow::class.java)
     } catch (e: Exception) {
         emptyList()
     }

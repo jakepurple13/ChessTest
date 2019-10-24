@@ -35,6 +35,7 @@ import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.utilities.ViewUtil
 import com.crestron.aurora.utilities.flashScreen
 import com.crestron.aurora.utilities.smoothScrollAction
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.like.LikeButton
@@ -213,6 +214,10 @@ class ShowListActivity : AppCompatActivity() {
 
     lateinit var firebaseStuff: List<FirebaseDB.FirebaseShow>
 
+    val showFilter: (ShowInfo) -> Boolean = {
+        it.name.contains(search_info.text.toString(), ignoreCase = true) && if(showingFavorites) firebaseStuff.any { f -> it.url == f.url } else true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_show_list)
@@ -239,7 +244,7 @@ class ShowListActivity : AppCompatActivity() {
         show_info.addItemDecoration(dividerItemDecoration)
         show_info.setIndexBarVisibility(!recentChoice)
 
-        fun getListOfAnime(urlToUse: String) {
+        suspend fun getListOfAnime(urlToUse: String) {
 
             try {
 
@@ -247,7 +252,7 @@ class ShowListActivity : AppCompatActivity() {
                 source.movie = movie
                 val showApi = ShowApi(source)
 
-                firebaseStuff = FirebaseDB(this@ShowListActivity).getAllShowsSync()
+                firebaseStuff = FirebaseDB.getAllFireShows(this@ShowListActivity)//FirebaseDB(this@ShowListActivity).getAllShowsSync()
                 Loged.r(firebaseStuff)
 
                 listOfNameAndLink.addAll(showApi.showInfoList)
@@ -314,7 +319,7 @@ class ShowListActivity : AppCompatActivity() {
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 runOnUiThread {
-                    val filtered = listOfNameAndLink.filter { it.name.contains(search_info.text.toString(), ignoreCase = true) }
+                    val filtered = listOfNameAndLink.filter(showFilter)// { it.name.contains(search_info.text.toString(), ignoreCase = true) }
                     //show_info.adapter = AListAdapter(filtered, this@ShowListActivity, showDatabase, actionHit)
                     show_info.swapAdapter(AListAdapter(filtered, this@ShowListActivity, showDatabase, actionHit, firebaseShows = firebaseStuff), true)
                 }
@@ -428,47 +433,25 @@ class ShowListActivity : AppCompatActivity() {
         favorite_show.setOnClickListener {
             favorite_show.setImageDrawable(if (showingFavorites) {
                 showingFavorites = false
-                favShow(false, showDatabase)
+                favShow(showDatabase)
                 IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_favorite_border).sizeDp(24)
             } else {
                 showingFavorites = true
-                favShow(true, showDatabase)
+                favShow(showDatabase)
                 IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_favorite).sizeDp(24)
             })
         }
     }
 
-    private fun favShow(b: Boolean, showDatabase: ShowDatabase) {
-        GlobalScope.launch {
-            val listToShow = if (b) {
-                val showList = showDatabase.showDao().allShows
-                val nnList = arrayListOf<NameAndLink>()
-                for (i in showList) {
-                    nnList.add(NameAndLink(i.name, i.link))
-                }
-
-                fun checkItems(nn: ShowInfo): Boolean {
-                    for (s in showList) {
-                        if (nn.url == s.link) {
-                            return true
-                        }
-                    }
-                    return false
-                }
-
-                listOfNameAndLink.filter { checkItems(it) }
-            } else {
-                listOfNameAndLink
-            }.distinctBy { it.name }
-            runOnUiThread {
-                show_info.swapAdapter(AListAdapter(listToShow, this@ShowListActivity, showDatabase, actionHit, firebaseShows = firebaseStuff), true)
-                //show_info.adapter = AListAdapter(listToShow, this@ShowListActivity, showDatabase, actionHit)
-            }
+    private fun favShow(showDatabase: ShowDatabase) = GlobalScope.launch {
+        firebaseStuff = FirebaseDB.getAllFireShows(this@ShowListActivity, com.google.firebase.firestore.Source.CACHE)
+        runOnUiThread {
+            show_info.swapAdapter(AListAdapter(listOfNameAndLink.filter(showFilter), this@ShowListActivity, showDatabase, actionHit, firebaseShows = firebaseStuff), true)
         }
     }
 
     private fun errorHasOccurred(message: String) {
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle("An error has occurred")
         builder.setMessage("Please send feedback and explain what you were doing when you found this error. I am sorry for your inconvenience.")
         // Add the buttons
@@ -484,8 +467,6 @@ class ShowListActivity : AppCompatActivity() {
             dialog.show()
         }
     }
-
-    class NameAndLink(val name: String, val url: String)
 
     interface LinkAction {
         fun hit(name: String, url: String, vararg view: View) {

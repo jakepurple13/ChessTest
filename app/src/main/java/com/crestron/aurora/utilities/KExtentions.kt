@@ -247,7 +247,7 @@ fun Any.toJson(): String = Gson().toJson(this)
 
 fun Any.toPrettyJson(): String = GsonBuilder().setPrettyPrinting().create().toJson(this)
 
-inline fun <reified T> String.fromJson(): T? = try {
+inline fun <reified T> String?.fromJson(): T? = try {
     Gson().fromJson(this, object : TypeToken<T>() {}.type)
 } catch (e: Exception) {
     null

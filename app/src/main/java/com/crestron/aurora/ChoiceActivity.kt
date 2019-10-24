@@ -1498,14 +1498,14 @@ class ChoiceActivity : AppCompatActivity() {
                 .build()
 
         GlobalScope.launch {
-            val show = ShowDatabase.getDatabase(this@ChoiceActivity).showDao()
-            val showList = show.allShows
-            if (showList.size > 0) {
+            val showList = FirebaseDB.getAllShows(this@ChoiceActivity)
+            Loged.r("Number of favorites: ${showList.size}")
+            if (showList.isNotEmpty()) {
                 val favoriteCountItem = PrimaryDrawerItem()
                         .withIcon(GoogleMaterial.Icon.gmd_star)
                         .withSelectable(false)
                         .withIdentifier(7)
-                        .withName("Number of favorites: ${showList.size} ")
+                        .withName("Number of favorites: ${showList.size}")
                 try {
                     runOnUiThread {
                         result.addItemsAtPosition(2, favoriteCountItem)
@@ -1516,72 +1516,77 @@ class ChoiceActivity : AppCompatActivity() {
             }
         }
 
-        if (Utility.isNetwork(this@ChoiceActivity))
-            GlobalScope.launch {
-                val url = URL(ConstantValues.PAST_VERSION_URL).readText()
-                val info = Gson().fromJson(url, PastAppInfo::class.java)
-                for (appVersion in info.versions) {
-                    versionItem.withSubItems(SecondaryDrawerItem()
-                            .withName("Version ${appVersion.version} Notes")
-                            .withSelectable(false)
-                            .withLevel(2)
-                            .withIcon(GoogleMaterial.Icon.gmd_android)
-                            .withOnDrawerItemClickListener { _, _, _ ->
-                                Loged.w("$info")
-                                runOnUiThread {
-                                    val builder = MaterialAlertDialogBuilder(this@ChoiceActivity)
-                                    builder.setTitle("Notes for version ${appVersion.version}")
-                                    builder.setMessage(appVersion.devNotes)
-                                    builder.setNeutralButton("Cool!") { _, _ ->
-                                        //FunApplication.cancelUpdate(this@ChoiceActivity)
-                                    }
-                                    val dialog = builder.create()
-                                    dialog.show()
-                                    runOnUiThread {
-                                        result.updateItem(versionItem)
-                                    }
-                                }
-                                true
-                            })
-                }
-                runOnUiThread {
-                    result.updateItem(versionItem)
-                }
-
-                br = BroadcastReceiverDownload(object : DownloadBroadcast {
-                    override fun onCall(intent: Intent) {
-                        val viewDownloadsItemUpdate = PrimaryDrawerItem()
-                                .withIcon(GoogleMaterial.Icon.gmd_file_download)
+        try {
+            if (Utility.isNetwork(this@ChoiceActivity))
+                GlobalScope.launch {
+                    val url = URL(ConstantValues.PAST_VERSION_URL).readText()
+                    val info = Gson().fromJson(url, PastAppInfo::class.java)
+                    for (appVersion in info.versions) {
+                        versionItem.withSubItems(SecondaryDrawerItem()
+                                .withName("Version ${appVersion.version} Notes")
                                 .withSelectable(false)
-                                .withIdentifier(0)
-                                .withName("View Downloads")
+                                .withLevel(2)
+                                .withIcon(GoogleMaterial.Icon.gmd_android)
                                 .withOnDrawerItemClickListener { _, _, _ ->
-                                    result.closeDrawer()
-                                    val intent1 = Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
-                                    intent1.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
-                                    ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intent1)
+                                    Loged.w("$info")
+                                    runOnUiThread {
+                                        val builder = MaterialAlertDialogBuilder(this@ChoiceActivity)
+                                        builder.setTitle("Notes for version ${appVersion.version}")
+                                        builder.setMessage(appVersion.devNotes)
+                                        builder.setNeutralButton("Cool!") { _, _ ->
+                                            //FunApplication.cancelUpdate(this@ChoiceActivity)
+                                        }
+                                        val dialog = builder.create()
+                                        dialog.show()
+                                        runOnUiThread {
+                                            result.updateItem(versionItem)
+                                        }
+                                    }
                                     true
-                                }
-
-                        try {
-                            val downloaded = (intent.getStringExtra("view_download_item_count") ?: "0").toInt()
-                            if (downloaded > 0) {
-                                viewDownloadsItemUpdate.withBadge("$downloaded")
-                                        .withBadgeStyle(BadgeStyle(Color.RED, Color.RED))
-                            }
-                        } catch (e: Exception) {
-
-                        }
-                        runOnUiThread {
-                            result.updateItem(viewDownloadsItemUpdate)
-                        }
+                                })
                     }
-                })
-                val filter = IntentFilter().apply {
-                    addAction(ConstantValues.BROADCAST_DOWNLOAD)
+                    runOnUiThread {
+                        result.updateItem(versionItem)
+                    }
+
+                    br = BroadcastReceiverDownload(object : DownloadBroadcast {
+                        override fun onCall(intent: Intent) {
+                            val viewDownloadsItemUpdate = PrimaryDrawerItem()
+                                    .withIcon(GoogleMaterial.Icon.gmd_file_download)
+                                    .withSelectable(false)
+                                    .withIdentifier(0)
+                                    .withName("View Downloads")
+                                    .withOnDrawerItemClickListener { _, _, _ ->
+                                        result.closeDrawer()
+                                        val intent1 = Intent(this@ChoiceActivity, DownloadViewerActivity::class.java)
+                                        intent1.putExtra(ConstantValues.DOWNLOAD_NOTIFICATION, true)
+                                        ViewUtil.presentActivity(toolbar, this@ChoiceActivity, intent1)
+                                        true
+                                    }
+
+                            try {
+                                val downloaded = (intent.getStringExtra("view_download_item_count") ?: "0").toInt()
+                                if (downloaded > 0) {
+                                    viewDownloadsItemUpdate.withBadge("$downloaded")
+                                            .withBadgeStyle(BadgeStyle(Color.RED, Color.RED))
+                                }
+                            } catch (e: Exception) {
+
+                            }
+                            runOnUiThread {
+                                result.updateItem(viewDownloadsItemUpdate)
+                            }
+                        }
+                    })
+                    val filter = IntentFilter().apply {
+                        addAction(ConstantValues.BROADCAST_DOWNLOAD)
+                    }
+                    registerReceiver(br, filter)
                 }
-                registerReceiver(br, filter)
-            }
+
+        } catch (e: Exception) {
+
+        }
 
     }
 

@@ -21,7 +21,7 @@ public abstract class ShowDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     // Create database here
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(), ShowDatabase.class, "show_database")
-                                   //.addMigrations(MIGRATION_2_3)
+                                   .addMigrations(MIGRATION_2_3)
                                    //.addMigrations(MIGRATION_3_4)
                                    .build();
                 }

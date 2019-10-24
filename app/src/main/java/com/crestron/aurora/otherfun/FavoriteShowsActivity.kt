@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
-import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.firebaseserver.FirebaseDB
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
@@ -49,7 +48,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
             return false
         }
 
-        fun longhit(info: ShowListActivity.NameAndLink, vararg view: View) {
+        fun longhit(info: ShowInfo, vararg view: View) {
 
         }
     }
@@ -57,7 +56,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
     private var homeScreen = false
     var shouldReset = false
 
-    private var allData: ArrayList<ShowListActivity.NameAndLink> = arrayListOf()
+    private var allData: ArrayList<ShowInfo> = arrayListOf()
 
     private var showPutlocker = true
     private var showGogoanime = true
@@ -88,7 +87,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
         list_to_choose.addItemDecoration(dividerItemDecoration)
         list_to_choose.addItemDecoration(ItemOffsetDecoration(20))
 
-        val chipCheck: (ShowListActivity.NameAndLink) -> Boolean = {
+        val chipCheck: (ShowInfo) -> Boolean = {
             it.name.contains(search_info.text.toString(), ignoreCase = true) &&
                     ((if (showPutlocker) it.url.contains("putlocker", true) else false)
                     || (if (showGogoanime) it.url.contains("gogoanime", true) else false)
@@ -96,7 +95,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
         }
 
         fun checkFilter() = runOnUiThread {
-            adapter.setListNotify(allData.filter(chipCheck) as ArrayList<ShowListActivity.NameAndLink>)
+            adapter.setListNotify(allData.filter(chipCheck) as ArrayList<ShowInfo>)
         }
 
         search_info.addTextChangedListener(object : TextWatcher {
@@ -129,15 +128,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
         }
 
         GlobalScope.launch {
-            val s2 = FirebaseDB(this@FavoriteShowsActivity).getAllShowsSync()
-            val s = ShowDatabase.getDatabase(this@FavoriteShowsActivity).showDao()
-            val showList = s.allShows
-
-            s2.toMutableList().removeAll { it.name.isNullOrBlank() }
-
-            allData.addAll((showList.map { ShowListActivity.NameAndLink(it.name, it.link) } + s2.map {
-                ShowListActivity.NameAndLink(it.name ?: "N/A", it.url ?: "N/A")
-            }.filter { it.name != "N/A" }).sortedBy { it.name }.distinctBy { it.url })
+            allData.addAll(FirebaseDB.getAllShows(this@FavoriteShowsActivity))
 
             runOnUiThread {
                 val listScreen = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")
@@ -172,7 +163,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
             startActivity(intented, options.toBundle())
         }
 
-        override fun longhit(info: ShowListActivity.NameAndLink, vararg view: View) {
+        override fun longhit(info: ShowInfo, vararg view: View) {
             val peekAndPop = PeekAndPop.Builder(this@FavoriteShowsActivity)
                     .peekLayout(R.layout.image_dialog_layout)
                     .flingTypes(true, true)

@@ -7,15 +7,16 @@ import android.view.ViewGroup
 import android.widget.SectionIndexer
 import androidx.recyclerview.widget.RecyclerView
 import com.crestron.aurora.R
+import com.crestron.aurora.showapi.ShowInfo
 import com.programmerbox.dragswipe.DragSwipeAdapter
 import kotlinx.android.synthetic.main.favorites_show_layout.view.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-class FavoriteShowsAdapter(var stuff: ArrayList<ShowListActivity.NameAndLink>,
+class FavoriteShowsAdapter(var stuff: ArrayList<ShowInfo>,
                            var context: Context,
                            var toBeChecked: List<FavoriteShowsActivity.NameUrl>,
-                           var action: FavoriteShowsActivity.ShowHit = object : FavoriteShowsActivity.ShowHit {}) : DragSwipeAdapter<ShowListActivity.NameAndLink, ViewHolder>(stuff), SectionIndexer {
+                           var action: FavoriteShowsActivity.ShowHit = object : FavoriteShowsActivity.ShowHit {}) : DragSwipeAdapter<ShowInfo, ViewHolder>(stuff), SectionIndexer {
 
     private var mSectionPositions: ArrayList<Int>? = null
 

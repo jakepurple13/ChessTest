@@ -12,13 +12,11 @@ import com.crestron.aurora.R
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
 import com.crestron.aurora.firebaseserver.FirebaseDB
-import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.like.LikeButton
 import com.like.OnLikeListener
 import kotlinx.android.synthetic.main.text_layout.view.*
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
@@ -147,12 +145,13 @@ class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
                 holder.favorite.apply {
 
                     setOnLikeListener(null)
-                    isLiked = try {
+                    /*isLiked = try {
                         stuff[position].url in firebaseShows.map { it.url } ||
                                 show.showDao().isUrlInDatabase(stuff[position].url) > 0
                     } catch (e: Exception) {
                         show.showDao().isUrlInDatabase(stuff[position].url) > 0
-                    }
+                    }*/
+                    isLiked = firebaseShows.any { stuff[position].url == it.url }
                     setOnLikeListener(object : OnLikeListener {
                         override fun liked(p0: LikeButton?) {
                             liked(p0!!.isLiked)
@@ -179,10 +178,6 @@ class AListAdapter : RecyclerView.Adapter<ViewHolderShow>, SectionIndexer {
             }
 
         }
-    }
-
-    private fun getEpisodeList(show: ShowInfo) = GlobalScope.async {
-        EpisodeApi(show).episodeList.size
     }
 
 }
