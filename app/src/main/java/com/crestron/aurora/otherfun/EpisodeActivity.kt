@@ -53,8 +53,6 @@ import java.util.*
 
 class EpisodeActivity : AppCompatActivity() {
 
-    private val listOfUrls = arrayListOf<String>()
-    private val listOfNames = arrayListOf<String>()
     private val listOfEpisodes = arrayListOf<EpisodeInfo>()
 
     lateinit var mNotificationManager: NotificationManager
@@ -258,7 +256,7 @@ class EpisodeActivity : AppCompatActivity() {
                     val downloadOrStream = defaultSharedPreferences.getBoolean(ConstantValues.DOWNLOAD_OR_STREAM, true)
                     Loged.i("$downloadOrStream")
 
-                    val fire = FirebaseDB(this@EpisodeActivity).getShowSync(url)
+                    val fire = FirebaseDB.getShowSync(url, this@EpisodeActivity)//FirebaseDB(this@EpisodeActivity).getShowSync(url)
                     Loged.r(fire)
 
                     adapter = EpisodeAdapter(listOfEpisodes, url, context = this@EpisodeActivity, slideOrButton = slideOrButton, downloadOrStream = downloadOrStream, action = object : EpisodeAction {
@@ -351,8 +349,6 @@ class EpisodeActivity : AppCompatActivity() {
         }
 
         episode_refresh.setOnRefreshListener {
-            listOfUrls.clear()
-            listOfNames.clear()
             listOfEpisodes.clear()
             // Your code to refresh the list here.
             // Make sure you call swipeContainer.setRefreshing(false)

@@ -20,9 +20,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.Source
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jetbrains.anko.defaultSharedPreferences
 
 
@@ -125,6 +123,31 @@ class FirebaseDB(private val context: Context, persistence: Boolean = true) {
             }
             return@async (shows.map { FirebaseShow(it.name, it.link, it.showNum) } + fireShow.toMutableList().filter { it.name != "N/A" }).distinctBy { it.url }
         }.await()
+
+        suspend fun getShowSync(url: String, context: Context): FirebaseShow? = withContext(Dispatchers.Default) {
+            val fire = try {
+                Tasks.await(FirebaseFirestore.getInstance()
+                        .collection(FirebaseAuth.getInstance().uid!!)
+                        .document(url.replace("/", "<"))
+                        .get()).toObject(FirebaseShow::class.java)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+            val show = try {
+                ShowDatabase.getDatabase(context).showDao().getEpisodes(url)
+            } catch (e: Exception) {
+                emptyList<Episode>()
+            }
+            if (fire != null) {
+                FirebaseShow(fire.name,
+                        fire.url,
+                        fire.showNum,
+                        fire.episodeInfo?.plus(show.map { FirebaseEpisode(it.showName, it.showUrl) })?.distinctBy { it.url } ?: emptyList())
+            } else {
+                null
+            }
+        }
     }
 
     fun storeDb() {

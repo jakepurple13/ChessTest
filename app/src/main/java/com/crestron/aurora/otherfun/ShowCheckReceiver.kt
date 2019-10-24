@@ -162,14 +162,14 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                             android.R.mipmap.sym_def_app_icon,
                             "updateCheckRun", 2, prog + 1, filtered.size, i.name)
                     try {
-                        Loged.i("Checking ${i.name}")
+                        Loged.i("Checking ${i.name} at ${i.url}")
                         val showList = EpisodeApi(i).episodeList.size
                         //if (showDatabase.showDao().getShow(i.name).showNum < showList) {
                         var newShow: ShowInfos? = null
                         val show = showDatabase.showDao().getShowByURL(i.url)
                         if (show != null) {
                             if (show.showNum < showList) {
-                                Loged.i("Checking ${i.name} with size ${show.showNum}")
+                                Loged.i("Checking ${i.name} at with size ${show.showNum}")
                                 val timeOfUpdate = SimpleDateFormat("MM/dd hh:mm a").format(System.currentTimeMillis())
                                 val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
                                 Loged.wtf(infoToShow)
@@ -224,8 +224,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                     //KUtility.commitNotiList(updateNotiMap.toMutableSet())
                     //KUtility.commitNotiJsonList(ShowInfosList(updateList))
                     if (defaultSharedPreferences.getBoolean("useNotifications", true)) {
-                        val links = arrayListOf<String>()
-                        val names = arrayListOf<String>()
                         dismissCurrentNotis(this@ShowCheckIntentService)
                         @Suppress("IMPLICIT_CAST_TO_ANY") val nStyle = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             Notification.InboxStyle()
@@ -238,8 +236,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                             } else {
                                 (nStyle as NotificationCompat.InboxStyle).addLine(i.name)
                             }
-                            links.add(i.url)
-                            names.add(i.name)
                             /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 sendBubbleNotification(this@ShowCheckIntentService,
                                         android.R.mipmap.sym_def_app_icon,
@@ -250,7 +246,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                         j + 3 + (Math.random() * 50).toInt(),
                                         NameWithUrl(i.name, i.url))
                             } else {*/
-                            if (list.size == 1) {
+                            //if (list.size == 1) {
                                 sendNotification(this@ShowCheckIntentService,
                                         android.R.mipmap.sym_def_app_icon,
                                         i.name,
@@ -259,7 +255,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                         EpisodeActivity::class.java,
                                         j + 3 + (Math.random() * 50).toInt(),
                                         NameWithUrl(i.name, i.url))
-                                Loged.i("We came here")
                                 /*sendBubbleNotification(this@ShowCheckIntentService,
                                         android.R.mipmap.sym_def_app_icon,
                                         i.name,
@@ -268,7 +263,7 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                         EpisodeActivity::class.java,
                                         j + 3 + (Math.random() * 50).toInt(),
                                         NameWithUrl(i.name, i.url))*/
-                            }
+                            //}
                         }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             (nStyle as Notification.InboxStyle).addLine("${list.size} show${if (list.size == 1) "" else "s"} had updates!")

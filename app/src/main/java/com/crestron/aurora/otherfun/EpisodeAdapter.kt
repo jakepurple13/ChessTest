@@ -87,21 +87,24 @@ class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String
         val checkedListener: (CompoundButton, Boolean) -> Unit = { _: CompoundButton, b: Boolean ->
             GlobalScope.launch {
                 try {
-                    if (b) {
+                    if (b && (show.isUrlInDatabase(name) > 1 || firebaseEps?.url == name)) {
                         Loged.e("Inserted ${items[position]}")
-                        show.insertEpisode(Episode(position, name, items[position].url))
                         FirebaseDB(context).addEpisode(name, Episode(position, name, items[position].url))
+                        show.insertEpisode(Episode(position, name, items[position].url))
                     } else {
                         Loged.e("Deleted")
-                        show.deleteEpisode(items[position].url)
                         FirebaseDB(context).removeEpisode(name, Episode(position, name, items[position].url))
+                        show.deleteEpisode(items[position].url)
+                        holder.watched.isChecked = false
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    this@EpisodeAdapter.context.runOnUiThread {
-                        Toast.makeText(this@EpisodeAdapter.context, "Please Favorite Show if you plan on Checking the Episodes", Toast.LENGTH_LONG).show()
+                    if (firebaseEps?.url != name) {
+                        this@EpisodeAdapter.context.runOnUiThread {
+                            Toast.makeText(this@EpisodeAdapter.context, "Please Favorite Show if you plan on Checking the Episodes", Toast.LENGTH_LONG).show()
+                        }
+                        holder.watched.isChecked = false
                     }
-                    holder.watched.isChecked = false
                 }
             }
         }
@@ -110,17 +113,19 @@ class EpisodeAdapter(val items: ArrayList<EpisodeInfo>, private val name: String
 
         try {
             //Loged.r(firebaseEps)
-            if(firebaseEps!=null) {
-                holder.watched.isChecked = items[position].url in (firebaseEps.episodeInfo?.map { it.url } ?: emptyList())
+            if (firebaseEps != null) {
+                holder.watched.isChecked = firebaseEps.episodeInfo?.any { it.url == items[position].url } ?: false
+                //holder.watched.isChecked = items[position].url in (firebaseEps.episodeInfo?.map { it.url } ?: emptyList())
             }
             holder.watched.setOnCheckedChangeListener(checkedListener)
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             GlobalScope.launch {
                 val episodes = show.getEpisodes(name)
 
                 withContext(Dispatchers.Main) {
                     holder.watched.isChecked = try {
-                        items[position].url in episodes.map { it.showUrl }
+                        episodes.any { it.showUrl == items[position].url }
+                        //items[position].url in episodes.map { it.showUrl }
                     } catch (e: Exception) {
                         false
                     }
