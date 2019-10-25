@@ -657,7 +657,7 @@ class ChoiceActivity : AppCompatActivity() {
                 }
             }
             runOnUiThread {
-                //All testing stuff/
+                //All testing stuff
                 //adapter.addItem(MaterialItem(ChoiceButton.VIEW_TESTING, "Some actions that are WIP", android.R.drawable.ic_menu_help))
             }
         }

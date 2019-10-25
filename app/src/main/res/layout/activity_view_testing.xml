@@ -38,4 +38,10 @@
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
+    <com.wshtaits.vsrecyclerview.VsRecyclerView
+        android:id="@+id/vs_test"
+        android:layout_below="@id/toggle_button_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
 </RelativeLayout>
