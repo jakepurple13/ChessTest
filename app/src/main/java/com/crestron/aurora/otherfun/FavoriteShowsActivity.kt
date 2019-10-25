@@ -128,7 +128,7 @@ class FavoriteShowsActivity : AppCompatActivity() {
         }
 
         GlobalScope.launch {
-            allData.addAll(FirebaseDB.getAllShows(this@FavoriteShowsActivity))
+            allData.addAll(FirebaseDB.getAllShows(this@FavoriteShowsActivity).sortedBy { it.name })
 
             runOnUiThread {
                 val listScreen = defaultSharedPreferences.getString("homeScreenAdding", "{\"list\" : []}")
