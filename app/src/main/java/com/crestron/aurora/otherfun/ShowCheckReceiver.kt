@@ -225,17 +225,19 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                     //KUtility.commitNotiJsonList(ShowInfosList(updateList))
                     if (defaultSharedPreferences.getBoolean("useNotifications", true)) {
                         dismissCurrentNotis(this@ShowCheckIntentService)
-                        @Suppress("IMPLICIT_CAST_TO_ANY") val nStyle = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        /*@Suppress("IMPLICIT_CAST_TO_ANY") val nStyle = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             Notification.InboxStyle()
                         } else {
                             NotificationCompat.InboxStyle()
-                        }
+                        }*/
+                        val nStyle = NotificationCompat.InboxStyle()
                         for ((j, i) in list.withIndex()) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                                 (nStyle as Notification.InboxStyle).addLine(i.name)
                             } else {
                                 (nStyle as NotificationCompat.InboxStyle).addLine(i.name)
-                            }
+                            }*/
+                            nStyle.addLine(i.name)
                             /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 sendBubbleNotification(this@ShowCheckIntentService,
                                         android.R.mipmap.sym_def_app_icon,
@@ -265,15 +267,16 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                         NameWithUrl(i.name, i.url))*/
                             //}
                         }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             (nStyle as Notification.InboxStyle).addLine("${list.size} show${if (list.size == 1) "" else "s"} had updates!")
                         } else {
                             (nStyle as NotificationCompat.InboxStyle).addLine("${list.size} show${if (list.size == 1) "" else "s"} had updates!")
-                        }
+                        }*/
+                        nStyle.addLine("${list.size} show${if (list.size == 1) "" else "s"} had updates!")
                         sendGroupNotification(this@ShowCheckIntentService,
                                 android.R.mipmap.sym_def_app_icon,
                                 "${list.size} show${if (list.size == 1) "" else "s"} had updates!",
-                                nStyle as NotificationCompat.InboxStyle,
+                                nStyle,
                                 "episodeUpdate",
                                 ShowListActivity::class.java)
                         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
