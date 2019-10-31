@@ -6,10 +6,165 @@ import kotlinx.coroutines.runBlocking
 import org.apache.tools.ant.util.DateUtils
 import org.junit.Before
 import org.junit.Test
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.system.measureTimeMillis
 
 @Suppress("SameParameterValue")
 class TestUnitThree {
+
+    open class Person(open var name: String? = null,
+                      open var age: Int? = null,
+                      open var dob: Date? = null,
+                      open var address: Address? = null) {
+
+        val friends: MutableList<Person> = mutableListOf()
+
+        private fun getDateString() = dob?.let { ", ${SimpleDateFormat("MM-dd-yyyy").format(it)}" } ?: ""
+
+        override fun toString(): String {
+            return "$name, $age${getDateString()}. Lives at $address. His friends are ${friends.joinToString(", ") { "${it.name}" }}."
+        }
+    }
+
+    data class Address(var street: String? = null,
+                       var number: Int? = null,
+                       var city: String? = null,
+                       var hobby: Hobby? = null) {
+        override fun toString(): String {
+            return "$number $street, $city. His hobby is $hobby"
+        }
+    }
+
+    data class Hobby(var hobbyName: String? = null) {
+        override fun toString(): String {
+            return "$hobbyName"
+        }
+    }
+
+    fun person(block: Person.() -> Unit): Person = Person().apply(block)
+
+    fun Person.address(block: Address.() -> Unit) {
+        address = Address().apply(block)
+    }
+
+    fun Person.friend(block: Person.() -> Unit) {
+        friends.add(Person().apply(block))
+    }
+
+    fun Address.hobby(block: Hobby.() -> Unit) {
+        hobby = Hobby().apply(block)
+    }
+
+    fun personBuilder(block: PersonBuilder.() -> Unit): Person = PersonBuilder().apply(block).build()
+
+    class PersonBuilder {
+        var name: String = ""
+        var age: Int = 0
+        private var dob: Date = Date()
+        var dateOfBirth: String = ""
+            set(value) {
+                dob = SimpleDateFormat("MM-dd-yyyy").parse(value)!!
+            }
+        private var address: Address? = null
+        private var friendList = mutableListOf<Person>()
+
+        fun address(block: AddressBuilder.() -> Unit) {
+            address = AddressBuilder().apply(block).build()
+        }
+
+        fun friend(block: PersonBuilder.() -> Unit) {
+            friendList.add(PersonBuilder().apply(block).build())
+        }
+
+        fun build(): Person = Person(name, age, dob, address).apply {
+            friends.addAll(friendList)
+        }
+    }
+
+    class AddressBuilder {
+        var street: String = ""
+        var number: Int = 0
+        var city: String = ""
+        private var hobby: Hobby? = null
+        fun hobby(block: Hobby.() -> Unit) {
+            hobby = Hobby().apply(block)
+        }
+
+        fun build(): Address = Address(street, number, city, hobby)
+    }
+
+    @Test
+    fun dslTesting() {
+
+        val person2 = personBuilder {
+            name = "John"
+            age = 34
+            dateOfBirth = "12-4-2014"
+            address {
+                street = "Main Street"
+                number = 42
+                city = "London"
+                hobby {
+                    hobbyName = "Tennis"
+                }
+            }
+            friend {
+                name = "Jacob"
+                age = 22
+                dateOfBirth = "12-31-1995"
+                address {
+                    street = "Bedford Rd"
+                    number = 861
+                    city = "Pleasantville"
+                    hobby {
+                        hobbyName = "Programming"
+                    }
+                }
+            }
+            friend {
+                name = "Jordan"
+                age = 24
+                dateOfBirth = "12-4-1974"
+                address {
+                    street = "Main Rd"
+                    number = 861
+                    city = "DC"
+                }
+            }
+        }
+
+        prettyLog(person2)
+
+        val person = person {
+            name = "John"
+            age = 25
+            dob = SimpleDateFormat("MM-dd-yyyy").parse("1-1-1985")!!
+            address {
+                street = "Main Street"
+                number = 42
+                city = "London"
+                hobby {
+                    hobbyName = "Tennis"
+                }
+            }
+            friend {
+                name = "Jacob"
+                age = 22
+                address {
+                    street = "Bedford Rd"
+                    number = 861
+                    city = "Pleasantville"
+                    hobby {
+                        hobbyName = "Programming"
+                    }
+                }
+                friends.add(this@person)
+            }
+        }
+        prettyLog(person)
+        prettyLog(person.friends[0])
+    }
 
     @Before
     fun setUp() {
@@ -68,7 +223,7 @@ class TestUnitThree {
     private fun indexOfMax(a: IntArray): Int? {
         return try {
             a.lastIndexOf(a.max()!!)
-        } catch(e: NullPointerException) {
+        } catch (e: NullPointerException) {
             null
         }
     }

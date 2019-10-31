@@ -173,7 +173,7 @@ dependencies {
     implementation 'com.dubsmash.volley:library:2.0.1'
     testImplementation 'org.robolectric:robolectric:4.3'
     testImplementation 'org.json:json:20190722'
-    implementation 'com.github.davidmigloz:multi-state-switch:+'
+    implementation 'com.github.davidmigloz:multi-state-switch:1.4.0'
     implementation "io.ktor:ktor-client-websockets:+"
     implementation "io.ktor:ktor-client-cio:+"
     implementation "io.ktor:ktor-client-js:+"
@@ -184,6 +184,7 @@ dependencies {
     implementation 'com.github.Kennyc1012:BottomSheetMenu:3.0.1'
     implementation 'com.bitvale:switcher:1.0.5'
     implementation 'com.wshtaits:vsrecyclerview:+'
+    implementation 'com.github.rubensousa:gravitysnaphelper:2.2.0'
 }
 kotlin {
     experimental {

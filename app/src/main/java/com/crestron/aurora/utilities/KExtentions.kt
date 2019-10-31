@@ -1,5 +1,6 @@
 package com.crestron.aurora.utilities
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -9,9 +10,11 @@ import android.graphics.drawable.GradientDrawable.RECTANGLE
 import android.os.Build
 import android.view.KeyEvent
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
+import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.core.view.doOnPreDraw
 import androidx.recyclerview.widget.*
@@ -176,6 +179,16 @@ inline fun <reified T> Intent.getCollectionExtra(key: String, defaultValue: T): 
 } catch (e: Exception) {
     defaultValue
 }
+
+fun Activity.setBrightness(@FloatRange(from = 0.0, to = 1.0) brightness: Float) {
+    val params = window.attributes
+    params.screenBrightness = brightness // range from 0 - 1 as per docs
+    window.attributes = params
+    window.addFlags(WindowManager.LayoutParams.FLAGS_CHANGED)
+}
+
+@FloatRange(from = 0.0, to = 1.0)
+fun Activity.getBrightness(): Float = window.attributes.screenBrightness
 
 /**
  * Close keyboard when ENTER ic clicked, clears focus from view and calls [InputMethodManager.hideSoftInputFromWindow]

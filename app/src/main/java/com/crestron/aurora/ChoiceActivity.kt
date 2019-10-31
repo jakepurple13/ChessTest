@@ -176,6 +176,7 @@ class ChoiceActivity : AppCompatActivity() {
         FirebaseApp.initializeApp(this)
 
         Loged.r(DeviceInfo())
+        Loged.r("Here", showPretty = false)
 
         mAuth = FirebaseAuth.getInstance()
 
