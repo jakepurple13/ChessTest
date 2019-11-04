@@ -20,7 +20,7 @@ object Loged {
                 .filter { it.className.contains(FILTER_BY_CLASS_NAME) && !it.className.contains(HELPER_NAME) }
                 .reversed()
                 .map { "${it.className}.${it.methodName}(${it.fileName}:${it.lineNumber})" }
-        var loc = "\n"
+        var loc = "\n╚═▷\t"
         for (i in wanted.indices.reversed()) {
             loc += wanted[i]
             //doing a future check
@@ -36,7 +36,7 @@ object Loged {
     private fun log(tag: String, msg: Any?, level: Int, threadName: Boolean) {
         val stackTraceElement = Thread.currentThread().stackTrace
         val currentIndex = stackTraceElement.indexOfFirst { it.methodName.compareTo("log") == 0 } + 3
-        val logged = with(stackTraceElement[currentIndex]) { "$msg\tat $className.$methodName($fileName:$lineNumber)" }
+        val logged = with(stackTraceElement[currentIndex]) { "$msg\n╚═▷\t$className.$methodName($fileName:$lineNumber)" }
         Log.println(level, tag + if (threadName) "/${Thread.currentThread().name}" else "", logged)
     }
 
@@ -139,7 +139,8 @@ object Loged {
      *  ### [Log.ASSERT] = 7
      */
     fun r(
-            msg: Any? = null, tag: String = TAG,
+            msg: Any? = null,
+            tag: String = TAG,
             showPretty: Boolean = SHOW_PRETTY,
             threadName: Boolean = WITH_THREAD_NAME,
             @IntRange(from = 2, to = 7) vararg choices: Int = intArrayOf(2, 3, 4, 5, 6, 7)

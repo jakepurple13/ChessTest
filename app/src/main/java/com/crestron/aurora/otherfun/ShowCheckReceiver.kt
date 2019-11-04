@@ -166,19 +166,6 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                         val showList = EpisodeApi(i).episodeList.size
                         //if (showDatabase.showDao().getShow(i.name).showNum < showList) {
                         var newShow: ShowInfos? = null
-                        val show = showDatabase.showDao().getShowByURL(i.url)
-                        if (show != null) {
-                            if (show.showNum < showList) {
-                                Loged.i("Checking ${i.name} at with size ${show.showNum}")
-                                val timeOfUpdate = SimpleDateFormat("MM/dd hh:mm a").format(System.currentTimeMillis())
-                                val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
-                                Loged.wtf(infoToShow)
-                                newShow = ShowInfos(i.name, showList, timeOfUpdate, i.url)
-                                show.showNum = showList
-                                showDatabase.showDao().updateShow(show)
-                                count++
-                            }
-                        }
                         val fireShow = fireDB.find { it.url == i.url }
                         if(fireShow != null) {
                             if (fireShow.showNum < showList) {
@@ -191,6 +178,23 @@ class ShowCheckIntentService : IntentService("ShowCheckIntentService") {
                                 firebase.updateShowNum(fireShow)
                                 count++
                             }
+                        }
+                        try {
+                            val show = showDatabase.showDao().getShowByURL(i.url)
+                            if (show != null) {
+                                if (show.showNum < showList) {
+                                    Loged.i("Checking ${i.name} at with size ${show.showNum}")
+                                    val timeOfUpdate = SimpleDateFormat("MM/dd hh:mm a").format(System.currentTimeMillis())
+                                    val infoToShow = "$timeOfUpdate - ${i.name} Updated: Episode $showList"
+                                    Loged.wtf(infoToShow)
+                                    newShow = ShowInfos(i.name, showList, timeOfUpdate, i.url)
+                                    show.showNum = showList
+                                    showDatabase.showDao().updateShow(show)
+                                    count++
+                                }
+                            }
+                        } catch (e: Exception) {
+
                         }
                         if (newShow != null) {
                             updateList.add(newShow)
