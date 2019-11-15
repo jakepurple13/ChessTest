@@ -1,10 +1,18 @@
 package com.crestron.aurora
 
 import androidx.annotation.IntRange
+import com.crestron.aurora.showapi.EpisodeApi
+import com.crestron.aurora.showapi.ShowApi
+import com.crestron.aurora.showapi.ShowInfo
+import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.isBlankOrEmpty
 import com.google.gson.Gson
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import it.skrape.core.Mode
+import it.skrape.extract
+import it.skrape.selects.elements
+import it.skrape.skrape
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
@@ -22,6 +30,37 @@ class TestUnitTwo {
     fun setUp() {
         Loged.FILTER_BY_CLASS_NAME = "crestron"
     }
+
+    @Test
+    fun `skrape testing`() = runBlocking {
+        val data = skrape {
+            url = "https://www.gogoanime1.com/home/latest-episodes"
+            mode = Mode.DOM
+            val list = extract {
+                elements("div.dl-item").map {
+                    val showUrl = it.select("div.name").select("a[href^=http]").attr("abs:href")
+                    ShowInfo(it.select("div.name").text(), showUrl.substring(0, showUrl.indexOf("/episode")))
+                }
+            }
+            list
+        }
+        prettyLog(data.joinToString("\n"))
+    }
+
+    @Test
+    fun `skrape testing2`() {//} = runBlocking {
+        val a = ShowApi(Source.RECENT_ANIME).showInfoList
+        val p = ShowApi(Source.RECENT_LIVE_ACTION).showInfoList
+        val c = ShowApi(Source.RECENT_CARTOON).showInfoList
+        prettyLog(a)
+        prettyLog(p)
+        prettyLog(c)
+        prettyLog(EpisodeApi(a.random()))
+        prettyLog(EpisodeApi(p.random()))
+        prettyLog(EpisodeApi(c.random()))
+    }
+
+
 
     /*data class Track(
             @SerializedName("track_id") val trackID: Long,
