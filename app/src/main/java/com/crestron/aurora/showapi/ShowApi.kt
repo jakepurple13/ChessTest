@@ -5,6 +5,7 @@ import okhttp3.OkHttpClient
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -48,9 +49,7 @@ enum class Source(val link: String, val recent: Boolean = false, var movie: Bool
  * Info about the show, name and url
  */
 open class ShowInfo(val name: String, val url: String) {
-    override fun toString(): String {
-        return "$name: $url"
-    }
+    override fun toString(): String = "$name: $url"
 }
 
 /**
@@ -63,26 +62,26 @@ class ShowApi(private val source: Source) {
         fun getSources(vararg source: Source): List<ShowInfo> = source.map { ShowApi(it).showInfoList }.flatten()
     }
 
-    private var doc: Document = Jsoup.connect(source.link).get()
+    private val doc: Document = Jsoup.connect(source.link).get()
     /**
      * returns a list of the show's from the wanted source
      */
     val showInfoList: List<ShowInfo> = if (source.recent) getRecentList() else getList()
 
+    private fun toShowInfo(element: Element) = ShowInfo(element.text(), element.attr("abs:href"))
+
     private fun getList(): List<ShowInfo> = when {
         source.link.contains("gogoanime") -> if (source == Source.ANIME_MOVIES || source.movie) gogoAnimeMovies() else gogoAnimeAll()
-        source.link.contains("putlocker") -> doc.select("a.az_ls_ent").map { ShowInfo(it.text(), it.attr("abs:href")) }
-        source.link.contains("animetoon") -> doc.allElements.select("td").select("a[href^=http]").map { ShowInfo(it.text(), it.attr("abs:href")) }.sortedBy { it.name }
+        source.link.contains("putlocker") -> doc.select("a.az_ls_ent").map(this::toShowInfo)
+        source.link.contains("animetoon") -> doc.allElements.select("td").select("a[href^=http]").map(this::toShowInfo)
         else -> emptyList()
-    }
-
-    private fun gogoAnimeAll(): List<ShowInfo> = doc.allElements.select("ul.arrow-list").select("li")
-            .map { ShowInfo(it.text(), it.select("a[href^=http]").attr("abs:href")) }.sortedBy { it.name }
-
-    private fun gogoAnimeMovies(): List<ShowInfo> = gogoAnimeAll().filter { it.name.contains("movie", ignoreCase = true) }.sortedBy { it.name }
+    }.sortedBy(ShowInfo::name)
 
     private fun getRecentList(): List<ShowInfo> = when {
-        source.link.contains("gogoanime") -> gogoAnimeRecent()
+        source.link.contains("gogoanime") -> doc.allElements.select("div.dl-item").map {
+            val tempUrl = it.select("div.name").select("a[href^=http]").attr("abs:href")
+            ShowInfo(it.select("div.name").text(), tempUrl.substring(0, tempUrl.indexOf("/episode")))
+        }
         source.link.contains("putlocker") -> doc.allElements.select("div.col-6").map {
             val url = it.select("a.thumbnail").attr("abs:href")
             ShowInfo(it.select("span.mov_title").text(), url.substring(0, url.indexOf("season")))
@@ -90,15 +89,15 @@ class ShowApi(private val source: Source) {
         source.link.contains("animetoon") -> {
             var listOfStuff = doc.allElements.select("div.left_col").select("table#updates").select("a[href^=http]")
             if (listOfStuff.size == 0) listOfStuff = doc.allElements.select("div.s_left_col").select("table#updates").select("a[href^=http]")
-            listOfStuff.map { ShowInfo(it.text(), it.attr("abs:href")) }.filter { !it.name.contains("Episode") }
+            listOfStuff.map(this::toShowInfo).filter { !it.name.contains("Episode") }
         }
         else -> emptyList()
     }
 
-    private fun gogoAnimeRecent(): List<ShowInfo> = doc.allElements.select("div.dl-item").map {
-        val tempUrl = it.select("div.name").select("a[href^=http]").attr("abs:href")
-        ShowInfo(it.select("div.name").text(), tempUrl.substring(0, tempUrl.indexOf("/episode")))
-    }
+    private fun gogoAnimeMovies(): List<ShowInfo> = gogoAnimeAll().filter { it.name.contains("movie", ignoreCase = true) }
+    private fun gogoAnimeAll(): List<ShowInfo> = doc.allElements.select("ul.arrow-list").select("li")
+            .map { ShowInfo(it.text(), it.select("a[href^=http]").attr("abs:href")) }
+
 }
 
 /**
@@ -153,15 +152,14 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
             var textToReturn = ""
             val para = doc.select(".mov-desc").select("p")
             for (i in para.withIndex()) {
-                val text = when (i.index) {
+                textToReturn += when (i.index) {
                     1 -> "Release: "
                     2 -> "Genre: "
                     3 -> "Director: "
                     4 -> "Stars: "
                     5 -> "Synopsis: "
                     else -> ""
-                } + i.value.text()
-                textToReturn += text + "\n"
+                } + i.value.text() + "\n"
             }
             textToReturn
         }

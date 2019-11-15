@@ -49,8 +49,8 @@ class TestUnitTwo {
 
     @Test
     fun `skrape testing2`() {//} = runBlocking {
-        val a = ShowApi(Source.RECENT_ANIME).showInfoList
-        val p = ShowApi(Source.RECENT_LIVE_ACTION).showInfoList
+        val a = ShowApi(Source.LIVE_ACTION).showInfoList
+        val p = ShowApi(Source.CARTOON).showInfoList
         val c = ShowApi(Source.RECENT_CARTOON).showInfoList
         prettyLog(a)
         prettyLog(p)
