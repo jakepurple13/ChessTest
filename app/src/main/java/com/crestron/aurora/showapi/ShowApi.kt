@@ -394,21 +394,11 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
     override fun toString(): String = "$name: $url"
 }
 
-internal class NormalLink {
-    var normal: Normal? = null
-    override fun toString(): String = "ClassPojo [normal = " + normal!!.toString() + "]"
-}
-
-internal class Normal {
-    var storage: Array<Storage>? = null
-    override fun toString(): String = "ClassPojo [storage = $storage]"
-}
-
-class Storage {
-    var sub: String? = null
-    var source: String? = null
-    var link: String? = null
-    var quality: String? = null
-    var filename: String? = null
-    override fun toString(): String = "ClassPojo [sub = $sub, source = $source, link = $link, quality = $quality, filename = $filename]"
-}
+internal class NormalLink(var normal: Normal? = null)
+internal class Normal(var storage: Array<Storage>? = emptyArray())
+data class Storage(
+    var sub: String? = null,
+    var source: String? = null,
+    var link: String? = null,
+    var quality: String? = null,
+    var filename: String? = null)
