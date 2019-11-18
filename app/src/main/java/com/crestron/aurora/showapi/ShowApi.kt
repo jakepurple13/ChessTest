@@ -197,8 +197,8 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
                         EpisodeInfo(epName, urlInfo.attr("abs:href"))
                     }.distinctBy(EpisodeInfo::name)
             ShowSource.ANIMETOON -> {
-                fun getStuff(url: String) = Jsoup.connect(url).get().allElements.select("div#videos").select("a[href^=http]").map { EpisodeInfo(it.text(), it.attr("abs:href")) }
-                getStuff(source.url) + doc.allElements.select("ul.pagination").select(" button[href^=http]").map { getStuff(it.attr("abs:href")) }.flatten()
+                fun getStuff(document: Document) = document.allElements.select("div#videos").select("a[href^=http]").map { EpisodeInfo(it.text(), it.attr("abs:href")) }
+                getStuff(doc) + doc.allElements.select("ul.pagination").select(" button[href^=http]").map { getStuff(Jsoup.connect(it.attr("abs:href")).get()) }.flatten()
             }
             ShowSource.NONE -> emptyList()
         }

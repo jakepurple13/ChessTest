@@ -56,7 +56,7 @@ class TestUnitTwo {
         prettyLog(p)
         prettyLog(c)*/
         //prettyLog(EpisodeApi(a.random()))
-        prettyLog(EpisodeApi(p.random()).episodeList.random().getVideoLink())
+        prettyLog(EpisodeApi(p.random()).episodeList)
         //prettyLog(EpisodeApi(c.random()))
     }
 
