@@ -396,9 +396,4 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
 
 internal class NormalLink(var normal: Normal? = null)
 internal class Normal(var storage: Array<Storage>? = emptyArray())
-data class Storage(
-    var sub: String? = null,
-    var source: String? = null,
-    var link: String? = null,
-    var quality: String? = null,
-    var filename: String? = null)
+data class Storage(var sub: String? = null, var source: String? = null, var link: String? = null, var quality: String? = null, var filename: String? = null)
