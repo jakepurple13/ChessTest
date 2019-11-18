@@ -137,28 +137,21 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
      * The url of the image
      */
     val image: String = when (ShowSource.getSourceType(source.url)) {
-        ShowSource.PUTLOCKER -> doc.select("div.thumb").select("img[src^=http]").attr("abs:src")
-        ShowSource.GOGOANIME -> doc.select("div.animeDetail-image").select("img[src^=http]").attr("abs:src")
-        ShowSource.ANIMETOON -> doc.select("div.left_col").select("img[src^=http]#series_image").attr("abs:src")
-        ShowSource.NONE -> ""
-    }
+        ShowSource.PUTLOCKER -> doc.select("div.thumb").select("img[src^=http]")
+        ShowSource.GOGOANIME -> doc.select("div.animeDetail-image").select("img[src^=http]")
+        ShowSource.ANIMETOON -> doc.select("div.left_col").select("img[src^=http]#series_image")
+        ShowSource.NONE -> null
+    }?.attr("abs:src") ?: ""
 
     /**
      * the description
      */
     val description: String = when (ShowSource.getSourceType(source.url)) {
         ShowSource.PUTLOCKER -> try {
-            val client = OkHttpClient()
-            val request = okhttp3.Request.Builder()
-                    .url("http://www.omdbapi.com/?t=$name&plot=full&apikey=e91b86ee")
-                    .get()
-                    .build()
-            val response = client.newCall(request).execute()
+            val request = okhttp3.Request.Builder().url("http://www.omdbapi.com/?t=$name&plot=full&apikey=e91b86ee").get().build()
+            val response = OkHttpClient().newCall(request).execute()
             val jsonObj = JSONObject(response.body()!!.string())
-            val year = jsonObj.getString("Year")
-            val released = jsonObj.getString("Released")
-            val plot = jsonObj.getString("Plot")
-            "Years Active: $year\nReleased: $released\n$plot"
+            "Years Active: ${jsonObj.getString("Year")}\nReleased: ${jsonObj.getString("Released")}\n${jsonObj.getString("Plot")}"
         } catch (e: Exception) {
             var textToReturn = ""
             val para = doc.select(".mov-desc").select("p")
@@ -200,13 +193,9 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
             ShowSource.GOGOANIME -> doc.select("ul.check-list").select("li")
                     .map {
                         val urlInfo = it.select("a[href^=http]")
-                        val epName = if (urlInfo.text().contains(name)) {
-                            urlInfo.text().substring(name.length)
-                        } else {
-                            urlInfo.text()
-                        }.trim()
+                        val epName = urlInfo.text().let { info -> if (info.contains(name)) info.substring(name.length) else info }.trim()
                         EpisodeInfo(epName, urlInfo.attr("abs:href"))
-                    }.distinctBy { it.name }
+                    }.distinctBy(EpisodeInfo::name)
             ShowSource.ANIMETOON -> {
                 fun getStuff(url: String) = Jsoup.connect(url).get().allElements.select("div#videos").select("a[href^=http]").map { EpisodeInfo(it.text(), it.attr("abs:href")) }
                 getStuff(source.url) + doc.allElements.select("ul.pagination").select(" button[href^=http]").map { getStuff(it.attr("abs:href")) }.flatten()
@@ -215,7 +204,6 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
         }
 
     override fun toString(): String = "$name - ${episodeList.size} eps - $description"
-
 }
 
 /**
