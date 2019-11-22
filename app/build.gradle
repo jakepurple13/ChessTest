@@ -61,6 +61,7 @@ android {
         exclude 'META-INF/ktor-io.kotlin_module'
         exclude 'META-INF/ktor-http-cio.kotlin_module'
         exclude 'META-INF/ktor-client-core.kotlin_module'
+        exclude 'META-INF/main.kotlin_module'
     }
     sourceSets.main.jniLibs.srcDirs = ['src/main/jniLibs']
 }
@@ -158,8 +159,9 @@ dependencies {
     implementation 'jp.wasabeef:picasso-transformations:2.2.1'
     implementation 'androidx.navigation:navigation-fragment:2.2.0-beta01'
     implementation 'androidx.palette:palette:1.0.0'
-    implementation 'com.github.jakepurple13.DragSwipeApp:dragswipe:v1.6'
-    implementation 'com.github.jakepurple13.DragSwipeApp:dragswipeex:v1.6'
+    implementation "com.programmersbox.loged:loged:0.3.6"
+    implementation 'com.github.jakepurple13.DragSwipeApp:dragswipe:v2.01'
+    implementation 'com.github.jakepurple13.DragSwipeApp:dragswipeex:v2.01'
     implementation 'jp.wasabeef:recyclerview-animators:3.0.0'
     // If you want to use the GPU Filters
     //implementation 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'

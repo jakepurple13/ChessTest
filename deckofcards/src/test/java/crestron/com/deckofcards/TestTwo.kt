@@ -28,7 +28,7 @@ class TestTwo {
         val c = d.getCardLocation(Card(Suit.SPADES, 5))
         log("${Card(Suit.SPADES, 5)} is in the $c place of the deck")
 
-        val dq = Deck.deck {
+        val dq = DeckBuilder.deck {
             addNormalDeck()
             card(Card.RandomCard)
             build()
@@ -83,7 +83,7 @@ class TestTwo {
         }
         d += Deck()
         Card.ClearCard
-        d += Deck.deck {
+        d += DeckBuilder.deck {
             card {
                 suit = Suit.randomSuit()
                 value = CardUtil.randomNumber(1, 13)

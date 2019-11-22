@@ -1,9 +1,5 @@
 package crestron.com.deckofcards
 
-
-// TODO: Auto-generated Javadoc
-
-
 /**
  * The Enum Suit.
  */
@@ -16,7 +12,6 @@ enum class Suit
  * @param unicodeSymbol the symbol in unicode
  */
 (private val printableName: String, val symbol: String, val unicodeSymbol: String) {
-
     /**
      * Hearts.
      */
@@ -42,44 +37,34 @@ enum class Suit
      * [Color.BLACK] is [SPADES] and [CLUBS]
      * [Color.RED] is [DIAMONDS] and [HEARTS]
      */
-    fun getColor(): Color {
-        return when (this) {
-            SPADES, CLUBS -> Color.BLACK
-            DIAMONDS, HEARTS -> Color.RED
-        }
+    fun getColor(): Color = when (this) {
+        SPADES, CLUBS -> Color.BLACK
+        DIAMONDS, HEARTS -> Color.RED
     }
 
     /**
      * @return [printableName]
      */
-    override fun toString(): String {
-        return printableName
-    }
+    override fun toString(): String = printableName
 
     /**
      * checks to see if the suits are the same
      * @return true if the two are equal, false if they are not
      */
-    fun equals(other: Suit): Boolean {
-        return symbol == other.symbol &&
-                printableName == other.printableName &&
-                unicodeSymbol == other.unicodeSymbol
-    }
+    fun equals(other: Suit): Boolean = symbol == other.symbol &&
+            printableName == other.printableName &&
+            unicodeSymbol == other.unicodeSymbol
 
     companion object {
         /**
          * @return a random suit
          */
-        fun randomSuit(): Suit {
-            return when (CardUtil.randomNumber(1, 4)) {
-                1 -> SPADES
-                2 -> CLUBS
-                3 -> DIAMONDS
-                4 -> HEARTS
-                else -> {
-                    SPADES
-                }
-            }
+        fun randomSuit(): Suit = when (CardUtil.randomNumber(1, 4)) {
+            1 -> SPADES
+            2 -> CLUBS
+            3 -> DIAMONDS
+            4 -> HEARTS
+            else -> SPADES
         }
     }
 
@@ -93,38 +78,25 @@ enum class Color(private val colorName: String) {
     RED("Red"),
     BACK("Back");
 
-    fun equals(c: Color): Boolean {
-        return colorName == c.colorName
-    }
+    fun equals(c: Color): Boolean = colorName == c.colorName
 
-    override fun toString(): String {
-        return colorName
-    }
+    override fun toString(): String = colorName
 
     companion object {
-        fun randomColor(color: Color): Suit {
-            return when (color) {
-                BLACK -> {
-                    when (CardUtil.randomNumber(1, 2)) {
-                        1 -> Suit.SPADES
-                        2 -> Suit.CLUBS
-                        else -> Suit.SPADES
-                    }
-                }
-                RED -> {
-                    when (CardUtil.randomNumber(1, 2)) {
-                        1 -> Suit.DIAMONDS
-                        2 -> Suit.HEARTS
-                        else -> Suit.DIAMONDS
-                    }
-                }
-                else -> {
-                    Suit.SPADES
-                }
+        fun randomColor(color: Color): Suit = when (color) {
+            BLACK -> when (CardUtil.randomNumber(1, 2)) {
+                1 -> Suit.SPADES
+                2 -> Suit.CLUBS
+                else -> Suit.SPADES
             }
+            RED -> when (CardUtil.randomNumber(1, 2)) {
+                1 -> Suit.DIAMONDS
+                2 -> Suit.HEARTS
+                else -> Suit.DIAMONDS
+            }
+            else -> Suit.SPADES
         }
     }
-
 }
 
 enum class CardDescriptor {
@@ -133,13 +105,11 @@ enum class CardDescriptor {
     UNICODE_SYMBOL;
 
     companion object {
-        fun randomDescriptor(): CardDescriptor {
-            return when (CardUtil.randomNumber(1, 3)) {
-                1 -> WRITTEN_OUT
-                2 -> SYMBOL
-                3 -> UNICODE_SYMBOL
-                else -> WRITTEN_OUT
-            }
+        fun randomDescriptor(): CardDescriptor = when (CardUtil.randomNumber(1, 3)) {
+            1 -> WRITTEN_OUT
+            2 -> SYMBOL
+            3 -> UNICODE_SYMBOL
+            else -> WRITTEN_OUT
         }
 
         fun setRandomDescriptor() {
@@ -150,8 +120,6 @@ enum class CardDescriptor {
 
 internal class CardUtil {
     companion object {
-        fun randomNumber(low: Int, high: Int): Int {
-            return low + (Math.random() * ((high - low) + 1)).toInt()
-        }
+        fun randomNumber(low: Int, high: Int): Int = low + (Math.random() * ((high - low) + 1)).toInt()
     }
 }

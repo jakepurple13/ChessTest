@@ -40,6 +40,14 @@ allprojects {
             url "https://artifactory.willturn.org/artifactory"
         }*/
         maven { url "https://dl.bintray.com/drummer-aidan/maven/" }
+        maven {
+            name = "Github"
+            url = uri("https://maven.pkg.github.com/jakepurple13/Logger")
+            credentials {
+                username = findProperty("github.username")
+                password = findProperty("github.token") ?: System.getenv("GPR_TOKEN")
+            }
+        }
     }
 }
 

@@ -9,6 +9,7 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
+import crestron.com.deckofcards.DeckBuilder
 import crestron.com.deckofcards.Suit
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -983,7 +984,7 @@ class ExampleUnitTest {
         person.name = "Jimmy"
         System.out.println(person.toString())
 
-        val d = Deck.deck {
+        val d = DeckBuilder.deck {
             card {
                 value = 1
                 suit = Suit.SPADES

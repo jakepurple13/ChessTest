@@ -14,7 +14,7 @@ open class Card(val suit: Suit, val value: Int) : Comparable<Card> {
     operator fun minus(c: Card) = value - c.value
     override fun equals(other: Any?) = suit.equals((other as Card).suit) && value == other.value
 
-    companion object DefaultCard {
+    companion object {
         /**
          * A Clear Card, [value] = 15, [suit] = SPADES
          * Used as a placeholder for ImageViews when wanting to have a spot for a card but do not want anything to show
@@ -32,9 +32,7 @@ open class Card(val suit: Suit, val value: Int) : Comparable<Card> {
          * A card of both random suit and number
          */
         val RandomCard: Card
-            get() {
-                return Card(Suit.randomSuit(), CardUtil.randomNumber(1, 13))
-            }
+            get() = Card(Suit.randomSuit(), CardUtil.randomNumber(1, 13))
 
         /**
          * A card of random value but chosen suit
@@ -65,9 +63,7 @@ open class Card(val suit: Suit, val value: Int) : Comparable<Card> {
     }
 
     init {
-        if (value > maxValue || value < minValue) {
-            throw CardNotFoundException("The value isn't a card")
-        }
+        check(value in minValue..maxValue) { throw CardNotFoundException("The value isn't a card") }
     }
 
     /**
@@ -95,11 +91,7 @@ open class Card(val suit: Suit, val value: Int) : Comparable<Card> {
      * @return the value ten
      */
     val valueTen: Int
-        get() = if (value > 10) {
-            10
-        } else {
-            value
-        }
+        get() = if (value > 10) 10 else value
 
     /**
      * The color of the suit
@@ -108,43 +100,35 @@ open class Card(val suit: Suit, val value: Int) : Comparable<Card> {
      */
     val color = suit.getColor()
 
-    override fun toString(): String {
-        return when (cardDescriptor) {
-            CardDescriptor.UNICODE_SYMBOL -> toPrettyString()
-            CardDescriptor.SYMBOL -> toSymbolString()
-            CardDescriptor.WRITTEN_OUT -> toNormalString()
-        }
+    override fun toString(): String = when (cardDescriptor) {
+        CardDescriptor.UNICODE_SYMBOL -> toPrettyString()
+        CardDescriptor.SYMBOL -> toSymbolString()
+        CardDescriptor.WRITTEN_OUT -> toNormalString()
     }
 
-    internal fun toNormalString(): String {
-        return when (value) {
-            1 -> "Ace"
-            11 -> "Jack"
-            12 -> "Queen"
-            13 -> "King"
-            else -> "$value"
-        } + " of $suit"
-    }
+    internal fun toNormalString(): String = when (value) {
+        1 -> "Ace"
+        11 -> "Jack"
+        12 -> "Queen"
+        13 -> "King"
+        else -> "$value"
+    } + " of $suit"
 
-    internal fun toSymbolString(): String {
-        return when (value) {
-            1 -> "A"
-            11 -> "J"
-            12 -> "Q"
-            13 -> "K"
-            else -> "$value"
-        } + suit.symbol
-    }
+    internal fun toSymbolString(): String = when (value) {
+        1 -> "A"
+        11 -> "J"
+        12 -> "Q"
+        13 -> "K"
+        else -> "$value"
+    } + suit.symbol
 
-    internal fun toPrettyString(): String {
-        return when (value) {
-            1 -> "A"
-            11 -> "J"
-            12 -> "Q"
-            13 -> "K"
-            else -> "$value"
-        } + suit.unicodeSymbol
-    }
+    internal fun toPrettyString(): String = when (value) {
+        1 -> "A"
+        11 -> "J"
+        12 -> "Q"
+        13 -> "K"
+        else -> "$value"
+    } + suit.unicodeSymbol
 
     /**
      * Compares the Suits of this and c.
@@ -154,65 +138,48 @@ open class Card(val suit: Suit, val value: Int) : Comparable<Card> {
      *
      *false if the two cards don't have the same suit
      */
-    fun equals(c: Card): Boolean {
-        return suit.equals(c.suit) && value == c.value
-    }
+    fun equals(c: Card): Boolean = suit.equals(c.suit) && value == c.value
 
     /**
      * Gives the card image.
      */
-    open fun getImage(context: Context): Int {
+    open fun getImage(context: Context): Int = context.resources.getIdentifier(getCardName(), "drawable", context.packageName)
 
-        val num = when (suit) {
+    private fun getCardName() = if (cardName(value) == "clear" || cardName(value) == "b1fv")
+        cardName(value)
+    else {
+        cardName(value) + when (suit) {
             Suit.CLUBS -> 1
             Suit.SPADES -> 2
             Suit.HEARTS -> 3
             Suit.DIAMONDS -> 4
         }
-
-        val s = if (cardName(value) == "clear" || cardName(value) == "b1fv")
-            cardName(value)
-        else {
-            cardName(value) + num
-        }
-
-        return context.resources.getIdentifier(s, "drawable", context.packageName)
     }
 
-    private fun cardName(num: Int): String {
-        return when (num) {
-            1 -> "ace"
-            2 -> "two"
-            3 -> "three"
-            4 -> "four"
-            5 -> "five"
-            6 -> "six"
-            7 -> "seven"
-            8 -> "eight"
-            9 -> "nine"
-            10 -> "ten"
-            11 -> "jack"
-            12 -> "queen"
-            13 -> "king"
-            15 -> "clear"
-            else -> "b1fv"
-        }
+    private fun cardName(num: Int): String = when (num) {
+        1 -> "ace"
+        2 -> "two"
+        3 -> "three"
+        4 -> "four"
+        5 -> "five"
+        6 -> "six"
+        7 -> "seven"
+        8 -> "eight"
+        9 -> "nine"
+        10 -> "ten"
+        11 -> "jack"
+        12 -> "queen"
+        13 -> "king"
+        15 -> "clear"
+        else -> "b1fv"
     }
 
-    fun compareSuit(c: Card): Boolean {
-        return suit == c.suit
-    }
-
-    fun compareColor(c: Card): Boolean {
-        return color == c.color
-    }
-
+    fun compareSuit(c: Card): Boolean = suit == c.suit
+    fun compareColor(c: Card): Boolean = color == c.color
     override fun hashCode(): Int {
         var result = suit.hashCode()
         result = 31 * result + value
         result = 31 * result + color.hashCode()
         return result
     }
-
 }
-

@@ -36,6 +36,7 @@ class ExampleInstrumentedTest {
     fun setUp() {
         Loged.FILTER_BY_CLASS_NAME = "crestron"
     }
+
     @Test
     fun socketting() {
         val ssc = ServerSocketChannel.open()
@@ -52,13 +53,7 @@ class ExampleInstrumentedTest {
         sc.close()
     }
 
-    fun addition(num: Int): Int {
-        return if(num==1) {
-            1
-        } else {
-            addition(num-1)
-        }
-    }
+    tailrec fun addition(num: Int): Int = if (num == 1) 1 else addition(num - 1)
 
     @Test
     fun logedTest() {

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
+import com.programmersbox.loged.DynamicAdapter
 import kotlinx.android.synthetic.main.activity_view_testing.*
 import kotlinx.android.synthetic.main.material_card_hub_item.view.*
 import kotlinx.android.synthetic.main.rss_layout_item.view.*
@@ -53,6 +54,18 @@ class ViewTesting : AppCompatActivity() {
             insertItemsToEnd(contacts2, R.layout.rss_layout_item) { contacting ->
                 itemView.description.text = contacting.name
                 itemView.item_feed.text = contacting.phone
+            }
+        }
+
+        test_rv.adapter = DynamicAdapter(this).apply {
+            contacts.addItems(R.layout.material_card_hub_item) {
+                material_title.text = it.name
+                material_detail.text = it.phone
+            }
+
+            addItems(R.layout.rss_layout_item, contacts2) {
+                description.text = it.name
+                item_feed.text = it.phone
             }
         }
 

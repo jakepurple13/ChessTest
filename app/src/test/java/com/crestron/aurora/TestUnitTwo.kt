@@ -26,6 +26,9 @@ import kotlin.random.Random
 
 class TestUnitTwo {
 
+    //This gets all enum values from ANY enum
+    inline fun <reified T: Enum<T>> getAllEnumValues() = T::class.java.enumConstants?.map { it }
+
     @Before
     fun setUp() {
         Loged.FILTER_BY_CLASS_NAME = "crestron"

@@ -28,19 +28,17 @@ enum class Source(val link: String, val recent: Boolean = false, var movie: Bool
     RECENT_LIVE_ACTION("https://www1.putlocker.fyi/recent-episodes/", true);
 
     companion object SourceUrl {
-        fun getSourceFromUrl(url: String): Source {
-            return when (url) {
-                ANIME.link -> ANIME
-                CARTOON.link -> CARTOON
-                DUBBED.link -> DUBBED
-                ANIME_MOVIES.link -> ANIME_MOVIES
-                CARTOON_MOVIES.link -> CARTOON_MOVIES
-                RECENT_ANIME.link -> RECENT_ANIME
-                RECENT_CARTOON.link -> RECENT_CARTOON
-                LIVE_ACTION.link -> LIVE_ACTION
-                RECENT_LIVE_ACTION.link -> RECENT_LIVE_ACTION
-                else -> ANIME
-            }
+        fun getSourceFromUrl(url: String): Source = when (url) {
+            ANIME.link -> ANIME
+            CARTOON.link -> CARTOON
+            DUBBED.link -> DUBBED
+            ANIME_MOVIES.link -> ANIME_MOVIES
+            CARTOON_MOVIES.link -> CARTOON_MOVIES
+            RECENT_ANIME.link -> RECENT_ANIME
+            RECENT_CARTOON.link -> RECENT_CARTOON
+            LIVE_ACTION.link -> LIVE_ACTION
+            RECENT_LIVE_ACTION.link -> RECENT_LIVE_ACTION
+            else -> ANIME
         }
     }
 }
@@ -148,8 +146,8 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
      */
     val description: String = when (ShowSource.getSourceType(source.url)) {
         ShowSource.PUTLOCKER -> try {
-            val request = okhttp3.Request.Builder().url("http://www.omdbapi.com/?t=$name&plot=full&apikey=e91b86ee").get().build()
-            val response = OkHttpClient().newCall(request).execute()
+            val response = OkHttpClient()
+                    .newCall(okhttp3.Request.Builder().url("http://www.omdbapi.com/?t=$name&plot=full&apikey=e91b86ee").get().build()).execute()
             val jsonObj = JSONObject(response.body()!!.string())
             "Years Active: ${jsonObj.getString("Year")}\nReleased: ${jsonObj.getString("Released")}\n${jsonObj.getString("Plot")}"
         } catch (e: Exception) {
@@ -244,10 +242,7 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
                 val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(getHtml(url))
                 if (d.find()) {
                     val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(getHtml(d.group(1)!!))
-                    if (a.find()) {
-                        val link = getFinalURL(URL("https://verystream.com/gettoken/${a.group(1)!!}?mime=true"))!!.toExternalForm()
-                        return arrayListOf(link)
-                    }
+                    if (a.find()) return arrayListOf(getFinalURL(URL("https://verystream.com/gettoken/${a.group(1)!!}?mime=true"))!!.toExternalForm())
                 }
                 return arrayListOf("N/A")
             }
@@ -288,32 +283,17 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
                 val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(getHtml(url))
                 if (d.find()) {
                     val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(getHtml(d.group(1)!!))
-                    if (a.find()) {
-                        val stor = Storage()
-                        stor.link = "https://verystream.com/gettoken/${a.group(1)!!}?mime=true"
-                        stor.filename = name
-                        stor.quality = "720"
-                        stor.source = "PutLocker"
-                        stor.sub = "No"
-                        return arrayListOf(stor)
-                    }
+                    if (a.find()) return arrayListOf(Storage(
+                            link = "https://verystream.com/gettoken/${a.group(1)!!}?mime=true",
+                            filename = name, quality = "720", source = "PutLocker", sub = "No"))
                 }
                 return arrayListOf()
             }
             ShowSource.GOGOANIME -> {
                 val doc = Jsoup.connect(url).get()
-                val storage = Storage()
-                storage.link = doc.select("a[download^=http]").attr("abs:download")
+                val storage = Storage(link = doc.select("a[download^=http]").attr("abs:download"), source = url, quality = "Good", sub = "Yes")
                 val regex = "^[^\\[]+(.*mp4)".toRegex().toPattern().matcher(storage.link!!)
-                storage.filename = if (regex.find()) {
-                    regex.group(1)!!
-                } else {
-                    val segments = URI(url).path.split("/")
-                    "${segments[2]} $name.mp4"
-                }
-                storage.source = url
-                storage.quality = "Good"
-                storage.sub = "Yes"
+                storage.filename = if (regex.find()) regex.group(1)!! else "${URI(url).path.split("/")[2]} $name.mp4"
                 return arrayListOf(storage)
             }
             ShowSource.ANIMETOON -> {
@@ -338,7 +318,7 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
             }
             ShowSource.NONE -> return emptyList()
         }
-        return arrayListOf()
+        return emptyList()
     }
 
     @Throws(IOException::class)
@@ -351,7 +331,6 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
         connection.addRequestProperty("Accept-Language", "en-US,en;q=0.5")
         connection.addRequestProperty("Referer", "http://thewebsite.com")
         connection.connect()
-
         // Read and store the result line by line then return the entire string.
         val in1 = connection.getInputStream()
         val reader = BufferedReader(InputStreamReader(in1))
@@ -374,7 +353,6 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
             con.addRequestProperty("Accept-Language", "en-US,en;q=0.5")
             con.addRequestProperty("Referer", "http://thewebsite.com")
             con.connect()
-            //con.getInputStream();
             val resCode = con.responseCode
             if (resCode == HttpURLConnection.HTTP_SEE_OTHER
                     || resCode == HttpURLConnection.HTTP_MOVED_PERM
