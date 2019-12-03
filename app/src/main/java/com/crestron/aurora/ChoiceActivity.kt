@@ -120,6 +120,7 @@ class ChoiceActivity : AppCompatActivity() {
         DUBBED("dubbed", "Dubbed"),
         ANIME_MOVIES("anime_movies", "Anime Movies"),
         CARTOON_MOVIES("cartoon_movies", "Cartoon Movies"),
+        LIVE_ACTION_MOVIES("live_action_movies", "Live Movies"),
         RECENT_ANIME("recent_anime", "Recent Anime"),
         RECENT_CARTOON("recent_cartoon", "Recent Cartoon"),
         LIVE_ACTION("live_action", "TV Shows"),
@@ -330,6 +331,7 @@ class ChoiceActivity : AppCompatActivity() {
                     ChoiceButton.DUBBED -> permissionCheck(ShowListActivity::class.java, url = Source.DUBBED.link)
                     ChoiceButton.ANIME_MOVIES -> permissionCheck(ShowListActivity::class.java, url = Source.ANIME_MOVIES.link, movie = true)
                     ChoiceButton.CARTOON_MOVIES -> permissionCheck(ShowListActivity::class.java, url = Source.CARTOON_MOVIES.link, movie = true)
+                    ChoiceButton.LIVE_ACTION_MOVIES -> permissionCheck(ShowListActivity::class.java, true, url = Source.LIVE_ACTION_MOVIES.link, movie = true)
                     ChoiceButton.LIVE_ACTION -> permissionCheck(ShowListActivity::class.java, url = Source.LIVE_ACTION.link)
                     ChoiceButton.RECENT_ANIME -> permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_ANIME.link)
                     ChoiceButton.RECENT_LIVE_ACTION -> permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_LIVE_ACTION.link)
@@ -526,6 +528,7 @@ class ChoiceActivity : AppCompatActivity() {
         modelList += MaterialItem(ChoiceButton.DUBBED, "View Dubbed Anime", R.drawable.ten4)
         modelList += MaterialItem(ChoiceButton.RECENT_LIVE_ACTION, "View TV Shows", R.drawable.recents)
         modelList += MaterialItem(ChoiceButton.LIVE_ACTION, "View Recent TV Shows", R.drawable.mov)
+        //modelList += MaterialItem(ChoiceButton.LIVE_ACTION_MOVIES, "View Live Movies", R.drawable.mov)
 
         modelList += MaterialItem(ChoiceButton.VIEW_DOWNLOADS, "View Downloading Shows", R.drawable.mov)
         modelList += MaterialItem(ChoiceButton.VIEW_VIDEOS, "View Downloaded Videos", R.drawable.mov)

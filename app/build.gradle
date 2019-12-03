@@ -187,7 +187,6 @@ dependencies {
     implementation 'com.bitvale:switcher:1.0.5'
     implementation 'com.wshtaits:vsrecyclerview:+'
     implementation 'com.github.rubensousa:gravitysnaphelper:2.2.0'
-    implementation("it.skrape:skrapeit-core:0.6.0")
 }
 kotlin {
     experimental {

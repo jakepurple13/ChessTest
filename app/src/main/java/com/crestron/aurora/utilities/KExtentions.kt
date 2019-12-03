@@ -26,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 import kotlin.random.Random
 
 /**
@@ -264,6 +265,16 @@ inline fun <reified T> String?.fromJson(): T? = try {
     Gson().fromJson(this, object : TypeToken<T>() {}.type)
 } catch (e: Exception) {
     null
+}
+
+inline fun <reified T> getJsonApi(url: String): T? {
+    val client = OkHttpClient()
+    val request = okhttp3.Request.Builder()
+            .url(url)
+            .get()
+            .build()
+    val response = client.newCall(request).execute()
+    return if (response.code() == 200) response.body()!!.string().fromJson<T>() else null
 }
 
 data class DeviceInfo(val board: String = Build.BOARD,

@@ -32,6 +32,7 @@ import com.crestron.aurora.utilities.Utility
 import com.crestron.aurora.utilities.intersect
 import com.crestron.aurora.utilities.otherWise
 import com.crestron.aurora.views.DownloadsWidget
+import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.kaopiz.kprogresshud.KProgressHUD
@@ -232,10 +233,20 @@ class EpisodeActivity : AppCompatActivity() {
             runOnUiThread {
 
                 GlobalScope.launch {
-                    val des = if (epApi != null) nameUrl(epApi.description) else "An error has occurred"
+                    val des = if (epApi != null) "${epApi.source.url}\n${epApi.description}" else "An error has occurred"
                     runOnUiThread {
                         download_info.text = des
                     }
+                }
+
+                titleName.text = epApi?.name
+
+                epApi?.genres?.forEach {
+                    genreList.addView(Chip(this@EpisodeActivity).apply {
+                        text = it
+                        isCheckable = false
+                        isClickable = false
+                    })
                 }
 
                 if (epApi != null) {

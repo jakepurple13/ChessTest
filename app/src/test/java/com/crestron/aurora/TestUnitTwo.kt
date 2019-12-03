@@ -1,18 +1,10 @@
 package com.crestron.aurora
 
 import androidx.annotation.IntRange
-import com.crestron.aurora.showapi.EpisodeApi
-import com.crestron.aurora.showapi.ShowApi
-import com.crestron.aurora.showapi.ShowInfo
-import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.isBlankOrEmpty
 import com.google.gson.Gson
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import it.skrape.core.Mode
-import it.skrape.extract
-import it.skrape.selects.elements
-import it.skrape.skrape
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
@@ -34,7 +26,7 @@ class TestUnitTwo {
         Loged.FILTER_BY_CLASS_NAME = "crestron"
     }
 
-    @Test
+    /*@Test
     fun `skrape testing`() = runBlocking {
         val data = skrape {
             url = "https://www.gogoanime1.com/home/latest-episodes"
@@ -48,20 +40,20 @@ class TestUnitTwo {
             list
         }
         prettyLog(data.joinToString("\n"))
-    }
+    }*/
 
-    @Test
+    /*@Test
     fun `skrape testing2`() {//} = runBlocking {
         //val a = ShowApi(Source.LIVE_ACTION).showInfoList
         val p = ShowApi(Source.CARTOON).showInfoList
-       /* val c = ShowApi(Source.RECENT_CARTOON).showInfoList
+       *//* val c = ShowApi(Source.RECENT_CARTOON).showInfoList
         prettyLog(a)
         prettyLog(p)
-        prettyLog(c)*/
+        prettyLog(c)*//*
         //prettyLog(EpisodeApi(a.random()))
         prettyLog(EpisodeApi(p.random()).episodeList.random().getVideoInfo())
         //prettyLog(EpisodeApi(c.random()))
-    }
+    }*/
 
 
 

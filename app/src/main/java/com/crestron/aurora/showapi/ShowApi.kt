@@ -12,6 +12,10 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
+import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 enum class Source(val link: String, val recent: Boolean = false, var movie: Boolean = false) {
     //ANIME("http://www.animeplus.tv/anime-list"),
@@ -25,7 +29,8 @@ enum class Source(val link: String, val recent: Boolean = false, var movie: Bool
     RECENT_ANIME("https://www.gogoanime1.com/home/latest-episodes", true),
     RECENT_CARTOON("http://www.animetoon.org/updates", true),
     LIVE_ACTION("https://www.putlocker.fyi/a-z-shows/"),
-    RECENT_LIVE_ACTION("https://www1.putlocker.fyi/recent-episodes/", true);
+    RECENT_LIVE_ACTION("https://www1.putlocker.fyi/recent-episodes/", true),
+    LIVE_ACTION_MOVIES("https://www1.putlocker.fyi/a-z-movies/", movie = true);
 
     companion object SourceUrl {
         fun getSourceFromUrl(url: String): Source = when (url) {
@@ -38,6 +43,7 @@ enum class Source(val link: String, val recent: Boolean = false, var movie: Bool
             RECENT_CARTOON.link -> RECENT_CARTOON
             LIVE_ACTION.link -> LIVE_ACTION
             RECENT_LIVE_ACTION.link -> RECENT_LIVE_ACTION
+            LIVE_ACTION_MOVIES.link -> LIVE_ACTION_MOVIES
             else -> ANIME
         }
     }
@@ -59,7 +65,7 @@ internal enum class ShowSource {
 /**
  * Info about the show, name and url
  */
-open class ShowInfo(val name: String, val url: String) {
+open class ShowInfo(val name: String, val url: String, internal val isMovie: Boolean = false) {
     override fun toString(): String = "$name: $url"
 }
 
@@ -83,7 +89,7 @@ class ShowApi(private val source: Source) {
 
     private fun getList(): List<ShowInfo> = when (ShowSource.getSourceType(source.link)) {
         ShowSource.GOGOANIME -> if (source == Source.ANIME_MOVIES || source.movie) gogoAnimeMovies() else gogoAnimeAll()
-        ShowSource.PUTLOCKER -> doc.select("a.az_ls_ent").map(this::toShowInfo)
+        ShowSource.PUTLOCKER -> if (source == Source.LIVE_ACTION_MOVIES || source.movie) putlockerMovies() else putlockerShows()
         ShowSource.ANIMETOON -> doc.allElements.select("td").select("a[href^=http]").map(this::toShowInfo)
         ShowSource.NONE -> emptyList()
     }.sortedBy(ShowInfo::name)
@@ -107,7 +113,45 @@ class ShowApi(private val source: Source) {
 
     private fun gogoAnimeMovies(): List<ShowInfo> = gogoAnimeAll().filter { it.name.contains("movie", ignoreCase = true) }
     private fun gogoAnimeAll(): List<ShowInfo> = doc.allElements.select("ul.arrow-list").select("li")
-            .map { ShowInfo(it.text(), it.select("a[href^=http]").attr("abs:href")) }
+            .map { ShowInfo(it.text(), it.select("a[href^=http]").attr("abs:href"), source.movie) }
+
+    private fun putlockerShows() = doc.select("a.az_ls_ent").map(this::toShowInfo)
+    private fun putlockerMovies(): List<ShowInfo> {
+        fun getMovieFromPage(document: Document) = document.allElements.select("div.col-6").map {
+            ShowInfo(it.select("span.mov_title").text(), it.select("a.thumbnail").attr("abs:href"), true)
+        }
+        return doc.allElements.select("ul.pagination-az").select("a.page-link").pmap { p ->
+            println(p.attr("abs:href"))
+            val page = Jsoup.connect(p.attr("abs:href")).get()
+            val listPage = page.allElements.select("li.page-item")
+            val lastPage = listPage[listPage.size - 2].text().toInt()
+            (1..lastPage).pmap {
+                if (it == 1) getMovieFromPage(page) else getMovieFromPage(
+                        Jsoup.connect(
+                                "${Source.LIVE_ACTION_MOVIES.link}page/$it/${p.attr("abs:href").split("/").last()}"
+                        ).get()
+                )
+            }.flatten()
+        }.flatten()
+    }
+
+    private fun <T, R> Iterable<T>.pmap(
+            numThreads: Int = Runtime.getRuntime().availableProcessors() - 2,
+            exec: ExecutorService = Executors.newFixedThreadPool(numThreads),
+            transform: (T) -> R): List<R> {
+        // default size is just an inlined version of kotlin.collections.collectionSizeOrDefault
+        val defaultSize = if (this is Collection<*>) this.size else 10
+        val destination = Collections.synchronizedList(java.util.ArrayList<R>(defaultSize))
+
+        for (item in this) {
+            exec.submit { destination.add(transform(item)) }
+        }
+
+        exec.shutdown()
+        exec.awaitTermination(1, TimeUnit.DAYS)
+
+        return java.util.ArrayList<R>(destination)
+    }
 }
 
 /**
@@ -140,6 +184,16 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
         ShowSource.ANIMETOON -> doc.select("div.left_col").select("img[src^=http]#series_image")
         ShowSource.NONE -> null
     }?.attr("abs:src") ?: ""
+
+    /**
+     * the genres of the show
+     */
+    val genres: List<String> = when(ShowSource.getSourceType(source.url)) {
+        ShowSource.PUTLOCKER -> doc.select(".mov-desc").select("p:contains(Genre)").select("a[href^=http]").eachText()
+        ShowSource.GOGOANIME -> doc.select("div.animeDetail-item:contains(Genres)").select("a[href^=http]").eachText()
+        ShowSource.ANIMETOON -> doc.select("span.red_box").select("a[href^=http]").eachText()
+        ShowSource.NONE -> emptyList()
+    }
 
     /**
      * the description
@@ -186,8 +240,17 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
      */
     val episodeList: List<EpisodeInfo>
         get() = when (ShowSource.getSourceType(source.url)) {
-            ShowSource.PUTLOCKER -> doc.select("div.col-lg-12").select("div.row").select("a.btn-episode")
-                    .map { EpisodeInfo(it.attr("title"), "https://www.putlocker.fyi/embed-src/${it.attr("data-pid")}") }
+            ShowSource.PUTLOCKER -> {
+                if (source.isMovie) {
+                    val info = "var post = \\{\"id\":\"(.*?)\"\\};".toRegex().toPattern().matcher(doc.html())
+                    if (info.find()) {
+                        listOf(EpisodeInfo(name, "https://www.putlocker.fyi/embed-src/${info.group(1)}"))
+                    } else emptyList()
+                } else {
+                    doc.select("div.col-lg-12").select("div.row").select("a.btn-episode")
+                            .map { EpisodeInfo(it.attr("title"), "https://www.putlocker.fyi/embed-src/${it.attr("data-pid")}") }
+                }
+            }
             ShowSource.GOGOANIME -> doc.select("ul.check-list").select("li")
                     .map {
                         val urlInfo = it.select("a[href^=http]")

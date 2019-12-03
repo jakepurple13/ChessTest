@@ -19,7 +19,6 @@ import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Environment;
 
-import com.crashlytics.android.Crashlytics;
 import com.crestron.aurora.firebaseserver.FirebaseDB;
 import com.crestron.aurora.otherfun.DownloadViewerActivity;
 import com.crestron.aurora.otherfun.FetchingUtils;
@@ -53,7 +52,6 @@ import java.util.Objects;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.palette.graphics.Palette;
-import io.fabric.sdk.android.Fabric;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -68,7 +66,7 @@ public class FunApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
+        //Fabric.with(this, new Crashlytics());
         Stetho.initializeWithDefaults(this);
         FirebaseApp.initializeApp(this);
         JobManager.create(this).addJobCreator(new JobCreation());

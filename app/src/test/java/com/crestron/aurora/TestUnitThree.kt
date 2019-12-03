@@ -1,17 +1,116 @@
 package com.crestron.aurora
 
+import com.crestron.aurora.showapi.EpisodeApi
+import com.crestron.aurora.showapi.ShowApi
+import com.crestron.aurora.showapi.ShowInfo
+import com.crestron.aurora.showapi.Source
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
 import kotlinx.coroutines.runBlocking
 import org.apache.tools.ant.util.DateUtils
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 
 @Suppress("SameParameterValue")
 class TestUnitThree {
+
+    @Before
+    fun beforeSetup() {
+        println("Starting at ${SimpleDateFormat("h:mm:ss a", Locale.getDefault()).format(System.currentTimeMillis())}")
+    }
+
+    @After
+    fun afterSetup() {
+        println("Ending at ${SimpleDateFormat("h:mm:ss a", Locale.getDefault()).format(System.currentTimeMillis())}")
+    }
+
+    @Test
+    fun putMov() {
+        val f = ShowApi(Source.LIVE_ACTION_MOVIES).showInfoList
+        val e = EpisodeApi(f.random())
+        prettyLog(e.episodeList)
+        prettyLog(e.episodeList.firstOrNull()?.getVideoInfo())
+    }
+
+    @Test
+    fun showAptest() = runBlocking {
+        //TODO: Look into multithreading
+        val doc: Document = Jsoup.connect("https://www1.putlocker.fyi/a-z-movies").get()
+        val alphabet = doc.allElements.select("ul.pagination-az").select("a.page-link")
+        val f = alphabet.pmap { p ->
+            println(p.attr("abs:href"))
+            val page = Jsoup.connect(p.attr("abs:href")).get()
+            val listPage = page.allElements.select("li.page-item")
+            val lastPage = listPage[listPage.size - 2].text().toInt()
+            fun getMovieFromPage(document: Document) = document.allElements.select("div.col-6").map {
+                ShowInfo(it.select("span.mov_title").text(), it.select("a.thumbnail").attr("abs:href"))
+            }
+            (1..lastPage).pmap {
+                if (it == 1)
+                    getMovieFromPage(page)
+                else
+                    getMovieFromPage(Jsoup.connect("https://www1.putlocker.fyi/a-z-movies/page/$it/${p.attr("abs:href").split("/").last()}").get())
+            }.flatten()
+        }.flatten()
+        f.showInfo()
+    }
+
+    @Test
+    fun showApTest2() = runBlocking {
+        val doc: Document = Jsoup.connect("https://www1.putlocker.fyi/a-z-movies").get()
+        val list = arrayListOf<ShowInfo>()
+        val alphabet = doc.allElements.select("ul.pagination-az").select("a.page-link")
+        for (p in alphabet) {
+            println(p.attr("abs:href") + " and list size is ${list.size}")
+            val page = Jsoup.connect(p.attr("abs:href")).get()
+            val listPage = page.allElements.select("li.page-item")
+            val lastPage = listPage[listPage.size - 2].text().toInt()
+            fun getMovieFromPage(document: Document) = list.addAll(document.allElements.select("div.col-6").map {
+                ShowInfo(
+                        it.select("span.mov_title").text(),
+                        it.select("a.thumbnail").attr("abs:href"))
+            })
+            getMovieFromPage(page)
+            for (i in 2..lastPage) {
+                getMovieFromPage(
+                        Jsoup.connect("https://www1.putlocker.fyi/a-z-movies/page/$i/${p.attr("abs:href").split("/").last()}").get()
+                )
+            }
+        }
+        list.showInfo()
+    }
+
+    private fun List<ShowInfo>.showInfo() {
+        println("$size")
+    }
+
+    fun <T, R> Iterable<T>.pmap(
+            numThreads: Int = Runtime.getRuntime().availableProcessors() - 2,
+            exec: ExecutorService = Executors.newFixedThreadPool(numThreads),
+            transform: (T) -> R): List<R> {
+        // default size is just an inlined version of kotlin.collections.collectionSizeOrDefault
+        val defaultSize = if (this is Collection<*>) this.size else 10
+        val destination = Collections.synchronizedList(ArrayList<R>(defaultSize))
+
+        for (item in this) {
+            exec.submit { destination.add(transform(item)) }
+        }
+
+        exec.shutdown()
+        exec.awaitTermination(1, TimeUnit.DAYS)
+
+        return ArrayList<R>(destination)
+    }
+
 
     open class Person(open var name: String? = null,
                       open var age: Int? = null,
