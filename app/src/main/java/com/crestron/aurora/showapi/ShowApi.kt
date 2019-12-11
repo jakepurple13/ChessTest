@@ -49,7 +49,7 @@ enum class Source(val link: String, val recent: Boolean = false, var movie: Bool
     }
 }
 
-internal enum class ShowSource {
+enum class ShowSource {
     GOGOANIME, ANIMETOON, PUTLOCKER, NONE;
 
     companion object {
@@ -77,13 +77,21 @@ class ShowApi(private val source: Source) {
         fun getAll() = getSources(Source.ANIME, Source.CARTOON, Source.CARTOON_MOVIES, Source.DUBBED, Source.LIVE_ACTION)
         fun getAllRecent(): List<ShowInfo> = getSources(Source.RECENT_ANIME, Source.RECENT_CARTOON, Source.RECENT_LIVE_ACTION)
         fun getSources(vararg source: Source): List<ShowInfo> = source.map { ShowApi(it).showInfoList }.flatten()
+        var LOGGING_ENABLED = false
     }
+
+    private var progressListener: (Double) -> Unit = {}
 
     private val doc: Document = Jsoup.connect(source.link).get()
     /**
      * returns a list of the show's from the wanted source
      */
     val showInfoList: List<ShowInfo> = if (source.recent) getRecentList() else getList()
+
+    fun getShowList(progress: (Double) -> Unit): List<ShowInfo> {
+        progressListener = progress
+        return if (source.recent) getRecentList() else getList()
+    }
 
     private fun toShowInfo(element: Element) = ShowInfo(element.text(), element.attr("abs:href"))
 
@@ -121,15 +129,14 @@ class ShowApi(private val source: Source) {
             ShowInfo(it.select("span.mov_title").text(), it.select("a.thumbnail").attr("abs:href"), true)
         }
         return doc.allElements.select("ul.pagination-az").select("a.page-link").pmap { p ->
-            println(p.attr("abs:href"))
+            if (LOGGING_ENABLED) println(p.attr("abs:href"))
             val page = Jsoup.connect(p.attr("abs:href")).get()
             val listPage = page.allElements.select("li.page-item")
             val lastPage = listPage[listPage.size - 2].text().toInt()
             (1..lastPage).pmap {
+                progressListener((it.toDouble() / lastPage.toDouble()))
                 if (it == 1) getMovieFromPage(page) else getMovieFromPage(
-                        Jsoup.connect(
-                                "${Source.LIVE_ACTION_MOVIES.link}page/$it/${p.attr("abs:href").split("/").last()}"
-                        ).get()
+                        Jsoup.connect("${Source.LIVE_ACTION_MOVIES.link}page/$it/${p.attr("abs:href").split("/").last()}").get()
                 )
             }.flatten()
         }.flatten()
@@ -141,7 +148,7 @@ class ShowApi(private val source: Source) {
             transform: (T) -> R): List<R> {
         // default size is just an inlined version of kotlin.collections.collectionSizeOrDefault
         val defaultSize = if (this is Collection<*>) this.size else 10
-        val destination = Collections.synchronizedList(java.util.ArrayList<R>(defaultSize))
+        val destination = Collections.synchronizedList(ArrayList<R>(defaultSize))
 
         for (item in this) {
             exec.submit { destination.add(transform(item)) }
@@ -150,7 +157,7 @@ class ShowApi(private val source: Source) {
         exec.shutdown()
         exec.awaitTermination(1, TimeUnit.DAYS)
 
-        return java.util.ArrayList<R>(destination)
+        return ArrayList<R>(destination)
     }
 }
 
@@ -188,12 +195,12 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
     /**
      * the genres of the show
      */
-    val genres: List<String> = when(ShowSource.getSourceType(source.url)) {
-        ShowSource.PUTLOCKER -> doc.select(".mov-desc").select("p:contains(Genre)").select("a[href^=http]").eachText()
-        ShowSource.GOGOANIME -> doc.select("div.animeDetail-item:contains(Genres)").select("a[href^=http]").eachText()
-        ShowSource.ANIMETOON -> doc.select("span.red_box").select("a[href^=http]").eachText()
-        ShowSource.NONE -> emptyList()
-    }
+    val genres: List<String> = when (ShowSource.getSourceType(source.url)) {
+        ShowSource.PUTLOCKER -> doc.select(".mov-desc").select("p:contains(Genre)")
+        ShowSource.GOGOANIME -> doc.select("div.animeDetail-item:contains(Genres)")
+        ShowSource.ANIMETOON -> doc.select("span.red_box")
+        ShowSource.NONE -> null
+    }?.select("a[href^=http]")?.eachText() ?: emptyList()
 
     /**
      * the description
@@ -427,7 +434,7 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
                 return getFinalURL(URL(location))
             }
         } catch (e: Exception) {
-            println(e.message)
+            if (ShowApi.LOGGING_ENABLED) println(e.message)
         }
         return url
     }
