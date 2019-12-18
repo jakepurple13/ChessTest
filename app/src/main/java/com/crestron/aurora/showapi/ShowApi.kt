@@ -149,14 +149,9 @@ class ShowApi(private val source: Source) {
         // default size is just an inlined version of kotlin.collections.collectionSizeOrDefault
         val defaultSize = if (this is Collection<*>) this.size else 10
         val destination = Collections.synchronizedList(ArrayList<R>(defaultSize))
-
-        for (item in this) {
-            exec.submit { destination.add(transform(item)) }
-        }
-
+        forEach { item -> exec.submit { destination.add(transform(item)) } }
         exec.shutdown()
         exec.awaitTermination(1, TimeUnit.DAYS)
-
         return ArrayList<R>(destination)
     }
 }
@@ -255,7 +250,10 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
                     } else emptyList()
                 } else {
                     doc.select("div.col-lg-12").select("div.row").select("a.btn-episode")
-                            .map { EpisodeInfo(it.attr("title"), "https://www.putlocker.fyi/embed-src/${it.attr("data-pid")}") }
+                            .map {
+                                val encodingPID = Base64.getEncoder().encodeToString("6${it.attr("data-pid").reversed()}".toByteArray())
+                                EpisodeInfo(it.attr("title"), "https://www.putlocker.fyi/embed-src-v2/$encodingPID")
+                            }
                 }
             }
             ShowSource.GOGOANIME -> doc.select("ul.check-list").select("li")
@@ -279,19 +277,22 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
  */
 class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
 
+    private fun getGogoAnime() = Jsoup.connect(url).get().select("a[download^=http]").attr("abs:download")
+    private fun getPutLocker(): String {
+        val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(getHtml(url))
+        return if (d.find()) {
+            val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(getHtml(d.group(1)!!))
+            if (a.find()) "https://verystream.com/gettoken/${a.group(1)!!}?mime=true" else ""
+        } else ""
+    }
+
     /**
      * returns a url link to the episodes video
      * # Use for anything but movies
      */
     fun getVideoLink(): String = when (ShowSource.getSourceType(url)) {
-        ShowSource.PUTLOCKER -> {
-            val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(getHtml(url))
-            if (d.find()) {
-                val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(getHtml(d.group(1)!!))
-                if (a.find()) "https://verystream.com/gettoken/${a.group(1)!!}?mime=true" else ""
-            } else ""
-        }
-        ShowSource.GOGOANIME -> Jsoup.connect(url).get().select("a[download^=http]").attr("abs:download")
+        ShowSource.PUTLOCKER -> getPutLocker()
+        ShowSource.GOGOANIME -> getGogoAnime()
         ShowSource.ANIMETOON -> {
             val matcher = "<iframe src=\"([^\"]+)\"[^<]+<\\/iframe>".toRegex().toPattern().matcher(getHtml(url))
             var list = ""
@@ -308,15 +309,8 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
      */
     fun getVideoLinks(): List<String> {
         when (ShowSource.getSourceType(url)) {
-            ShowSource.PUTLOCKER -> {
-                val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(getHtml(url))
-                if (d.find()) {
-                    val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(getHtml(d.group(1)!!))
-                    if (a.find()) return arrayListOf(getFinalURL(URL("https://verystream.com/gettoken/${a.group(1)!!}?mime=true"))!!.toExternalForm())
-                }
-                return arrayListOf("N/A")
-            }
-            ShowSource.GOGOANIME -> return arrayListOf(Jsoup.connect(url).get().select("a[download^=http]").attr("abs:download"))
+            ShowSource.PUTLOCKER -> return arrayListOf(getPutLocker())
+            ShowSource.GOGOANIME -> return arrayListOf(getGogoAnime())
             ShowSource.ANIMETOON -> {
                 val m = "<iframe src=\"([^\"]+)\"[^<]+<\\/iframe>".toRegex().toPattern().matcher(getHtml(url))
                 val list = arrayListOf<String>()
@@ -349,19 +343,9 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
      */
     fun getVideoInfo(): List<Storage> {
         when (ShowSource.getSourceType(url)) {
-            ShowSource.PUTLOCKER -> {
-                val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(getHtml(url))
-                if (d.find()) {
-                    val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(getHtml(d.group(1)!!))
-                    if (a.find()) return arrayListOf(Storage(
-                            link = "https://verystream.com/gettoken/${a.group(1)!!}?mime=true",
-                            filename = name, quality = "720", source = "PutLocker", sub = "No"))
-                }
-                return arrayListOf()
-            }
+            ShowSource.PUTLOCKER -> return arrayListOf(Storage(link = getPutLocker(), filename = name, quality = "720", source = "PutLocker", sub = "No"))
             ShowSource.GOGOANIME -> {
-                val doc = Jsoup.connect(url).get()
-                val storage = Storage(link = doc.select("a[download^=http]").attr("abs:download"), source = url, quality = "Good", sub = "Yes")
+                val storage = Storage(link = getGogoAnime(), source = url, quality = "Good", sub = "Yes")
                 val regex = "^[^\\[]+(.*mp4)".toRegex().toPattern().matcher(storage.link!!)
                 storage.filename = if (regex.find()) regex.group(1)!! else "${URI(url).path.split("/")[2]} $name.mp4"
                 return arrayListOf(storage)

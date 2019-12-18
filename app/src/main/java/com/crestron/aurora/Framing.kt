@@ -151,7 +151,7 @@ enum class FrameType(val frame: Frame) {
     }
 }
 
-fun String.frame(frameType: FrameType, rtl: Boolean = false) = listOf(this).frame(
+fun String.frame(frameType: FrameType, rtl: Boolean = false) = split("\n").frame(
         top = frameType.frame.top, bottom = frameType.frame.bottom,
         left = frameType.frame.left, right = frameType.frame.right,
         topLeft = frameType.frame.topLeft, topRight = frameType.frame.topRight,

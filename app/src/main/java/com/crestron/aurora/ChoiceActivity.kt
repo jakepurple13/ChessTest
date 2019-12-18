@@ -752,9 +752,7 @@ class ChoiceActivity : AppCompatActivity() {
                 holder.actionTwo.setOnClickListener { actionTwo?.invoke() }
                 holder.itemView.setOnClickListener { this.onPress() }
                 holder.image.setBackgroundResource(0)
-                bgImage?.let {
-                    holder.image.setBackgroundResource(it)
-                }
+                bgImage?.let { holder.image.setBackgroundResource(it) }
                 holder.actionLayout.orientation = actionOrientation
             }
         }

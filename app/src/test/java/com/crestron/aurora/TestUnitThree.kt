@@ -13,6 +13,10 @@ import org.jsoup.nodes.Document
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
@@ -38,9 +42,75 @@ class TestUnitThree {
     @Test
     fun putlo() {
         val f = ShowApi(Source.LIVE_ACTION).showInfoList
+        val e = f.find { it.name.contains("HarmonQuest", true) }?.let { EpisodeApi(it) }!!
+        val first = e.episodeList.firstOrNull()
+        Loged.f(first)
+        Loged.f(first?.getVideoLink())
+        println(Jsoup.connect(first?.url).get())
+        println("-".repeat(50))
+        println(getHtml(first?.url!!))
+        println("-".repeat(50))
+        Loged.f(Jsoup.connect("https://mixdrop.co/e/ruuicksyx").get())
+        //val next = "https://cadsoks.com/ng7y2swh3?key=17d7f7655624c90e52f1293128c0fd22&psid=MP1P2_1043"
+        //println(Jsoup.connect(next).get())
+        //Loged.f(first?.getVideoLinks().toString())
+        //Loged.f(first?.getVideoInfo().toString())
+        //println(Jsoup.connect("https://www5.putlocker.fyi/show/harmonquest/season-3/episode-8/").get())
+        /*Loged.f(e.episodeList)
+        Loged.f(e.episodeList.firstOrNull()?.getVideoInfo().toString())
+        val firstUrl = e.episodeList.first().url
+        println(firstUrl)
+        println(Jsoup.connect(firstUrl).get())
+        println(getHtml(firstUrl))*/
+        /*val anime = ShowApi.getSources(Source.ANIME)
+        val cartoon = ShowApi.getSources(Source.CARTOON, Source.CARTOON_MOVIES, Source.DUBBED)
+        val liveAction = ShowApi.getSources(Source.LIVE_ACTION)
+
+        Loged.f(EpisodeApi(anime.random()))
+        Loged.f(EpisodeApi(cartoon.random()))
+        Loged.f(EpisodeApi(liveAction.random()))*/
+
+        /*val f = ShowApi(Source.LIVE_ACTION_MOVIES).showInfoList
         val e = EpisodeApi(f.random())
-        prettyLog(e.episodeList)
-        prettyLog(e.episodeList.firstOrNull()?.getVideoInfo())
+        Loged.f(e)*/
+
+    }
+
+    private fun Loged.f(
+            msg: EpisodeApi, tag: String = msg.name, infoText: String = TAG,
+            showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME
+    ) = f(listOf(
+            "Name: ${msg.name}",
+            "Url: ${msg.source.url}",
+            "Image: ${msg.image}",
+            "Genres: ${msg.genres.joinToString(", ") { it }}",
+            "Description: ${msg.description.replace("\n", " ")}",
+            "Episodes:",
+            *msg.episodeList.map { "      $it" }.toTypedArray()
+    ), tag, infoText, showPretty, threadName)
+
+    @Throws(IOException::class)
+    private fun getHtml(url: String): String {
+        // Build and set timeout values for the request.
+        val connection = URL(url).openConnection()
+        connection.connectTimeout = 5000
+        connection.readTimeout = 5000
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0")
+        connection.addRequestProperty("Accept-Language", "en-US,en;q=0.5")
+        connection.addRequestProperty("Referer", "http://thewebsite.com")
+        connection.connect()
+        // Read and store the result line by line then return the entire string.
+        val in1 = connection.getInputStream()
+        val reader = BufferedReader(InputStreamReader(in1))
+        val html = StringBuilder()
+        var line: String? = ""
+        while (line != null) {
+            line = reader.readLine()
+            html.append(line)
+        }
+        in1.close()
+
+        return html.toString()
     }
 
     @Test

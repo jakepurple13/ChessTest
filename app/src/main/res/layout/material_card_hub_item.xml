@@ -2,6 +2,7 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="@layout/activity_choice"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
@@ -52,16 +53,17 @@
                 android:id="@+id/material_Image"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:layout_marginStart="8dp"
                 android:layout_marginEnd="5dp"
                 android:background="@android:color/transparent"
                 app:srcCompat="@drawable/star_on"
-                tools:contentDescription="image" />
+                android:contentDescription="image"
+                tools:ignore="HardcodedText" />
+
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/action_layout"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="8dp"
@@ -70,18 +72,16 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/action_one"
                 style="?attr/materialButtonOutlinedStyle"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 app:strokeColor="@color/colorAccent"
                 tools:text="Action 1" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/action_two"
                 style="?attr/materialButtonOutlinedStyle"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 app:strokeColor="@color/colorAccent"
                 tools:text="Action 2" />
 

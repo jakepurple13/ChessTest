@@ -74,7 +74,7 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.1.0'
     implementation 'androidx.collection:collection-ktx:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.google.firebase:firebase-auth:19.1.0'
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
     implementation 'com.google.firebase:firebase-database:19.2.0'
@@ -85,7 +85,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:20.0.0'
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
     testImplementation 'junit:junit:4.12'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.2'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation project(':deckofcards')
@@ -110,9 +110,9 @@ dependencies {
     implementation "androidx.tonyodev.fetch2fileserver:xfetch2fileserver:3.1.4"
     implementation 'org.jsoup:jsoup:1.12.1'
     // Room components
-    implementation 'androidx.room:room-runtime:2.2.0'
-    annotationProcessor 'androidx.room:room-compiler:2.2.0'
-    androidTestImplementation 'androidx.room:room-testing:2.2.0'
+    implementation 'androidx.room:room-runtime:2.2.2'
+    annotationProcessor 'androidx.room:room-compiler:2.2.2'
+    androidTestImplementation 'androidx.room:room-testing:2.2.2'
     // Lifecycle components
     implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
     annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.1.0'
@@ -159,7 +159,7 @@ dependencies {
     implementation 'jp.wasabeef:picasso-transformations:2.2.1'
     implementation 'androidx.navigation:navigation-fragment:2.2.0-beta01'
     implementation 'androidx.palette:palette:1.0.0'
-    implementation "com.programmersbox.loged:loged:0.3.6"
+    //implementation "com.programmersbox.loged:loged:0.3.6"
     implementation 'com.github.jakepurple13.DragSwipeApp:dragswipe:v2.01'
     implementation 'com.github.jakepurple13.DragSwipeApp:dragswipeex:v2.01'
     implementation 'jp.wasabeef:recyclerview-animators:3.0.0'

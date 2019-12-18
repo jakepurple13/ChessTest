@@ -4,11 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.crestron.aurora.Loged
 import com.crestron.aurora.R
-import com.programmersbox.loged.DynamicAdapter
 import kotlinx.android.synthetic.main.activity_view_testing.*
-import kotlinx.android.synthetic.main.material_card_hub_item.view.*
-import kotlinx.android.synthetic.main.rss_layout_item.view.*
-import kotlinx.android.synthetic.main.text_layout.view.*
 
 class ViewTesting : AppCompatActivity() {
 
@@ -39,7 +35,7 @@ class ViewTesting : AppCompatActivity() {
                 Contact("Harry", "(492) 359-3953")
         )
 
-        with(vs_test) {
+        /*with(vs_test) {
             insertItemToEnd("Contacts", R.layout.text_layout) { title ->
                 itemView.link_list.text = title
             }
@@ -67,7 +63,7 @@ class ViewTesting : AppCompatActivity() {
                 description.text = it.name
                 item_feed.text = it.phone
             }
-        }
+        }*/
 
     }
 
