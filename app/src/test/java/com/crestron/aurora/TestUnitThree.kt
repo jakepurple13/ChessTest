@@ -35,58 +35,6 @@ class TestUnitThree {
         println("Ending at ${SimpleDateFormat("h:mm:ss a", Locale.getDefault()).format(System.currentTimeMillis())}")
     }
 
-    sealed class AndroidInfo(val title: String, val author: String, val description: String, val url: String) {
-        open fun isAnyEmpty() = title.isNotBlank() && description.isNotBlank() && author.isNotBlank()
-        private val type by lazy { this::javaClass.get().simpleName }
-        override fun toString() = "$type - $url | $title by $author: $description"
-
-        class AndroidArsenal(title: String, author: String, description: String, url: String, val dateRegistered: String) : AndroidInfo(title, author, description, url) {
-            override fun isAnyEmpty() = super.isAnyEmpty() && dateRegistered.isNotBlank()
-            override fun toString() = "${super.toString()} - created on $dateRegistered"
-        }
-
-        class GitHubTopic(title: String, author: String, description: String, url: String) : AndroidInfo(title, author, description, url)
-
-        companion object {
-            private fun tryCatch(block: () -> String) = try {
-                block()
-            } catch (e: Exception) {
-                ""
-            }
-
-            fun getAll(githubTopic: String = "android-library") = getAndroidArsenal() + getGithub(githubTopic)
-
-            fun getAndroidArsenal(): List<AndroidArsenal> = Jsoup
-                    .connect("https://android-arsenal.com/?sort=updated&category=1").get()
-                    .select("div.pi").map {
-                        val url = it.select("div.title a").attr("abs:href")
-                        val title = tryCatch { it.select("div.title").select("a").first().text() }
-                        val desc = it.select("div.desc").text()
-                        val ftr = it.select("div.ftr")
-                        val dateRegistered = tryCatch { ftr.first().text() }
-                        val author = tryCatch { ftr.last().text() }
-                        AndroidArsenal(title, author, desc, url, dateRegistered)
-                    }.filter(AndroidArsenal::isAnyEmpty)
-
-            fun getGithub(topic: String = "android-library"): List<GitHubTopic> = Jsoup
-                    .connect("https://github.com/topics/${topic.replace(" ", "-")}?o=desc&s=updated").get()
-                    .select("article").map {
-                        val url = tryCatch { it.select("h1.f3 a").last().attr("abs:href") }
-                        val title = it.select("h1.f3").text().split("/")
-                        val author = tryCatch { title[0].trim() }
-                        val repoTitle = tryCatch { title[1].trim() }
-                        val desc = it.select("div.border-bottom div.px-3 p.mb-0").text().trim()
-                        GitHubTopic(repoTitle, author, desc, url)
-                    }.filter(GitHubTopic::isAnyEmpty)
-        }
-    }
-
-    @Test
-    fun bothTest() {
-        val f = AndroidInfo.getAll()
-        Loged.f(f)
-    }
-
     @Test
     fun putlo() {
         val f = ShowApi(Source.LIVE_ACTION).showInfoList

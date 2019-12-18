@@ -159,16 +159,15 @@ fun String.frame(frameType: FrameType, rtl: Boolean = false) = listOf(this).fram
         topFillIn = frameType.frame.topFillIn, bottomFillIn = frameType.frame.bottomFillIn, rtl = rtl
 )
 
-fun <T> Collection<T>.frame(frameType: FrameType, rtl: Boolean = false, transform: (T) -> String = { it.toString() }) =
-        frame(
-                top = frameType.frame.top, bottom = frameType.frame.bottom,
-                left = frameType.frame.left, right = frameType.frame.right,
-                topLeft = frameType.frame.topLeft, topRight = frameType.frame.topRight,
-                bottomLeft = frameType.frame.bottomLeft, bottomRight = frameType.frame.bottomRight,
-                topFillIn = frameType.frame.topFillIn, bottomFillIn = frameType.frame.bottomFillIn, rtl = rtl, transform = transform
-        )
+fun <T> Iterable<T>.frame(frameType: FrameType, rtl: Boolean = false, transform: (T) -> String = { it.toString() }) = frame(
+        top = frameType.frame.top, bottom = frameType.frame.bottom,
+        left = frameType.frame.left, right = frameType.frame.right,
+        topLeft = frameType.frame.topLeft, topRight = frameType.frame.topRight,
+        bottomLeft = frameType.frame.bottomLeft, bottomRight = frameType.frame.bottomRight,
+        topFillIn = frameType.frame.topFillIn, bottomFillIn = frameType.frame.bottomFillIn, rtl = rtl, transform = transform
+)
 
-fun <T> Collection<T>.frame(
+fun <T> Iterable<T>.frame(
         top: String, bottom: String,
         left: String, right: String,
         topLeft: String, topRight: String,
@@ -187,32 +186,38 @@ fun <T> Collection<T>.frame(
     return "$topLeft${topBottomText(top, true)}$topRight\n$mid\n$bottomLeft${topBottomText(bottom, false)}$bottomRight"
 }
 
+internal fun frameLog(tag: String): FrameType.() -> Unit = {
+    frame.top = tag
+    frame.bottomLeft = "╠"
+}
+
 /**
  * [Loged.r] but adds a frame around the [msg] using the [String.frame] method
  */
 fun Loged.f(
-        msg: Any? = null,
-        tag: String = TAG,
-        infoText: String = "-----",
-        showPretty: Boolean = SHOW_PRETTY,
-        threadName: Boolean = WITH_THREAD_NAME,
+        msg: Any? = null, tag: String = TAG,
+        infoText: String = TAG,
+        showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME,
         @IntRange(from = 2, to = 7) vararg choices: Int = intArrayOf(2, 3, 4, 5, 6, 7)
-) = r("$infoText\n${msg.toString().frame(FrameType.BOX.apply {
-    frame.top = tag
-    frame.bottomLeft = "╠"
-})}", tag, showPretty, threadName, *choices)
+) = r("${if (UNIT_TESTING) "" else "$infoText\n"}${msg.toString().frame(FrameType.BOX.apply(frameLog(tag)))}", tag, showPretty, threadName, *choices)
 
 /**
  * [Loged.r] but adds a frame around the [msg] using the [Collection.frame] method
  */
 fun Loged.f(
-        msg: Collection<*>,
-        tag: String = TAG,
-        infoText: String = "-----",
-        showPretty: Boolean = SHOW_PRETTY,
-        threadName: Boolean = WITH_THREAD_NAME,
+        msg: Iterable<*>, tag: String = TAG,
+        infoText: String = TAG,
+        showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME,
         @IntRange(from = 2, to = 7) vararg choices: Int = intArrayOf(2, 3, 4, 5, 6, 7)
-) = r("$infoText\n${msg.frame(FrameType.BOX.apply {
-    frame.top = tag
-    frame.bottomLeft = "╠"
-})}", tag, showPretty, threadName, *choices)
+) = r("${if (UNIT_TESTING) "" else "$infoText\n"}${msg.frame(FrameType.BOX.apply(frameLog(tag)))}", tag, showPretty, threadName, *choices)
+
+/**
+ * [Loged.r] but adds a frame around the [msg] using the [Iterable.frame] method
+ */
+fun <T> Loged.f(
+        msg: Iterable<T>, tag: String = TAG,
+        infoText: String = TAG,
+        showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME,
+        @IntRange(from = 2, to = 7) vararg choices: Int = intArrayOf(2, 3, 4, 5, 6, 7),
+        transform: (T) -> String = { it.toString() }
+) = r("$infoText\n${msg.frame(FrameType.BOX.apply(frameLog(tag)), transform = transform)}", tag, showPretty, threadName, *choices)

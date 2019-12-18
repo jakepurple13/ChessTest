@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.crashlytics.android.Crashlytics
 import com.crestron.aurora.ChoiceActivity
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
@@ -181,7 +180,7 @@ class NotificationBubbleActivity : AppCompatActivity() {
 
                         override fun onError(download: Download, error: Error, throwable: Throwable?) {
                             super.onError(download, error, throwable)
-                            Crashlytics.log("${error.throwable?.message}")
+                            //Crashlytics.log("${error.throwable?.message}")
                             if (context.defaultSharedPreferences.getBoolean(ConstantValues.AUTO_RETRY, false))
                                 FetchingUtils.retry(download)
                             if (DownloadsWidget.isWidgetActive(context))

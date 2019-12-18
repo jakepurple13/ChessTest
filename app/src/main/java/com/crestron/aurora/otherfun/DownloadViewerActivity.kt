@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.abdeveloper.library.MultiSelectDialog
 import com.abdeveloper.library.MultiSelectModel
-import com.crashlytics.android.Crashlytics
 import com.crestron.aurora.ChoiceActivity
 import com.crestron.aurora.ConstantValues
 import com.crestron.aurora.Loged
@@ -187,7 +186,7 @@ class DownloadViewerActivity : AppCompatActivity(), ActionListener {
 
         override fun onError(download: Download, error: Error, throwable: Throwable?) {
             super.onError(download, error, throwable)
-            Crashlytics.log("${error.throwable?.message}")
+            //Crashlytics.log("${error.throwable?.message}")
             fileAdapter!!.update(download, UNKNOWN_REMAINING_TIME, UNKNOWN_DOWNLOADED_BYTES_PER_SECOND)
             if (defaultSharedPreferences.getBoolean(ConstantValues.AUTO_RETRY, false))
                 FetchingUtils.retry(download)

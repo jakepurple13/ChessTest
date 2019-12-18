@@ -5,12 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import android.util.Log
 import android.view.Gravity
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import antonkozyriatskyi.devdrawer.DevDrawer
-import com.crashlytics.android.Crashlytics
 import com.crestron.aurora.boardgames.chess.MainActivity
 import com.crestron.aurora.boardgames.tictactoe.TTTActivity
 import com.crestron.aurora.boardgames.yahtzee.YahtzeeActivity
@@ -35,13 +33,12 @@ class ChooseActivity : AppCompatActivity() {
 
     private var colored = false
     private lateinit var konami: KonamiCode
-    private val PERSON_OF_INTEREST = arrayOf("Ilene Rein", "Tina Gross")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_choose)
 
-        Crashlytics.log(Log.ASSERT, Loged.TAG, "a;lkdsfj")
+        //Crashlytics.log(Log.ASSERT, Loged.TAG, "a;lkdsfj")
 
         //Color.rgb(20, 46, 18)
 
