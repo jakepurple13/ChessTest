@@ -67,16 +67,16 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         })
     }
 
-    private fun fetchIt(url: Collection<String>, ap: Boolean = false, networkType: NetworkType = NetworkType.ALL, keyAndValue: Array<out EpisodeActivity.KeyAndValue>) {
+    private fun fetchIt(ep: EpisodeInfo, ap: Boolean = false, networkType: NetworkType = NetworkType.ALL, keyAndValue: Array<out EpisodeActivity.KeyAndValue>) {
 
         fetch.setGlobalNetworkType(networkType)
 
-        fun getNameFromUrl(url: String): String? {
-            return Uri.parse(url).lastPathSegment
+        fun getNameFromUrl(url: String): String {
+            return Uri.parse(url).lastPathSegment?.let { if(it.isNotEmpty()) it else ep.name } ?: ep.name
         }
 
         val requestList = arrayListOf<Request>()
-
+        val url = ep.getVideoLinks()
         for (i in url) {
 
             val filePath = folderLocation + getNameFromUrl(i) + ".mp4"
@@ -105,9 +105,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
 
         //fetch.addListener(fetchAction)
 
-        fetch.enqueue(requestList, Func {
-
-        })
+        fetch.enqueue(requestList, Func {})
     }
 
     fun cancelAll() {
@@ -139,19 +137,11 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
     }
 
     fun getVideo(urlToUse: EpisodeInfo, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.launch {
-        fetchIt(urlToUse.getVideoLinks(), true, networkType, keyAndValue)
+        fetchIt(urlToUse, true, networkType, keyAndValue)
     }
 
     fun getVideo(urlToUse: Collection<EpisodeInfo>, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.launch {
-
-        val urlList = arrayListOf<String>()
-
-        for(i in urlToUse) {
-            urlList += i.getVideoLink()
-        }
-
-        fetchIt(urlList, true, networkType, keyAndValue)
-
+        urlToUse.forEach { fetchIt(it, true, networkType, keyAndValue) }
         Loged.d("DONE!")
 
     }

@@ -9,7 +9,6 @@ import org.jsoup.nodes.Element
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
-import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
 import java.util.*
@@ -278,12 +277,38 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
 class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
 
     private fun getGogoAnime() = Jsoup.connect(url).get().select("a[download^=http]").attr("abs:download")
-    private fun getPutLocker(): String {
-        val d = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().toPattern().matcher(getHtml(url))
-        return if (d.find()) {
-            val a = "<p[^>]+id=\"videolink\">([^>]*)<\\/p>".toRegex().toPattern().matcher(getHtml(d.group(1)!!))
-            if (a.find()) "https://verystream.com/gettoken/${a.group(1)!!}?mime=true" else ""
-        } else ""
+    private fun getPutLocker(): String = try {
+        val doc = Jsoup.connect(url.trim()).get()
+        val mix = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().find(doc.toString())!!.groups[1]!!.value
+        val doc2 = Jsoup.connect(mix.trim()).get()
+        val r = "\\}\\('(.+)',(\\d+),(\\d+),'([^']+)'\\.split\\('\\|'\\)".toRegex().find(doc2.toString())!!
+        fun encodeBaseN(num: Int, n: Int): String {
+            var num1 = num
+            val fullTable = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            val table = fullTable.substring(0..n)
+            if (num1 == 0) return table[0].toString()
+            var ret = ""
+            while (num1 > 0) {
+                ret = (table[num1 % n].toString() + ret)
+                num1 = Math.floorDiv(num, n)
+            }
+            return ret
+        }
+        val (obfucastedCode, baseTemp, countTemp, symbolsTemp) = r.destructured
+        val base = baseTemp.toInt()
+        var count = countTemp.toInt()
+        val symbols = symbolsTemp.split("|")
+        val symbolTable = mutableMapOf<String, String>()
+        while (count > 0) {
+            count--
+            val baseNCount = encodeBaseN(count, base)
+            symbolTable[baseNCount] = if (symbols[count].isNotEmpty()) symbols[count] else baseNCount
+        }
+        val unpacked = "\\b(\\w+)\\b".toRegex().replace(obfucastedCode) { symbolTable[it.groups[0]!!.value].toString() }
+        val search = "MDCore\\.v.*?=\"([^\"]+)".toRegex().find(unpacked)!!.groups[1]!!.value
+        "https:$search"
+    } catch (e: Exception) {
+        ""
     }
 
     /**
@@ -397,30 +422,6 @@ class EpisodeInfo(name: String, url: String) : ShowInfo(name, url) {
         in1.close()
 
         return html.toString()
-    }
-
-    private fun getFinalURL(url: URL): URL? {
-        try {
-            val con = url.openConnection() as HttpURLConnection
-            con.instanceFollowRedirects = false
-            con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0")
-            con.addRequestProperty("Accept-Language", "en-US,en;q=0.5")
-            con.addRequestProperty("Referer", "http://thewebsite.com")
-            con.connect()
-            val resCode = con.responseCode
-            if (resCode == HttpURLConnection.HTTP_SEE_OTHER
-                    || resCode == HttpURLConnection.HTTP_MOVED_PERM
-                    || resCode == HttpURLConnection.HTTP_MOVED_TEMP) {
-                var location = con.getHeaderField("Location")
-                if (location.startsWith("/")) {
-                    location = url.protocol + "://" + url.host + location
-                }
-                return getFinalURL(URL(location))
-            }
-        } catch (e: Exception) {
-            if (ShowApi.LOGGING_ENABLED) println(e.message)
-        }
-        return url
     }
 
     override fun toString(): String = "$name: $url"
