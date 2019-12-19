@@ -44,11 +44,22 @@ import com.tonyodev.fetch2core.Downloader;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.palette.graphics.Palette;
@@ -97,7 +108,8 @@ public class FunApplication extends Application {
                 .enableLogging(true)
                 .setProgressReportingInterval(1000L)
                 .setGlobalNetworkType(wifiOnly ? NetworkType.WIFI_ONLY : NetworkType.ALL)
-                .setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
+                //.setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
+                .setHttpDownloader(new HttpsUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
                 //.setHttpDownloader(new OkHttpDownloader(okHttpClient, Downloader.FileDownloaderType.PARALLEL))
                 .setDownloadConcurrentLimit(sharedPreferences.getInt("downloadNumber", 1))
                 .setNotificationManager(new CustomFetchNotificationManager(this))
@@ -289,7 +301,8 @@ public class FunApplication extends Application {
                 .enableRetryOnNetworkGain(true)
                 .setProgressReportingInterval(1000L)
                 .setGlobalNetworkType(wifiOnly ? NetworkType.WIFI_ONLY : NetworkType.ALL)
-                .setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
+                //.setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
+                .setHttpDownloader(new HttpsUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
                 .setDownloadConcurrentLimit(sharedPreferences.getInt("downloadNumber", 1))
                 .setNotificationManager(new DefaultFetchNotificationManager(context) {
 
@@ -341,4 +354,49 @@ public class FunApplication extends Application {
     public static Context getAppContext() {
         return FunApplication.context;
     }
+}
+
+class HttpsUrlConnectionDownloader extends HttpUrlConnectionDownloader {
+
+    HttpsUrlConnectionDownloader(@NotNull Downloader.FileDownloaderType fileDownloaderType) {
+        super(fileDownloaderType);
+    }
+
+    @Override
+    public Void onPreClientExecute(@NotNull HttpURLConnection client, @NotNull ServerRequest request) {
+        super.onPreClientExecute(client, request);
+        if (request.getUrl().startsWith("https")) {
+            HttpsURLConnection httpsURLConnection = (HttpsURLConnection) client;
+            httpsURLConnection.setSSLSocketFactory(getSSLSocketFactory());
+        }
+        return null;
+    }
+
+    private SSLSocketFactory getSSLSocketFactory() {
+        SSLContext sslContext = null;
+        try {
+            TrustManager[] tm = {
+                    new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
+                        @Override
+                        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
+                        @Override
+                        public X509Certificate[] getAcceptedIssuers() { return null; }
+                    }
+            };
+            sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, tm, null);
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return sslContext.getSocketFactory();
+    }
+
 }
