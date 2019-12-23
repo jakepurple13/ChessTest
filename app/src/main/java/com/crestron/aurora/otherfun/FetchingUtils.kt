@@ -15,6 +15,7 @@ import com.tonyodev.fetch2core.Func
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import org.jsoup.Jsoup
 import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
@@ -67,12 +68,17 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         })
     }
 
-    private fun fetchIt(ep: EpisodeInfo, ap: Boolean = false, networkType: NetworkType = NetworkType.ALL, keyAndValue: Array<out EpisodeActivity.KeyAndValue>) {
+    private fun getPutlockerOrigin(url: String): String {
+        val doc = Jsoup.connect(url.trim()).get()
+        return "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().find(doc.toString())!!.groups[1]!!.value
+    }
+
+    private fun fetchIt(ep: EpisodeInfo, networkType: NetworkType = NetworkType.ALL, keyAndValue: Array<out EpisodeActivity.KeyAndValue>) {
 
         fetch.setGlobalNetworkType(networkType)
 
         fun getNameFromUrl(url: String): String {
-            return Uri.parse(url).lastPathSegment?.let { if(it.isNotEmpty()) it else ep.name } ?: ep.name
+            return Uri.parse(url).lastPathSegment?.let { if (it.isNotEmpty()) it else ep.name } ?: ep.name
         }
 
         val requestList = arrayListOf<Request>()
@@ -91,13 +97,20 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
                 request.extras.map.toProperties()[keyValue.key] = keyValue.value
             }
 
-            if (ap) {
-                request.addHeader("Accept-Language", "en-US,en;q=0.5")
-                request.addHeader("User-Agent", "\"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0\"")
-                request.addHeader("Accept", "text/html,video/mp4,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            request.addHeader("Accept-Language", "en-US,en;q=0.5")
+            request.addHeader("User-Agent", "\"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0\"")
+            request.addHeader("Accept", "text/html,video/mp4,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            request.addHeader("Access-Control-Allow-Origin", "*")
+            if(ep.url.contains("putlocker", true)) {
+                request.addHeader("Referer", getPutlockerOrigin(ep.url))
+                request.addHeader("Origin", "http://mixdrop.co")
+                request.addHeader("sec-fetch-site", "same-origin")
+                request.addHeader("sec-fetch-mode", "navigate")
+                request.addHeader("sec-fetch-user", "?1")
+            } else {
                 request.addHeader("Referer", "http://thewebsite.com")
-                request.addHeader("Connection", "keep-alive")
             }
+            request.addHeader("Connection", "keep-alive")
 
             requestList.add(request)
 
@@ -137,11 +150,11 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
     }
 
     fun getVideo(urlToUse: EpisodeInfo, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.launch {
-        fetchIt(urlToUse, true, networkType, keyAndValue)
+        fetchIt(urlToUse, networkType, keyAndValue)
     }
 
     fun getVideo(urlToUse: Collection<EpisodeInfo>, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.launch {
-        urlToUse.forEach { fetchIt(it, true, networkType, keyAndValue) }
+        urlToUse.forEach { fetchIt(it, networkType, keyAndValue) }
         Loged.d("DONE!")
 
     }

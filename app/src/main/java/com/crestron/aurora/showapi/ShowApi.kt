@@ -211,7 +211,6 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
             for (i in para.withIndex()) {
                 textToReturn += when (i.index) {
                     1 -> "Release: "
-                    2 -> "Genre: "
                     3 -> "Director: "
                     4 -> "Stars: "
                     5 -> "Synopsis: "
@@ -245,7 +244,8 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
                 if (source.isMovie) {
                     val info = "var post = \\{\"id\":\"(.*?)\"\\};".toRegex().toPattern().matcher(doc.html())
                     if (info.find()) {
-                        listOf(EpisodeInfo(name, "https://www.putlocker.fyi/embed-src/${info.group(1)}"))
+                        val encodingPID = Base64.getEncoder().encodeToString("6${info.group(1)!!.reversed()}".toByteArray())
+                        listOf(EpisodeInfo(name, "https://www.putlocker.fyi/embed-src-v2/$encodingPID"))
                     } else emptyList()
                 } else {
                     doc.select("div.col-lg-12").select("div.row").select("a.btn-episode")

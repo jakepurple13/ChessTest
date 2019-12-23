@@ -1,12 +1,14 @@
+@file:Suppress("IncorrectScope")
+
 package com.crestron.aurora
 
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.ShowApi
 import com.crestron.aurora.showapi.ShowInfo
 import com.crestron.aurora.showapi.Source
+import com.crestron.aurora.utilities.f
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
-import io.ktor.utils.io.core.String
 import kotlinx.coroutines.runBlocking
 import org.apache.tools.ant.util.DateUtils
 import org.jsoup.Jsoup
@@ -24,9 +26,9 @@ import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import java.util.regex.Matcher
-import java.util.regex.Pattern
+import kotlin.random.Random
 import kotlin.system.measureTimeMillis
+
 
 @Suppress("SameParameterValue")
 class TestUnitThree {
@@ -35,6 +37,7 @@ class TestUnitThree {
     fun beforeSetup() {
         Loged.FILTER_BY_CLASS_NAME = "crestron"
         Loged.UNIT_TESTING = true
+        Loged.OTHER_CLASS_FILTER = { !it.contains("Framing") }
         println("Starting at ${SimpleDateFormat("h:mm:ss a", Locale.getDefault()).format(System.currentTimeMillis())}")
     }
 
@@ -114,84 +117,17 @@ class TestUnitThree {
         val first = e.episodeList.first()
         Loged.f(first)
         Loged.f(first.getVideoLink())
-        Loged.f(first.getVideoLinks())
-        Loged.f(first.url)
-        //val link = Jsoup.connect(first.url).get()
-        //println(link.toString())
-        //Loged.f(getUrl(link.toString()))
-        //Loged.f(getPutLocker(first.url))
-        /*
-        println(Jsoup.connect(first?.url).get())
-        println("-".repeat(50))
-        println(getHtml(first?.url!!))
-        println("-".repeat(50))*/
-        //println(Jsoup.connect("https://mixdrop.co/e/ruuicksyx").get())
-        val s = """
-            <!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width; initial-scale=1.0"><meta name="csrf" content="8df0deb677f26db36ae189ab9f43a19f"><!--<link href="https://vjs.zencdn.net/7.3.0/video-js.css" rel="stylesheet">--><link rel="stylesheet" href="/player/video-js.min.css" /><link rel="stylesheet" href="/player/airplay/videojs.airplay.css" /><link rel="stylesheet" href="/player/videoplayer.min.css?v=0.18" /></head><body><script src="https://www.google.com/recaptcha/api.js?render=6LetXaoUAAAAAB6axgg4WLG9oZ_6QLTsFXZj-5sd"></script><script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><script src="https://vjs.zencdn.net/7.6.6/video.min.js"></script><script src="/player/airplay/videojs.airplay.js"></script><link rel="stylesheet" href="/js/jRange/jquery.range.css" /><script src="/js/jRange/jquery.range-min.js"></script><script src="/player/videoplayer.min.js?v=1.0.67"></script><script src="/js/ads.js"></script><script>MDCore.ref = "ruuicksyx";eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/^/,String)){while(c--){d[c.toString(a)]=k[c]||c.toString(a)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('1.p="//2-4.6.7/8/3.9";1.a="//2-4.6.7/b/3.5?2=-c&e=d";1.f="3.5";1.i="2-4";1.j="";1.k="0";1.l="m%n%o%h.g";',26,26,'|MDCore|s|e2d07893ddac08c69d194ac24d4d3c96|delivery3|mp4|mxdcontent|net|thumbs|jpg|vvsr|v|09ngjmoqiwmrWyBCntmpg|1576716665||vfile|com|2Fthewebsite|vserver|remotesub|chromeInject|referrer|http|3A|2F|poster'.split('|'),0,{}))</script><video id="videojs" class="player video-js vjs-default-skin vjs-big-play-centered" style="width: 100% !important;height: 100% !important;" preload="none" crossorigin="anonymous" controls></video><input type="file" onchange="MDCore.addSub(this)" id="subfile" accept=".vtt,.srt" style="display: none"><!-- Tssp--><!-- PopAds.net Popunder Code for mixdrop.co | 2019-12-18,3365713,0,0 --><script type="text/javascript" data-cfasync="false">/*<![CDATA[/* *//* Generated 2019-12-18 18:34:21 for "PopAds%20CGAPIL%20A", len 1917 */ (function(){ var o=window;o["\u005f\u0070\x6f\x70"]=[["s\x69\u0074eI\x64",3365713],["\x6di\x6e\u0042\x69d",0],["\u0070\u006f\u0070\u0075\u006e\u0064\x65\x72s\u0050\u0065\x72\x49P",0],["\x64\x65l\u0061y\u0042\x65\u0074wee\x6e",0],["\x64\u0065fau\u006c\u0074","h\u0074\x74p\u0073\u003a\x2f\u002f\x75\u0074\u0068\u006f\u0072\x6e\u0065\x72.\x69nf\u006f\x2f\x72\x65dir\x65\x63\x74\u003ft\u0069d\x3d\x38\u00314\u0030\x305\u0026\u0072\u0065f=mi\x78dr\u006f\x70.\x63\u006f"],["\u0064e\u0066\x61\u0075l\x74\x50e\u0072\x44ay",0],["\x74\u006fp\x6dostLa\u0079e\x72",!1]];var l=["\x2f\u002f\u00631.\u0070\u006f\u0070\x61\x64\u0073\x2e\u006e\x65\u0074/\u0070\u006fp\x2e\u006a\x73","\u002f\u002f\u0063\u0032\u002e\x70\u006f\x70\x61d\u0073\u002en\x65\u0074\x2f\x70o\u0070\u002e\x6a\u0073","\u002f/\u0077w\x77.ka\x70uaaw\x61\x73\u0065.\x63om/\u0075s\u002e\x6a\u0073","//\x77\u0077w.\u0071\x71\x71\x6d\x6eo\u0070\u0063\x69\x78\x79i.\u0063o\u006d\x2f\u006f\x72\u006a\x2ejs",""],b=0,s,r=function(){if(""==l[b])return;s=o["d\u006fc\u0075m\x65n\u0074"]["c\u0072\u0065\x61\x74\u0065\x45\u006c\u0065\u006de\x6e\u0074"]("s\u0063\u0072\u0069\x70\x74");s["\u0074\u0079\u0070\u0065"]="t\u0065\u0078\u0074\u002f\x6aa\u0076\x61\x73\x63\u0072\x69p\u0074";s["\u0061\x73\u0079nc"]=!0;var g=o["d\u006f\x63um\u0065n\x74"]["\x67\x65\u0074\u0045l\x65me\u006e\u0074\u0073\u0042y\u0054\u0061\u0067\u004e\x61\x6d\u0065"]("\x73\x63\u0072\u0069\u0070t")[0];s["\u0073\x72\x63"]=l[b];if(b<2){s["cro\u0073\x73O\x72i\u0067\x69\u006e"]="\x61\x6e\u006fn\x79\u006d\u006fu\u0073";s["i\u006e\x74\x65\u0067\x72\u0069\x74y"]="\x73\u0068a\x32\x35\u0036-\x583\x337F\x5a\u0079\u0053E\x36\x53\u00427\x58SOB\u0075\u004aw\x53\x47\x34k\x33\u0076Cq\x57\x79\u0049h\x65\x42M\x47\u002b\x6e\u0043\x4d\u0071Ww="};s["\u006f\u006e\x65\x72\u0072\x6f\x72"]=function(){b++;r()};g["\x70\u0061r\x65\x6etNo\u0064\u0065"]["i\u006e\u0073\u0065\x72\u0074B\u0065\u0066\x6f\x72e"](s,g)};r()})();/*]]>/* */</script><script>function MDinjectP3(){ ${'$'}("body").append('<script data-cfasync="false">(function(){var d={url:"https://cadsoks.com/ng7y2swh3?key=17d7f7655624c90e52f1293128c0fd22&psid=MP1P2_1043",delay:-1,max:1,period:30,perpage:-1,id:"p3",};var b=0;lastTimestamp=Math.floor(Date.now()/1000);if(document.addEventListener){document.addEventListener("click",function(g){if(g.target.className.indexOf("dtnoppu")==-1){f()}},true)}else{if(document.attachEvent){document.attachEvent("onclick",function(g){if(g.target&&g.target.className&&g.target.className.indexOf("dtnoppu")==-1){f()}})}else{var a=setInterval(function(){if(typeof(document.body)!="undefined"&&document.body){document.body.onclick=function(g){if(g.target.className.indexOf("dtnoppu")==-1){f()}};clearInterval(a)}},10)}}function f(){var g=Math.floor(Date.now()/1000);if(!localStorage["mp0p"+d.id]||g>localStorage["mp0p"+d.id]){localStorage["mp0p"+d.id]=g+d.period;localStorage["mp0p_counter"+d.id]=0}if(d.max!=-1&&localStorage["mp0p_counter"+d.id]>=d.max){return}if(d.perpage!=-1&&b>=d.perpage){return}if(d.delay>0&&g<(lastTimestamp+d.delay)){return}localStorage["mp0p_counter"+d.id]++;lastTimestamp=Math.floor(Date.now()/1000);b++;window.open(d.url)}function e(i,j,h){var g=new Date();g.setTime(g.getTime()+h);document.cookie=i+"="+j+"; expires="+g.toGMTString()+"; path=/"}function c(g){var j=document.cookie.toString().split("; ");for(var h=0;h<j.length;h++){if(j[h].split("=")[0]==g){return j[h].split("=")[1]}}return false}}());<\/script>') }</script><div style="position:absolute;top:0;left:0;width: 100%;height: 100%;z-index:2147483647" onclick="${'$'}(this).remove();MDinjectP2()"></div><script>function MDinjectP2(){ ${'$'}("body").append('<script data-cfasync="false">(function(){var d={url:"https://www.predictivdisplay.com/jump/next.php?r=2692607",delay:-1,max:1,period:30,perpage:1,id:"p2",};var b=0;lastTimestamp=Math.floor(Date.now()/1000);if(document.addEventListener){document.addEventListener("click",function(g){if(g.target.className.indexOf("dtnoppu")==-1){f()}},true)}else{if(document.attachEvent){document.attachEvent("onclick",function(g){if(g.target&&g.target.className&&g.target.className.indexOf("dtnoppu")==-1){f()}})}else{var a=setInterval(function(){if(typeof(document.body)!="undefined"&&document.body){document.body.onclick=function(g){if(g.target.className.indexOf("dtnoppu")==-1){f()}};clearInterval(a)}},10)}}function f(){var g=Math.floor(Date.now()/1000);if(!localStorage["mp0p"+d.id]||g>localStorage["mp0p"+d.id]){localStorage["mp0p"+d.id]=g+d.period;localStorage["mp0p_counter"+d.id]=0}if(d.max!=-1&&localStorage["mp0p_counter"+d.id]>=d.max){return}if(d.perpage!=-1&&b>=d.perpage){return}if(d.delay>0&&g<(lastTimestamp+d.delay)){return}localStorage["mp0p_counter"+d.id]++;lastTimestamp=Math.floor(Date.now()/1000);b++;window.open(d.url)}function e(i,j,h){var g=new Date();g.setTime(g.getTime()+h);document.cookie=i+"="+j+"; expires="+g.toGMTString()+"; path=/"}function c(g){var j=document.cookie.toString().split("; ");for(var h=0;h<j.length;h++){if(j[h].split("=")[0]==g){return j[h].split("=")[1]}}return false}}());<\/script><div style="position:absolute;top:0;left:0;width: 100%;height: 100%;z-index:2147483647" onclick="${'$'}(this).remove(); MDinjectP3()"></div>') }</script><script>eval(function(p,a,c,k,e,d){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--){d[e(c)]=k[c]||e(c)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('${'$'}(P).z(2(){5(2(){${'$'}("6").7("<1 8=\\"9\\" c=\\"a\\" b=\\"4://u.x.m/w-v-p/t.s?q=r\\" f=\\"g:i\\" j=\\"0-d-k 0-l 0-e 0-h\\"></1>")},3);5(2(){${'$'}("6").7("<1 8=\\"9\\" c=\\"a\\" b=\\"4://n.o/A\\" f=\\"g:i\\" j=\\"0-d-k 0-l 0-e 0-h\\"></1>")},3);5(2(){${'$'}("6").7("<1 8=\\"9\\" c=\\"a\\" b=\\"4://y.C/D?E=F&G=H.I\\" f=\\"g:i\\" j=\\"0-d-k 0-l 0-e 0-h\\"></1>")},3);5(2(){${'$'}("6").7("<1 8=\\"9\\" c=\\"a\\" b=\\"4://J.m/K/L\\" f=\\"g:i\\" j=\\"0-d-k 0-l 0-e 0-h\\"></1>")},3);5(2(){${'$'}("6").7("<1 8=\\"9\\" c=\\"a\\" b=\\"4://M.m/B/N\\" f=\\"g:i\\" j=\\"0-d-k 0-l 0-e 0-h\\"></1>")},3);5(2(){${'$'}("6").7("<1 8=\\"9\\" c=\\"a\\" b=\\"4://n.o/O\\" f=\\"g:i\\" j=\\"0-d-k 0-l 0-e 0-h\\"></1>")},3)});',52,52,'allow|iframe|function|120000|https|setTimeout|body|append|width|1366|768|src|height|same|popups|style|display|forms|none|sandbox|origin|scripts|com|zap|buzz|phone|lkid|74203065|html|pp_009309925869|www|watch|smart|gearbest|uthorner|ready|6kr3yJp|213480|info|redirect|tid|814005|ref|mixdrop|co|pmzer|213479|9189|dynamicadx|9190|Y79rkqR|document'.split('|'),0,{}))</script><script async src="https://www.googletagmanager.com/gtag/js?id=UA-142309154-2"></script><script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'UA-142309154-2');</script></body></html>null
-        """.trimIndent()
-        /*val mix = Jsoup.connect("https://mixdrop.co/e/ruuicksyx").get()//Jsoup.parse(s)
-        //println(mix)
-        println()
-        println(getUrl(mix.toString()))*/
-
-        //https://www.putlocker.fyi/embed-src-v2/NjgzMzk2NA==
-
-        val s1 = """
-            <iframe src="https://mixdrop.co/e/ruuicksyx" id="the_frame" width="100%" height="100%" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no" frameborder="0"></iframe>
-        """.trimIndent()
-
-        /*val notMix = Jsoup.connect("https://www.putlocker.fyi/embed-src-v2/NjgzMzk2NA==").get()//Jsoup.parse(s)
-        val mix1 = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().find(notMix.toString())!!.value
-        println(mix1)*/
-
-        //val notMix = Jsoup.connect("https://www.putlocker.fyi/embed-src-v2/NjgzMzk2NA==").get()//Jsoup.parse(s)
-        //val mix1 = "<iframe[^>]+src=\"([^\"]+)\"[^>]*><\\/iframe>".toRegex().find(s1)!!.groups[1]!!.value
-        //println(mix1)
-
-        //val find = r.group()
-        //println("$r - $count")
-        //Loged.r(r.toList().map { it.destructured.toList() })
-
-        /*val f1 = JsUnpacker(f)
-        f1.detect()
-        println(f1.unpack())*/
-        //val next = "https://cadsoks.com/ng7y2swh3?key=17d7f7655624c90e52f1293128c0fd22&psid=MP1P2_1043"
-        //println(Jsoup.connect(next).get())
-        //Loged.f(first?.getVideoLinks().toString())
-        //Loged.f(first?.getVideoInfo().toString())
-        //println(Jsoup.connect("https://www5.putlocker.fyi/show/harmonquest/season-3/episode-8/").get())
-        /*Loged.f(e.episodeList)
-        Loged.f(e.episodeList.firstOrNull()?.getVideoInfo().toString())
-        val firstUrl = e.episodeList.first().url
-        println(firstUrl)
-        println(Jsoup.connect(firstUrl).get())
-        println(getHtml(firstUrl))*/
-        /*val anime = ShowApi.getSources(Source.ANIME)
-        val cartoon = ShowApi.getSources(Source.CARTOON, Source.CARTOON_MOVIES, Source.DUBBED)
-        val liveAction = ShowApi.getSources(Source.LIVE_ACTION)
-
-        Loged.f(EpisodeApi(anime.random()))
-        Loged.f(EpisodeApi(cartoon.random()))
-        Loged.f(EpisodeApi(liveAction.random()))*/
-
-        /*val f = ShowApi(Source.LIVE_ACTION_MOVIES).showInfoList
-        val e = EpisodeApi(f.random())
-        Loged.f(e)*/
-
     }
 
-    private fun Loged.f(
-            msg: EpisodeApi, tag: String = msg.name, infoText: String = TAG,
-            showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME
-    ) = f(listOf(
-            "Name: ${msg.name}",
-            "Url: ${msg.source.url}",
-            "Image: ${msg.image}",
-            "Genres: ${msg.genres.joinToString(", ") { it }}",
-            "Description: ${msg.description.replace("\n", " ")}",
-            "Episodes:",
-            *msg.episodeList.map { "      $it" }.toTypedArray()
-    ), tag, infoText, showPretty, threadName)
+    @Test
+    fun randomVideoInfo() {
+        val f = EpisodeApi(ShowApi.getAll().random())
+        Loged.f(f)
+        /*val a = ShowApi.getSources(Source.LIVE_ACTION_MOVIES).sortedBy { it.name }
+        Loged.f(a.count())
+        val a1 = a.indexOfFirst { it.name[0].toString().equals("i", true) }
+        Loged.f(a1)*/
+    }
 
     @Throws(IOException::class)
     private fun getHtml(url: String): String {
@@ -215,6 +151,37 @@ class TestUnitThree {
         in1.close()
 
         return html.toString()
+    }
+
+    @Test
+    fun merryChristmas() {
+        /*println(getTree(3))
+        println()
+        println(getTree(4))
+        println()
+        println(getTree(5))*/
+        //Loged.f(1.christmasTree())
+        Loged.f(Random.nextInt(1, 10).christmasTree(), "Tree")
+        //(1..10).forEach { Loged.f(it.christmasTree(), "Tree") }
+    }
+
+    private fun Number.christmasTree() = getTree(toInt())
+
+    private fun getTree(n: Int): String =
+            "${(1..(n * 2) step 2).joinToString("\n") { n1 -> " ".repeat(((n * 2) - n1) / 2).let { "$it${"*".repeat(n1)}$it" } }}\n${" ".repeat(n - 1)}*"
+
+    /*private fun getTree(n: Int): String = when {
+        n < 1 -> throw IllegalArgumentException("Must be greater than 0")
+        else -> "${(1..(n * 2) step 2).joinToString("\n") { n1 -> " ".repeat(((n * 2) - n1) / 2).let { "$it${"*".repeat(n1)}$it" } }}\n${" ".repeat(n - 1)}*"
+    }*/
+
+    @Test
+    fun packedTest() {
+        val s = """
+            eval(function(p,a,c,k,e,r){e=String;if(!''.replace(/^/,String)){while(c--)r[c]=k[c]||c;k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('3 4(0,1,2){5 0.6(7 8(1,\'9\'),2)}',10,10,'a|b|c|function|replaceAll|return|replace|new|RegExp|g'.split('|'),0,{}))
+        """.trimIndent()
+        val j = JSUnpacker()
+        println(j.unpack(s))
     }
 
     @Test
@@ -760,114 +727,31 @@ class ShellSort : AbstractSortStrategy() {
     }
 }
 
-class JsUnpacker(packedJS: String?) {
-    private var packedJS: String? = null
-    /**
-     * Detects whether the javascript is P.A.C.K.E.R. coded.
-     *
-     * @return true if it's P.A.C.K.E.R. coded.
-     */
-    fun detect(): Boolean {
-        val js = packedJS!!.replace(" ", "")
-        val p: Pattern = Pattern.compile("eval\\(function\\(p,a,c,k,e,(?:r|d)")
-        val m: Matcher = p.matcher(js)
-        return m.find()
-    }
-
-    /**
-     * Unpack the javascript
-     *
-     * @return the javascript unpacked or null.
-     */
-    fun unpack(): String? {
-        val js = String(packedJS!!.toByteArray())
-        try {
-            var p: Pattern = Pattern.compile("\\}\\s*\\('(.*)',\\s*(.*?),\\s*(\\d+),\\s*'(.*?)'\\.split\\('\\|'\\)", Pattern.DOTALL)
-            var m: Matcher = p.matcher(js)
-            if (m.find() && m.groupCount() == 4) {
-                val payload: String = m.group(1)!!.replace("\\'", "'")
-                val radixStr: String = m.group(2)!!
-                val countStr: String = m.group(3)!!
-                val symtab: List<String> = m.group(4)!!.split("\\|")
-                var radix = 36
-                var count = 0
-                try {
-                    radix = radixStr.toInt()
-                } catch (e: Exception) {
-                }
-                try {
-                    count = countStr.toInt()
-                } catch (e: Exception) {
-                }
-                if (symtab.size != count) {
-                    throw Exception("Unknown p.a.c.k.e.r. encoding")
-                }
-                val unbase = Unbase(radix)
-                p = Pattern.compile("\\b\\w+\\b")
-                m = p.matcher(payload)
-                val decoded = java.lang.StringBuilder(payload)
-                var replaceOffset = 0
-                while (m.find()) {
-                    val word: String = m.group(0)!!
-                    val x = unbase.unbase(word)
-                    var value: String? = null
-                    if (x < symtab.size) {
-                        value = symtab[x]
-                    }
-                    if (value != null && value.length > 0) {
-                        decoded.replace(m.start() + replaceOffset, m.end() + replaceOffset, value)
-                        replaceOffset += value.length - word.length
-                    }
-                }
-                return decoded.toString()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return null
-    }
-
-    private inner class Unbase internal constructor(private val radix: Int) {
-        private val ALPHABET_62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        private val ALPHABET_95 = " !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
-        private var alphabet: String? = null
-        private var dictionnary: HashMap<String, Int>? = null
-        fun unbase(str: String): Int {
-            var ret = 0
-            if (alphabet == null) {
-                ret = str.toInt(radix)
-            } else {
-                val tmp = java.lang.StringBuilder(str).reverse().toString()
-                for (i in 0 until tmp.length) {
-                    ret += (Math.pow(radix.toDouble(), i.toDouble()) * dictionnary!![tmp.substring(i, i + 1)]!!).toInt()
-                }
+class JSUnpacker {
+    fun unpack(html: String): String {
+        val r = "}\\('(.+)',(\\d+),(\\d+),'([^']+)'\\.split\\('\\|'\\)".toRegex().find(html)!!
+        fun encodeBaseN(num: Int, n: Int): String {
+            var num1 = num
+            val fullTable = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            val table = fullTable.substring(0..n)
+            if (num1 == 0) return table[0].toString()
+            var ret = ""
+            while (num1 > 0) {
+                ret = (table[num1 % n].toString() + ret)
+                num1 = floorDiv(num, n)
             }
             return ret
         }
-
-        init {
-            if (radix > 36) {
-                if (radix < 62) {
-                    alphabet = ALPHABET_62.substring(0, radix)
-                } else if (radix > 62 && radix < 95) {
-                    alphabet = ALPHABET_95.substring(0, radix)
-                } else if (radix == 62) {
-                    alphabet = ALPHABET_62
-                } else if (radix == 95) {
-                    alphabet = ALPHABET_95
-                }
-                dictionnary = HashMap(95)
-                for (i in 0 until alphabet!!.length) {
-                    dictionnary!![alphabet!!.substring(i, i + 1)] = i
-                }
-            }
+        val (obfucastedCode, baseTemp, countTemp, symbolsTemp) = r.destructured
+        val base = baseTemp.toInt()
+        var count = countTemp.toInt()
+        val symbols = symbolsTemp.split("|")
+        val symbolTable = mutableMapOf<String, String>()
+        while (count > 0) {
+            count--
+            val baseNCount = encodeBaseN(count, base)
+            symbolTable[baseNCount] = if (symbols[count].isNotEmpty()) symbols[count] else baseNCount
         }
-    }
-
-    /**
-     * @param  packedJS javascript P.A.C.K.E.R. coded.
-     */
-    init {
-        this.packedJS = packedJS
+        return "\\b(\\w+)\\b".toRegex().replace(obfucastedCode) { symbolTable[it.groups[0]!!.value].toString() }
     }
 }

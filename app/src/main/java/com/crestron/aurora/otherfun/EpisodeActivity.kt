@@ -26,10 +26,7 @@ import com.crestron.aurora.firebaseserver.FirebaseDB
 import com.crestron.aurora.showapi.EpisodeApi
 import com.crestron.aurora.showapi.EpisodeInfo
 import com.crestron.aurora.showapi.ShowInfo
-import com.crestron.aurora.utilities.KUtility
-import com.crestron.aurora.utilities.Utility
-import com.crestron.aurora.utilities.intersect
-import com.crestron.aurora.utilities.otherWise
+import com.crestron.aurora.utilities.*
 import com.crestron.aurora.views.DownloadsWidget
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -219,6 +216,8 @@ class EpisodeActivity : AppCompatActivity() {
                 EpisodeApi(ShowInfo(name, url))
             } catch (e: SocketTimeoutException) {
                 null
+            }?.apply {
+                Loged.f(this, this.name)
             }
 
             if (epApi != null)

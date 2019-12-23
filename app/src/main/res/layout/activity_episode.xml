@@ -32,36 +32,37 @@
             android:animateLayoutChanges="true"
             android:orientation="vertical">
 
-            <TextView
-                app:layout_constraintTop_toTopOf="parent"
-                android:id="@+id/titleName"
-                tools:text="Title"
-                android:gravity="center"
+            <HorizontalScrollView
+                android:id="@+id/genreListLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/titleName">
 
-            <com.google.android.material.chip.ChipGroup
-                app:layout_constraintTop_toBottomOf="@id/titleName"
-                android:id="@+id/genreList"
-                android:layout_marginHorizontal="5dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <com.google.android.material.chip.Chip
-                    android:visibility="gone"
-                    android:text="Comedy"
-                    tools:visibility="visible"
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/genreList"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="5dp"
+                    app:singleLine="true">
 
-            </com.google.android.material.chip.ChipGroup>
+                    <com.google.android.material.chip.Chip
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Comedy"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                </com.google.android.material.chip.ChipGroup>
+
+            </HorizontalScrollView>
 
             <ScrollView
-                app:layout_constraintTop_toBottomOf="@id/genreList"
-                app:layout_constraintBottom_toBottomOf="parent"
                 android:id="@+id/info_scroll"
                 android:layout_width="match_parent"
-                android:layout_height="0dp">
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/genreListLayout">
+
                 <TextView
                     android:id="@+id/download_info"
                     android:layout_width="match_parent"
@@ -72,6 +73,14 @@
                     android:textIsSelectable="true"
                     android:transitionName="show_name_trans" />
             </ScrollView>
+
+            <TextView
+                android:id="@+id/titleName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Title" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

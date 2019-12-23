@@ -18,6 +18,9 @@ import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.core.view.doOnPreDraw
 import androidx.recyclerview.widget.*
+import com.crestron.aurora.Loged
+import com.crestron.aurora.f
+import com.crestron.aurora.showapi.EpisodeApi
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -286,3 +289,16 @@ data class DeviceInfo(val board: String = Build.BOARD,
                       val sdkInt: Int = Build.VERSION.SDK_INT,
                       val versionCode: String = Build.VERSION_CODES::class.java.fields[Build.VERSION.SDK_INT].name,
                       val versionNumber: String = Build.VERSION.RELEASE)
+
+fun Loged.f(
+        msg: EpisodeApi, tag: String = msg.name, infoText: String = TAG,
+        showPretty: Boolean = SHOW_PRETTY, threadName: Boolean = WITH_THREAD_NAME
+) = f(listOf(
+        "Name: ${msg.name}",
+        "Url: ${msg.source.url}",
+        "Image: ${msg.image}",
+        "Genres: ${msg.genres.joinToString(", ") { it }}",
+        "Description: ${msg.description.replace("\n", " ")}",
+        "Episodes:",
+        *msg.episodeList.map { "      $it" }.toTypedArray()
+), tag, infoText, showPretty, threadName)
