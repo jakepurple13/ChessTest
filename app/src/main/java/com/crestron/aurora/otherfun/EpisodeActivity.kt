@@ -376,7 +376,7 @@ class EpisodeActivity : AppCompatActivity() {
             startActivity(Intent(this@EpisodeActivity, DownloadViewerActivity::class.java))
         }
 
-        batch_download.setOnLongClickListener {
+        marked_watched.setOnClickListener {
             GlobalScope.launch {
                 val eList = show.showDao().getEpisodesByUrl(url).map { it.showUrl }
                         .intersect(FirebaseDB(this@EpisodeActivity).getShowSync(url)?.episodeInfo?.map { it.url } ?: emptyList()) { one, two ->
@@ -411,10 +411,9 @@ class EpisodeActivity : AppCompatActivity() {
                     m.show()
                 }
             }
-            true
         }
 
-        batch_download.setOnClickListener {
+        batch_downloaded.setOnClickListener {
             val multiSelectDialog = MultiSelectDialog()
                     .title("Select the Episodes to download") //setting title for dialog
                     .titleSize(25f)

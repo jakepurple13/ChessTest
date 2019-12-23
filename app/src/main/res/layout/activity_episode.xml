@@ -86,6 +86,39 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/episode_refresh">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/batch_downloaded"
+            style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:insetBottom="0dp"
+            android:text="Download Multiple"
+            app:cornerRadius="0dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/marked_watched"
+            style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:insetBottom="0dp"
+            android:text="Mark Watched"
+            app:cornerRadius="0dp" />
+
+    </LinearLayout>
+
     <ProgressBar
         android:id="@+id/progressBar2"
         style="?android:attr/progressBarStyleHorizontal"
@@ -153,7 +186,7 @@
         android:id="@+id/episode_refresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/batch_download"
+        app:layout_constraintBottom_toTopOf="@id/buttonLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/option_layout">
 
@@ -176,6 +209,7 @@
         android:layout_height="wrap_content"
         android:insetBottom="0dp"
         android:text="Download Multiple/Mark Watched"
+        android:visibility="gone"
         app:cornerRadius="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
