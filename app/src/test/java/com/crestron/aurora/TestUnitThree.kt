@@ -9,6 +9,9 @@ import com.crestron.aurora.showapi.Source
 import com.crestron.aurora.utilities.f
 import crestron.com.deckofcards.Card
 import crestron.com.deckofcards.Deck
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import org.apache.tools.ant.util.DateUtils
 import org.jsoup.Jsoup
@@ -26,8 +29,11 @@ import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.stream.Collectors
 import kotlin.random.Random
 import kotlin.system.measureTimeMillis
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 
 
 @Suppress("SameParameterValue")
@@ -44,6 +50,35 @@ class TestUnitThree {
     @After
     fun afterSetup() {
         println("Ending at ${SimpleDateFormat("h:mm:ss a", Locale.getDefault()).format(System.currentTimeMillis())}")
+    }
+
+    private suspend fun <A, B> Iterable<A>.pmapped(f: suspend (A) -> B): List<B> = coroutineScope {
+        map { async { f(it) } }.awaitAll()
+    }
+
+    @UseExperimental(ExperimentalTime::class)
+    @Test
+    fun mappingTesting() = runBlocking {
+        val time = measureTime {
+            val output = (1..100).pmapped { it * 2 }
+            println(output)
+        }.inMilliseconds
+
+        println("Total time: $time")
+
+        val time2 = measureTime  {
+            val output = (1..100).map { it * 2 }
+            println(output)
+        }.inMilliseconds
+
+        println("Total time2: $time2")
+
+        val time3 = measureTime  {
+            val output = (1..100).toList().parallelStream().map { it * 2 }.collect(Collectors.toList())
+            println(output)
+        }.inMilliseconds
+
+        println("Total time3: $time3")
     }
 
     private fun getUrl(html: String): String {

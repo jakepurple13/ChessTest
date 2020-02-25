@@ -1,3 +1,5 @@
+@file:Suppress("IncorrectScope")
+
 package com.crestron.aurora
 
 import android.os.Handler

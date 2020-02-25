@@ -101,7 +101,7 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
             request.addHeader("User-Agent", "\"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0\"")
             request.addHeader("Accept", "text/html,video/mp4,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
             request.addHeader("Access-Control-Allow-Origin", "*")
-            if(ep.url.contains("putlocker", true)) {
+            if (ep.url.contains("putlocker", true)) {
                 request.addHeader("Referer", getPutlockerOrigin(ep.url))
                 request.addHeader("Origin", "http://mixdrop.co")
                 request.addHeader("sec-fetch-site", "same-origin")
@@ -222,6 +222,9 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
                     e.printStackTrace()
                 }
             }
+            get() = FunApplication.getAppContext()
+                    .getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, Context.MODE_PRIVATE).getString(ConstantValues.FOLDER_LOCATION, null)
+                    ?: (Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString() + "/Fun/")
 
         var downloadCount = 0
             set(value) {
@@ -230,11 +233,9 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
                 shared.putInt(ConstantValues.DOWNLOAD_COUNT, value)
                 shared.apply()
             }
-            get() {
-                return FunApplication.getAppContext()
-                        .getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, Context.MODE_PRIVATE)
-                        .getInt(ConstantValues.DOWNLOAD_COUNT, 0)
-            }
+            get() = FunApplication.getAppContext()
+                    .getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, Context.MODE_PRIVATE)
+                    .getInt(ConstantValues.DOWNLOAD_COUNT, 0)
 
         fun getMimeType(context: Context, uri: Uri): String {
             val cR = context.contentResolver

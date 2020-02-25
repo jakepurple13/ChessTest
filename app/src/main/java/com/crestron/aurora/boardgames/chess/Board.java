@@ -1,8 +1,5 @@
 package com.crestron.aurora.boardgames.chess;
 
-
-import com.crestron.aurora.Loged;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -180,7 +177,6 @@ public class Board {
         }
 
         s = s.substring(0, s.length() - 1) + " ";
-        //colorName += boards.getSideToMove().value().substring(0, 1).toLowerCase() + " ";
         s+="w ";
         String castle = "";
         if (!getLocation(0, 0).getMoved() && !getLocation(0, 4).getMoved()) {
