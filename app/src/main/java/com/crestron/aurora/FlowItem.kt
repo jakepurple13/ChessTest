@@ -4,6 +4,7 @@ import android.view.View
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
@@ -16,7 +17,7 @@ class FlowItem<T>(startingValue: T, capacity: Int = 1) {
     private var flowItem: T = startingValue
         set(value) {
             field = value
-            itemBroadcast.offer(value)
+            itemBroadcast.sendLaunch(value)
         }
 
     fun collect(action: suspend (value: T) -> Unit) = itemFlow.flowQuery(action)
@@ -31,3 +32,4 @@ class FlowItem<T>(startingValue: T, capacity: Int = 1) {
 }
 
 fun <T> T.asFlowItem() = FlowItem(this)
+fun <T> SendChannel<T>.sendLaunch(value: T) = GlobalScope.launch { send(value) }
