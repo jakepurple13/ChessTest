@@ -88,7 +88,7 @@ class YahtzeeScores {
         }
     var total = 0
 
-    private fun getSmallNum(dice: Collection<Dice>, num: Int): Int = dice.filter { it.num == num }.sumBy { it.num }
+    private fun getSmallNum(dice: Collection<Dice>, num: Int): Int = dice.filter { it.num == num }.sumBy(Dice::num)
 
     fun getOnes(dice: Collection<Dice>): Int = getSmallNum(dice, 1).apply { ones = this }
     fun getTwos(dice: Collection<Dice>): Int = getSmallNum(dice, 2).apply { twos = this }
@@ -97,61 +97,24 @@ class YahtzeeScores {
     fun getFives(dice: Collection<Dice>): Int = getSmallNum(dice, 5).apply { fives = this }
     fun getSixes(dice: Collection<Dice>): Int = getSmallNum(dice, 6).apply { sixes = this }
 
-    fun canGetThreeKind(dice: Collection<Dice>): Boolean {
-        val values = dice.groupingBy { it.num }.eachCount().values
-        return 3 in values || 4 in values || 5 in values
-    }
-
-    fun getThreeOfAKind(dice: Collection<Dice>): Int = if (canGetThreeKind(dice)) {
-        dice.sumBy { it.num }
-    } else {
-        0
-    }.apply { threeOfKind = this }
-
-    fun canGetFourKind(dice: Collection<Dice>): Boolean {
-        val values = dice.groupingBy { it.num }.eachCount().values
-        return 4 in values || 5 in values
-    }
-
-    fun getFourOfAKind(dice: Collection<Dice>): Int = if (canGetFourKind(dice)) {
-        dice.sumBy { it.num }
-    } else {
-        0
-    }.apply { fourOfKind = this }
-
-    fun canGetYahtzee(dice: Collection<Dice>): Boolean = 5 in dice.groupingBy { it.num }.eachCount().values
+    fun canGetThreeKind(dice: Collection<Dice>): Boolean = dice.groupingBy(Dice::num).eachCount().values.let { 3 in it || 4 in it || 5 in it }
+    fun getThreeOfAKind(dice: Collection<Dice>): Int = (if (canGetThreeKind(dice)) dice.sumBy(Dice::num) else 0).apply { threeOfKind = this }
+    fun canGetFourKind(dice: Collection<Dice>): Boolean = dice.groupingBy(Dice::num).eachCount().values.let { 4 in it || 5 in it }
+    fun getFourOfAKind(dice: Collection<Dice>): Int = (if (canGetFourKind(dice)) dice.sumBy(Dice::num) else 0).apply { fourOfKind = this }
+    fun canGetYahtzee(dice: Collection<Dice>): Boolean = 5 in dice.groupingBy(Dice::num).eachCount().values
 
     fun getYahtzee(dice: Collection<Dice>): Int = (if (canGetYahtzee(dice)) if (gotYahtzee) 100 else 50 else 0).apply {
         gotYahtzee = true
         yahtzee += this
     }
 
-    fun canGetFullHouse(dice: Collection<Dice>): Boolean {
-        val values = dice.groupingBy { it.num }.eachCount().values
-        return 3 in values && 2 in values
-    }
-
+    fun canGetFullHouse(dice: Collection<Dice>): Boolean = dice.groupingBy(Dice::num).eachCount().values.let { 3 in it && 2 in it }
     fun getFullHouse(dice: Collection<Dice>): Int = (if (canGetFullHouse(dice)) 25 else 0).apply { fullHouse = this }
-
-    fun canGetLargeStraight(dice: Collection<Dice>): Boolean {
-        val filteredDice = dice.sortedBy { it.num }
-        return longestSequence(filteredDice.toTypedArray()) == 4
-    }
-
+    fun canGetLargeStraight(dice: Collection<Dice>): Boolean = longestSequence(dice.sortedBy(Dice::num).toTypedArray()) == 4
     fun getLargeStraight(dice: Collection<Dice>): Int = (if (canGetLargeStraight(dice)) 40 else 0).apply { largeStraight = this }
-
-    fun canGetSmallStraight(dice: Collection<Dice>): Boolean {
-        val filteredDice = dice.sortedBy { it.num }
-        return longestSequence(filteredDice.toTypedArray()) in 3..4
-    }
-
+    fun canGetSmallStraight(dice: Collection<Dice>): Boolean = longestSequence(dice.sortedBy(Dice::num).toTypedArray()) in 3..4
     fun getSmallStraight(dice: Collection<Dice>): Int = (if (canGetSmallStraight(dice)) 30 else 0).apply { smallStraight = this }
-
-    fun getChance(dice: Collection<Dice>): Int {
-        return dice.sumBy { it.num }.apply {
-            chance = this
-        }
-    }
+    fun getChance(dice: Collection<Dice>): Int = dice.sumBy(Dice::num).apply { chance = this }
 
     private fun longestSequence(a: Array<Dice>): Int {
         Arrays.sort(a, compareBy { it.num })
@@ -159,8 +122,7 @@ class YahtzeeScores {
         var sequence = 0
         for (i in 1 until a.size) {
             when (a[i].num - a[i - 1].num) {
-                0 -> {/*ignore duplicates*/
-                }
+                0 -> Unit//ignore duplicates
                 1 -> sequence += 1
                 else -> if (sequence > longest) {
                     longest = sequence

@@ -5,14 +5,12 @@ package com.crestron.aurora
 import android.os.Handler
 import com.crestron.aurora.boardgames.yahtzee.Dice
 import com.crestron.aurora.boardgames.yahtzee.YahtzeeScores
+import com.crestron.aurora.cardgames.videopoker.Scores
 import com.crestron.aurora.showapi.*
 import com.crestron.aurora.utilities.KUtility
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import crestron.com.deckofcards.Card
-import crestron.com.deckofcards.Deck
-import crestron.com.deckofcards.DeckBuilder
-import crestron.com.deckofcards.Suit
+import crestron.com.deckofcards.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.html.*
@@ -1128,5 +1126,77 @@ class ExampleUnitTest {
         deck.removeAll { it.suit == Suit.HEARTS }
     }
 
+    @Test
+    fun handTest() {
+        val scores = Scores()
+        fun threeOfAKind(hand: Hand): Boolean = hand.hand.groupBy(Card::value).any { it.value.size == 3 }
+
+        val hand = Hand()
+        hand.add(listOf(Card(Suit.SPADES, 4), Card(Suit.CLUBS, 4), Card(Suit.DIAMONDS, 4), Card(Suit.SPADES, 7), Card(Suit.SPADES, 9)))
+
+        println(threeOfAKind(hand))
+        println(scores.getWinningHand(hand))
+
+        hand.clearHand()
+        fun flush(hand: Hand) = Suit.values().any { suit -> hand.hand.all { it.suit == suit } }
+        hand.add(listOf(Card(Suit.SPADES, 4), Card(Suit.SPADES, 4), Card(Suit.SPADES, 4), Card(Suit.SPADES, 7), Card(Suit.SPADES, 9)))
+
+        println(flush(hand))
+        println(scores.getWinningHand(hand))
+
+        hand.clearHand()
+        hand.add(listOf(Card(Suit.SPADES, 4), Card(Suit.SPADES, 4), Card(Suit.SPADES, 7), Card(Suit.SPADES, 7), Card(Suit.SPADES, 9)))
+
+        println(hand.hand.groupBy(Card::value).entries.count { it.value.size == 2 } == 2)
+
+        Card.cardDescriptor = CardDescriptor.UNICODE_SYMBOL
+
+        hand.clearHand()
+        hand.add(listOf(Card(Suit.SPADES, 8), Card(Suit.SPADES, 9), Card(Suit.SPADES, 10), Card(Suit.SPADES, 11), Card(Suit.CLUBS, 12)))
+        hand.straightCheck()
+
+        hand.clearHand()
+        hand.add(listOf(Card(Suit.SPADES, 1), Card(Suit.SPADES, 13), Card(Suit.SPADES, 10), Card(Suit.SPADES, 11), Card(Suit.CLUBS, 12)))
+        hand.straightCheck()
+
+        hand.clearHand()
+        hand.add(listOf(Card(Suit.SPADES, 1), Card(Suit.SPADES, 2), Card(Suit.SPADES, 3), Card(Suit.SPADES, 4), Card(Suit.CLUBS, 5)))
+        hand.straightCheck()
+
+        hand.clearHand()
+        hand.add(listOf(Card(Suit.SPADES, 6), Card(Suit.SPADES, 2), Card(Suit.SPADES, 3), Card(Suit.SPADES, 4), Card(Suit.CLUBS, 5)))
+        hand.straightCheck()
+
+    }
+
+    private fun Hand.straightCheck() {
+        println("$hand + ${straight(this)}")
+        println("$hand + ${straight2(this)}")
+        println("-".repeat(50))
+    }
+
+    private fun straight2(hand: Hand): Boolean {
+        val h = hand.hand.sortedBy(Card::value)
+        for (i in 0 until h.size - 1) {
+            var value = h[i].value
+            if (value == 1) if (h[i + 1].value == 10) value = 9
+            if (value + 1 != h[i + 1].value) return false
+        }
+        return true
+    }
+
+    private fun straight(hand: Hand): Boolean {
+        val h = hand.hand.sortedBy(Card::value)
+        var count = 0
+        for (i in 0 until h.size - 1) {
+            var value = h[i].value
+            if (value == 1) {
+                if (h[i + 1].value == 2) value = 1
+                else if (h[i + 1].value == 10) value = 9
+            }
+            if (value + 1 == h[i + 1].value) count++
+        }
+        return count == 4
+    }
 }
 

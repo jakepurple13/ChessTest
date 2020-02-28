@@ -218,7 +218,7 @@ class VideoPokerActivity : AppCompatActivity() {
         fun debugListener(num: Int) = object : DebugListener {
             override fun wheelChange(t: Card?) {
                 hand.replaceCard(num, t!!)
-                current_hand.text = scores.getWinningHand(hand)
+                current_hand.text = scores.getWinningHand(hand).stringName
                 score_view.text = Html.fromHtml(scores.htmlValues(scores.getWinningHand(hand), betAmount), Html.FROM_HTML_MODE_COMPACT)
             }
 
@@ -230,7 +230,7 @@ class VideoPokerActivity : AppCompatActivity() {
         val debugListener2 = object : DebugListener {
             override fun wheelChange(t: Card?, num: Int) {
                 hand.replaceCard(num, t!!)
-                current_hand.text = scores.getWinningHand(hand)
+                current_hand.text = scores.getWinningHand(hand).stringName
                 score_view.text = Html.fromHtml(scores.htmlValues(scores.getWinningHand(hand), betAmount), Html.FROM_HTML_MODE_COMPACT)
             }
 
@@ -438,7 +438,7 @@ class VideoPokerActivity : AppCompatActivity() {
                             AnimationUtility.animateCard(cardsAndButtons[i]!!.cardView, cardsAndButtons[i]!!.card, this@VideoPokerActivity, end = object : AnimationUtility.AnimationEnd {
                                 override fun onAnimationEnd() {
                                     super.onAnimationEnd()
-                                    current_hand.text = scores.getWinningHand(hand)
+                                    current_hand.text = scores.getWinningHand(hand).stringName
                                     //score_view.text = Html.fromHtml(scores.htmlValuesWithMark(scores.getWinningHand(hand)), Html.FROM_HTML_MODE_COMPACT)
                                     score_view.text = Html.fromHtml(scores.htmlValues(scores.getWinningHand(hand), betAmount), Html.FROM_HTML_MODE_COMPACT)
                                 }
@@ -475,7 +475,7 @@ class VideoPokerActivity : AppCompatActivity() {
                 })
             }
         }*/
-        current_hand.text = scores.getWinningHand(hand)
+        current_hand.text = scores.getWinningHand(hand).stringName
         //score_view.text = Html.fromHtml(scores.htmlValuesWithMark(scores.getWinningHand(hand)), Html.FROM_HTML_MODE_COMPACT)
         score_view.text = Html.fromHtml(scores.htmlValues(scores.getWinningHand(hand), betAmount), Html.FROM_HTML_MODE_COMPACT)
 
