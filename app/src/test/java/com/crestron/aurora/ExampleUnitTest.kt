@@ -6,6 +6,7 @@ import android.os.Handler
 import com.crestron.aurora.boardgames.yahtzee.Dice
 import com.crestron.aurora.boardgames.yahtzee.YahtzeeScores
 import com.crestron.aurora.cardgames.videopoker.Scores
+import com.crestron.aurora.cardgames.videopoker.getWinningHand
 import com.crestron.aurora.showapi.*
 import com.crestron.aurora.utilities.KUtility
 import com.google.gson.Gson
@@ -195,7 +196,7 @@ class ExampleUnitTest {
                 .get()
                 .build()
         val response = client.newCall(request).execute()
-        val resString = response.body()!!.string()
+        val resString = response.body!!.string()
         prettyLog(resString)
         val jsonObj = JSONObject(resString)
         prettyLog(jsonObj.getString("Plot"))
@@ -209,8 +210,8 @@ class ExampleUnitTest {
                 .get()
                 .build()
         val response = client.newCall(request).execute()
-        if (response.code() == 200) {
-            val resString = response.body()!!.string()
+        if (response.code == 200) {
+            val resString = response.body!!.string()
             //retrieve(JSONObject(resString))
             retrieve(resString)
         } else {
@@ -319,7 +320,7 @@ class ExampleUnitTest {
         val resString = response.body()!!.string()
         prettyLog("Code: $code\n$resString\n$response")*/
         getApiCalls("https://restful-booker.herokuapp.com/booking/2&token=b788c7935947355", onError = {
-            prettyLog("Code is ${it.code()}\n$it")
+            prettyLog("Code is ${it.code}\n$it")
         }) {
             prettyLog(it)
         }
@@ -328,7 +329,7 @@ class ExampleUnitTest {
 
         //getApiCalls("https://api.musixmatch.com/ws/1.1/matcher.track.get?q_track=$songName&q_artist=Johnny Cash&apikey=67053f507ef88fc99c544f4d7052dfa8", onError = {
         getApiCalls("https://api.musixmatch.com/ws/1.1/matcher.track.get?q_track=starlight brigade&q_artist=twrp&apikey=67053f507ef88fc99c544f4d7052dfa8", onError = {
-            prettyLog("Code is ${it.code()}\n$it")
+            prettyLog("Code is ${it.code}\n$it")
         }) {
             prettyLog(it)
             val obj = Gson().fromJson(it, TrackInfo::class.java)

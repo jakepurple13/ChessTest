@@ -66,14 +66,14 @@ class TestUnitThree {
 
         println("Total time: $time")
 
-        val time2 = measureTime  {
+        val time2 = measureTime {
             val output = (1..100).map { it * 2 }
             println(output)
         }.inMilliseconds
 
         println("Total time2: $time2")
 
-        val time3 = measureTime  {
+        val time3 = measureTime {
             val output = (1..100).toList().parallelStream().map { it * 2 }.collect(Collectors.toList())
             println(output)
         }.inMilliseconds

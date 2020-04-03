@@ -498,8 +498,8 @@ fun getApiCalls(url: String, onError: (Response) -> Unit = {}, retrieve: (String
             .get()
             .build()
     val response = client.newCall(request).execute()
-    if (response.code() == 200) {
-        val resString = response.body()!!.string()
+    if (response.code == 200) {
+        val resString = response.body!!.string()
         retrieve(resString)
     } else {
         onError(response)
@@ -513,8 +513,8 @@ inline fun <reified T> getApiCalls(url: String, onError: (Response) -> Unit = {}
             .get()
             .build()
     val response = client.newCall(request).execute()
-    if (response.code() == 200) {
-        val resString = response.body()!!.string()
+    if (response.code == 200) {
+        val resString = response.body!!.string()
         val l = JSONObject(resString).getJSONObject("message").getJSONObject("body")
         val key = l.keys().next()
         val l2 = try {
@@ -536,8 +536,8 @@ inline fun <reified T> getApiListCalls(url: String, onError: (Response) -> Unit 
             .get()
             .build()
     val response = client.newCall(request).execute()
-    if (response.code() == 200) {
-        val resString = response.body()!!.string()
+    if (response.code == 200) {
+        val resString = response.body!!.string()
         val l = JSONObject(resString).getJSONObject("message").getJSONObject("body")
         //val l2 = l.getJSONArray(l.keys().next()).toString()
         val l2 = l.toString()

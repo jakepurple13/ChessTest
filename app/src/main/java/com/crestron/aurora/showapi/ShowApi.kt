@@ -203,7 +203,7 @@ class EpisodeApi(val source: ShowInfo, timeOut: Int = 10000) {
         ShowSource.PUTLOCKER -> try {
             val response = OkHttpClient()
                     .newCall(okhttp3.Request.Builder().url("http://www.omdbapi.com/?t=$name&plot=full&apikey=e91b86ee").get().build()).execute()
-            val jsonObj = JSONObject(response.body()!!.string())
+            val jsonObj = JSONObject(response.body!!.string())
             "Years Active: ${jsonObj.getString("Year")}\nReleased: ${jsonObj.getString("Released")}\n${jsonObj.getString("Plot")}"
         } catch (e: Exception) {
             var textToReturn = ""

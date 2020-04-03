@@ -277,7 +277,7 @@ inline fun <reified T> getJsonApi(url: String): T? {
             .get()
             .build()
     val response = client.newCall(request).execute()
-    return if (response.code() == 200) response.body()!!.string().fromJson<T>() else null
+    return if (response.code == 200) response.body!!.string().fromJson<T>() else null
 }
 
 data class DeviceInfo(val board: String = Build.BOARD,

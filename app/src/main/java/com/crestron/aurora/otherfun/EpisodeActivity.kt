@@ -43,7 +43,6 @@ import kotlinx.android.synthetic.main.activity_episode.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.defaultSharedPreferences
-import programmer.box.utilityhelper.UtilNotification
 import java.net.SocketTimeoutException
 import java.util.*
 
@@ -177,8 +176,8 @@ class EpisodeActivity : AppCompatActivity() {
 
         mNotificationManager = this@EpisodeActivity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        UtilNotification.createNotificationChannel(this@EpisodeActivity, ConstantValues.CHANNEL_NAME, ConstantValues.CHANNEL_DES, ConstantValues.CHANNEL_ID)
-        UtilNotification.createNotificationGroup(this@EpisodeActivity, ConstantValues.GROUP_ID, ConstantValues.GROUP_NAME)
+        //UtilNotification.createNotificationChannel(this@EpisodeActivity, ConstantValues.CHANNEL_NAME, ConstantValues.CHANNEL_DES, ConstantValues.CHANNEL_ID)
+        //UtilNotification.createNotificationGroup(this@EpisodeActivity, ConstantValues.GROUP_ID, ConstantValues.GROUP_NAME)
 
         handleIntent(intent)
 

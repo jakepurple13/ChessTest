@@ -8,7 +8,6 @@ import com.google.gson.Gson
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import org.jetbrains.anko.defaultSharedPreferences
-import programmer.box.utilityhelper.UtilNotification
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
@@ -39,8 +38,7 @@ class UpdateJob : Job() {
 
             Loged.i("version is ${version.toDouble()} and info is ${info.version}")
 
-            UtilNotification.sendNotification(this@UpdateJob.context, R.drawable.apk, "Checked!", "We did check",
-                    ConstantValues.CHANNEL_ID, ChoiceActivity::class.java, 90)
+            //UtilNotification.sendNotification(this@UpdateJob.context, R.drawable.apk, "Checked!", "We did check", ConstantValues.CHANNEL_ID, ChoiceActivity::class.java, 90)
 
             this@UpdateJob.context.defaultSharedPreferences.edit().putBoolean(ConstantValues.APP_UPDATE, version.toDouble() < info.version).apply()
         }

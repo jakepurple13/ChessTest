@@ -254,8 +254,8 @@ class TestUnitTwo {
                     .get()
                     .build()
             val response = client.newCall(request).execute()
-            if (response.code() == 200) {
-                val resString = response.body()!!.string()
+            if (response.code == 200) {
+                val resString = response.body!!.string()
                 retrieve(resString)
             } else {
                 onError(response)
@@ -269,8 +269,8 @@ class TestUnitTwo {
                     .get()
                     .build()
             val response = client.newCall(request).execute()
-            if (response.code() == 200) {
-                val resString = response.body()!!.string()
+            if (response.code == 200) {
+                val resString = response.body!!.string()
                 val l = JSONObject(resString).getJSONObject("message").getJSONObject("body")
                 val key = l.keys().next()
                 val l2 = try {
@@ -292,8 +292,8 @@ class TestUnitTwo {
                     .get()
                     .build()
             val response = client.newCall(request).execute()
-            if (response.code() == 200) {
-                val resString = response.body()!!.string()
+            if (response.code == 200) {
+                val resString = response.body!!.string()
                 val l = JSONObject(resString).getJSONObject("message").getJSONObject("body")
                 //val l2 = l.getJSONArray(l.keys().next()).toString()
                 val l2 = l.toString()
