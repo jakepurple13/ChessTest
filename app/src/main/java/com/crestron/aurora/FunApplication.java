@@ -123,8 +123,8 @@ public class FunApplication extends Application {
         Fetch.Impl.setDefaultInstanceConfiguration(fetchConfiguration);
 
         //episode update
-        //UtilNotification.createNotificationChannel(this, "episode_update","episode_update_info", "episodeUpdate");
-        //UtilNotification.createNotificationGroup(this, "episode_group_id", "episode_group");
+        UtilNotification.createNotificationChannel(this, "episode_update","episode_update_info", "episodeUpdate");
+        UtilNotification.createNotificationGroup(this, "episode_group_id", "episode_group");
         //show check update running
             /*UtilNotification.createNotificationChannel(this, "updateCheckRun",
                     "episode check update",
@@ -140,8 +140,8 @@ public class FunApplication extends Application {
             mNotificationManager.createNotificationChannel(channel);
         }
         //app update
-        //UtilNotification.createNotificationChannel(this, "update_notification", "update_notification", "update_notification");
-        //UtilNotification.createNotificationGroup(this, "update_notification_group", "update_notification_group");
+        UtilNotification.createNotificationChannel(this, "update_notification", "update_notification", "update_notification");
+        UtilNotification.createNotificationGroup(this, "update_notification_group", "update_notification_group");
         //float length = getSharedPreferences(ConstantValues.DEFAULT_APP_PREFS_NAME, MODE_PRIVATE).getFloat("updateCheck", 1f);
         //JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
         //if (jobScheduler != null && jobScheduler.getPendingJob(1) == null)
@@ -391,3 +391,4 @@ class HttpsUrlConnectionDownloader extends HttpUrlConnectionDownloader {
     }
 
 }
+

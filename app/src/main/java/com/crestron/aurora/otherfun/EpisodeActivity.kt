@@ -15,10 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.abdeveloper.library.MultiSelectDialog
 import com.abdeveloper.library.MultiSelectModel
-import com.crestron.aurora.ChoiceActivity
-import com.crestron.aurora.ConstantValues
-import com.crestron.aurora.Loged
-import com.crestron.aurora.R
+import com.crestron.aurora.*
 import com.crestron.aurora.db.Episode
 import com.crestron.aurora.db.Show
 import com.crestron.aurora.db.ShowDatabase
@@ -176,8 +173,8 @@ class EpisodeActivity : AppCompatActivity() {
 
         mNotificationManager = this@EpisodeActivity.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        //UtilNotification.createNotificationChannel(this@EpisodeActivity, ConstantValues.CHANNEL_NAME, ConstantValues.CHANNEL_DES, ConstantValues.CHANNEL_ID)
-        //UtilNotification.createNotificationGroup(this@EpisodeActivity, ConstantValues.GROUP_ID, ConstantValues.GROUP_NAME)
+        UtilNotification.createNotificationChannel(this@EpisodeActivity, ConstantValues.CHANNEL_NAME, ConstantValues.CHANNEL_DES, ConstantValues.CHANNEL_ID)
+        UtilNotification.createNotificationGroup(this@EpisodeActivity, ConstantValues.GROUP_ID, ConstantValues.GROUP_NAME)
 
         handleIntent(intent)
 
