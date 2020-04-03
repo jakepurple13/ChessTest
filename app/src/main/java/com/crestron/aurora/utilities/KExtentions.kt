@@ -172,7 +172,7 @@ inline fun <reified T> SharedPreferences.getCollection(key: String, defaultValue
 
 fun <T> Intent.putExtra(key: String, value: T): Intent = putExtra(key, Gson().toJson(value))
 
-inline fun <reified T> Intent.getObjectExtra(key: String, defaultValue: T): T = try {
+inline fun <reified T> Intent.getObjectExtra(key: String, defaultValue: T?): T? = try {
     Gson().fromJson(getStringExtra(key), T::class.java) ?: defaultValue
 } catch (e: Exception) {
     defaultValue

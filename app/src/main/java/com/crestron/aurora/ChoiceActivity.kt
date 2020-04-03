@@ -125,6 +125,7 @@ class ChoiceActivity : AppCompatActivity() {
         RECENT_CARTOON("recent_cartoon", "Recent Cartoon"),
         LIVE_ACTION("live_action", "TV Shows"),
         RECENT_LIVE_ACTION("recent_live_action", "Recent TV Shows"),
+        SUPER_RECENT_ANIME("super_recent_anime", "Super Recent Anime"),
         UPDATE_APP("update_app", "Update App"),
         VIEW_DOWNLOADS("view_downloads", "View Downloads"),
         VIEW_VIDEOS("view_videos", "View Videos"),
@@ -336,6 +337,7 @@ class ChoiceActivity : AppCompatActivity() {
                     ChoiceButton.RECENT_ANIME -> permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_ANIME.link)
                     ChoiceButton.RECENT_LIVE_ACTION -> permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_LIVE_ACTION.link)
                     ChoiceButton.RECENT_CARTOON -> permissionCheck(ShowListActivity::class.java, true, url = Source.RECENT_CARTOON.link)
+                    ChoiceButton.SUPER_RECENT_ANIME -> permissionCheck(SuperRecentAnimeActivity::class.java, true)
                     ChoiceButton.UPDATE_APP -> {
                         if (Utility.isNetwork(this@ChoiceActivity))
                             GlobalScope.launch {
@@ -519,6 +521,7 @@ class ChoiceActivity : AppCompatActivity() {
         modelList += MaterialItem(ChoiceButton.CHAT, "Enter a Chat Server", R.drawable.a_normal)
         //All video stuff here
         modelList += MaterialItem(ChoiceButton.RSS_FEED, "Look at upcoming Anime", android.R.drawable.ic_menu_today)
+        modelList += MaterialItem(ChoiceButton.SUPER_RECENT_ANIME, "View Super Recent Anime", R.drawable.recents)
         modelList += MaterialItem(ChoiceButton.RECENT_ANIME, "View Recent Anime", R.drawable.recents)
         modelList += MaterialItem(ChoiceButton.ANIME, "View Anime", R.drawable.ten2)
         modelList += MaterialItem(ChoiceButton.ANIME_MOVIES, "View Anime Movies", R.drawable.mov)

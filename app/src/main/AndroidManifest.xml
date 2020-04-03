@@ -13,6 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="LockedOrientationActivity">
+        <activity android:name=".otherfun.SuperRecentAnimeEpisodeActivity"></activity>
+        <activity android:name=".otherfun.SuperRecentAnimeActivity" />
         <activity android:name=".server.MusicQuizActivity" />
         <activity android:name=".server.ShowQuizActivity" />
         <activity android:name=".server.TestQuizActivity" />
@@ -72,7 +74,6 @@
         <activity android:name=".otherfun.AniDownloadActivity" />
         <activity
             android:name=".otherfun.EpisodeActivity"
-
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent">
             <intent-filter>
@@ -198,7 +199,6 @@
         </activity>
         <activity
             android:name=".otherfun.ShowListActivity"
-
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent" />
         <activity
@@ -206,7 +206,6 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".otherfun.DownloadViewerActivity"
-
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent" />
         <activity
@@ -228,12 +227,10 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".otherfun.FavoriteShowsActivity"
-
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent" />
         <activity
             android:name=".otherfun.RssActivity"
-
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent" />
         <activity
@@ -247,12 +244,10 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".otherfun.ViewVideosActivity"
-
             android:screenOrientation="portrait" />
         <activity
             android:name=".otherfun.VideoPlayerActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-
             android:resizeableActivity="true"
             android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true" />
@@ -429,7 +424,6 @@
                 android:value="true" />
         </service>
     </application>
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -442,6 +436,7 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.INSTALL_SHORTCUT" />
+
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
 </manifest>
