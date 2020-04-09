@@ -121,6 +121,46 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
         fetch.enqueue(requestList, Func {})
     }
 
+    private fun fetchIt(ep: EpisodeInfo, networkType: NetworkType = NetworkType.ALL, recent: Boolean, keyAndValue: Array<out EpisodeActivity.KeyAndValue>) {
+
+        fetch.setGlobalNetworkType(networkType)
+
+        fun getNameFromUrl(url: String): String {
+            return Uri.parse(url).lastPathSegment?.let { if (it.isNotEmpty()) it else ep.name } ?: ep.name
+        }
+
+        val requestList = arrayListOf<Request>()
+        val url = ep.getVideoLinks()
+        for (i in url) {
+
+            val filePath = folderLocation + getNameFromUrl(i) + ".mp4"
+            Loged.wtf("${File(filePath).exists()}")
+            val request = Request(i, filePath)
+            request.priority = Priority.HIGH
+            request.networkType = networkType
+            //request.enqueueAction = EnqueueAction.DO_NOT_ENQUEUE_IF_EXISTING
+            //request.addHeader("clientKey", "SD78DF93_3947&MVNGHE1WONG")
+
+            for (keyValue in keyAndValue) {
+                request.extras.map.toProperties()[keyValue.key] = keyValue.value
+            }
+
+            request.addHeader("Accept-Language", "en-US,en;q=0.5")
+            request.addHeader("User-Agent", "\"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0\"")
+            request.addHeader("Accept", "text/html,video/mp4,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            request.addHeader("Access-Control-Allow-Origin", "*")
+            request.addHeader("Connection", "keep-alive")
+            request.addHeader("Referer", "http://thewebsite.com")
+
+            requestList.add(request)
+
+        }
+
+        //fetch.addListener(fetchAction)
+
+        fetch.enqueue(requestList, Func {})
+    }
+
     fun cancelAll() {
         fetch.cancelAll()
     }
@@ -151,6 +191,10 @@ class FetchingUtils(val context: Context, private var fetchAction: FetchAction =
 
     fun getVideo(urlToUse: EpisodeInfo, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.launch {
         fetchIt(urlToUse, networkType, keyAndValue)
+    }
+
+    fun getVideo(urlToUse: EpisodeInfo, recent: Boolean, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.launch {
+        fetchIt(urlToUse, networkType, recent, keyAndValue)
     }
 
     fun getVideo(urlToUse: Collection<EpisodeInfo>, networkType: NetworkType = NetworkType.ALL, vararg keyAndValue: EpisodeActivity.KeyAndValue) = GlobalScope.launch {

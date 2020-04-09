@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.crestron.aurora.*
+import com.crestron.aurora.showapi.EpisodeInfo
 import com.crestron.aurora.utilities.getObjectExtra
 import com.crestron.aurora.views.DownloadsWidget
 import com.ncorti.slidetoact.SlideToActView
@@ -22,10 +23,12 @@ import com.programmersbox.flowutils.clicks
 import com.programmersbox.flowutils.collectOnUi
 import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2.Error
+import com.tonyodev.fetch2.NetworkType
 import com.tonyodev.fetch2core.DownloadBlock
 import kotlinx.android.synthetic.main.activity_super_recent_anime_episode.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.defaultSharedPreferences
+
 
 class SuperRecentAnimeEpisodeActivity : AppCompatActivity() {
 
@@ -176,12 +179,11 @@ class SuperRecentAnimeEpisodeActivity : AppCompatActivity() {
                     //action here
                     GlobalScope.launch {
                         runOnUiThread { Toast.makeText(this@SuperRecentAnimeEpisodeActivity, "Downloading...", Toast.LENGTH_SHORT).show() }
-                        val mediaUrl = withContext(Dispatchers.Default) { api.parseMediaUrl(item) }
-                        withContext(Dispatchers.Default) { api.parseM3U8Url("https:${mediaUrl.vidcdnUrl}") }?.let {
-                            Loged.f(it)
-                            //fetching.getVideo(EpisodeInfo(item.episodeNumber, it), if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL)
+                        withContext(Dispatchers.Default) {
+                            api.fetchAnimeVideoInfo(api.parseMediaUrl(item)).firstOrNull()?.let {
+                                fetching.getVideo(EpisodeInfo(it.fileName, it.fileUrl), true, if (reverse_order.isChecked) NetworkType.WIFI_ONLY else NetworkType.ALL)
+                            }
                         }
-                        //animeInfo?.toJson()?.let { SuperRecentAnimeEpisodeActivity.KeyAndValue(ConstantValues.URL_INTENT, it) })
                         delay(500)
                         runOnUiThread { view.resetSlider() }
                     }

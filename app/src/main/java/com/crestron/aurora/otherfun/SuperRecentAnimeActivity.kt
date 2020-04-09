@@ -197,30 +197,42 @@ class AnimeShowApi {
     data class EpisodeInfoModel(
             var vidcdnUrl: String? = null,
             var nextEpisodeUrl: String? = null,
-            var previousEpisodeUrl: String? = null
+            var previousEpisodeUrl: String? = null,
+            var downloadUrl: String? = null
     )
 
     fun parseMediaUrl(model: EpisodeModel): EpisodeInfoModel {
         val mediaUrl: String?
         val document = Jsoup.connect("$baseUrl${model.episodeurl}").get()
-        val info = document.getElementsByClass("vidcdn").first().select("a")
+        val info = document.getElementsByClass("anime").first().select("a")
         mediaUrl = info.attr("data-video").toString()
         val nextEpisodeUrl = document.getElementsByClass("anime_video_body_episodes_r")?.select("a")?.first()?.attr("href")
         val previousEpisodeUrl = document.getElementsByClass("anime_video_body_episodes_l")?.select("a")?.first()?.attr("href")
-
+        val downloadEpisodeUrl = document.select("a:has(span.btndownload)")?.attr("abs:href")
         return EpisodeInfoModel(
                 nextEpisodeUrl = nextEpisodeUrl,
                 previousEpisodeUrl = previousEpisodeUrl,
-                vidcdnUrl = mediaUrl
+                vidcdnUrl = mediaUrl,
+                downloadUrl = downloadEpisodeUrl
         )
     }
 
-    fun parseM3U8Url(response: String): String? {
+    private val USER_AGENT = "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
+    private val ORIGIN = "origin: https://www16.gogoanime.io"
+    private val REFERER = "referer: https://www16.gogoanime.io/"
+
+    fun parseM3U8Url(response: EpisodeInfoModel): String? {
         var m3u8Url: String? = null
-        val document = Jsoup.connect(response).get()
+        val document = Jsoup.connect("https:${response.vidcdnUrl}")
+                .referrer("https://www16.gogoanime.io/")
+                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36")
+                .headers(mutableMapOf("Origin" to "https://vidstreaming.io"))
+                .get()
+        println(document)
         val info = document.getElementsByClass("videocontent")
+        println(info)
         val pattern = Pattern.compile("(http|https)://([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?")
-        val matcher = pattern.matcher(info.toString())
+        val matcher = pattern.matcher(info.html())
         return try {
             while (matcher.find()) {
                 if (matcher.group(0)!!.contains("m3u8")) {
@@ -258,6 +270,20 @@ class AnimeShowApi {
             )
         }
         return episodeList
+    }
+
+    data class AnimeShowVideoInfo(val fileName: String, val size: String, val duration: String, val fileUrl: String)
+
+    fun fetchAnimeVideoInfo(episodeModel: EpisodeInfoModel): List<AnimeShowVideoInfo> {
+        val f = Jsoup.connect(episodeModel.downloadUrl).get()
+        return f.select("div.dowload").select("a").map {
+            AnimeShowVideoInfo(
+                    fileName = f.select("span#title").text(),
+                    size = f.select("span#filesize").text(),
+                    duration = f.select("span#duration").first().text(),
+                    fileUrl = it.attr("abs:href")
+            )
+        }
     }
 
     private fun getCategoryUrl(url: String): String {
