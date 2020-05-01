@@ -8,8 +8,10 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/superRecentAnimeRV"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+        app:spanCount="3"
         android:orientation="vertical"
+        tools:listitem="@layout/super_recent_item"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

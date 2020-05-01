@@ -10,9 +10,11 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.TransitionManager
 import com.abdeveloper.library.MultiSelectDialog
 import com.abdeveloper.library.MultiSelectModel
 import com.crestron.aurora.*
@@ -188,6 +190,19 @@ class EpisodeActivity : AppCompatActivity() {
                     fav_episode.isLiked = show.showDao().isUrlInDatabase(url) > 0 || FirebaseDB(this@EpisodeActivity).getShowSync(url) != null
                 }
             }
+        }
+
+        val constraintSet1 = ConstraintSet()
+        constraintSet1.clone(episodeLayout)
+        val constraintSet2 = ConstraintSet()
+        constraintSet2.clone(this, R.layout.activity_episode_alt)
+
+        var change = false
+        view_info.setOnClickListener {
+            TransitionManager.beginDelayedTransition(episodeLayout)
+            (if (change) constraintSet1 else constraintSet2).applyTo(episodeLayout)
+            change = !change
+            view_info.text = "${if(!change) "View" else "Hide"} Info"
         }
 
         episode_list.layoutManager = LinearLayoutManager(this)

@@ -21,9 +21,11 @@ enum class Source(val link: String, val recent: Boolean = false, var movie: Bool
     ANIME("https://www.gogoanime1.com/home/anime-list"),
     CARTOON("http://www.animetoon.org/cartoon"),
     DUBBED("http://www.animetoon.org/dubbed-anime"),
+
     //ANIME_MOVIES("http://www.animeplus.tv/anime-movies"),
     ANIME_MOVIES("https://www.gogoanime1.com/home/anime-list", movie = true),
     CARTOON_MOVIES("http://www.animetoon.org/movies", movie = true),
+
     //RECENT_ANIME("http://www.animeplus.tv/anime-updates", true),
     RECENT_ANIME("https://www.gogoanime1.com/home/latest-episodes", true),
     RECENT_CARTOON("http://www.animetoon.org/updates", true),
@@ -82,6 +84,7 @@ class ShowApi(private val source: Source) {
     private var progressListener: (Double) -> Unit = {}
 
     private val doc: Document = Jsoup.connect(source.link).get()
+
     /**
      * returns a list of the show's from the wanted source
      */

@@ -1,27 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_margin="5dp"
+app:cardCornerRadius="5dp">
+
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:padding="5dp">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/animeImage"
         android:layout_width="360px"
         android:layout_height="480px"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/b1fv" />
+        app:layout_constraintEnd_toEndOf="@id/animeTitle"
+        app:layout_constraintStart_toStartOf="@id/animeTitle"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/animeTitle"
+        style="@style/ColorText.Digit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="5dp"
-        app:layout_constraintBottom_toBottomOf="@id/animeImage"
-        app:layout_constraintStart_toEndOf="@id/animeImage"
-        app:layout_constraintTop_toTopOf="@id/animeImage"
-        tools:text="Hello World" />
+        android:textSize="25sp"
+        tools:src="@drawable/b1fv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/animeImage"
+        tools:text="Mushi-shi" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

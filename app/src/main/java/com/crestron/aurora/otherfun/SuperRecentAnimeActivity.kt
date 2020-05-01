@@ -7,17 +7,20 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.crestron.aurora.R
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.programmerbox.dragswipe.DragSwipeAdapter
 import com.programmerbox.dragswipeex.plusAssign
-import com.programmersbox.flowutils.RecyclerViewScroll
 import com.programmersbox.flowutils.clicks
 import com.programmersbox.flowutils.collectOnUi
-import com.programmersbox.flowutils.scrollReached
 import com.programmersbox.gsonutils.putExtra
+import com.programmersbox.loggingutils.Loged
+import com.programmersbox.loggingutils.f
 import kotlinx.android.synthetic.main.activity_super_recent_anime.*
 import kotlinx.android.synthetic.main.super_recent_item.view.*
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +36,22 @@ class SuperRecentAnimeActivity : AppCompatActivity() {
     private var pageNumber = 1
     private val api = AnimeShowApi()
     private lateinit var hud: KProgressHUD
+    private val scroll by lazy {
+        object : EndlessScrollingListener(superRecentAnimeRV.layoutManager!!) {
+            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
+                Loged.f("Loading more")
+                //loadNewInfo(++pageNumber)
+                loadNewAnime()
+            }
+        }
+    }
+
+    private fun loadNewInfo(pageNumber: Int) {
+        GlobalScope.launch {
+            val info = AnimeShowApi().parseRecentSubOrDub(pageNumber)
+            runOnUiThread { adapter.addItems(info) }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,11 +66,12 @@ class SuperRecentAnimeActivity : AppCompatActivity() {
                 .setCancellable(false)
 
         superRecentAnimeRV.adapter = adapter
-        superRecentAnimeRV
+        /*superRecentAnimeRV
                 .scrollReached()
                 .collectOnUi {
                     if (it == RecyclerViewScroll.END) loadNewAnime()
-                }
+                }*/
+        superRecentAnimeRV.addOnScrollListener(scroll)
 
         loadNewAnime()
     }
@@ -85,11 +105,7 @@ class SuperRecentAnimeActivity : AppCompatActivity() {
             holder.title.text = item.title
             holder.itemView
                     .clicks()
-                    .collectOnUi {
-                        startActivity(Intent(this@SuperRecentAnimeActivity, SuperRecentAnimeEpisodeActivity::class.java).apply {
-                            putExtra("animeInfo", item)
-                        })
-                    }
+                    .collectOnUi { startActivity(Intent(this@SuperRecentAnimeActivity, SuperRecentAnimeEpisodeActivity::class.java).apply { putExtra("animeInfo", item) }) }
         }
 
     }
@@ -293,4 +309,122 @@ class AnimeShowApi {
     }
 
     private fun formatInfoValues(infoValue: String): String = infoValue.substring(infoValue.indexOf(':') + 1, infoValue.length)
+}
+
+abstract class EndlessScrollingListener : RecyclerView.OnScrollListener {
+    // The minimum amount of items to have below your current scroll position
+    // before loading more.
+    private var visibleThreshold = 5
+
+    // The current offset index of data you have loaded
+    private var currentPage = 0
+
+    // The total number of items in the dataset after the last load
+    private var previousTotalItemCount = 0
+
+    // True if we are still waiting for the last set of data to load.
+    private var loading = true
+
+    // Sets the starting page index
+    private val startingPageIndex = 0
+    var mLayoutManager: RecyclerView.LayoutManager
+
+    constructor(layoutManager: LinearLayoutManager) {
+        mLayoutManager = layoutManager
+    }
+
+    //    public EndlessRecyclerViewScrollListener() {
+    //        this.mLayoutManager = layoutManager;
+    //        visibleThreshold = visibleThreshold * layoutManager.getSpanCount();
+    //    }
+    constructor(layoutManager: StaggeredGridLayoutManager) {
+        mLayoutManager = layoutManager
+        visibleThreshold *= layoutManager.spanCount
+    }
+
+    constructor(layoutManager: RecyclerView.LayoutManager) {
+        mLayoutManager = layoutManager
+        if(layoutManager is StaggeredGridLayoutManager) visibleThreshold *= layoutManager.spanCount
+    }
+
+    fun getLastVisibleItem(lastVisibleItemPositions: IntArray): Int {
+        var maxSize = 0
+        for (i in lastVisibleItemPositions.indices) {
+            if (i == 0) {
+                maxSize = lastVisibleItemPositions[i]
+            } else if (lastVisibleItemPositions[i] > maxSize) {
+                maxSize = lastVisibleItemPositions[i]
+            }
+        }
+        return maxSize
+    }
+
+    // This happens many times a second during a scroll, so be wary of the code you place here.
+    // We are given a few useful parameters to help us work out if we need to load some more data,
+    // but first we check if we are waiting for the previous load to finish.
+    override fun onScrolled(view: RecyclerView, dx: Int, dy: Int) {
+        var lastVisibleItemPosition = 0
+        val totalItemCount = mLayoutManager.itemCount
+        when (mLayoutManager) {
+            is StaggeredGridLayoutManager -> {
+                val lastVisibleItemPositions = (mLayoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(null)
+                // get maximum element within the list
+                lastVisibleItemPosition = getLastVisibleItem(lastVisibleItemPositions)
+            }
+            is GridLayoutManager -> {
+                lastVisibleItemPosition = (mLayoutManager as GridLayoutManager).findLastVisibleItemPosition()
+            }
+            is LinearLayoutManager -> {
+                lastVisibleItemPosition = (mLayoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+            }
+
+            // If the total item count is zero and the previous isn't, assume the
+            // list is invalidated and should be reset back to initial state
+            // If it’s still loading, we check to see if the dataset count has
+            // changed, if so we conclude it has finished loading and update the current page
+            // number and total item count.
+
+            // If it isn’t currently loading, we check to see if we have breached
+            // the visibleThreshold and need to reload more data.
+            // If we do need to reload some more data, we execute onLoadMore to fetch the data.
+            // threshold should reflect how many total columns there are too
+        }
+
+        // If the total item count is zero and the previous isn't, assume the
+        // list is invalidated and should be reset back to initial state
+        if (totalItemCount < previousTotalItemCount) {
+            currentPage = startingPageIndex
+            previousTotalItemCount = totalItemCount
+            if (totalItemCount == 0) {
+                loading = true
+            }
+        }
+        // If it’s still loading, we check to see if the dataset count has
+        // changed, if so we conclude it has finished loading and update the current page
+        // number and total item count.
+        if (loading && totalItemCount > previousTotalItemCount) {
+            loading = false
+            previousTotalItemCount = totalItemCount
+        }
+
+        // If it isn’t currently loading, we check to see if we have breached
+        // the visibleThreshold and need to reload more data.
+        // If we do need to reload some more data, we execute onLoadMore to fetch the data.
+        // threshold should reflect how many total columns there are too
+        if (!loading && lastVisibleItemPosition + visibleThreshold > totalItemCount) {
+            currentPage++
+            onLoadMore(currentPage, totalItemCount, view)
+            loading = true
+        }
+    }
+
+    // Call this method whenever performing new searches
+    fun resetState() {
+        currentPage = startingPageIndex
+        previousTotalItemCount = 0
+        loading = true
+    }
+
+    // Defines the process for actually loading more data based on page
+    abstract fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?)
 }

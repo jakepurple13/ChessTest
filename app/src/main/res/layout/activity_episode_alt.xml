@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/cod_gray"
     android:clipChildren="true"
-    android:id="@+id/episodeLayout"
     tools:context=".otherfun.EpisodeActivity"
     tools:ignore="HardcodedText">
 
@@ -17,6 +16,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/progressBar2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -95,8 +95,7 @@
         android:weightSum="3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/episode_refresh">
+        app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/batch_downloaded"
@@ -138,6 +137,7 @@
         android:layout_alignParentStart="true"
         android:layout_below="@id/info_layout"
         android:layout_centerVertical="true"
+        app:layout_constraintBottom_toTopOf="@id/option_layout"
         app:layout_constraintTop_toBottomOf="@id/info_layout" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -146,6 +146,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="5dp"
         android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/buttonLayout"
         app:layout_constraintTop_toBottomOf="@id/progressBar2">
 
         <Button
@@ -194,6 +195,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:visibility="gone"
         android:id="@+id/episode_refresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
