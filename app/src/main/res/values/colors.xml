@@ -37,6 +37,7 @@
     <color name="charcoal">#40423F</color>
     <color name="cod_gray">#2D2F31</color>
     <color name="material_blue">#00b1ea</color>
+    <color name="white">#ffffff</color>
 
     <!-- OVERWRITE THESE COLORS FOR A LIGHT THEME -->
     <!-- MaterialDrawer DEFAULT colors -->

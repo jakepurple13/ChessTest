@@ -4,16 +4,13 @@ import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.Rect
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionManager
 import com.abdeveloper.library.MultiSelectDialog
 import com.abdeveloper.library.MultiSelectModel
@@ -33,6 +30,7 @@ import com.google.gson.Gson
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.like.LikeButton
 import com.like.OnLikeListener
+import com.programmersbox.helpfulutils.ItemRange
 import com.squareup.picasso.Picasso
 import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2.Error
@@ -192,32 +190,23 @@ class EpisodeActivity : AppCompatActivity() {
             }
         }
 
-        val constraintSet1 = ConstraintSet()
-        constraintSet1.clone(episodeLayout)
-        val constraintSet2 = ConstraintSet()
-        constraintSet2.clone(this, R.layout.activity_episode_alt)
+        var constraintRange = ItemRange(
+                ConstraintSet().apply { clone(episodeLayout) },
+                ConstraintSet().apply { clone(this@EpisodeActivity, R.layout.activity_episode_alt) }
+        )
 
         var change = false
         view_info.setOnClickListener {
+            constraintRange++
             TransitionManager.beginDelayedTransition(episodeLayout)
-            (if (change) constraintSet1 else constraintSet2).applyTo(episodeLayout)
+            constraintRange.item.applyTo(episodeLayout)
             change = !change
-            view_info.text = "${if(!change) "View" else "Hide"} Info"
-        }
-
-        episode_list.layoutManager = LinearLayoutManager(this)
-        class ItemOffsetDecoration(private val mItemOffset: Int) : RecyclerView.ItemDecoration() {
-            override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView,
-                                        state: RecyclerView.State) {
-                super.getItemOffsets(outRect, view, parent, state)
-                outRect.set(mItemOffset, mItemOffset, mItemOffset, mItemOffset)
-            }
+            view_info.text = "${if (!change) "View" else "Hide"} Info"
         }
 
         episode_list.layoutManager = LinearLayoutManager(this)
         val dividerItemDecoration = DividerItemDecoration(episode_list.context, (episode_list.layoutManager as LinearLayoutManager).orientation)
         episode_list.addItemDecoration(dividerItemDecoration)
-        episode_list.addItemDecoration(ItemOffsetDecoration(20))
 
         fun getList() = GlobalScope.launch {
             runOnUiThread {

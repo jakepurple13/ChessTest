@@ -1,56 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_vertical"
-    android:orientation="horizontal"
-    android:weightSum="2"
-    tools:ignore="HardcodedText">
+    android:layout_margin="5dp"
+    app:cardCornerRadius="5dp">
 
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/watched_button"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:text="Episode Name"
-        app:useMaterialThemeColors="true" />
-
-    <Button
-        android:id="@+id/download_episode"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:text="Download"
-        android:visibility="gone" />
-
-    <!--<com.agik.AGIKSwipeButton.View.Swipe_Button_View
-        android:id="@+id/okay_to_download"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="visible"
-        app:sb_swipe_animate_text="true"
-        app:sb_swipe_bg_color="@color/emeraldGreen"
-        android:layout_weight="1"
-        app:sb_swipe_text="Download"
-        app:sb_thumb_bg_color="@color/emeraldGreen">
+        android:layout_gravity="center_vertical"
+        android:layout_margin="5dp"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        tools:ignore="HardcodedText">
 
-    </com.agik.AGIKSwipeButton.View.Swipe_Button_View>-->
+        <Button
+            android:id="@+id/download_episode"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Download"
+            android:visibility="gone" />
 
-    <com.ncorti.slidetoact.SlideToActView
-        android:id="@+id/okay_to_download"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:visibility="visible"
-        app:animate_completion="true"
-        app:area_margin="10dp"
-        app:outer_color="@color/emeraldGreen"
-        app:slider_icon_color="@color/emeraldGreen"
-        app:text="Download" />
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/watched_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="Episode Name"
+            app:useMaterialThemeColors="true" />
 
-</LinearLayout>
+        <com.ncorti.slidetoact.SlideToActView
+            android:id="@+id/okay_to_download"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:visibility="visible"
+            app:animate_completion="true"
+            app:area_margin="10dp"
+            app:outer_color="@color/emeraldGreen"
+            app:slider_icon_color="@color/emeraldGreen"
+            app:text="Download" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
 
     <!--
     <?xml version="1.0" encoding="utf-8"?>

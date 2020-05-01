@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="LockedOrientationActivity">
-        <activity android:name=".otherfun.SuperRecentAnimeEpisodeActivity"></activity>
+        <activity android:name=".otherfun.SuperRecentAnimeEpisodeActivity" />
         <activity android:name=".otherfun.SuperRecentAnimeActivity" />
         <activity android:name=".server.MusicQuizActivity" />
         <activity android:name=".server.ShowQuizActivity" />
@@ -74,8 +74,7 @@
         <activity android:name=".otherfun.AniDownloadActivity" />
         <activity
             android:name=".otherfun.EpisodeActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Transparent">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
